@@ -2,13 +2,14 @@ package messaging
 
 import (
 	"encoding/json"
-	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
-	"github.com/sirupsen/logrus"
 	"golang-clean-architecture/internal/model"
+
+	"github.com/IBM/sarama"
+	"github.com/sirupsen/logrus"
 )
 
 type Producer[T model.Event] struct {
-	Producer *kafka.Producer
+	Producer sarama.SyncProducer
 	Topic    string
 	Log      *logrus.Logger
 }
@@ -24,20 +25,18 @@ func (p *Producer[T]) Send(event T) error {
 		return err
 	}
 
-	message := &kafka.Message{
-		TopicPartition: kafka.TopicPartition{
-			Topic:     p.GetTopic(),
-			Partition: kafka.PartitionAny,
-		},
-		Value: value,
-		Key:   []byte(event.GetId()),
+	message := &sarama.ProducerMessage{
+		Topic: p.Topic,
+		Key:   sarama.StringEncoder(event.GetId()),
+		Value: sarama.ByteEncoder(value),
 	}
 
-	err = p.Producer.Produce(message, nil)
+	partition, offset, err := p.Producer.SendMessage(message)
 	if err != nil {
 		p.Log.WithError(err).Error("failed to produce message")
 		return err
 	}
 
+	p.Log.Debugf("Message sent to topic %s, partition %d, offset %d", p.Topic, partition, offset)
 	return nil
 }

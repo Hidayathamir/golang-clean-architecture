@@ -2,14 +2,15 @@ package main
 
 import (
 	"context"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"golang-clean-architecture/internal/config"
 	"golang-clean-architecture/internal/delivery/messaging"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 func main() {
@@ -41,21 +42,21 @@ func main() {
 
 func RunAddressConsumer(logger *logrus.Logger, viperConfig *viper.Viper, ctx context.Context) {
 	logger.Info("setup address consumer")
-	addressConsumer := config.NewKafkaConsumer(viperConfig, logger)
+	addressConsumerGroup := config.NewKafkaConsumerGroup(viperConfig, logger)
 	addressHandler := messaging.NewAddressConsumer(logger)
-	messaging.ConsumeTopic(ctx, addressConsumer, "addresses", logger, addressHandler.Consume)
+	messaging.ConsumeTopic(ctx, addressConsumerGroup, "addresses", logger, addressHandler.Consume)
 }
 
 func RunContactConsumer(logger *logrus.Logger, viperConfig *viper.Viper, ctx context.Context) {
 	logger.Info("setup contact consumer")
-	contactConsumer := config.NewKafkaConsumer(viperConfig, logger)
+	contactConsumerGroup := config.NewKafkaConsumerGroup(viperConfig, logger)
 	contactHandler := messaging.NewContactConsumer(logger)
-	messaging.ConsumeTopic(ctx, contactConsumer, "contacts", logger, contactHandler.Consume)
+	messaging.ConsumeTopic(ctx, contactConsumerGroup, "contacts", logger, contactHandler.Consume)
 }
 
 func RunUserConsumer(logger *logrus.Logger, viperConfig *viper.Viper, ctx context.Context) {
 	logger.Info("setup user consumer")
-	userConsumer := config.NewKafkaConsumer(viperConfig, logger)
+	userConsumerGroup := config.NewKafkaConsumerGroup(viperConfig, logger)
 	userHandler := messaging.NewUserConsumer(logger)
-	messaging.ConsumeTopic(ctx, userConsumer, "users", logger, userHandler.Consume)
+	messaging.ConsumeTopic(ctx, userConsumerGroup, "users", logger, userHandler.Consume)
 }

@@ -2,46 +2,75 @@ package messaging
 
 import (
 	"context"
-	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
+
+	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
-type ConsumerHandler func(message *kafka.Message) error
+type ConsumerHandler func(message *sarama.ConsumerMessage) error
 
-func ConsumeTopic(ctx context.Context, consumer *kafka.Consumer, topic string, log *logrus.Logger, handler ConsumerHandler) {
-	err := consumer.Subscribe(topic, nil)
-	if err != nil {
-		log.Fatalf("Failed to subscribe to topic: %v", err)
-	}
+type ConsumerGroupHandler struct {
+	Handler ConsumerHandler
+	Log     *logrus.Logger
+}
 
-	run := true
+func (h *ConsumerGroupHandler) Setup(sarama.ConsumerGroupSession) error {
+	return nil
+}
 
-	for run {
+func (h *ConsumerGroupHandler) Cleanup(sarama.ConsumerGroupSession) error {
+	return nil
+}
+
+func (h *ConsumerGroupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
+	for {
 		select {
-		case <-ctx.Done():
-			run = false
-		default:
-			message, err := consumer.ReadMessage(time.Second)
-			if err == nil {
-				err := handler(message)
-				if err != nil {
-					log.Errorf("Failed to process message: %v", err)
-				} else {
-					_, err = consumer.CommitMessage(message)
-					if err != nil {
-						log.Fatalf("Failed to commit message: %v", err)
-					}
-				}
-			} else if !err.(kafka.Error).IsTimeout() {
-				log.Warnf("Consumer error: %v (%v)\n", err, message)
+		case message := <-claim.Messages():
+			if message == nil {
+				return nil
 			}
+
+			err := h.Handler(message)
+			if err != nil {
+				h.Log.WithError(err).Error("Failed to process message")
+			} else {
+				session.MarkMessage(message, "")
+			}
+
+		case <-session.Context().Done():
+			return nil
 		}
 	}
+}
 
-	log.Infof("Closing consumer for topic : %s", topic)
-	err = consumer.Close()
-	if err != nil {
-		panic(err)
+func ConsumeTopic(ctx context.Context, consumerGroup sarama.ConsumerGroup, topic string, log *logrus.Logger, handler ConsumerHandler) {
+	consumerHandler := &ConsumerGroupHandler{
+		Handler: handler,
+		Log:     log,
+	}
+
+	go func() {
+		for {
+			if err := consumerGroup.Consume(ctx, []string{topic}, consumerHandler); err != nil {
+				log.WithError(err).Error("Error from consumer")
+			}
+
+			if ctx.Err() != nil {
+				log.Info("Context cancelled, stopping consumer")
+				return
+			}
+		}
+	}()
+
+	go func() {
+		for err := range consumerGroup.Errors() {
+			log.WithError(err).Error("Consumer group error")
+		}
+	}()
+
+	<-ctx.Done()
+	log.Infof("Closing consumer group for topic: %s", topic)
+	if err := consumerGroup.Close(); err != nil {
+		log.WithError(err).Error("Error closing consumer group")
 	}
 }

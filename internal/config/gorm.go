@@ -2,12 +2,13 @@ package config
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"time"
 )
 
 func NewDatabase(viper *viper.Viper, log *logrus.Logger) *gorm.DB {

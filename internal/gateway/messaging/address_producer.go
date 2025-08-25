@@ -1,16 +1,17 @@
 package messaging
 
 import (
-	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
-	"github.com/sirupsen/logrus"
 	"golang-clean-architecture/internal/model"
+
+	"github.com/IBM/sarama"
+	"github.com/sirupsen/logrus"
 )
 
 type AddressProducer struct {
 	Producer[*model.AddressEvent]
 }
 
-func NewAddressProducer(producer *kafka.Producer, log *logrus.Logger) *AddressProducer {
+func NewAddressProducer(producer sarama.SyncProducer, log *logrus.Logger) *AddressProducer {
 	return &AddressProducer{
 		Producer: Producer[*model.AddressEvent]{
 			Producer: producer,

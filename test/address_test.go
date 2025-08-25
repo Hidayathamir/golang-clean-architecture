@@ -2,13 +2,14 @@ package test
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
 	"golang-clean-architecture/internal/model"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateAddress(t *testing.T) {

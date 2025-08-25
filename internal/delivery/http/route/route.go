@@ -1,8 +1,9 @@
 package route
 
 import (
-	"github.com/gofiber/fiber/v2"
 	"golang-clean-architecture/internal/delivery/http"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type RouteConfig struct {

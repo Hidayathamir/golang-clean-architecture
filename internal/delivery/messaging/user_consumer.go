@@ -2,9 +2,10 @@ package messaging
 
 import (
 	"encoding/json"
-	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
-	"github.com/sirupsen/logrus"
 	"golang-clean-architecture/internal/model"
+
+	"github.com/IBM/sarama"
+	"github.com/sirupsen/logrus"
 )
 
 type UserConsumer struct {
@@ -17,7 +18,7 @@ func NewUserConsumer(log *logrus.Logger) *UserConsumer {
 	}
 }
 
-func (c UserConsumer) Consume(message *kafka.Message) error {
+func (c UserConsumer) Consume(message *sarama.ConsumerMessage) error {
 	UserEvent := new(model.UserEvent)
 	if err := json.Unmarshal(message.Value, UserEvent); err != nil {
 		c.Log.WithError(err).Error("error unmarshalling User event")
@@ -25,6 +26,6 @@ func (c UserConsumer) Consume(message *kafka.Message) error {
 	}
 
 	// TODO process event
-	c.Log.Infof("Received topic users with event: %v from partition %d", UserEvent, message.TopicPartition.Partition)
+	c.Log.Infof("Received topic users with event: %v from partition %d", UserEvent, message.Partition)
 	return nil
 }

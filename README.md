@@ -34,7 +34,7 @@ This is golang clean architecture template.
 - Golang Migrate (Database Migration) : https://github.com/golang-migrate/migrate
 - Go Playground Validator (Validation) : https://github.com/go-playground/validator
 - Logrus (Logger) : https://github.com/sirupsen/logrus
-- Confluent Kafka Golang : https://github.com/confluentinc/confluent-kafka-go
+- Sarama (Kafka Client) : https://github.com/IBM/sarama
 
 ## Configuration
 

@@ -1,17 +1,18 @@
 package config
 
 import (
-	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
-	"github.com/go-playground/validator/v10"
-	"github.com/gofiber/fiber/v2"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"golang-clean-architecture/internal/delivery/http"
 	"golang-clean-architecture/internal/delivery/http/middleware"
 	"golang-clean-architecture/internal/delivery/http/route"
 	"golang-clean-architecture/internal/gateway/messaging"
 	"golang-clean-architecture/internal/repository"
 	"golang-clean-architecture/internal/usecase"
+
+	"github.com/IBM/sarama"
+	"github.com/go-playground/validator/v10"
+	"github.com/gofiber/fiber/v2"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
@@ -21,7 +22,7 @@ type BootstrapConfig struct {
 	Log      *logrus.Logger
 	Validate *validator.Validate
 	Config   *viper.Viper
-	Producer *kafka.Producer
+	Producer sarama.SyncProducer
 }
 
 func Bootstrap(config *BootstrapConfig) {

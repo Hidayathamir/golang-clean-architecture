@@ -2,9 +2,10 @@ package messaging
 
 import (
 	"encoding/json"
-	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
-	"github.com/sirupsen/logrus"
 	"golang-clean-architecture/internal/model"
+
+	"github.com/IBM/sarama"
+	"github.com/sirupsen/logrus"
 )
 
 type AddressConsumer struct {
@@ -17,7 +18,7 @@ func NewAddressConsumer(log *logrus.Logger) *AddressConsumer {
 	}
 }
 
-func (c AddressConsumer) Consume(message *kafka.Message) error {
+func (c AddressConsumer) Consume(message *sarama.ConsumerMessage) error {
 	addressEvent := new(model.AddressEvent)
 	if err := json.Unmarshal(message.Value, addressEvent); err != nil {
 		c.Log.WithError(err).Error("error unmarshalling address event")
@@ -25,6 +26,6 @@ func (c AddressConsumer) Consume(message *kafka.Message) error {
 	}
 
 	// TODO process event
-	c.Log.Infof("Received topic addresses with event: %v from partition %d", addressEvent, message.TopicPartition.Partition)
+	c.Log.Infof("Received topic addresses with event: %v from partition %d", addressEvent, message.Partition)
 	return nil
 }

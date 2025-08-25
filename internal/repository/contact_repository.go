@@ -1,9 +1,10 @@
 package repository
 
 import (
-	"github.com/sirupsen/logrus"
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/model"
+
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 

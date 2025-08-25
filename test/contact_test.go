@@ -2,8 +2,6 @@ package test
 
 import (
 	"encoding/json"
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/model"
 	"io"
@@ -11,6 +9,9 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateContact(t *testing.T) {

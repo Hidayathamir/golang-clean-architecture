@@ -1,36 +1,48 @@
 package config
 
 import (
-	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
+	"strings"
+
+	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
-func NewKafkaConsumer(config *viper.Viper, log *logrus.Logger) *kafka.Consumer {
-	kafkaConfig := &kafka.ConfigMap{
-		"bootstrap.servers": config.GetString("kafka.bootstrap.servers"),
-		"group.id":          config.GetString("kafka.group.id"),
-		"auto.offset.reset": config.GetString("kafka.auto.offset.reset"),
+func NewKafkaConsumerGroup(config *viper.Viper, log *logrus.Logger) sarama.ConsumerGroup {
+	saramaConfig := sarama.NewConfig()
+	saramaConfig.Consumer.Return.Errors = true
+
+	offsetReset := config.GetString("kafka.auto.offset.reset")
+	if offsetReset == "earliest" {
+		saramaConfig.Consumer.Offsets.Initial = sarama.OffsetOldest
+	} else {
+		saramaConfig.Consumer.Offsets.Initial = sarama.OffsetNewest
 	}
 
-	consumer, err := kafka.NewConsumer(kafkaConfig)
+	brokers := strings.Split(config.GetString("kafka.bootstrap.servers"), ",")
+	groupID := config.GetString("kafka.group.id")
+
+	consumerGroup, err := sarama.NewConsumerGroup(brokers, groupID, saramaConfig)
 	if err != nil {
-		log.Fatalf("Failed to create consumer: %v", err)
+		log.Fatalf("Failed to create consumer group: %v", err)
 	}
-	return consumer
+	return consumerGroup
 }
 
-func NewKafkaProducer(config *viper.Viper, log *logrus.Logger) *kafka.Producer {
+func NewKafkaProducer(config *viper.Viper, log *logrus.Logger) sarama.SyncProducer {
 	if !config.GetBool("kafka.producer.enabled") {
 		log.Info("Kafka producer is disabled")
 		return nil
 	}
 
-	kafkaConfig := &kafka.ConfigMap{
-		"bootstrap.servers": config.GetString("kafka.bootstrap.servers"),
-	}
+	saramaConfig := sarama.NewConfig()
+	saramaConfig.Producer.Return.Successes = true
+	saramaConfig.Producer.RequiredAcks = sarama.WaitForAll
+	saramaConfig.Producer.Retry.Max = 3
 
-	producer, err := kafka.NewProducer(kafkaConfig)
+	brokers := strings.Split(config.GetString("kafka.bootstrap.servers"), ",")
+
+	producer, err := sarama.NewSyncProducer(brokers, saramaConfig)
 	if err != nil {
 		log.Fatalf("Failed to create producer: %v", err)
 	}
