@@ -1,29 +1,53 @@
 package repository
 
-import "gorm.io/gorm"
+import (
+	"golang-clean-architecture/pkg/errkit"
+
+	"gorm.io/gorm"
+)
 
 type Repository[T any] struct {
 	DB *gorm.DB
 }
 
 func (r *Repository[T]) Create(db *gorm.DB, entity *T) error {
-	return db.Create(entity).Error
+	err := db.Create(entity).Error
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+	return nil
 }
 
 func (r *Repository[T]) Update(db *gorm.DB, entity *T) error {
-	return db.Save(entity).Error
+	err := db.Save(entity).Error
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+	return nil
 }
 
 func (r *Repository[T]) Delete(db *gorm.DB, entity *T) error {
-	return db.Delete(entity).Error
+	err := db.Delete(entity).Error
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+	return nil
 }
 
 func (r *Repository[T]) CountById(db *gorm.DB, id any) (int64, error) {
 	var total int64
 	err := db.Model(new(T)).Where("id = ?", id).Count(&total).Error
-	return total, err
+	if err != nil {
+		return 0, errkit.AddFuncName(err)
+	}
+	return total, nil
 }
 
 func (r *Repository[T]) FindById(db *gorm.DB, entity *T, id any) error {
-	return db.Where("id = ?", id).Take(entity).Error
+	err := db.Where("id = ?", id).Take(entity).Error
+	if err != nil {
+		err = errkit.NotFound(err)
+		return errkit.AddFuncName(err)
+	}
+	return nil
 }

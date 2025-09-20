@@ -2,6 +2,7 @@ package repository
 
 import (
 	"golang-clean-architecture/internal/entity"
+	"golang-clean-architecture/pkg/errkit"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -19,13 +20,19 @@ func NewAddressRepository(log *logrus.Logger) *AddressRepository {
 }
 
 func (r *AddressRepository) FindByIdAndContactId(tx *gorm.DB, address *entity.Address, id string, contactId string) error {
-	return tx.Where("id = ? AND contact_id = ?", id, contactId).First(address).Error
+	err := tx.Where("id = ? AND contact_id = ?", id, contactId).First(address).Error
+	if err != nil {
+		err = errkit.NotFound(err)
+		return errkit.AddFuncName(err)
+	}
+	return nil
+
 }
 
 func (r *AddressRepository) FindAllByContactId(tx *gorm.DB, contactId string) ([]entity.Address, error) {
 	var addresses []entity.Address
 	if err := tx.Where("contact_id = ?", contactId).Find(&addresses).Error; err != nil {
-		return nil, err
+		return nil, errkit.AddFuncName(err)
 	}
 	return addresses, nil
 }

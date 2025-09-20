@@ -1,7 +1,6 @@
 package errkit
 
 import (
-	"fmt"
 	"golang-clean-architecture/pkg/caller"
 )
 
@@ -21,7 +20,7 @@ func AddFuncName(err error, options ...OptionAddFuncName) error {
 	}
 
 	callerFuncName := caller.FuncName(caller.WithSkip(option.Skip))
-	return fmt.Errorf("%s: %w", callerFuncName, err)
+	return Wrap(callerFuncName, err)
 }
 
 func WithSkip(skip int) OptionAddFuncName {

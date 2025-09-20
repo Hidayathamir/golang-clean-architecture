@@ -2,7 +2,6 @@ package response_test
 
 import (
 	"errors"
-	"fmt"
 	"golang-clean-architecture/internal/delivery/http/response"
 	"golang-clean-architecture/pkg/errkit"
 	"net/http"
@@ -14,9 +13,9 @@ import (
 func TestLoadErrAsHTTPError_1(t *testing.T) {
 	var err error
 	err = errors.New("dummy err 1")
-	err = fmt.Errorf("wrap: %w", err)
+	err = errkit.Wrap("wrap:: %w", err)
 	err = errkit.Unauthorized(err)
-	err = fmt.Errorf("wrap2: %w", err)
+	err = errkit.Wrap("wrap2:: %w", err)
 
 	httpErr := response.LoadErrAsHTTPError(err)
 
@@ -26,8 +25,8 @@ func TestLoadErrAsHTTPError_1(t *testing.T) {
 func TestLoadErrAsHTTPError_2(t *testing.T) {
 	var err error
 	err = errors.New("dummy err 1")
-	err = fmt.Errorf("wrap: %w", err)
-	err = fmt.Errorf("wrap2: %w", err)
+	err = errkit.Wrap("wrap:: %w", err)
+	err = errkit.Wrap("wrap2:: %w", err)
 
 	httpErr := response.LoadErrAsHTTPError(err)
 
@@ -37,9 +36,9 @@ func TestLoadErrAsHTTPError_2(t *testing.T) {
 func TestLoadErrAsHTTPError_3(t *testing.T) {
 	var err error
 	err = errors.New("dummy err 1")
-	err = fmt.Errorf("wrap: %w", err)
+	err = errkit.Wrap("wrap:: %w", err)
 	err = errkit.Unauthorized(err)
-	err = fmt.Errorf("wrap2: %w", err)
+	err = errkit.Wrap("wrap2:: %w", err)
 	err = errkit.InternalServerError(err)
 
 	httpErr := response.LoadErrAsHTTPError(err)
@@ -50,9 +49,9 @@ func TestLoadErrAsHTTPError_3(t *testing.T) {
 func TestLoadErrAsHTTPError_4(t *testing.T) {
 	var err error
 	err = errors.New("dummy err 1")
-	err = fmt.Errorf("wrap: %w", err)
+	err = errkit.Wrap("wrap:: %w", err)
 	err = errkit.Unauthorized(err)
-	err = fmt.Errorf("wrap2: %w", err)
+	err = errkit.Wrap("wrap2:: %w", err)
 	err = errkit.InternalServerError(err)
 	err = errkit.Unauthorized(err)
 
@@ -86,7 +85,7 @@ func TestLoadErrAsHTTPError_7(t *testing.T) {
 		HTTPCode: http.StatusUnauthorized,
 		Message:  "unauthorized",
 	}
-	err = fmt.Errorf("wrap1: %w", err)
+	err = errkit.Wrap("wrap1:: %w", err)
 
 	httpErr := response.LoadErrAsHTTPError(err)
 

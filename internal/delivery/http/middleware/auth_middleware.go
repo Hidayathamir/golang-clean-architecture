@@ -1,8 +1,10 @@
 package middleware
 
 import (
+	"golang-clean-architecture/internal/delivery/http/response"
 	"golang-clean-architecture/internal/model"
 	"golang-clean-architecture/internal/usecase"
+	"golang-clean-architecture/pkg/errkit"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -15,7 +17,9 @@ func NewAuth(userUserCase *usecase.UserUseCase) fiber.Handler {
 		auth, err := userUserCase.Verify(ctx.UserContext(), request)
 		if err != nil {
 			userUserCase.Log.Warnf("Failed find user by token : %+v", err)
-			return fiber.ErrUnauthorized
+			err = errkit.Unauthorized(err)
+			err = errkit.AddFuncName(err)
+			return response.Error(ctx, err)
 		}
 
 		userUserCase.Log.Debugf("User : %+v", auth.ID)

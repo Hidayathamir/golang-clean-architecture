@@ -30,12 +30,14 @@ func (c *UserController) Register(ctx *fiber.Ctx) error {
 	if err != nil {
 		c.Log.Warnf("Failed to parse request body : %+v", err)
 		err = errkit.BadRequest(err)
+		err = errkit.AddFuncName(err)
 		return response.Error(ctx, err)
 	}
 
 	res, err := c.UseCase.Create(ctx.UserContext(), req)
 	if err != nil {
 		c.Log.Warnf("Failed to register user : %+v", err)
+		err = errkit.AddFuncName(err)
 		return response.Error(ctx, err)
 	}
 
@@ -48,12 +50,14 @@ func (c *UserController) Login(ctx *fiber.Ctx) error {
 	if err != nil {
 		c.Log.Warnf("Failed to parse request body : %+v", err)
 		err = errkit.BadRequest(err)
+		err = errkit.AddFuncName(err)
 		return response.Error(ctx, err)
 	}
 
 	res, err := c.UseCase.Login(ctx.UserContext(), req)
 	if err != nil {
 		c.Log.Warnf("Failed to login user : %+v", err)
+		err = errkit.AddFuncName(err)
 		return response.Error(ctx, err)
 	}
 
@@ -70,6 +74,7 @@ func (c *UserController) Current(ctx *fiber.Ctx) error {
 	res, err := c.UseCase.Current(ctx.UserContext(), req)
 	if err != nil {
 		c.Log.WithError(err).Warnf("Failed to get current user")
+		err = errkit.AddFuncName(err)
 		return response.Error(ctx, err)
 	}
 
@@ -86,6 +91,7 @@ func (c *UserController) Logout(ctx *fiber.Ctx) error {
 	res, err := c.UseCase.Logout(ctx.UserContext(), req)
 	if err != nil {
 		c.Log.WithError(err).Warnf("Failed to logout user")
+		err = errkit.AddFuncName(err)
 		return response.Error(ctx, err)
 	}
 
@@ -99,6 +105,7 @@ func (c *UserController) Update(ctx *fiber.Ctx) error {
 	if err := ctx.BodyParser(req); err != nil {
 		c.Log.Warnf("Failed to parse request body : %+v", err)
 		err = errkit.BadRequest(err)
+		err = errkit.AddFuncName(err)
 		return response.Error(ctx, err)
 	}
 
@@ -106,6 +113,7 @@ func (c *UserController) Update(ctx *fiber.Ctx) error {
 	res, err := c.UseCase.Update(ctx.UserContext(), req)
 	if err != nil {
 		c.Log.WithError(err).Warnf("Failed to update user")
+		err = errkit.AddFuncName(err)
 		return response.Error(ctx, err)
 	}
 

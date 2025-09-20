@@ -3,6 +3,7 @@ package messaging
 import (
 	"encoding/json"
 	"golang-clean-architecture/internal/model"
+	"golang-clean-architecture/pkg/errkit"
 
 	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
@@ -22,7 +23,7 @@ func (c AddressConsumer) Consume(message *sarama.ConsumerMessage) error {
 	addressEvent := new(model.AddressEvent)
 	if err := json.Unmarshal(message.Value, addressEvent); err != nil {
 		c.Log.WithError(err).Error("error unmarshalling address event")
-		return err
+		return errkit.AddFuncName(err)
 	}
 
 	// TODO process event

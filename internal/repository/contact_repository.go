@@ -3,6 +3,7 @@ package repository
 import (
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/model"
+	"golang-clean-architecture/pkg/errkit"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -20,18 +21,23 @@ func NewContactRepository(log *logrus.Logger) *ContactRepository {
 }
 
 func (r *ContactRepository) FindByIdAndUserId(db *gorm.DB, contact *entity.Contact, id string, userId string) error {
-	return db.Where("id = ? AND user_id = ?", id, userId).Take(contact).Error
+	err := db.Where("id = ? AND user_id = ?", id, userId).Take(contact).Error
+	if err != nil {
+		err = errkit.NotFound(err)
+		return errkit.AddFuncName(err)
+	}
+	return nil
 }
 
 func (r *ContactRepository) Search(db *gorm.DB, request *model.SearchContactRequest) ([]entity.Contact, int64, error) {
 	var contacts []entity.Contact
 	if err := db.Scopes(r.FilterContact(request)).Offset((request.Page - 1) * request.Size).Limit(request.Size).Find(&contacts).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, errkit.AddFuncName(err)
 	}
 
 	var total int64 = 0
 	if err := db.Model(&entity.Contact{}).Scopes(r.FilterContact(request)).Count(&total).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, errkit.AddFuncName(err)
 	}
 
 	return contacts, total, nil

@@ -3,6 +3,7 @@ package messaging
 import (
 	"encoding/json"
 	"golang-clean-architecture/internal/model"
+	"golang-clean-architecture/pkg/errkit"
 
 	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
@@ -27,7 +28,7 @@ func (p *Producer[T]) Send(event T) error {
 	value, err := json.Marshal(event)
 	if err != nil {
 		p.Log.WithError(err).Error("failed to marshal event")
-		return err
+		return errkit.AddFuncName(err)
 	}
 
 	message := &sarama.ProducerMessage{
@@ -39,7 +40,7 @@ func (p *Producer[T]) Send(event T) error {
 	partition, offset, err := p.Producer.SendMessage(message)
 	if err != nil {
 		p.Log.WithError(err).Error("failed to produce message")
-		return err
+		return errkit.AddFuncName(err)
 	}
 
 	p.Log.Debugf("Message sent to topic %s, partition %d, offset %d", p.Topic, partition, offset)

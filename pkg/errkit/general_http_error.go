@@ -1,13 +1,21 @@
 package errkit
 
 import (
-	"fmt"
 	"net/http"
 )
 
+func Custom(err error, status int, msg string) error {
+	return WrapE(
+		&HTTPError{
+			HTTPCode: status,
+			Message:  msg,
+		},
+		err,
+	)
+}
+
 func InternalServerError(err error) error {
-	return fmt.Errorf(
-		"%w: %w",
+	return WrapE(
 		&HTTPError{
 			HTTPCode: http.StatusInternalServerError,
 			Message:  "internal server error",
@@ -17,8 +25,7 @@ func InternalServerError(err error) error {
 }
 
 func BadRequest(err error) error {
-	return fmt.Errorf(
-		"%w: %w",
+	return WrapE(
 		&HTTPError{
 			HTTPCode: http.StatusBadRequest,
 			Message:  "bad request",
@@ -28,8 +35,7 @@ func BadRequest(err error) error {
 }
 
 func Conflict(err error) error {
-	return fmt.Errorf(
-		"%w: %w",
+	return WrapE(
 		&HTTPError{
 			HTTPCode: http.StatusConflict,
 			Message:  "conflict",
@@ -39,8 +45,7 @@ func Conflict(err error) error {
 }
 
 func NotFound(err error) error {
-	return fmt.Errorf(
-		"%w: %w",
+	return WrapE(
 		&HTTPError{
 			HTTPCode: http.StatusNotFound,
 			Message:  "not found",
@@ -50,8 +55,7 @@ func NotFound(err error) error {
 }
 
 func Unauthorized(err error) error {
-	return fmt.Errorf(
-		"%w: %w",
+	return WrapE(
 		&HTTPError{
 			HTTPCode: http.StatusUnauthorized,
 			Message:  "unauthorized",
