@@ -2,6 +2,7 @@ package test
 
 import (
 	"encoding/json"
+	"golang-clean-architecture/internal/delivery/http/response"
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/model"
 	"io"
@@ -30,22 +31,22 @@ func TestCreateContact(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodPost, "/api/contacts", strings.NewReader(string(bodyJson)))
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodPost, "/api/contacts", strings.NewReader(string(bodyJson)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.ContactResponse])
+	responseBody := new(response.WebResponse[model.ContactResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, requestBody.FirstName, responseBody.Data.FirstName)
 	assert.Equal(t, requestBody.LastName, responseBody.Data.LastName)
 	assert.Equal(t, requestBody.Email, responseBody.Data.Email)
@@ -71,23 +72,23 @@ func TestCreateContactFailed(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodPost, "/api/contacts", strings.NewReader(string(bodyJson)))
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodPost, "/api/contacts", strings.NewReader(string(bodyJson)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.ContactResponse])
+	responseBody := new(response.WebResponse[model.ContactResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusBadRequest, response.StatusCode)
-	assert.NotNil(t, responseBody.Errors)
+	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
 }
 
 func TestGetConnect(t *testing.T) {
@@ -101,21 +102,21 @@ func TestGetConnect(t *testing.T) {
 	err = db.Where("user_id = ?", user.ID).First(contact).Error
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodGet, "/api/contacts/"+contact.ID, nil)
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodGet, "/api/contacts/"+contact.ID, nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.ContactResponse])
+	responseBody := new(response.WebResponse[model.ContactResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, contact.ID, responseBody.Data.ID)
 	assert.Equal(t, contact.FirstName, responseBody.Data.FirstName)
 	assert.Equal(t, contact.LastName, responseBody.Data.LastName)
@@ -132,21 +133,21 @@ func TestGetContactFailed(t *testing.T) {
 	err := db.Where("id = ?", "khannedy").First(user).Error
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodGet, "/api/contacts/"+uuid.NewString(), nil)
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodGet, "/api/contacts/"+uuid.NewString(), nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.ContactResponse])
+	responseBody := new(response.WebResponse[model.ContactResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusNotFound, response.StatusCode)
+	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 }
 
 func TestUpdateContact(t *testing.T) {
@@ -169,22 +170,22 @@ func TestUpdateContact(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodPut, "/api/contacts/"+contact.ID, strings.NewReader(string(bodyJson)))
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodPut, "/api/contacts/"+contact.ID, strings.NewReader(string(bodyJson)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.ContactResponse])
+	responseBody := new(response.WebResponse[model.ContactResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, requestBody.FirstName, responseBody.Data.FirstName)
 	assert.Equal(t, requestBody.LastName, responseBody.Data.LastName)
 	assert.Equal(t, requestBody.Email, responseBody.Data.Email)
@@ -214,22 +215,22 @@ func TestUpdateContactFailed(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodPut, "/api/contacts/"+contact.ID, strings.NewReader(string(bodyJson)))
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodPut, "/api/contacts/"+contact.ID, strings.NewReader(string(bodyJson)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.ContactResponse])
+	responseBody := new(response.WebResponse[model.ContactResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusBadRequest, response.StatusCode)
+	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
 }
 
 func TestUpdateContactNotFound(t *testing.T) {
@@ -248,22 +249,22 @@ func TestUpdateContactNotFound(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodPut, "/api/contacts/"+uuid.NewString(), strings.NewReader(string(bodyJson)))
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodPut, "/api/contacts/"+uuid.NewString(), strings.NewReader(string(bodyJson)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.ContactResponse])
+	responseBody := new(response.WebResponse[model.ContactResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusNotFound, response.StatusCode)
+	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 }
 
 func TestDeleteContact(t *testing.T) {
@@ -277,21 +278,21 @@ func TestDeleteContact(t *testing.T) {
 	err = db.Where("user_id = ?", user.ID).First(contact).Error
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodDelete, "/api/contacts/"+contact.ID, nil)
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodDelete, "/api/contacts/"+contact.ID, nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[bool])
+	responseBody := new(response.WebResponse[bool])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, true, responseBody.Data)
 }
 
@@ -302,21 +303,21 @@ func TestDeleteContactFailed(t *testing.T) {
 	err := db.Where("id = ?", "khannedy").First(user).Error
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodDelete, "/api/contacts/"+uuid.NewString(), nil)
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodDelete, "/api/contacts/"+uuid.NewString(), nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[bool])
+	responseBody := new(response.WebResponse[bool])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusNotFound, response.StatusCode)
+	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 }
 
 func TestSearchContact(t *testing.T) {
@@ -328,21 +329,21 @@ func TestSearchContact(t *testing.T) {
 
 	CreateContacts(user, 20)
 
-	request := httptest.NewRequest(http.MethodGet, "/api/contacts", nil)
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodGet, "/api/contacts", nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[[]model.ContactResponse])
+	responseBody := new(response.WebResponse[[]model.ContactResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, 10, len(responseBody.Data))
 	assert.Equal(t, int64(20), responseBody.Paging.TotalItem)
 	assert.Equal(t, int64(2), responseBody.Paging.TotalPage)
@@ -359,21 +360,21 @@ func TestSearchContactWithPagination(t *testing.T) {
 
 	CreateContacts(user, 20)
 
-	request := httptest.NewRequest(http.MethodGet, "/api/contacts?page=2&size=5", nil)
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodGet, "/api/contacts?page=2&size=5", nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[[]model.ContactResponse])
+	responseBody := new(response.WebResponse[[]model.ContactResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, 5, len(responseBody.Data))
 	assert.Equal(t, int64(20), responseBody.Paging.TotalItem)
 	assert.Equal(t, int64(4), responseBody.Paging.TotalPage)
@@ -390,21 +391,21 @@ func TestSearchContactWithFilter(t *testing.T) {
 
 	CreateContacts(user, 20)
 
-	request := httptest.NewRequest(http.MethodGet, "/api/contacts?name=contact&phone=08000000&email=example.com", nil)
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodGet, "/api/contacts?name=contact&phone=08000000&email=example.com", nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[[]model.ContactResponse])
+	responseBody := new(response.WebResponse[[]model.ContactResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, 10, len(responseBody.Data))
 	assert.Equal(t, int64(20), responseBody.Paging.TotalItem)
 	assert.Equal(t, int64(2), responseBody.Paging.TotalPage)

@@ -2,6 +2,7 @@ package test
 
 import (
 	"encoding/json"
+	"golang-clean-architecture/internal/delivery/http/response"
 	"golang-clean-architecture/internal/model"
 	"io"
 	"net/http"
@@ -28,22 +29,22 @@ func TestCreateAddress(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodPost, "/api/contacts/"+contact.ID+"/addresses", strings.NewReader(string(bodyJson)))
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodPost, "/api/contacts/"+contact.ID+"/addresses", strings.NewReader(string(bodyJson)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.AddressResponse])
+	responseBody := new(response.WebResponse[model.AddressResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, requestBody.Street, responseBody.Data.Street)
 	assert.Equal(t, requestBody.City, responseBody.Data.City)
 	assert.Equal(t, requestBody.Province, responseBody.Data.Province)
@@ -70,22 +71,22 @@ func TestCreateAddressFailed(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodPost, "/api/contacts/"+contact.ID+"/addresses", strings.NewReader(string(bodyJson)))
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodPost, "/api/contacts/"+contact.ID+"/addresses", strings.NewReader(string(bodyJson)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.AddressResponse])
+	responseBody := new(response.WebResponse[model.AddressResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusBadRequest, response.StatusCode)
+	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
 }
 
 func TestListAddresses(t *testing.T) {
@@ -96,21 +97,21 @@ func TestListAddresses(t *testing.T) {
 
 	CreateAddresses(t, contact, 5)
 
-	request := httptest.NewRequest(http.MethodGet, "/api/contacts/"+contact.ID+"/addresses", nil)
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodGet, "/api/contacts/"+contact.ID+"/addresses", nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[[]model.AddressResponse])
+	responseBody := new(response.WebResponse[[]model.AddressResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, 5, len(responseBody.Data))
 }
 
@@ -122,21 +123,21 @@ func TestListAddressesFailed(t *testing.T) {
 
 	CreateAddresses(t, contact, 5)
 
-	request := httptest.NewRequest(http.MethodGet, "/api/contacts/"+"wrong"+"/addresses", nil)
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodGet, "/api/contacts/"+"wrong"+"/addresses", nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[[]model.AddressResponse])
+	responseBody := new(response.WebResponse[[]model.AddressResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusNotFound, response.StatusCode)
+	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 }
 
 func TestGetAddress(t *testing.T) {
@@ -146,21 +147,21 @@ func TestGetAddress(t *testing.T) {
 	contact := GetFirstContact(t, user)
 	address := GetFirstAddress(t, contact)
 
-	request := httptest.NewRequest(http.MethodGet, "/api/contacts/"+contact.ID+"/addresses/"+address.ID, nil)
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodGet, "/api/contacts/"+contact.ID+"/addresses/"+address.ID, nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.AddressResponse])
+	responseBody := new(response.WebResponse[model.AddressResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, address.ID, responseBody.Data.ID)
 	assert.Equal(t, address.Street, responseBody.Data.Street)
 	assert.Equal(t, address.City, responseBody.Data.City)
@@ -177,21 +178,21 @@ func TestGetAddressFailed(t *testing.T) {
 	user := GetFirstUser(t)
 	contact := GetFirstContact(t, user)
 
-	request := httptest.NewRequest(http.MethodGet, "/api/contacts/"+contact.ID+"/addresses/"+"wrong", nil)
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodGet, "/api/contacts/"+contact.ID+"/addresses/"+"wrong", nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.AddressResponse])
+	responseBody := new(response.WebResponse[model.AddressResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusNotFound, response.StatusCode)
+	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 }
 
 func TestUpdateAddress(t *testing.T) {
@@ -211,22 +212,22 @@ func TestUpdateAddress(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodPut, "/api/contacts/"+contact.ID+"/addresses/"+address.ID, strings.NewReader(string(bodyJson)))
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodPut, "/api/contacts/"+contact.ID+"/addresses/"+address.ID, strings.NewReader(string(bodyJson)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.AddressResponse])
+	responseBody := new(response.WebResponse[model.AddressResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, requestBody.Street, responseBody.Data.Street)
 	assert.Equal(t, requestBody.City, responseBody.Data.City)
 	assert.Equal(t, requestBody.Province, responseBody.Data.Province)
@@ -254,22 +255,22 @@ func TestUpdateAddressFailed(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodPut, "/api/contacts/"+contact.ID+"/addresses/"+address.ID, strings.NewReader(string(bodyJson)))
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodPut, "/api/contacts/"+contact.ID+"/addresses/"+address.ID, strings.NewReader(string(bodyJson)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.AddressResponse])
+	responseBody := new(response.WebResponse[model.AddressResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusBadRequest, response.StatusCode)
+	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
 }
 
 func TestDeleteAddress(t *testing.T) {
@@ -279,21 +280,21 @@ func TestDeleteAddress(t *testing.T) {
 	contact := GetFirstContact(t, user)
 	address := GetFirstAddress(t, contact)
 
-	request := httptest.NewRequest(http.MethodDelete, "/api/contacts/"+contact.ID+"/addresses/"+address.ID, nil)
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodDelete, "/api/contacts/"+contact.ID+"/addresses/"+address.ID, nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[bool])
+	responseBody := new(response.WebResponse[bool])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, true, responseBody.Data)
 }
 
@@ -303,19 +304,19 @@ func TestDeleteAddressFailed(t *testing.T) {
 	user := GetFirstUser(t)
 	contact := GetFirstContact(t, user)
 
-	request := httptest.NewRequest(http.MethodDelete, "/api/contacts/"+contact.ID+"/addresses/"+"wrong", nil)
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodDelete, "/api/contacts/"+contact.ID+"/addresses/"+"wrong", nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[bool])
+	responseBody := new(response.WebResponse[bool])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusNotFound, response.StatusCode)
+	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 }

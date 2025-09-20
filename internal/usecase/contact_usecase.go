@@ -2,14 +2,15 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/gateway/messaging"
 	"golang-clean-architecture/internal/model"
 	"golang-clean-architecture/internal/model/converter"
 	"golang-clean-architecture/internal/repository"
+	"golang-clean-architecture/pkg/httperror"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -40,7 +41,7 @@ func (c *ContactUseCase) Create(ctx context.Context, request *model.CreateContac
 
 	if err := c.Validate.Struct(request); err != nil {
 		c.Log.WithError(err).Error("error validating request body")
-		return nil, fiber.ErrBadRequest
+		return nil, errors.Join(httperror.BadRequest(), err)
 	}
 
 	contact := &entity.Contact{
@@ -54,18 +55,18 @@ func (c *ContactUseCase) Create(ctx context.Context, request *model.CreateContac
 
 	if err := c.ContactRepository.Create(tx, contact); err != nil {
 		c.Log.WithError(err).Error("error creating contact")
-		return nil, fiber.ErrInternalServerError
+		return nil, errors.Join(httperror.InternalServerError(), err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
 		c.Log.WithError(err).Error("error creating contact")
-		return nil, fiber.ErrInternalServerError
+		return nil, errors.Join(httperror.InternalServerError(), err)
 	}
 
 	event := converter.ContactToEvent(contact)
 	if err := c.ContactProducer.Send(event); err != nil {
 		c.Log.WithError(err).Error("error publishing contact created event")
-		return nil, fiber.ErrInternalServerError
+		return nil, errors.Join(httperror.InternalServerError(), err)
 	}
 
 	return converter.ContactToResponse(contact), nil
@@ -78,12 +79,12 @@ func (c *ContactUseCase) Update(ctx context.Context, request *model.UpdateContac
 	contact := new(entity.Contact)
 	if err := c.ContactRepository.FindByIdAndUserId(tx, contact, request.ID, request.UserId); err != nil {
 		c.Log.WithError(err).Error("error getting contact")
-		return nil, fiber.ErrNotFound
+		return nil, errors.Join(httperror.NotFound(), err)
 	}
 
 	if err := c.Validate.Struct(request); err != nil {
 		c.Log.WithError(err).Error("error validating request body")
-		return nil, fiber.ErrBadRequest
+		return nil, errors.Join(httperror.BadRequest(), err)
 	}
 
 	contact.FirstName = request.FirstName
@@ -93,18 +94,18 @@ func (c *ContactUseCase) Update(ctx context.Context, request *model.UpdateContac
 
 	if err := c.ContactRepository.Update(tx, contact); err != nil {
 		c.Log.WithError(err).Error("error updating contact")
-		return nil, fiber.ErrInternalServerError
+		return nil, errors.Join(httperror.InternalServerError(), err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
 		c.Log.WithError(err).Error("error updating contact")
-		return nil, fiber.ErrInternalServerError
+		return nil, errors.Join(httperror.InternalServerError(), err)
 	}
 
 	event := converter.ContactToEvent(contact)
 	if err := c.ContactProducer.Send(event); err != nil {
 		c.Log.WithError(err).Error("error publishing contact updated event")
-		return nil, fiber.ErrInternalServerError
+		return nil, errors.Join(httperror.InternalServerError(), err)
 	}
 
 	return converter.ContactToResponse(contact), nil
@@ -116,18 +117,18 @@ func (c *ContactUseCase) Get(ctx context.Context, request *model.GetContactReque
 
 	if err := c.Validate.Struct(request); err != nil {
 		c.Log.WithError(err).Error("error validating request body")
-		return nil, fiber.ErrBadRequest
+		return nil, errors.Join(httperror.BadRequest(), err)
 	}
 
 	contact := new(entity.Contact)
 	if err := c.ContactRepository.FindByIdAndUserId(tx, contact, request.ID, request.UserId); err != nil {
 		c.Log.WithError(err).Error("error getting contact")
-		return nil, fiber.ErrNotFound
+		return nil, errors.Join(httperror.NotFound(), err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
 		c.Log.WithError(err).Error("error getting contact")
-		return nil, fiber.ErrInternalServerError
+		return nil, errors.Join(httperror.InternalServerError(), err)
 	}
 
 	return converter.ContactToResponse(contact), nil
@@ -139,23 +140,23 @@ func (c *ContactUseCase) Delete(ctx context.Context, request *model.DeleteContac
 
 	if err := c.Validate.Struct(request); err != nil {
 		c.Log.WithError(err).Error("error validating request body")
-		return fiber.ErrBadRequest
+		return errors.Join(httperror.BadRequest(), err)
 	}
 
 	contact := new(entity.Contact)
 	if err := c.ContactRepository.FindByIdAndUserId(tx, contact, request.ID, request.UserId); err != nil {
 		c.Log.WithError(err).Error("error getting contact")
-		return fiber.ErrNotFound
+		return errors.Join(httperror.NotFound(), err)
 	}
 
 	if err := c.ContactRepository.Delete(tx, contact); err != nil {
 		c.Log.WithError(err).Error("error deleting contact")
-		return fiber.ErrInternalServerError
+		return errors.Join(httperror.InternalServerError(), err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
 		c.Log.WithError(err).Error("error deleting contact")
-		return fiber.ErrInternalServerError
+		return errors.Join(httperror.InternalServerError(), err)
 	}
 
 	return nil
@@ -167,18 +168,18 @@ func (c *ContactUseCase) Search(ctx context.Context, request *model.SearchContac
 
 	if err := c.Validate.Struct(request); err != nil {
 		c.Log.WithError(err).Error("error validating request body")
-		return nil, 0, fiber.ErrBadRequest
+		return nil, 0, errors.Join(httperror.BadRequest(), err)
 	}
 
 	contacts, total, err := c.ContactRepository.Search(tx, request)
 	if err != nil {
 		c.Log.WithError(err).Error("error getting contacts")
-		return nil, 0, fiber.ErrInternalServerError
+		return nil, 0, errors.Join(httperror.InternalServerError(), err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
 		c.Log.WithError(err).Error("error getting contacts")
-		return nil, 0, fiber.ErrInternalServerError
+		return nil, 0, errors.Join(httperror.InternalServerError(), err)
 	}
 
 	responses := make([]model.ContactResponse, len(contacts))

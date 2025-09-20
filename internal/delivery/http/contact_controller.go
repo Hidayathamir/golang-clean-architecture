@@ -1,10 +1,14 @@
 package http
 
 import (
+	"errors"
 	"golang-clean-architecture/internal/delivery/http/middleware"
+	"golang-clean-architecture/internal/delivery/http/response"
 	"golang-clean-architecture/internal/model"
 	"golang-clean-architecture/internal/usecase"
+	"golang-clean-architecture/pkg/httperror"
 	"math"
+	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
@@ -25,26 +29,27 @@ func NewContactController(useCase *usecase.ContactUseCase, log *logrus.Logger) *
 func (c *ContactController) Create(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 
-	request := new(model.CreateContactRequest)
-	if err := ctx.BodyParser(request); err != nil {
+	req := new(model.CreateContactRequest)
+	if err := ctx.BodyParser(req); err != nil {
 		c.Log.WithError(err).Error("error parsing request body")
-		return fiber.ErrBadRequest
+		err = errors.Join(httperror.BadRequest(), err)
+		return response.Error(ctx, err)
 	}
-	request.UserId = auth.ID
+	req.UserId = auth.ID
 
-	response, err := c.UseCase.Create(ctx.UserContext(), request)
+	res, err := c.UseCase.Create(ctx.UserContext(), req)
 	if err != nil {
 		c.Log.WithError(err).Error("error creating contact")
-		return err
+		return response.Error(ctx, err)
 	}
 
-	return ctx.JSON(model.WebResponse[*model.ContactResponse]{Data: response})
+	return response.Data(ctx, http.StatusOK, res)
 }
 
 func (c *ContactController) List(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 
-	request := &model.SearchContactRequest{
+	req := &model.SearchContactRequest{
 		UserId: auth.ID,
 		Name:   ctx.Query("name", ""),
 		Email:  ctx.Query("email", ""),
@@ -53,76 +58,74 @@ func (c *ContactController) List(ctx *fiber.Ctx) error {
 		Size:   ctx.QueryInt("size", 10),
 	}
 
-	responses, total, err := c.UseCase.Search(ctx.UserContext(), request)
+	res, total, err := c.UseCase.Search(ctx.UserContext(), req)
 	if err != nil {
 		c.Log.WithError(err).Error("error searching contact")
-		return err
+		return response.Error(ctx, err)
 	}
 
-	paging := &model.PageMetadata{
-		Page:      request.Page,
-		Size:      request.Size,
+	paging := &response.PageMetadata{
+		Page:      req.Page,
+		Size:      req.Size,
 		TotalItem: total,
-		TotalPage: int64(math.Ceil(float64(total) / float64(request.Size))),
+		TotalPage: int64(math.Ceil(float64(total) / float64(req.Size))),
 	}
 
-	return ctx.JSON(model.WebResponse[[]model.ContactResponse]{
-		Data:   responses,
-		Paging: paging,
-	})
+	return response.DataPaging(ctx, http.StatusOK, res, paging)
 }
 
 func (c *ContactController) Get(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 
-	request := &model.GetContactRequest{
+	req := &model.GetContactRequest{
 		UserId: auth.ID,
 		ID:     ctx.Params("contactId"),
 	}
 
-	response, err := c.UseCase.Get(ctx.UserContext(), request)
+	res, err := c.UseCase.Get(ctx.UserContext(), req)
 	if err != nil {
 		c.Log.WithError(err).Error("error getting contact")
-		return err
+		return response.Error(ctx, err)
 	}
 
-	return ctx.JSON(model.WebResponse[*model.ContactResponse]{Data: response})
+	return response.Data(ctx, http.StatusOK, res)
 }
 
 func (c *ContactController) Update(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 
-	request := new(model.UpdateContactRequest)
-	if err := ctx.BodyParser(request); err != nil {
+	req := new(model.UpdateContactRequest)
+	if err := ctx.BodyParser(req); err != nil {
 		c.Log.WithError(err).Error("error parsing request body")
-		return fiber.ErrBadRequest
+		err = errors.Join(httperror.BadRequest(), err)
+		return response.Error(ctx, err)
 	}
 
-	request.UserId = auth.ID
-	request.ID = ctx.Params("contactId")
+	req.UserId = auth.ID
+	req.ID = ctx.Params("contactId")
 
-	response, err := c.UseCase.Update(ctx.UserContext(), request)
+	res, err := c.UseCase.Update(ctx.UserContext(), req)
 	if err != nil {
 		c.Log.WithError(err).Error("error updating contact")
-		return err
+		return response.Error(ctx, err)
 	}
 
-	return ctx.JSON(model.WebResponse[*model.ContactResponse]{Data: response})
+	return response.Data(ctx, http.StatusOK, res)
 }
 
 func (c *ContactController) Delete(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 	contactId := ctx.Params("contactId")
 
-	request := &model.DeleteContactRequest{
+	req := &model.DeleteContactRequest{
 		UserId: auth.ID,
 		ID:     contactId,
 	}
 
-	if err := c.UseCase.Delete(ctx.UserContext(), request); err != nil {
+	if err := c.UseCase.Delete(ctx.UserContext(), req); err != nil {
 		c.Log.WithError(err).Error("error deleting contact")
-		return err
+		return response.Error(ctx, err)
 	}
 
-	return ctx.JSON(model.WebResponse[bool]{Data: true})
+	return response.Data(ctx, http.StatusOK, true)
 }
