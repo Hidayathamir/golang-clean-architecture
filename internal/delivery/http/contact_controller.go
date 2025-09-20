@@ -14,11 +14,11 @@ import (
 )
 
 type ContactController struct {
-	UseCase *usecase.ContactUseCase
+	UseCase usecase.ContactUseCase
 	Log     *logrus.Logger
 }
 
-func NewContactController(useCase *usecase.ContactUseCase, log *logrus.Logger) *ContactController {
+func NewContactController(useCase usecase.ContactUseCase, log *logrus.Logger) *ContactController {
 	return &ContactController{
 		UseCase: useCase,
 		Log:     log,

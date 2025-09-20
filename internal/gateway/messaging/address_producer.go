@@ -7,13 +7,19 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type AddressProducer struct {
+//go:generate moq -out=../../mock/AddressProducer.go -pkg=mock . AddressProducer
+
+type AddressProducer interface {
 	Producer[*model.AddressEvent]
 }
 
-func NewAddressProducer(producer sarama.SyncProducer, log *logrus.Logger) *AddressProducer {
-	return &AddressProducer{
-		Producer: Producer[*model.AddressEvent]{
+type AddressProducerImpl struct {
+	ProducerImpl[*model.AddressEvent]
+}
+
+func NewAddressProducer(producer sarama.SyncProducer, log *logrus.Logger) *AddressProducerImpl {
+	return &AddressProducerImpl{
+		ProducerImpl: ProducerImpl[*model.AddressEvent]{
 			Producer: producer,
 			Topic:    "addresses",
 			Log:      log,

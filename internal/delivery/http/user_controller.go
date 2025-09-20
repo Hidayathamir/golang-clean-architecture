@@ -13,14 +13,14 @@ import (
 )
 
 type UserController struct {
+	UseCase usecase.UserUseCase
 	Log     *logrus.Logger
-	UseCase *usecase.UserUseCase
 }
 
-func NewUserController(useCase *usecase.UserUseCase, logger *logrus.Logger) *UserController {
+func NewUserController(useCase usecase.UserUseCase, logger *logrus.Logger) *UserController {
 	return &UserController{
-		Log:     logger,
 		UseCase: useCase,
+		Log:     logger,
 	}
 }
 

@@ -6,11 +6,23 @@ import (
 	"gorm.io/gorm"
 )
 
-type Repository[T any] struct {
+//go:generate moq -out=../mock/Repository.go -pkg=mock . Repository
+
+type Repository[T any] interface {
+	Create(db *gorm.DB, entity *T) error
+	Update(db *gorm.DB, entity *T) error
+	Delete(db *gorm.DB, entity *T) error
+	CountById(db *gorm.DB, id any) (int64, error)
+	FindById(db *gorm.DB, entity *T, id any) error
+}
+
+var _ Repository[any] = &RepositoryImpl[any]{}
+
+type RepositoryImpl[T any] struct {
 	DB *gorm.DB
 }
 
-func (r *Repository[T]) Create(db *gorm.DB, entity *T) error {
+func (r *RepositoryImpl[T]) Create(db *gorm.DB, entity *T) error {
 	err := db.Create(entity).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
@@ -18,7 +30,7 @@ func (r *Repository[T]) Create(db *gorm.DB, entity *T) error {
 	return nil
 }
 
-func (r *Repository[T]) Update(db *gorm.DB, entity *T) error {
+func (r *RepositoryImpl[T]) Update(db *gorm.DB, entity *T) error {
 	err := db.Save(entity).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
@@ -26,7 +38,7 @@ func (r *Repository[T]) Update(db *gorm.DB, entity *T) error {
 	return nil
 }
 
-func (r *Repository[T]) Delete(db *gorm.DB, entity *T) error {
+func (r *RepositoryImpl[T]) Delete(db *gorm.DB, entity *T) error {
 	err := db.Delete(entity).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
@@ -34,7 +46,7 @@ func (r *Repository[T]) Delete(db *gorm.DB, entity *T) error {
 	return nil
 }
 
-func (r *Repository[T]) CountById(db *gorm.DB, id any) (int64, error) {
+func (r *RepositoryImpl[T]) CountById(db *gorm.DB, id any) (int64, error) {
 	var total int64
 	err := db.Model(new(T)).Where("id = ?", id).Count(&total).Error
 	if err != nil {
@@ -43,7 +55,7 @@ func (r *Repository[T]) CountById(db *gorm.DB, id any) (int64, error) {
 	return total, nil
 }
 
-func (r *Repository[T]) FindById(db *gorm.DB, entity *T, id any) error {
+func (r *RepositoryImpl[T]) FindById(db *gorm.DB, entity *T, id any) error {
 	err := db.Where("id = ?", id).Take(entity).Error
 	if err != nil {
 		err = errkit.NotFound(err)

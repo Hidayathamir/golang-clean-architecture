@@ -14,3 +14,6 @@ migrate:
 
 migrate-new:
 	echo "please run: migrate create -ext sql -dir db/migrations create_table_xxx"
+
+generate:
+	go generate ./...

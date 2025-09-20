@@ -9,18 +9,28 @@ import (
 	"gorm.io/gorm"
 )
 
-type ContactRepository struct {
+//go:generate moq -out=../mock/ContactRepository.go -pkg=mock . ContactRepository
+
+type ContactRepository interface {
 	Repository[entity.Contact]
+	FindByIdAndUserId(db *gorm.DB, contact *entity.Contact, id string, userId string) error
+	Search(db *gorm.DB, request *model.SearchContactRequest) ([]entity.Contact, int64, error)
+}
+
+var _ ContactRepository = &ContactRepositoryImpl{}
+
+type ContactRepositoryImpl struct {
+	RepositoryImpl[entity.Contact]
 	Log *logrus.Logger
 }
 
-func NewContactRepository(log *logrus.Logger) *ContactRepository {
-	return &ContactRepository{
+func NewContactRepository(log *logrus.Logger) *ContactRepositoryImpl {
+	return &ContactRepositoryImpl{
 		Log: log,
 	}
 }
 
-func (r *ContactRepository) FindByIdAndUserId(db *gorm.DB, contact *entity.Contact, id string, userId string) error {
+func (r *ContactRepositoryImpl) FindByIdAndUserId(db *gorm.DB, contact *entity.Contact, id string, userId string) error {
 	err := db.Where("id = ? AND user_id = ?", id, userId).Take(contact).Error
 	if err != nil {
 		err = errkit.NotFound(err)
@@ -29,21 +39,21 @@ func (r *ContactRepository) FindByIdAndUserId(db *gorm.DB, contact *entity.Conta
 	return nil
 }
 
-func (r *ContactRepository) Search(db *gorm.DB, request *model.SearchContactRequest) ([]entity.Contact, int64, error) {
+func (r *ContactRepositoryImpl) Search(db *gorm.DB, request *model.SearchContactRequest) ([]entity.Contact, int64, error) {
 	var contacts []entity.Contact
-	if err := db.Scopes(r.FilterContact(request)).Offset((request.Page - 1) * request.Size).Limit(request.Size).Find(&contacts).Error; err != nil {
+	if err := db.Scopes(r.filterContact(request)).Offset((request.Page - 1) * request.Size).Limit(request.Size).Find(&contacts).Error; err != nil {
 		return nil, 0, errkit.AddFuncName(err)
 	}
 
 	var total int64 = 0
-	if err := db.Model(&entity.Contact{}).Scopes(r.FilterContact(request)).Count(&total).Error; err != nil {
+	if err := db.Model(&entity.Contact{}).Scopes(r.filterContact(request)).Count(&total).Error; err != nil {
 		return nil, 0, errkit.AddFuncName(err)
 	}
 
 	return contacts, total, nil
 }
 
-func (r *ContactRepository) FilterContact(request *model.SearchContactRequest) func(tx *gorm.DB) *gorm.DB {
+func (r *ContactRepositoryImpl) filterContact(request *model.SearchContactRequest) func(tx *gorm.DB) *gorm.DB {
 	return func(tx *gorm.DB) *gorm.DB {
 		tx = tx.Where("user_id = ?", request.UserId)
 

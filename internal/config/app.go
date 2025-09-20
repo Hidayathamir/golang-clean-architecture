@@ -32,13 +32,9 @@ func Bootstrap(config *BootstrapConfig) {
 	addressRepository := repository.NewAddressRepository(config.Log)
 
 	// setup producer
-	var userProducer *messaging.UserProducer
-	var contactProducer *messaging.ContactProducer
-	var addressProducer *messaging.AddressProducer
-
-	userProducer = messaging.NewUserProducer(config.Producer, config.Log)
-	contactProducer = messaging.NewContactProducer(config.Producer, config.Log)
-	addressProducer = messaging.NewAddressProducer(config.Producer, config.Log)
+	userProducer := messaging.NewUserProducer(config.Producer, config.Log)
+	contactProducer := messaging.NewContactProducer(config.Producer, config.Log)
+	addressProducer := messaging.NewAddressProducer(config.Producer, config.Log)
 
 	// setup use cases
 	userUseCase := usecase.NewUserUseCase(config.DB, config.Log, config.Validate, userRepository, userProducer)
@@ -51,7 +47,7 @@ func Bootstrap(config *BootstrapConfig) {
 	addressController := http.NewAddressController(addressUseCase, config.Log)
 
 	// setup middleware
-	authMiddleware := middleware.NewAuth(userUseCase)
+	authMiddleware := middleware.NewAuth(config.Log, userUseCase)
 
 	routeConfig := route.RouteConfig{
 		App:               config.App,
@@ -60,5 +56,6 @@ func Bootstrap(config *BootstrapConfig) {
 		AddressController: addressController,
 		AuthMiddleware:    authMiddleware,
 	}
+
 	routeConfig.Setup()
 }

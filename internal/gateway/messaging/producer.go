@@ -9,17 +9,26 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type Producer[T model.Event] struct {
+//go:generate moq -out=../../mock/Producer.go -pkg=mock . Producer
+
+type Producer[T model.Event] interface {
+	GetTopic() *string
+	Send(event T) error
+}
+
+var _ Producer[model.Event] = &ProducerImpl[model.Event]{}
+
+type ProducerImpl[T model.Event] struct {
 	Producer sarama.SyncProducer
 	Topic    string
 	Log      *logrus.Logger
 }
 
-func (p *Producer[T]) GetTopic() *string {
+func (p *ProducerImpl[T]) GetTopic() *string {
 	return &p.Topic
 }
 
-func (p *Producer[T]) Send(event T) error {
+func (p *ProducerImpl[T]) Send(event T) error {
 	if p.Producer == nil {
 		p.Log.Warn("Kafka producer is disabled")
 		return nil

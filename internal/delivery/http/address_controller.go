@@ -13,14 +13,14 @@ import (
 )
 
 type AddressController struct {
-	UseCase *usecase.AddressUseCase
+	UseCase usecase.AddressUseCase
 	Log     *logrus.Logger
 }
 
-func NewAddressController(useCase *usecase.AddressUseCase, log *logrus.Logger) *AddressController {
+func NewAddressController(useCase usecase.AddressUseCase, log *logrus.Logger) *AddressController {
 	return &AddressController{
-		Log:     log,
 		UseCase: useCase,
+		Log:     log,
 	}
 }
 

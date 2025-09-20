@@ -7,13 +7,19 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type UserProducer struct {
+//go:generate moq -out=../../mock/UserProducer.go -pkg=mock . UserProducer
+
+type UserProducer interface {
 	Producer[*model.UserEvent]
 }
 
-func NewUserProducer(producer sarama.SyncProducer, log *logrus.Logger) *UserProducer {
-	return &UserProducer{
-		Producer: Producer[*model.UserEvent]{
+type UserProducerImpl struct {
+	ProducerImpl[*model.UserEvent]
+}
+
+func NewUserProducer(producer sarama.SyncProducer, log *logrus.Logger) *UserProducerImpl {
+	return &UserProducerImpl{
+		ProducerImpl: ProducerImpl[*model.UserEvent]{
 			Producer: producer,
 			Topic:    "users",
 			Log:      log,

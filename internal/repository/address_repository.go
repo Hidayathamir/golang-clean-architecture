@@ -8,19 +8,29 @@ import (
 	"gorm.io/gorm"
 )
 
-type AddressRepository struct {
+//go:generate moq -out=../mock/AddressRepository.go -pkg=mock . AddressRepository
+
+type AddressRepository interface {
 	Repository[entity.Address]
+	FindByIdAndContactId(db *gorm.DB, address *entity.Address, id string, contactId string) error
+	FindAllByContactId(db *gorm.DB, contactId string) ([]entity.Address, error)
+}
+
+var _ AddressRepository = &AddressRepositoryImpl{}
+
+type AddressRepositoryImpl struct {
+	RepositoryImpl[entity.Address]
 	Log *logrus.Logger
 }
 
-func NewAddressRepository(log *logrus.Logger) *AddressRepository {
-	return &AddressRepository{
+func NewAddressRepository(log *logrus.Logger) *AddressRepositoryImpl {
+	return &AddressRepositoryImpl{
 		Log: log,
 	}
 }
 
-func (r *AddressRepository) FindByIdAndContactId(tx *gorm.DB, address *entity.Address, id string, contactId string) error {
-	err := tx.Where("id = ? AND contact_id = ?", id, contactId).First(address).Error
+func (r *AddressRepositoryImpl) FindByIdAndContactId(db *gorm.DB, address *entity.Address, id string, contactId string) error {
+	err := db.Where("id = ? AND contact_id = ?", id, contactId).First(address).Error
 	if err != nil {
 		err = errkit.NotFound(err)
 		return errkit.AddFuncName(err)
@@ -29,9 +39,9 @@ func (r *AddressRepository) FindByIdAndContactId(tx *gorm.DB, address *entity.Ad
 
 }
 
-func (r *AddressRepository) FindAllByContactId(tx *gorm.DB, contactId string) ([]entity.Address, error) {
+func (r *AddressRepositoryImpl) FindAllByContactId(db *gorm.DB, contactId string) ([]entity.Address, error) {
 	var addresses []entity.Address
-	if err := tx.Where("contact_id = ?", contactId).Find(&addresses).Error; err != nil {
+	if err := db.Where("contact_id = ?", contactId).Find(&addresses).Error; err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 	return addresses, nil
