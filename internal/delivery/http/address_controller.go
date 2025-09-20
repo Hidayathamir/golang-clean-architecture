@@ -1,12 +1,11 @@
 package http
 
 import (
-	"errors"
 	"golang-clean-architecture/internal/delivery/http/middleware"
 	"golang-clean-architecture/internal/delivery/http/response"
 	"golang-clean-architecture/internal/model"
 	"golang-clean-architecture/internal/usecase"
-	"golang-clean-architecture/pkg/httperror"
+	"golang-clean-architecture/pkg/errkit"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -31,7 +30,7 @@ func (c *AddressController) Create(ctx *fiber.Ctx) error {
 	req := new(model.CreateAddressRequest)
 	if err := ctx.BodyParser(req); err != nil {
 		c.Log.WithError(err).Error("failed to parse request body")
-		err = errors.Join(httperror.BadRequest(), err)
+		err = errkit.BadRequest(err)
 		return response.Error(ctx, err)
 	}
 
@@ -91,7 +90,7 @@ func (c *AddressController) Update(ctx *fiber.Ctx) error {
 	req := new(model.UpdateAddressRequest)
 	if err := ctx.BodyParser(req); err != nil {
 		c.Log.WithError(err).Error("failed to parse request body")
-		err = errors.Join(httperror.BadRequest(), err)
+		err = errkit.BadRequest(err)
 		return response.Error(ctx, err)
 	}
 

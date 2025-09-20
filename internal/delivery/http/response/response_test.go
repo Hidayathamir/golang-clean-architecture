@@ -4,7 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"golang-clean-architecture/internal/delivery/http/response"
-	"golang-clean-architecture/pkg/httperror"
+	"golang-clean-architecture/pkg/errkit"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,13 +15,12 @@ func TestLoadErrAsHTTPError_1(t *testing.T) {
 	var err error
 	err = errors.New("dummy err 1")
 	err = fmt.Errorf("wrap: %w", err)
-	err = errors.Join(httperror.Unauthorized(), err)
+	err = errkit.Unauthorized(err)
 	err = fmt.Errorf("wrap2: %w", err)
 
 	httpErr := response.LoadErrAsHTTPError(err)
 
-	assert.Equal(t, httperror.Unauthorized().ID, httpErr.ID)
-	assert.Equal(t, httperror.Unauthorized().Message, httpErr.Message)
+	assert.Equal(t, "unauthorized", httpErr.Message)
 }
 
 func TestLoadErrAsHTTPError_2(t *testing.T) {
@@ -31,46 +31,45 @@ func TestLoadErrAsHTTPError_2(t *testing.T) {
 
 	httpErr := response.LoadErrAsHTTPError(err)
 
-	assert.Equal(t, httperror.InternalServerError().ID, httpErr.ID)
-	assert.Equal(t, httperror.InternalServerError().Message, httpErr.Message)
+	assert.Equal(t, "internal server error", httpErr.Message)
 }
 
 func TestLoadErrAsHTTPError_3(t *testing.T) {
 	var err error
 	err = errors.New("dummy err 1")
 	err = fmt.Errorf("wrap: %w", err)
-	err = errors.Join(httperror.Unauthorized(), err)
+	err = errkit.Unauthorized(err)
 	err = fmt.Errorf("wrap2: %w", err)
-	err = errors.Join(httperror.InternalServerError(), err)
+	err = errkit.InternalServerError(err)
 
 	httpErr := response.LoadErrAsHTTPError(err)
 
-	assert.Equal(t, httperror.InternalServerError().ID, httpErr.ID)
-	assert.Equal(t, httperror.InternalServerError().Message, httpErr.Message)
+	assert.Equal(t, "internal server error", httpErr.Message)
 }
 
 func TestLoadErrAsHTTPError_4(t *testing.T) {
 	var err error
 	err = errors.New("dummy err 1")
 	err = fmt.Errorf("wrap: %w", err)
-	err = errors.Join(httperror.Unauthorized(), err)
+	err = errkit.Unauthorized(err)
 	err = fmt.Errorf("wrap2: %w", err)
-	err = errors.Join(httperror.InternalServerError(), err)
-	err = errors.Join(httperror.Unauthorized(), err)
+	err = errkit.InternalServerError(err)
+	err = errkit.Unauthorized(err)
 
 	httpErr := response.LoadErrAsHTTPError(err)
 
-	assert.Equal(t, httperror.Unauthorized().ID, httpErr.ID)
-	assert.Equal(t, httperror.Unauthorized().Message, httpErr.Message)
+	assert.Equal(t, "unauthorized", httpErr.Message)
 }
 
 func TestLoadErrAsHTTPError_5(t *testing.T) {
-	var err error = httperror.Unauthorized()
+	var err error = &errkit.HTTPError{
+		HTTPCode: http.StatusUnauthorized,
+		Message:  "unauthorized",
+	}
 
 	httpErr := response.LoadErrAsHTTPError(err)
 
-	assert.Equal(t, httperror.Unauthorized().ID, httpErr.ID)
-	assert.Equal(t, httperror.Unauthorized().Message, httpErr.Message)
+	assert.Equal(t, "unauthorized", httpErr.Message)
 }
 
 func TestLoadErrAsHTTPError_6(t *testing.T) {
@@ -78,17 +77,18 @@ func TestLoadErrAsHTTPError_6(t *testing.T) {
 
 	httpErr := response.LoadErrAsHTTPError(err)
 
-	assert.Equal(t, httperror.InternalServerError().ID, httpErr.ID)
-	assert.Equal(t, httperror.InternalServerError().Message, httpErr.Message)
+	assert.Equal(t, "internal server error", httpErr.Message)
 }
 
 func TestLoadErrAsHTTPError_7(t *testing.T) {
 	var err error
-	err = httperror.Unauthorized()
+	err = &errkit.HTTPError{
+		HTTPCode: http.StatusUnauthorized,
+		Message:  "unauthorized",
+	}
 	err = fmt.Errorf("wrap1: %w", err)
 
 	httpErr := response.LoadErrAsHTTPError(err)
 
-	assert.Equal(t, httperror.Unauthorized().ID, httpErr.ID)
-	assert.Equal(t, httperror.Unauthorized().Message, httpErr.Message)
+	assert.Equal(t, "unauthorized", httpErr.Message)
 }

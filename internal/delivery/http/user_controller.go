@@ -1,12 +1,11 @@
 package http
 
 import (
-	"errors"
 	"golang-clean-architecture/internal/delivery/http/middleware"
 	"golang-clean-architecture/internal/delivery/http/response"
 	"golang-clean-architecture/internal/model"
 	"golang-clean-architecture/internal/usecase"
-	"golang-clean-architecture/pkg/httperror"
+	"golang-clean-architecture/pkg/errkit"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -30,7 +29,7 @@ func (c *UserController) Register(ctx *fiber.Ctx) error {
 	err := ctx.BodyParser(req)
 	if err != nil {
 		c.Log.Warnf("Failed to parse request body : %+v", err)
-		err = errors.Join(httperror.BadRequest(), err)
+		err = errkit.BadRequest(err)
 		return response.Error(ctx, err)
 	}
 
@@ -48,7 +47,7 @@ func (c *UserController) Login(ctx *fiber.Ctx) error {
 	err := ctx.BodyParser(req)
 	if err != nil {
 		c.Log.Warnf("Failed to parse request body : %+v", err)
-		err = errors.Join(httperror.BadRequest(), err)
+		err = errkit.BadRequest(err)
 		return response.Error(ctx, err)
 	}
 
@@ -99,7 +98,7 @@ func (c *UserController) Update(ctx *fiber.Ctx) error {
 	req := new(model.UpdateUserRequest)
 	if err := ctx.BodyParser(req); err != nil {
 		c.Log.Warnf("Failed to parse request body : %+v", err)
-		err = errors.Join(httperror.BadRequest(), err)
+		err = errkit.BadRequest(err)
 		return response.Error(ctx, err)
 	}
 

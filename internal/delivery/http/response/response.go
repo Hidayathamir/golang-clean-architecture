@@ -2,7 +2,8 @@ package response
 
 import (
 	"errors"
-	"golang-clean-architecture/pkg/httperror"
+	"golang-clean-architecture/pkg/errkit"
+	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -10,7 +11,6 @@ import (
 type WebResponse[T any] struct {
 	Data         T             `json:"data"`
 	Paging       *PageMetadata `json:"paging,omitempty"`
-	ErrorID      string        `json:"error_id,omitempty"`
 	ErrorMessage string        `json:"error_message,omitempty"`
 }
 
@@ -47,15 +47,18 @@ func Error(ctx *fiber.Ctx, err error) error {
 	httpErr := LoadErrAsHTTPError(err)
 
 	res := WebResponse[any]{}
-	res.ErrorID = httpErr.ID
 	res.ErrorMessage = httpErr.Message
 
 	return ctx.Status(httpErr.HTTPCode).JSON(res)
 }
 
-// LoadErrAsHTTPError load error as HTTPError with use InternalServerError as default.
-func LoadErrAsHTTPError(err error) *httperror.HTTPError {
-	httpErr := httperror.InternalServerError()
+// LoadErrAsHTTPError load error as HTTPError. Default http.StatusInternalServerError.
+func LoadErrAsHTTPError(err error) *errkit.HTTPError {
+	httpErr := &errkit.HTTPError{
+		HTTPCode: http.StatusInternalServerError,
+		Message:  "internal server error",
+	}
+
 	errors.As(err, &httpErr)
 
 	return httpErr

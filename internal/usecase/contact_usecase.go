@@ -2,13 +2,12 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/gateway/messaging"
 	"golang-clean-architecture/internal/model"
 	"golang-clean-architecture/internal/model/converter"
 	"golang-clean-architecture/internal/repository"
-	"golang-clean-architecture/pkg/httperror"
+	"golang-clean-architecture/pkg/errkit"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
@@ -41,7 +40,7 @@ func (c *ContactUseCase) Create(ctx context.Context, request *model.CreateContac
 
 	if err := c.Validate.Struct(request); err != nil {
 		c.Log.WithError(err).Error("error validating request body")
-		return nil, errors.Join(httperror.BadRequest(), err)
+		return nil, errkit.BadRequest(err)
 	}
 
 	contact := &entity.Contact{
@@ -55,18 +54,18 @@ func (c *ContactUseCase) Create(ctx context.Context, request *model.CreateContac
 
 	if err := c.ContactRepository.Create(tx, contact); err != nil {
 		c.Log.WithError(err).Error("error creating contact")
-		return nil, errors.Join(httperror.InternalServerError(), err)
+		return nil, errkit.InternalServerError(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
 		c.Log.WithError(err).Error("error creating contact")
-		return nil, errors.Join(httperror.InternalServerError(), err)
+		return nil, errkit.InternalServerError(err)
 	}
 
 	event := converter.ContactToEvent(contact)
 	if err := c.ContactProducer.Send(event); err != nil {
 		c.Log.WithError(err).Error("error publishing contact created event")
-		return nil, errors.Join(httperror.InternalServerError(), err)
+		return nil, errkit.InternalServerError(err)
 	}
 
 	return converter.ContactToResponse(contact), nil
@@ -79,12 +78,12 @@ func (c *ContactUseCase) Update(ctx context.Context, request *model.UpdateContac
 	contact := new(entity.Contact)
 	if err := c.ContactRepository.FindByIdAndUserId(tx, contact, request.ID, request.UserId); err != nil {
 		c.Log.WithError(err).Error("error getting contact")
-		return nil, errors.Join(httperror.NotFound(), err)
+		return nil, errkit.NotFound(err)
 	}
 
 	if err := c.Validate.Struct(request); err != nil {
 		c.Log.WithError(err).Error("error validating request body")
-		return nil, errors.Join(httperror.BadRequest(), err)
+		return nil, errkit.BadRequest(err)
 	}
 
 	contact.FirstName = request.FirstName
@@ -94,18 +93,18 @@ func (c *ContactUseCase) Update(ctx context.Context, request *model.UpdateContac
 
 	if err := c.ContactRepository.Update(tx, contact); err != nil {
 		c.Log.WithError(err).Error("error updating contact")
-		return nil, errors.Join(httperror.InternalServerError(), err)
+		return nil, errkit.InternalServerError(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
 		c.Log.WithError(err).Error("error updating contact")
-		return nil, errors.Join(httperror.InternalServerError(), err)
+		return nil, errkit.InternalServerError(err)
 	}
 
 	event := converter.ContactToEvent(contact)
 	if err := c.ContactProducer.Send(event); err != nil {
 		c.Log.WithError(err).Error("error publishing contact updated event")
-		return nil, errors.Join(httperror.InternalServerError(), err)
+		return nil, errkit.InternalServerError(err)
 	}
 
 	return converter.ContactToResponse(contact), nil
@@ -117,18 +116,18 @@ func (c *ContactUseCase) Get(ctx context.Context, request *model.GetContactReque
 
 	if err := c.Validate.Struct(request); err != nil {
 		c.Log.WithError(err).Error("error validating request body")
-		return nil, errors.Join(httperror.BadRequest(), err)
+		return nil, errkit.BadRequest(err)
 	}
 
 	contact := new(entity.Contact)
 	if err := c.ContactRepository.FindByIdAndUserId(tx, contact, request.ID, request.UserId); err != nil {
 		c.Log.WithError(err).Error("error getting contact")
-		return nil, errors.Join(httperror.NotFound(), err)
+		return nil, errkit.NotFound(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
 		c.Log.WithError(err).Error("error getting contact")
-		return nil, errors.Join(httperror.InternalServerError(), err)
+		return nil, errkit.InternalServerError(err)
 	}
 
 	return converter.ContactToResponse(contact), nil
@@ -140,23 +139,23 @@ func (c *ContactUseCase) Delete(ctx context.Context, request *model.DeleteContac
 
 	if err := c.Validate.Struct(request); err != nil {
 		c.Log.WithError(err).Error("error validating request body")
-		return errors.Join(httperror.BadRequest(), err)
+		return errkit.BadRequest(err)
 	}
 
 	contact := new(entity.Contact)
 	if err := c.ContactRepository.FindByIdAndUserId(tx, contact, request.ID, request.UserId); err != nil {
 		c.Log.WithError(err).Error("error getting contact")
-		return errors.Join(httperror.NotFound(), err)
+		return errkit.NotFound(err)
 	}
 
 	if err := c.ContactRepository.Delete(tx, contact); err != nil {
 		c.Log.WithError(err).Error("error deleting contact")
-		return errors.Join(httperror.InternalServerError(), err)
+		return errkit.InternalServerError(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
 		c.Log.WithError(err).Error("error deleting contact")
-		return errors.Join(httperror.InternalServerError(), err)
+		return errkit.InternalServerError(err)
 	}
 
 	return nil
@@ -168,18 +167,18 @@ func (c *ContactUseCase) Search(ctx context.Context, request *model.SearchContac
 
 	if err := c.Validate.Struct(request); err != nil {
 		c.Log.WithError(err).Error("error validating request body")
-		return nil, 0, errors.Join(httperror.BadRequest(), err)
+		return nil, 0, errkit.BadRequest(err)
 	}
 
 	contacts, total, err := c.ContactRepository.Search(tx, request)
 	if err != nil {
 		c.Log.WithError(err).Error("error getting contacts")
-		return nil, 0, errors.Join(httperror.InternalServerError(), err)
+		return nil, 0, errkit.InternalServerError(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
 		c.Log.WithError(err).Error("error getting contacts")
-		return nil, 0, errors.Join(httperror.InternalServerError(), err)
+		return nil, 0, errkit.InternalServerError(err)
 	}
 
 	responses := make([]model.ContactResponse, len(contacts))

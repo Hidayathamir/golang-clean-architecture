@@ -1,12 +1,11 @@
 package http
 
 import (
-	"errors"
 	"golang-clean-architecture/internal/delivery/http/middleware"
 	"golang-clean-architecture/internal/delivery/http/response"
 	"golang-clean-architecture/internal/model"
 	"golang-clean-architecture/internal/usecase"
-	"golang-clean-architecture/pkg/httperror"
+	"golang-clean-architecture/pkg/errkit"
 	"math"
 	"net/http"
 
@@ -32,7 +31,7 @@ func (c *ContactController) Create(ctx *fiber.Ctx) error {
 	req := new(model.CreateContactRequest)
 	if err := ctx.BodyParser(req); err != nil {
 		c.Log.WithError(err).Error("error parsing request body")
-		err = errors.Join(httperror.BadRequest(), err)
+		err = errkit.BadRequest(err)
 		return response.Error(ctx, err)
 	}
 	req.UserId = auth.ID
@@ -97,7 +96,7 @@ func (c *ContactController) Update(ctx *fiber.Ctx) error {
 	req := new(model.UpdateContactRequest)
 	if err := ctx.BodyParser(req); err != nil {
 		c.Log.WithError(err).Error("error parsing request body")
-		err = errors.Join(httperror.BadRequest(), err)
+		err = errkit.BadRequest(err)
 		return response.Error(ctx, err)
 	}
 
