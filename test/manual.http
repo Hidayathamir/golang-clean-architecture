@@ -1,3 +1,8 @@
+@token = 40400808-b01f-4e53-ade6-755cbf807d5a
+@contactId = 85ddf7a1-829c-46d7-a0b0-de3762ff0fb6
+@addressId = 1ad438ce-f542-44ce-975b-561ac604bdd3
+
+
 ### Register new user
 POST http://localhost:3000/api/users
 Content-Type: application/json
