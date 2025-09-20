@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/gateway/messaging"
 	"golang-clean-architecture/internal/model"
@@ -78,6 +79,7 @@ func (c *UserUseCase) Create(ctx context.Context, request *model.RegisterUserReq
 	}
 
 	if total > 0 {
+		err = errors.New("user already exists")
 		c.Log.Warnf("User already exists : %+v", err)
 		err = errkit.Conflict(err)
 		return nil, errkit.AddFuncName(err)
