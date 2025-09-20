@@ -7,8 +7,9 @@ import (
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/model"
 	"golang-clean-architecture/internal/repository"
-	"gorm.io/gorm"
 	"sync"
+
+	"gorm.io/gorm"
 )
 
 // Ensure, that ContactRepositoryMock does implement repository.ContactRepository.

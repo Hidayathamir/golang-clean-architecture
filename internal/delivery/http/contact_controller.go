@@ -25,6 +25,16 @@ func NewContactController(useCase usecase.ContactUseCase, log *logrus.Logger) *C
 	}
 }
 
+// Create godoc
+//
+//	@Summary		Create contact
+//	@Description	Create a new contact
+//	@Tags			contacts
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		model.CreateContactRequest	true	"Create Contact Request"
+//	@Success		200		{object}	response.WebResponse[model.ContactResponse]
+//	@Router			/api/contacts [post]
 func (c *ContactController) Create(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 
@@ -47,6 +57,19 @@ func (c *ContactController) Create(ctx *fiber.Ctx) error {
 	return response.Data(ctx, http.StatusOK, res)
 }
 
+// List godoc
+//
+//	@Summary		List contacts
+//	@Description	Search and list contacts with filters and pagination
+//	@Tags			contacts
+//	@Produce		json
+//	@Param			name	query		string	false	"Filter by name"
+//	@Param			email	query		string	false	"Filter by email"
+//	@Param			phone	query		string	false	"Filter by phone"
+//	@Param			page	query		int		false	"Page number"	default(1)
+//	@Param			size	query		int		false	"Page size"		default(10)
+//	@Success		200		{object}	response.WebResponse[[]model.ContactResponse]
+//	@Router			/api/contacts [get]
 func (c *ContactController) List(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 
@@ -76,6 +99,15 @@ func (c *ContactController) List(ctx *fiber.Ctx) error {
 	return response.DataPaging(ctx, http.StatusOK, res, paging)
 }
 
+// Get godoc
+//
+//	@Summary		Get contact
+//	@Description	Get a specific contact by ID
+//	@Tags			contacts
+//	@Produce		json
+//	@Param			contactId	path		string	true	"Contact ID"
+//	@Success		200			{object}	response.WebResponse[model.ContactResponse]
+//	@Router			/api/contacts/{contactId} [get]
 func (c *ContactController) Get(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 
@@ -94,6 +126,17 @@ func (c *ContactController) Get(ctx *fiber.Ctx) error {
 	return response.Data(ctx, http.StatusOK, res)
 }
 
+// Update godoc
+//
+//	@Summary		Update contact
+//	@Description	Update an existing contact by ID
+//	@Tags			contacts
+//	@Accept			json
+//	@Produce		json
+//	@Param			contactId	path		string						true	"Contact ID"
+//	@Param			request		body		model.UpdateContactRequest	true	"Update Contact Request"
+//	@Success		200			{object}	response.WebResponse[model.ContactResponse]
+//	@Router			/api/contacts/{contactId} [put]
 func (c *ContactController) Update(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 
@@ -118,6 +161,15 @@ func (c *ContactController) Update(ctx *fiber.Ctx) error {
 	return response.Data(ctx, http.StatusOK, res)
 }
 
+// Delete godoc
+//
+//	@Summary		Delete contact
+//	@Description	Delete a contact by ID
+//	@Tags			contacts
+//	@Produce		json
+//	@Param			contactId	path		string	true	"Contact ID"
+//	@Success		200			{object}	response.WebResponse[bool]
+//	@Router			/api/contacts/{contactId} [delete]
 func (c *ContactController) Delete(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 	contactId := ctx.Params("contactId")

@@ -1,9 +1,11 @@
 package route
 
 import (
+	_ "golang-clean-architecture/api" // need import for swagger
 	"golang-clean-architecture/internal/delivery/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/swagger"
 )
 
 type RouteConfig struct {
@@ -15,8 +17,13 @@ type RouteConfig struct {
 }
 
 func (c *RouteConfig) Setup() {
+	c.SetupSwaggerRoute()
 	c.SetupGuestRoute()
 	c.SetupAuthRoute()
+}
+
+func (c *RouteConfig) SetupSwaggerRoute() {
+	c.App.Get("/swagger/*", swagger.HandlerDefault)
 }
 
 func (c *RouteConfig) SetupGuestRoute() {

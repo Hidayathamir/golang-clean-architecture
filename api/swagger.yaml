@@ -1,0 +1,598 @@
+definitions:
+  golang-clean-architecture_internal_delivery_http_response.PageMetadata:
+    properties:
+      page:
+        type: integer
+      size:
+        type: integer
+      total_item:
+        type: integer
+      total_page:
+        type: integer
+    type: object
+  ? golang-clean-architecture_internal_delivery_http_response.WebResponse-array_golang-clean-architecture_internal_model_AddressResponse
+  : properties:
+      data:
+        items:
+          $ref: '#/definitions/golang-clean-architecture_internal_model.AddressResponse'
+        type: array
+      error_detail:
+        items:
+          type: string
+        type: array
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.PageMetadata'
+    type: object
+  ? golang-clean-architecture_internal_delivery_http_response.WebResponse-array_golang-clean-architecture_internal_model_ContactResponse
+  : properties:
+      data:
+        items:
+          $ref: '#/definitions/golang-clean-architecture_internal_model.ContactResponse'
+        type: array
+      error_detail:
+        items:
+          type: string
+        type: array
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.PageMetadata'
+    type: object
+  golang-clean-architecture_internal_delivery_http_response.WebResponse-bool:
+    properties:
+      data:
+        type: boolean
+      error_detail:
+        items:
+          type: string
+        type: array
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.PageMetadata'
+    type: object
+  golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_AddressResponse:
+    properties:
+      data:
+        $ref: '#/definitions/golang-clean-architecture_internal_model.AddressResponse'
+      error_detail:
+        items:
+          type: string
+        type: array
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.PageMetadata'
+    type: object
+  golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_ContactResponse:
+    properties:
+      data:
+        $ref: '#/definitions/golang-clean-architecture_internal_model.ContactResponse'
+      error_detail:
+        items:
+          type: string
+        type: array
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.PageMetadata'
+    type: object
+  golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_UserResponse:
+    properties:
+      data:
+        $ref: '#/definitions/golang-clean-architecture_internal_model.UserResponse'
+      error_detail:
+        items:
+          type: string
+        type: array
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.PageMetadata'
+    type: object
+  golang-clean-architecture_internal_model.AddressResponse:
+    properties:
+      city:
+        type: string
+      country:
+        type: string
+      created_at:
+        type: integer
+      id:
+        type: string
+      postal_code:
+        type: string
+      province:
+        type: string
+      street:
+        type: string
+      updated_at:
+        type: integer
+    type: object
+  golang-clean-architecture_internal_model.ContactResponse:
+    properties:
+      addresses:
+        items:
+          $ref: '#/definitions/golang-clean-architecture_internal_model.AddressResponse'
+        type: array
+      created_at:
+        type: integer
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+      phone:
+        type: string
+      updated_at:
+        type: integer
+    type: object
+  golang-clean-architecture_internal_model.CreateAddressRequest:
+    properties:
+      city:
+        maxLength: 255
+        type: string
+      country:
+        maxLength: 100
+        type: string
+      postal_code:
+        maxLength: 10
+        type: string
+      province:
+        maxLength: 255
+        type: string
+      street:
+        maxLength: 255
+        type: string
+    type: object
+  golang-clean-architecture_internal_model.CreateContactRequest:
+    properties:
+      email:
+        maxLength: 200
+        type: string
+      first_name:
+        maxLength: 100
+        type: string
+      last_name:
+        maxLength: 100
+        type: string
+      phone:
+        maxLength: 20
+        type: string
+    required:
+    - first_name
+    type: object
+  golang-clean-architecture_internal_model.LoginUserRequest:
+    properties:
+      id:
+        maxLength: 100
+        type: string
+      password:
+        maxLength: 100
+        type: string
+    required:
+    - id
+    - password
+    type: object
+  golang-clean-architecture_internal_model.RegisterUserRequest:
+    properties:
+      id:
+        maxLength: 100
+        type: string
+      name:
+        maxLength: 100
+        type: string
+      password:
+        maxLength: 100
+        type: string
+    required:
+    - id
+    - name
+    - password
+    type: object
+  golang-clean-architecture_internal_model.UpdateAddressRequest:
+    properties:
+      city:
+        maxLength: 255
+        type: string
+      country:
+        maxLength: 100
+        type: string
+      postal_code:
+        maxLength: 10
+        type: string
+      province:
+        maxLength: 255
+        type: string
+      street:
+        maxLength: 255
+        type: string
+    type: object
+  golang-clean-architecture_internal_model.UpdateContactRequest:
+    properties:
+      email:
+        maxLength: 200
+        type: string
+      first_name:
+        maxLength: 100
+        type: string
+      last_name:
+        maxLength: 100
+        type: string
+      phone:
+        maxLength: 20
+        type: string
+    required:
+    - first_name
+    type: object
+  golang-clean-architecture_internal_model.UpdateUserRequest:
+    properties:
+      name:
+        maxLength: 100
+        type: string
+      password:
+        maxLength: 100
+        type: string
+    type: object
+  golang-clean-architecture_internal_model.UserResponse:
+    properties:
+      created_at:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+      token:
+        type: string
+      updated_at:
+        type: integer
+    type: object
+info:
+  contact: {}
+  title: Golang Clean Architecture
+paths:
+  /api/contacts:
+    get:
+      description: Search and list contacts with filters and pagination
+      parameters:
+      - description: Filter by name
+        in: query
+        name: name
+        type: string
+      - description: Filter by email
+        in: query
+        name: email
+        type: string
+      - description: Filter by phone
+        in: query
+        name: phone
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Page size
+        in: query
+        name: size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-array_golang-clean-architecture_internal_model_ContactResponse'
+      summary: List contacts
+      tags:
+      - contacts
+    post:
+      consumes:
+      - application/json
+      description: Create a new contact
+      parameters:
+      - description: Create Contact Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/golang-clean-architecture_internal_model.CreateContactRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_ContactResponse'
+      summary: Create contact
+      tags:
+      - contacts
+  /api/contacts/{contactId}:
+    delete:
+      description: Delete a contact by ID
+      parameters:
+      - description: Contact ID
+        in: path
+        name: contactId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-bool'
+      summary: Delete contact
+      tags:
+      - contacts
+    get:
+      description: Get a specific contact by ID
+      parameters:
+      - description: Contact ID
+        in: path
+        name: contactId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_ContactResponse'
+      summary: Get contact
+      tags:
+      - contacts
+    put:
+      consumes:
+      - application/json
+      description: Update an existing contact by ID
+      parameters:
+      - description: Contact ID
+        in: path
+        name: contactId
+        required: true
+        type: string
+      - description: Update Contact Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/golang-clean-architecture_internal_model.UpdateContactRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_ContactResponse'
+      summary: Update contact
+      tags:
+      - contacts
+  /api/contacts/{contactId}/addresses:
+    get:
+      description: Get all addresses for a contact
+      parameters:
+      - description: Contact ID
+        in: path
+        name: contactId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-array_golang-clean-architecture_internal_model_AddressResponse'
+      summary: List addresses
+      tags:
+      - addresses
+    post:
+      consumes:
+      - application/json
+      description: Create a new address for a contact
+      parameters:
+      - description: Contact ID
+        in: path
+        name: contactId
+        required: true
+        type: string
+      - description: Create Address Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/golang-clean-architecture_internal_model.CreateAddressRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_AddressResponse'
+      summary: Create address
+      tags:
+      - addresses
+  /api/contacts/{contactId}/addresses/{addressId}:
+    delete:
+      description: Delete an address by ID
+      parameters:
+      - description: Contact ID
+        in: path
+        name: contactId
+        required: true
+        type: string
+      - description: Address ID
+        in: path
+        name: addressId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-bool'
+      summary: Delete address
+      tags:
+      - addresses
+    get:
+      description: Get a specific address by ID
+      parameters:
+      - description: Contact ID
+        in: path
+        name: contactId
+        required: true
+        type: string
+      - description: Address ID
+        in: path
+        name: addressId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_AddressResponse'
+      summary: Get address
+      tags:
+      - addresses
+    put:
+      consumes:
+      - application/json
+      description: Update an existing address by ID
+      parameters:
+      - description: Contact ID
+        in: path
+        name: contactId
+        required: true
+        type: string
+      - description: Address ID
+        in: path
+        name: addressId
+        required: true
+        type: string
+      - description: Update Address Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/golang-clean-architecture_internal_model.UpdateAddressRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_AddressResponse'
+      summary: Update address
+      tags:
+      - addresses
+  /api/users:
+    delete:
+      description: Logout the current authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-bool'
+      security:
+      - BearerAuth: []
+      summary: Logout user
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Register a new user account
+      parameters:
+      - description: Register User Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/golang-clean-architecture_internal_model.RegisterUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_UserResponse'
+      summary: Register user
+      tags:
+      - users
+  /api/users/_current:
+    get:
+      description: Get profile of the currently authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_UserResponse'
+      security:
+      - BearerAuth: []
+      summary: Get current user
+      tags:
+      - users
+    patch:
+      consumes:
+      - application/json
+      description: Update profile of the current authenticated user
+      parameters:
+      - description: Update User Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/golang-clean-architecture_internal_model.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_UserResponse'
+      security:
+      - BearerAuth: []
+      summary: Update user
+      tags:
+      - users
+  /api/users/_login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a user and return access token
+      parameters:
+      - description: Login User Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/golang-clean-architecture_internal_model.LoginUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_UserResponse'
+      summary: Login user
+      tags:
+      - users
+swagger: "2.0"

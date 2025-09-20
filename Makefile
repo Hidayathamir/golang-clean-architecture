@@ -17,3 +17,6 @@ migrate-new:
 
 generate:
 	go generate ./...
+
+swag:
+	swag fmt && swag init --parseDependency --parseInternal --generalInfo ./cmd/web/main.go --output ./api/

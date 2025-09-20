@@ -5,8 +5,9 @@ package mock
 
 import (
 	"golang-clean-architecture/internal/repository"
-	"gorm.io/gorm"
 	"sync"
+
+	"gorm.io/gorm"
 )
 
 // Ensure, that RepositoryMock does implement repository.Repository.

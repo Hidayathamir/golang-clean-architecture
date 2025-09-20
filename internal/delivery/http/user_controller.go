@@ -24,6 +24,16 @@ func NewUserController(useCase usecase.UserUseCase, logger *logrus.Logger) *User
 	}
 }
 
+// Register godoc
+//
+//	@Summary		Register user
+//	@Description	Register a new user account
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		model.RegisterUserRequest	true	"Register User Request"
+//	@Success		200		{object}	response.WebResponse[model.UserResponse]
+//	@Router			/api/users [post]
 func (c *UserController) Register(ctx *fiber.Ctx) error {
 	req := new(model.RegisterUserRequest)
 	err := ctx.BodyParser(req)
@@ -44,6 +54,16 @@ func (c *UserController) Register(ctx *fiber.Ctx) error {
 	return response.Data(ctx, http.StatusOK, res)
 }
 
+// Login godoc
+//
+//	@Summary		Login user
+//	@Description	Authenticate a user and return access token
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		model.LoginUserRequest	true	"Login User Request"
+//	@Success		200		{object}	response.WebResponse[model.UserResponse]
+//	@Router			/api/users/_login [post]
 func (c *UserController) Login(ctx *fiber.Ctx) error {
 	req := new(model.LoginUserRequest)
 	err := ctx.BodyParser(req)
@@ -64,6 +84,15 @@ func (c *UserController) Login(ctx *fiber.Ctx) error {
 	return response.Data(ctx, http.StatusOK, res)
 }
 
+// Current godoc
+//
+//	@Summary		Get current user
+//	@Description	Get profile of the currently authenticated user
+//	@Tags			users
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Success		200	{object}	response.WebResponse[model.UserResponse]
+//	@Router			/api/users/_current [get]
 func (c *UserController) Current(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 
@@ -81,6 +110,15 @@ func (c *UserController) Current(ctx *fiber.Ctx) error {
 	return response.Data(ctx, http.StatusOK, res)
 }
 
+// Logout godoc
+//
+//	@Summary		Logout user
+//	@Description	Logout the current authenticated user
+//	@Tags			users
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Success		200	{object}	response.WebResponse[bool]
+//	@Router			/api/users [delete]
 func (c *UserController) Logout(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 
@@ -98,6 +136,17 @@ func (c *UserController) Logout(ctx *fiber.Ctx) error {
 	return response.Data(ctx, http.StatusOK, res)
 }
 
+// Update godoc
+//
+//	@Summary		Update user
+//	@Description	Update profile of the current authenticated user
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			request	body		model.UpdateUserRequest	true	"Update User Request"
+//	@Success		200		{object}	response.WebResponse[model.UserResponse]
+//	@Router			/api/users/_current [patch]
 func (c *UserController) Update(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 

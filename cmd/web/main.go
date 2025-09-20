@@ -6,6 +6,8 @@ import (
 	"golang-clean-architecture/pkg/constant/configkey"
 )
 
+//	@title	Golang Clean Architecture
+
 func main() {
 	viperConfig := config.NewViper()
 	log := config.NewLogger(viperConfig)
