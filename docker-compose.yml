@@ -10,7 +10,4 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
       MYSQL_DATABASE: golang_clean_architecture
     volumes:
-      - mysql_data:/var/lib/mysql
-
-volumes:
-  mysql_data:
+      - ./data/mysql:/var/lib/mysql

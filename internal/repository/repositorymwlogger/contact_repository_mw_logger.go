@@ -15,16 +15,11 @@ var _ repository.ContactRepository = &ContactRepositoryImpl{}
 type ContactRepositoryImpl struct {
 	logger *logrus.Logger
 
-	RepositoryImpl[entity.Contact]
 	next repository.ContactRepository
 }
 
 func NewContactRepository(logger *logrus.Logger, next repository.ContactRepository) *ContactRepositoryImpl {
 	return &ContactRepositoryImpl{
-		RepositoryImpl: RepositoryImpl[entity.Contact]{
-			logger: logger,
-			next:   next,
-		},
 		logger: logger,
 		next:   next,
 	}
@@ -54,4 +49,37 @@ func (r *ContactRepositoryImpl) Search(db *gorm.DB, req *model.SearchContactRequ
 	helper.Log(r.logger, fields, err)
 
 	return contacts, total, err
+}
+
+func (r *ContactRepositoryImpl) Create(db *gorm.DB, entity *entity.Contact) error {
+	err := r.next.Create(db, entity)
+
+	fields := logrus.Fields{
+		"entity": entity,
+	}
+	helper.Log(r.logger, fields, err)
+
+	return err
+}
+
+func (r *ContactRepositoryImpl) Delete(db *gorm.DB, entity *entity.Contact) error {
+	err := r.next.Delete(db, entity)
+
+	fields := logrus.Fields{
+		"entity": entity,
+	}
+	helper.Log(r.logger, fields, err)
+
+	return err
+}
+
+func (r *ContactRepositoryImpl) Update(db *gorm.DB, entity *entity.Contact) error {
+	err := r.next.Update(db, entity)
+
+	fields := logrus.Fields{
+		"entity": entity,
+	}
+	helper.Log(r.logger, fields, err)
+
+	return err
 }

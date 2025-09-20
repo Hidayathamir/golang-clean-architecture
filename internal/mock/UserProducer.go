@@ -19,9 +19,6 @@ var _ messaging.UserProducer = &UserProducerMock{}
 //
 //		// make and configure a mocked messaging.UserProducer
 //		mockedUserProducer := &UserProducerMock{
-//			GetTopicFunc: func() *string {
-//				panic("mock out the GetTopic method")
-//			},
 //			SendFunc: func(event *model.UserEvent) error {
 //				panic("mock out the Send method")
 //			},
@@ -32,52 +29,18 @@ var _ messaging.UserProducer = &UserProducerMock{}
 //
 //	}
 type UserProducerMock struct {
-	// GetTopicFunc mocks the GetTopic method.
-	GetTopicFunc func() *string
-
 	// SendFunc mocks the Send method.
 	SendFunc func(event *model.UserEvent) error
 
 	// calls tracks calls to the methods.
 	calls struct {
-		// GetTopic holds details about calls to the GetTopic method.
-		GetTopic []struct {
-		}
 		// Send holds details about calls to the Send method.
 		Send []struct {
 			// Event is the event argument value.
 			Event *model.UserEvent
 		}
 	}
-	lockGetTopic sync.RWMutex
-	lockSend     sync.RWMutex
-}
-
-// GetTopic calls GetTopicFunc.
-func (mock *UserProducerMock) GetTopic() *string {
-	if mock.GetTopicFunc == nil {
-		panic("UserProducerMock.GetTopicFunc: method is nil but UserProducer.GetTopic was just called")
-	}
-	callInfo := struct {
-	}{}
-	mock.lockGetTopic.Lock()
-	mock.calls.GetTopic = append(mock.calls.GetTopic, callInfo)
-	mock.lockGetTopic.Unlock()
-	return mock.GetTopicFunc()
-}
-
-// GetTopicCalls gets all the calls that were made to GetTopic.
-// Check the length with:
-//
-//	len(mockedUserProducer.GetTopicCalls())
-func (mock *UserProducerMock) GetTopicCalls() []struct {
-} {
-	var calls []struct {
-	}
-	mock.lockGetTopic.RLock()
-	calls = mock.calls.GetTopic
-	mock.lockGetTopic.RUnlock()
-	return calls
+	lockSend sync.RWMutex
 }
 
 // Send calls SendFunc.

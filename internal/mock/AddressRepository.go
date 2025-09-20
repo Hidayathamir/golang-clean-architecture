@@ -6,9 +6,8 @@ package mock
 import (
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/repository"
-	"sync"
-
 	"gorm.io/gorm"
+	"sync"
 )
 
 // Ensure, that AddressRepositoryMock does implement repository.AddressRepository.
@@ -21,9 +20,6 @@ var _ repository.AddressRepository = &AddressRepositoryMock{}
 //
 //		// make and configure a mocked repository.AddressRepository
 //		mockedAddressRepository := &AddressRepositoryMock{
-//			CountByIdFunc: func(db *gorm.DB, id any) (int64, error) {
-//				panic("mock out the CountById method")
-//			},
 //			CreateFunc: func(db *gorm.DB, entityMoqParam *entity.Address) error {
 //				panic("mock out the Create method")
 //			},
@@ -32,9 +28,6 @@ var _ repository.AddressRepository = &AddressRepositoryMock{}
 //			},
 //			FindAllByContactIdFunc: func(db *gorm.DB, contactId string) ([]entity.Address, error) {
 //				panic("mock out the FindAllByContactId method")
-//			},
-//			FindByIdFunc: func(db *gorm.DB, entityMoqParam *entity.Address, id any) error {
-//				panic("mock out the FindById method")
 //			},
 //			FindByIdAndContactIdFunc: func(db *gorm.DB, address *entity.Address, id string, contactId string) error {
 //				panic("mock out the FindByIdAndContactId method")
@@ -49,9 +42,6 @@ var _ repository.AddressRepository = &AddressRepositoryMock{}
 //
 //	}
 type AddressRepositoryMock struct {
-	// CountByIdFunc mocks the CountById method.
-	CountByIdFunc func(db *gorm.DB, id any) (int64, error)
-
 	// CreateFunc mocks the Create method.
 	CreateFunc func(db *gorm.DB, entityMoqParam *entity.Address) error
 
@@ -61,9 +51,6 @@ type AddressRepositoryMock struct {
 	// FindAllByContactIdFunc mocks the FindAllByContactId method.
 	FindAllByContactIdFunc func(db *gorm.DB, contactId string) ([]entity.Address, error)
 
-	// FindByIdFunc mocks the FindById method.
-	FindByIdFunc func(db *gorm.DB, entityMoqParam *entity.Address, id any) error
-
 	// FindByIdAndContactIdFunc mocks the FindByIdAndContactId method.
 	FindByIdAndContactIdFunc func(db *gorm.DB, address *entity.Address, id string, contactId string) error
 
@@ -72,13 +59,6 @@ type AddressRepositoryMock struct {
 
 	// calls tracks calls to the methods.
 	calls struct {
-		// CountById holds details about calls to the CountById method.
-		CountById []struct {
-			// Db is the db argument value.
-			Db *gorm.DB
-			// ID is the id argument value.
-			ID any
-		}
 		// Create holds details about calls to the Create method.
 		Create []struct {
 			// Db is the db argument value.
@@ -100,15 +80,6 @@ type AddressRepositoryMock struct {
 			// ContactId is the contactId argument value.
 			ContactId string
 		}
-		// FindById holds details about calls to the FindById method.
-		FindById []struct {
-			// Db is the db argument value.
-			Db *gorm.DB
-			// EntityMoqParam is the entityMoqParam argument value.
-			EntityMoqParam *entity.Address
-			// ID is the id argument value.
-			ID any
-		}
 		// FindByIdAndContactId holds details about calls to the FindByIdAndContactId method.
 		FindByIdAndContactId []struct {
 			// Db is the db argument value.
@@ -128,49 +99,11 @@ type AddressRepositoryMock struct {
 			EntityMoqParam *entity.Address
 		}
 	}
-	lockCountById            sync.RWMutex
 	lockCreate               sync.RWMutex
 	lockDelete               sync.RWMutex
 	lockFindAllByContactId   sync.RWMutex
-	lockFindById             sync.RWMutex
 	lockFindByIdAndContactId sync.RWMutex
 	lockUpdate               sync.RWMutex
-}
-
-// CountById calls CountByIdFunc.
-func (mock *AddressRepositoryMock) CountById(db *gorm.DB, id any) (int64, error) {
-	if mock.CountByIdFunc == nil {
-		panic("AddressRepositoryMock.CountByIdFunc: method is nil but AddressRepository.CountById was just called")
-	}
-	callInfo := struct {
-		Db *gorm.DB
-		ID any
-	}{
-		Db: db,
-		ID: id,
-	}
-	mock.lockCountById.Lock()
-	mock.calls.CountById = append(mock.calls.CountById, callInfo)
-	mock.lockCountById.Unlock()
-	return mock.CountByIdFunc(db, id)
-}
-
-// CountByIdCalls gets all the calls that were made to CountById.
-// Check the length with:
-//
-//	len(mockedAddressRepository.CountByIdCalls())
-func (mock *AddressRepositoryMock) CountByIdCalls() []struct {
-	Db *gorm.DB
-	ID any
-} {
-	var calls []struct {
-		Db *gorm.DB
-		ID any
-	}
-	mock.lockCountById.RLock()
-	calls = mock.calls.CountById
-	mock.lockCountById.RUnlock()
-	return calls
 }
 
 // Create calls CreateFunc.
@@ -278,46 +211,6 @@ func (mock *AddressRepositoryMock) FindAllByContactIdCalls() []struct {
 	mock.lockFindAllByContactId.RLock()
 	calls = mock.calls.FindAllByContactId
 	mock.lockFindAllByContactId.RUnlock()
-	return calls
-}
-
-// FindById calls FindByIdFunc.
-func (mock *AddressRepositoryMock) FindById(db *gorm.DB, entityMoqParam *entity.Address, id any) error {
-	if mock.FindByIdFunc == nil {
-		panic("AddressRepositoryMock.FindByIdFunc: method is nil but AddressRepository.FindById was just called")
-	}
-	callInfo := struct {
-		Db             *gorm.DB
-		EntityMoqParam *entity.Address
-		ID             any
-	}{
-		Db:             db,
-		EntityMoqParam: entityMoqParam,
-		ID:             id,
-	}
-	mock.lockFindById.Lock()
-	mock.calls.FindById = append(mock.calls.FindById, callInfo)
-	mock.lockFindById.Unlock()
-	return mock.FindByIdFunc(db, entityMoqParam, id)
-}
-
-// FindByIdCalls gets all the calls that were made to FindById.
-// Check the length with:
-//
-//	len(mockedAddressRepository.FindByIdCalls())
-func (mock *AddressRepositoryMock) FindByIdCalls() []struct {
-	Db             *gorm.DB
-	EntityMoqParam *entity.Address
-	ID             any
-} {
-	var calls []struct {
-		Db             *gorm.DB
-		EntityMoqParam *entity.Address
-		ID             any
-	}
-	mock.lockFindById.RLock()
-	calls = mock.calls.FindById
-	mock.lockFindById.RUnlock()
 	return calls
 }
 

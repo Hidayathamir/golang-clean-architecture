@@ -22,4 +22,4 @@ swag:
 	swag fmt && swag init --parseDependency --parseInternal --generalInfo ./cmd/web/main.go --output ./api/
 
 docker-compose:
-	docker compose up
+	docker compose down && docker compose up

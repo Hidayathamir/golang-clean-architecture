@@ -3,24 +3,33 @@ package messagingmwlogger
 import (
 	"golang-clean-architecture/internal/gateway/messaging"
 	"golang-clean-architecture/internal/model"
+	"golang-clean-architecture/pkg/helper"
 
 	"github.com/sirupsen/logrus"
 )
 
+var _ messaging.UserProducer = &UserProducerImpl{}
+
 type UserProducerImpl struct {
 	logger *logrus.Logger
 
-	ProducerImpl[*model.UserEvent]
 	next messaging.UserProducer
 }
 
 func NewUserProducer(logger *logrus.Logger, next messaging.UserProducer) *UserProducerImpl {
 	return &UserProducerImpl{
-		ProducerImpl: ProducerImpl[*model.UserEvent]{
-			logger: logger,
-			next:   next,
-		},
 		logger: logger,
 		next:   next,
 	}
+}
+
+func (p *UserProducerImpl) Send(event *model.UserEvent) error {
+	err := p.next.Send(event)
+
+	fields := logrus.Fields{
+		"event": event,
+	}
+	helper.Log(p.logger, fields, err)
+
+	return err
 }

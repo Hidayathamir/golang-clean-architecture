@@ -11,22 +11,22 @@ import (
 //go:generate moq -out=../mock/AddressRepository.go -pkg=mock . AddressRepository
 
 type AddressRepository interface {
-	Repository[entity.Address]
 	FindByIdAndContactId(db *gorm.DB, address *entity.Address, id string, contactId string) error
 	FindAllByContactId(db *gorm.DB, contactId string) ([]entity.Address, error)
+	Create(db *gorm.DB, entity *entity.Address) error
+	Update(db *gorm.DB, entity *entity.Address) error
+	Delete(db *gorm.DB, entity *entity.Address) error
 }
 
 var _ AddressRepository = &AddressRepositoryImpl{}
 
 type AddressRepositoryImpl struct {
-	RepositoryImpl[entity.Address]
 	Log *logrus.Logger
 }
 
 func NewAddressRepository(log *logrus.Logger) *AddressRepositoryImpl {
 	return &AddressRepositoryImpl{
-		RepositoryImpl: RepositoryImpl[entity.Address]{},
-		Log:            log,
+		Log: log,
 	}
 }
 
@@ -46,4 +46,28 @@ func (r *AddressRepositoryImpl) FindAllByContactId(db *gorm.DB, contactId string
 		return nil, errkit.AddFuncName(err)
 	}
 	return addresses, nil
+}
+
+func (r *AddressRepositoryImpl) Create(db *gorm.DB, entity *entity.Address) error {
+	err := db.Create(entity).Error
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+	return nil
+}
+
+func (r *AddressRepositoryImpl) Update(db *gorm.DB, entity *entity.Address) error {
+	err := db.Save(entity).Error
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+	return nil
+}
+
+func (r *AddressRepositoryImpl) Delete(db *gorm.DB, entity *entity.Address) error {
+	err := db.Delete(entity).Error
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+	return nil
 }

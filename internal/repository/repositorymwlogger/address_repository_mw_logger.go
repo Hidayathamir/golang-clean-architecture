@@ -14,16 +14,11 @@ var _ repository.AddressRepository = &AddressRepositoryImpl{}
 type AddressRepositoryImpl struct {
 	logger *logrus.Logger
 
-	RepositoryImpl[entity.Address]
 	next repository.AddressRepository
 }
 
 func NewAddressRepository(logger *logrus.Logger, next repository.AddressRepository) *AddressRepositoryImpl {
 	return &AddressRepositoryImpl{
-		RepositoryImpl: RepositoryImpl[entity.Address]{
-			logger: logger,
-			next:   next,
-		},
 		logger: logger,
 		next:   next,
 	}
@@ -48,6 +43,39 @@ func (r *AddressRepositoryImpl) FindByIdAndContactId(db *gorm.DB, address *entit
 		"address":   address,
 		"id":        id,
 		"contactId": contactId,
+	}
+	helper.Log(r.logger, fields, err)
+
+	return err
+}
+
+func (r *AddressRepositoryImpl) Create(db *gorm.DB, entity *entity.Address) error {
+	err := r.next.Create(db, entity)
+
+	fields := logrus.Fields{
+		"entity": entity,
+	}
+	helper.Log(r.logger, fields, err)
+
+	return err
+}
+
+func (r *AddressRepositoryImpl) Delete(db *gorm.DB, entity *entity.Address) error {
+	err := r.next.Delete(db, entity)
+
+	fields := logrus.Fields{
+		"entity": entity,
+	}
+	helper.Log(r.logger, fields, err)
+
+	return err
+}
+
+func (r *AddressRepositoryImpl) Update(db *gorm.DB, entity *entity.Address) error {
+	err := r.next.Update(db, entity)
+
+	fields := logrus.Fields{
+		"entity": entity,
 	}
 	helper.Log(r.logger, fields, err)
 

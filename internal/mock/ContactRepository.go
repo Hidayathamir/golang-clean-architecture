@@ -7,9 +7,8 @@ import (
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/model"
 	"golang-clean-architecture/internal/repository"
-	"sync"
-
 	"gorm.io/gorm"
+	"sync"
 )
 
 // Ensure, that ContactRepositoryMock does implement repository.ContactRepository.
@@ -22,22 +21,16 @@ var _ repository.ContactRepository = &ContactRepositoryMock{}
 //
 //		// make and configure a mocked repository.ContactRepository
 //		mockedContactRepository := &ContactRepositoryMock{
-//			CountByIdFunc: func(db *gorm.DB, id any) (int64, error) {
-//				panic("mock out the CountById method")
-//			},
 //			CreateFunc: func(db *gorm.DB, entityMoqParam *entity.Contact) error {
 //				panic("mock out the Create method")
 //			},
 //			DeleteFunc: func(db *gorm.DB, entityMoqParam *entity.Contact) error {
 //				panic("mock out the Delete method")
 //			},
-//			FindByIdFunc: func(db *gorm.DB, entityMoqParam *entity.Contact, id any) error {
-//				panic("mock out the FindById method")
-//			},
 //			FindByIdAndUserIdFunc: func(db *gorm.DB, contact *entity.Contact, id string, userId string) error {
 //				panic("mock out the FindByIdAndUserId method")
 //			},
-//			SearchFunc: func(db *gorm.DB, request *model.SearchContactRequest) ([]entity.Contact, int64, error) {
+//			SearchFunc: func(db *gorm.DB, req *model.SearchContactRequest) ([]entity.Contact, int64, error) {
 //				panic("mock out the Search method")
 //			},
 //			UpdateFunc: func(db *gorm.DB, entityMoqParam *entity.Contact) error {
@@ -50,36 +43,23 @@ var _ repository.ContactRepository = &ContactRepositoryMock{}
 //
 //	}
 type ContactRepositoryMock struct {
-	// CountByIdFunc mocks the CountById method.
-	CountByIdFunc func(db *gorm.DB, id any) (int64, error)
-
 	// CreateFunc mocks the Create method.
 	CreateFunc func(db *gorm.DB, entityMoqParam *entity.Contact) error
 
 	// DeleteFunc mocks the Delete method.
 	DeleteFunc func(db *gorm.DB, entityMoqParam *entity.Contact) error
 
-	// FindByIdFunc mocks the FindById method.
-	FindByIdFunc func(db *gorm.DB, entityMoqParam *entity.Contact, id any) error
-
 	// FindByIdAndUserIdFunc mocks the FindByIdAndUserId method.
 	FindByIdAndUserIdFunc func(db *gorm.DB, contact *entity.Contact, id string, userId string) error
 
 	// SearchFunc mocks the Search method.
-	SearchFunc func(db *gorm.DB, request *model.SearchContactRequest) ([]entity.Contact, int64, error)
+	SearchFunc func(db *gorm.DB, req *model.SearchContactRequest) ([]entity.Contact, int64, error)
 
 	// UpdateFunc mocks the Update method.
 	UpdateFunc func(db *gorm.DB, entityMoqParam *entity.Contact) error
 
 	// calls tracks calls to the methods.
 	calls struct {
-		// CountById holds details about calls to the CountById method.
-		CountById []struct {
-			// Db is the db argument value.
-			Db *gorm.DB
-			// ID is the id argument value.
-			ID any
-		}
 		// Create holds details about calls to the Create method.
 		Create []struct {
 			// Db is the db argument value.
@@ -93,15 +73,6 @@ type ContactRepositoryMock struct {
 			Db *gorm.DB
 			// EntityMoqParam is the entityMoqParam argument value.
 			EntityMoqParam *entity.Contact
-		}
-		// FindById holds details about calls to the FindById method.
-		FindById []struct {
-			// Db is the db argument value.
-			Db *gorm.DB
-			// EntityMoqParam is the entityMoqParam argument value.
-			EntityMoqParam *entity.Contact
-			// ID is the id argument value.
-			ID any
 		}
 		// FindByIdAndUserId holds details about calls to the FindByIdAndUserId method.
 		FindByIdAndUserId []struct {
@@ -118,8 +89,8 @@ type ContactRepositoryMock struct {
 		Search []struct {
 			// Db is the db argument value.
 			Db *gorm.DB
-			// Request is the request argument value.
-			Request *model.SearchContactRequest
+			// Req is the req argument value.
+			Req *model.SearchContactRequest
 		}
 		// Update holds details about calls to the Update method.
 		Update []struct {
@@ -129,49 +100,11 @@ type ContactRepositoryMock struct {
 			EntityMoqParam *entity.Contact
 		}
 	}
-	lockCountById         sync.RWMutex
 	lockCreate            sync.RWMutex
 	lockDelete            sync.RWMutex
-	lockFindById          sync.RWMutex
 	lockFindByIdAndUserId sync.RWMutex
 	lockSearch            sync.RWMutex
 	lockUpdate            sync.RWMutex
-}
-
-// CountById calls CountByIdFunc.
-func (mock *ContactRepositoryMock) CountById(db *gorm.DB, id any) (int64, error) {
-	if mock.CountByIdFunc == nil {
-		panic("ContactRepositoryMock.CountByIdFunc: method is nil but ContactRepository.CountById was just called")
-	}
-	callInfo := struct {
-		Db *gorm.DB
-		ID any
-	}{
-		Db: db,
-		ID: id,
-	}
-	mock.lockCountById.Lock()
-	mock.calls.CountById = append(mock.calls.CountById, callInfo)
-	mock.lockCountById.Unlock()
-	return mock.CountByIdFunc(db, id)
-}
-
-// CountByIdCalls gets all the calls that were made to CountById.
-// Check the length with:
-//
-//	len(mockedContactRepository.CountByIdCalls())
-func (mock *ContactRepositoryMock) CountByIdCalls() []struct {
-	Db *gorm.DB
-	ID any
-} {
-	var calls []struct {
-		Db *gorm.DB
-		ID any
-	}
-	mock.lockCountById.RLock()
-	calls = mock.calls.CountById
-	mock.lockCountById.RUnlock()
-	return calls
 }
 
 // Create calls CreateFunc.
@@ -246,46 +179,6 @@ func (mock *ContactRepositoryMock) DeleteCalls() []struct {
 	return calls
 }
 
-// FindById calls FindByIdFunc.
-func (mock *ContactRepositoryMock) FindById(db *gorm.DB, entityMoqParam *entity.Contact, id any) error {
-	if mock.FindByIdFunc == nil {
-		panic("ContactRepositoryMock.FindByIdFunc: method is nil but ContactRepository.FindById was just called")
-	}
-	callInfo := struct {
-		Db             *gorm.DB
-		EntityMoqParam *entity.Contact
-		ID             any
-	}{
-		Db:             db,
-		EntityMoqParam: entityMoqParam,
-		ID:             id,
-	}
-	mock.lockFindById.Lock()
-	mock.calls.FindById = append(mock.calls.FindById, callInfo)
-	mock.lockFindById.Unlock()
-	return mock.FindByIdFunc(db, entityMoqParam, id)
-}
-
-// FindByIdCalls gets all the calls that were made to FindById.
-// Check the length with:
-//
-//	len(mockedContactRepository.FindByIdCalls())
-func (mock *ContactRepositoryMock) FindByIdCalls() []struct {
-	Db             *gorm.DB
-	EntityMoqParam *entity.Contact
-	ID             any
-} {
-	var calls []struct {
-		Db             *gorm.DB
-		EntityMoqParam *entity.Contact
-		ID             any
-	}
-	mock.lockFindById.RLock()
-	calls = mock.calls.FindById
-	mock.lockFindById.RUnlock()
-	return calls
-}
-
 // FindByIdAndUserId calls FindByIdAndUserIdFunc.
 func (mock *ContactRepositoryMock) FindByIdAndUserId(db *gorm.DB, contact *entity.Contact, id string, userId string) error {
 	if mock.FindByIdAndUserIdFunc == nil {
@@ -331,21 +224,21 @@ func (mock *ContactRepositoryMock) FindByIdAndUserIdCalls() []struct {
 }
 
 // Search calls SearchFunc.
-func (mock *ContactRepositoryMock) Search(db *gorm.DB, request *model.SearchContactRequest) ([]entity.Contact, int64, error) {
+func (mock *ContactRepositoryMock) Search(db *gorm.DB, req *model.SearchContactRequest) ([]entity.Contact, int64, error) {
 	if mock.SearchFunc == nil {
 		panic("ContactRepositoryMock.SearchFunc: method is nil but ContactRepository.Search was just called")
 	}
 	callInfo := struct {
-		Db      *gorm.DB
-		Request *model.SearchContactRequest
+		Db  *gorm.DB
+		Req *model.SearchContactRequest
 	}{
-		Db:      db,
-		Request: request,
+		Db:  db,
+		Req: req,
 	}
 	mock.lockSearch.Lock()
 	mock.calls.Search = append(mock.calls.Search, callInfo)
 	mock.lockSearch.Unlock()
-	return mock.SearchFunc(db, request)
+	return mock.SearchFunc(db, req)
 }
 
 // SearchCalls gets all the calls that were made to Search.
@@ -353,12 +246,12 @@ func (mock *ContactRepositoryMock) Search(db *gorm.DB, request *model.SearchCont
 //
 //	len(mockedContactRepository.SearchCalls())
 func (mock *ContactRepositoryMock) SearchCalls() []struct {
-	Db      *gorm.DB
-	Request *model.SearchContactRequest
+	Db  *gorm.DB
+	Req *model.SearchContactRequest
 } {
 	var calls []struct {
-		Db      *gorm.DB
-		Request *model.SearchContactRequest
+		Db  *gorm.DB
+		Req *model.SearchContactRequest
 	}
 	mock.lockSearch.RLock()
 	calls = mock.calls.Search

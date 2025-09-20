@@ -12,22 +12,22 @@ import (
 //go:generate moq -out=../mock/ContactRepository.go -pkg=mock . ContactRepository
 
 type ContactRepository interface {
-	Repository[entity.Contact]
 	FindByIdAndUserId(db *gorm.DB, contact *entity.Contact, id string, userId string) error
 	Search(db *gorm.DB, req *model.SearchContactRequest) ([]entity.Contact, int64, error)
+	Create(db *gorm.DB, entity *entity.Contact) error
+	Update(db *gorm.DB, entity *entity.Contact) error
+	Delete(db *gorm.DB, entity *entity.Contact) error
 }
 
 var _ ContactRepository = &ContactRepositoryImpl{}
 
 type ContactRepositoryImpl struct {
-	RepositoryImpl[entity.Contact]
 	Log *logrus.Logger
 }
 
 func NewContactRepository(log *logrus.Logger) *ContactRepositoryImpl {
 	return &ContactRepositoryImpl{
-		RepositoryImpl: RepositoryImpl[entity.Contact]{},
-		Log:            log,
+		Log: log,
 	}
 }
 
@@ -75,4 +75,28 @@ func (r *ContactRepositoryImpl) filterContact(req *model.SearchContactRequest) f
 
 		return tx
 	}
+}
+
+func (r *ContactRepositoryImpl) Create(db *gorm.DB, entity *entity.Contact) error {
+	err := db.Create(entity).Error
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+	return nil
+}
+
+func (r *ContactRepositoryImpl) Update(db *gorm.DB, entity *entity.Contact) error {
+	err := db.Save(entity).Error
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+	return nil
+}
+
+func (r *ContactRepositoryImpl) Delete(db *gorm.DB, entity *entity.Contact) error {
+	err := db.Delete(entity).Error
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+	return nil
 }
