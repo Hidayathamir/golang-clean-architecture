@@ -24,7 +24,8 @@ type UserRepositoryImpl struct {
 
 func NewUserRepository(log *logrus.Logger) *UserRepositoryImpl {
 	return &UserRepositoryImpl{
-		Log: log,
+		RepositoryImpl: RepositoryImpl[entity.User]{},
+		Log:            log,
 	}
 }
 

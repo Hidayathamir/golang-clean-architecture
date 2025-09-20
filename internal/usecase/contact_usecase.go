@@ -64,7 +64,6 @@ func (u *ContactUseCaseImpl) Create(ctx context.Context, req *model.CreateContac
 	defer tx.Rollback()
 
 	if err := u.Validate.Struct(req); err != nil {
-		u.Log.WithError(err).Error("error validating request body")
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
 	}
@@ -79,18 +78,15 @@ func (u *ContactUseCaseImpl) Create(ctx context.Context, req *model.CreateContac
 	}
 
 	if err := u.ContactRepository.Create(tx, contact); err != nil {
-		u.Log.WithError(err).Error("error creating contact")
 		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		u.Log.WithError(err).Error("error creating contact")
 		return nil, errkit.AddFuncName(err)
 	}
 
 	event := converter.ContactToEvent(contact)
 	if err := u.ContactProducer.Send(event); err != nil {
-		u.Log.WithError(err).Error("error publishing contact created event")
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -103,12 +99,10 @@ func (u *ContactUseCaseImpl) Update(ctx context.Context, req *model.UpdateContac
 
 	contact := new(entity.Contact)
 	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, req.ID, req.UserId); err != nil {
-		u.Log.WithError(err).Error("error getting contact")
 		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := u.Validate.Struct(req); err != nil {
-		u.Log.WithError(err).Error("error validating request body")
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
 	}
@@ -119,18 +113,15 @@ func (u *ContactUseCaseImpl) Update(ctx context.Context, req *model.UpdateContac
 	contact.Phone = req.Phone
 
 	if err := u.ContactRepository.Update(tx, contact); err != nil {
-		u.Log.WithError(err).Error("error updating contact")
 		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		u.Log.WithError(err).Error("error updating contact")
 		return nil, errkit.AddFuncName(err)
 	}
 
 	event := converter.ContactToEvent(contact)
 	if err := u.ContactProducer.Send(event); err != nil {
-		u.Log.WithError(err).Error("error publishing contact updated event")
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -142,19 +133,16 @@ func (u *ContactUseCaseImpl) Get(ctx context.Context, req *model.GetContactReque
 	defer tx.Rollback()
 
 	if err := u.Validate.Struct(req); err != nil {
-		u.Log.WithError(err).Error("error validating request body")
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	contact := new(entity.Contact)
 	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, req.ID, req.UserId); err != nil {
-		u.Log.WithError(err).Error("error getting contact")
 		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		u.Log.WithError(err).Error("error getting contact")
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -166,24 +154,20 @@ func (u *ContactUseCaseImpl) Delete(ctx context.Context, req *model.DeleteContac
 	defer tx.Rollback()
 
 	if err := u.Validate.Struct(req); err != nil {
-		u.Log.WithError(err).Error("error validating request body")
 		err = errkit.BadRequest(err)
 		return errkit.AddFuncName(err)
 	}
 
 	contact := new(entity.Contact)
 	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, req.ID, req.UserId); err != nil {
-		u.Log.WithError(err).Error("error getting contact")
 		return errkit.AddFuncName(err)
 	}
 
 	if err := u.ContactRepository.Delete(tx, contact); err != nil {
-		u.Log.WithError(err).Error("error deleting contact")
 		return errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		u.Log.WithError(err).Error("error deleting contact")
 		return errkit.AddFuncName(err)
 	}
 
@@ -195,19 +179,16 @@ func (u *ContactUseCaseImpl) Search(ctx context.Context, req *model.SearchContac
 	defer tx.Rollback()
 
 	if err := u.Validate.Struct(req); err != nil {
-		u.Log.WithError(err).Error("error validating request body")
 		err = errkit.BadRequest(err)
 		return nil, 0, errkit.AddFuncName(err)
 	}
 
 	contacts, total, err := u.ContactRepository.Search(tx, req)
 	if err != nil {
-		u.Log.WithError(err).Error("error getting contacts")
 		return nil, 0, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		u.Log.WithError(err).Error("error getting contacts")
 		return nil, 0, errkit.AddFuncName(err)
 	}
 

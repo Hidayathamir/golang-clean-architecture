@@ -25,7 +25,8 @@ type AddressRepositoryImpl struct {
 
 func NewAddressRepository(log *logrus.Logger) *AddressRepositoryImpl {
 	return &AddressRepositoryImpl{
-		Log: log,
+		RepositoryImpl: RepositoryImpl[entity.Address]{},
+		Log:            log,
 	}
 }
 

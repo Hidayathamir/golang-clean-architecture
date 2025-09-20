@@ -19,7 +19,6 @@ type Repository[T any] interface {
 var _ Repository[any] = &RepositoryImpl[any]{}
 
 type RepositoryImpl[T any] struct {
-	DB *gorm.DB
 }
 
 func (r *RepositoryImpl[T]) Create(db *gorm.DB, entity *T) error {

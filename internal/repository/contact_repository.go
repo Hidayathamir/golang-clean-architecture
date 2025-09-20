@@ -14,7 +14,7 @@ import (
 type ContactRepository interface {
 	Repository[entity.Contact]
 	FindByIdAndUserId(db *gorm.DB, contact *entity.Contact, id string, userId string) error
-	Search(db *gorm.DB, request *model.SearchContactRequest) ([]entity.Contact, int64, error)
+	Search(db *gorm.DB, req *model.SearchContactRequest) ([]entity.Contact, int64, error)
 }
 
 var _ ContactRepository = &ContactRepositoryImpl{}
@@ -26,7 +26,8 @@ type ContactRepositoryImpl struct {
 
 func NewContactRepository(log *logrus.Logger) *ContactRepositoryImpl {
 	return &ContactRepositoryImpl{
-		Log: log,
+		RepositoryImpl: RepositoryImpl[entity.Contact]{},
+		Log:            log,
 	}
 }
 
@@ -39,35 +40,35 @@ func (r *ContactRepositoryImpl) FindByIdAndUserId(db *gorm.DB, contact *entity.C
 	return nil
 }
 
-func (r *ContactRepositoryImpl) Search(db *gorm.DB, request *model.SearchContactRequest) ([]entity.Contact, int64, error) {
+func (r *ContactRepositoryImpl) Search(db *gorm.DB, req *model.SearchContactRequest) ([]entity.Contact, int64, error) {
 	var contacts []entity.Contact
-	if err := db.Scopes(r.filterContact(request)).Offset((request.Page - 1) * request.Size).Limit(request.Size).Find(&contacts).Error; err != nil {
+	if err := db.Scopes(r.filterContact(req)).Offset((req.Page - 1) * req.Size).Limit(req.Size).Find(&contacts).Error; err != nil {
 		return nil, 0, errkit.AddFuncName(err)
 	}
 
 	var total int64 = 0
-	if err := db.Model(&entity.Contact{}).Scopes(r.filterContact(request)).Count(&total).Error; err != nil {
+	if err := db.Model(&entity.Contact{}).Scopes(r.filterContact(req)).Count(&total).Error; err != nil {
 		return nil, 0, errkit.AddFuncName(err)
 	}
 
 	return contacts, total, nil
 }
 
-func (r *ContactRepositoryImpl) filterContact(request *model.SearchContactRequest) func(tx *gorm.DB) *gorm.DB {
+func (r *ContactRepositoryImpl) filterContact(req *model.SearchContactRequest) func(tx *gorm.DB) *gorm.DB {
 	return func(tx *gorm.DB) *gorm.DB {
-		tx = tx.Where("user_id = ?", request.UserId)
+		tx = tx.Where("user_id = ?", req.UserId)
 
-		if name := request.Name; name != "" {
+		if name := req.Name; name != "" {
 			name = "%" + name + "%"
 			tx = tx.Where("first_name LIKE ? OR last_name LIKE ?", name, name)
 		}
 
-		if phone := request.Phone; phone != "" {
+		if phone := req.Phone; phone != "" {
 			phone = "%" + phone + "%"
 			tx = tx.Where("phone LIKE ?", phone)
 		}
 
-		if email := request.Email; email != "" {
+		if email := req.Email; email != "" {
 			email = "%" + email + "%"
 			tx = tx.Where("email LIKE ?", email)
 		}

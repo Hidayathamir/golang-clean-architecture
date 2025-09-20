@@ -68,19 +68,16 @@ func (u *UserUseCaseImpl) Verify(ctx context.Context, req *model.VerifyUserReque
 
 	err := u.Validate.Struct(req)
 	if err != nil {
-		u.Log.Warnf("Invalid request body : %+v", err)
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	user := new(entity.User)
 	if err := u.UserRepository.FindByToken(tx, user, req.Token); err != nil {
-		u.Log.Warnf("Failed find user by token : %+v", err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		u.Log.Warnf("Failed commit transaction : %+v", err)
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -93,27 +90,23 @@ func (u *UserUseCaseImpl) Create(ctx context.Context, req *model.RegisterUserReq
 
 	err := u.Validate.Struct(req)
 	if err != nil {
-		u.Log.Warnf("Invalid request body : %+v", err)
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	total, err := u.UserRepository.CountById(tx, req.ID)
 	if err != nil {
-		u.Log.Warnf("Failed count user from database : %+v", err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	if total > 0 {
 		err = errors.New("user already exists")
-		u.Log.Warnf("User already exists : %+v", err)
 		err = errkit.Conflict(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	password, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-		u.Log.Warnf("Failed to generate bcrype hash : %+v", err)
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -124,18 +117,15 @@ func (u *UserUseCaseImpl) Create(ctx context.Context, req *model.RegisterUserReq
 	}
 
 	if err := u.UserRepository.Create(tx, user); err != nil {
-		u.Log.Warnf("Failed create user to database : %+v", err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		u.Log.Warnf("Failed commit transaction : %+v", err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	event := converter.UserToEvent(user)
 	if err = u.UserProducer.Send(event); err != nil {
-		u.Log.WithError(err).Error("failed to publish user created event")
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -147,38 +137,32 @@ func (u *UserUseCaseImpl) Login(ctx context.Context, req *model.LoginUserRequest
 	defer tx.Rollback()
 
 	if err := u.Validate.Struct(req); err != nil {
-		u.Log.Warnf("Invalid request body  : %+v", err)
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	user := new(entity.User)
 	if err := u.UserRepository.FindById(tx, user, req.ID); err != nil {
-		u.Log.Warnf("Failed find user by id : %+v", err)
 		err = errkit.Unauthorized(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
-		u.Log.Warnf("Failed to compare user password with bcrype hash : %+v", err)
 		err = errkit.Unauthorized(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	user.Token = uuid.New().String()
 	if err := u.UserRepository.Update(tx, user); err != nil {
-		u.Log.Warnf("Failed save user : %+v", err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		u.Log.Warnf("Failed commit transaction : %+v", err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	event := converter.UserToEvent(user)
 	if err := u.UserProducer.Send(event); err != nil {
-		u.Log.WithError(err).Error("Failed publish user login event")
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -190,19 +174,16 @@ func (u *UserUseCaseImpl) Current(ctx context.Context, req *model.GetUserRequest
 	defer tx.Rollback()
 
 	if err := u.Validate.Struct(req); err != nil {
-		u.Log.Warnf("Invalid request body : %+v", err)
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	user := new(entity.User)
 	if err := u.UserRepository.FindById(tx, user, req.ID); err != nil {
-		u.Log.Warnf("Failed find user by id : %+v", err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		u.Log.Warnf("Failed commit transaction : %+v", err)
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -214,32 +195,27 @@ func (u *UserUseCaseImpl) Logout(ctx context.Context, req *model.LogoutUserReque
 	defer tx.Rollback()
 
 	if err := u.Validate.Struct(req); err != nil {
-		u.Log.Warnf("Invalid request body : %+v", err)
 		err = errkit.BadRequest(err)
 		return false, errkit.AddFuncName(err)
 	}
 
 	user := new(entity.User)
 	if err := u.UserRepository.FindById(tx, user, req.ID); err != nil {
-		u.Log.Warnf("Failed find user by id : %+v", err)
 		return false, errkit.AddFuncName(err)
 	}
 
 	user.Token = ""
 
 	if err := u.UserRepository.Update(tx, user); err != nil {
-		u.Log.Warnf("Failed save user : %+v", err)
 		return false, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		u.Log.Warnf("Failed commit transaction : %+v", err)
 		return false, errkit.AddFuncName(err)
 	}
 
 	event := converter.UserToEvent(user)
 	if err := u.UserProducer.Send(event); err != nil {
-		u.Log.WithError(err).Error("Failed publish user logout event")
 		return false, errkit.AddFuncName(err)
 	}
 
@@ -251,14 +227,12 @@ func (u *UserUseCaseImpl) Update(ctx context.Context, req *model.UpdateUserReque
 	defer tx.Rollback()
 
 	if err := u.Validate.Struct(req); err != nil {
-		u.Log.Warnf("Invalid request body : %+v", err)
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	user := new(entity.User)
 	if err := u.UserRepository.FindById(tx, user, req.ID); err != nil {
-		u.Log.Warnf("Failed find user by id : %+v", err)
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -269,25 +243,21 @@ func (u *UserUseCaseImpl) Update(ctx context.Context, req *model.UpdateUserReque
 	if req.Password != "" {
 		password, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 		if err != nil {
-			u.Log.Warnf("Failed to generate bcrype hash : %+v", err)
 			return nil, errkit.AddFuncName(err)
 		}
 		user.Password = string(password)
 	}
 
 	if err := u.UserRepository.Update(tx, user); err != nil {
-		u.Log.Warnf("Failed save user : %+v", err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		u.Log.Warnf("Failed commit transaction : %+v", err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	event := converter.UserToEvent(user)
 	if err := u.UserProducer.Send(event); err != nil {
-		u.Log.WithError(err).Error("Failed publish user updated event")
 		return nil, errkit.AddFuncName(err)
 	}
 
