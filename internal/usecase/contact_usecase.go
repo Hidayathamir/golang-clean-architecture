@@ -16,11 +16,11 @@ import (
 )
 
 type ContactUseCase interface {
-	Create(ctx context.Context, request *model.CreateContactRequest) (*model.ContactResponse, error)
-	Update(ctx context.Context, request *model.UpdateContactRequest) (*model.ContactResponse, error)
-	Get(ctx context.Context, request *model.GetContactRequest) (*model.ContactResponse, error)
-	Delete(ctx context.Context, request *model.DeleteContactRequest) error
-	Search(ctx context.Context, request *model.SearchContactRequest) ([]model.ContactResponse, int64, error)
+	Create(ctx context.Context, req *model.CreateContactRequest) (*model.ContactResponse, error)
+	Update(ctx context.Context, req *model.UpdateContactRequest) (*model.ContactResponse, error)
+	Get(ctx context.Context, req *model.GetContactRequest) (*model.ContactResponse, error)
+	Delete(ctx context.Context, req *model.DeleteContactRequest) error
+	Search(ctx context.Context, req *model.SearchContactRequest) ([]model.ContactResponse, int64, error)
 }
 
 var _ ContactUseCase = &ContactUseCaseImpl{}
@@ -59,11 +59,11 @@ func NewContactUseCase(
 	}
 }
 
-func (u *ContactUseCaseImpl) Create(ctx context.Context, request *model.CreateContactRequest) (*model.ContactResponse, error) {
+func (u *ContactUseCaseImpl) Create(ctx context.Context, req *model.CreateContactRequest) (*model.ContactResponse, error) {
 	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	if err := u.Validate.Struct(request); err != nil {
+	if err := u.Validate.Struct(req); err != nil {
 		u.Log.WithError(err).Error("error validating request body")
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
@@ -71,11 +71,11 @@ func (u *ContactUseCaseImpl) Create(ctx context.Context, request *model.CreateCo
 
 	contact := &entity.Contact{
 		ID:        uuid.New().String(),
-		FirstName: request.FirstName,
-		LastName:  request.LastName,
-		Email:     request.Email,
-		Phone:     request.Phone,
-		UserId:    request.UserId,
+		FirstName: req.FirstName,
+		LastName:  req.LastName,
+		Email:     req.Email,
+		Phone:     req.Phone,
+		UserId:    req.UserId,
 	}
 
 	if err := u.ContactRepository.Create(tx, contact); err != nil {
@@ -97,26 +97,26 @@ func (u *ContactUseCaseImpl) Create(ctx context.Context, request *model.CreateCo
 	return converter.ContactToResponse(contact), nil
 }
 
-func (u *ContactUseCaseImpl) Update(ctx context.Context, request *model.UpdateContactRequest) (*model.ContactResponse, error) {
+func (u *ContactUseCaseImpl) Update(ctx context.Context, req *model.UpdateContactRequest) (*model.ContactResponse, error) {
 	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, request.ID, request.UserId); err != nil {
+	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, req.ID, req.UserId); err != nil {
 		u.Log.WithError(err).Error("error getting contact")
 		return nil, errkit.AddFuncName(err)
 	}
 
-	if err := u.Validate.Struct(request); err != nil {
+	if err := u.Validate.Struct(req); err != nil {
 		u.Log.WithError(err).Error("error validating request body")
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
-	contact.FirstName = request.FirstName
-	contact.LastName = request.LastName
-	contact.Email = request.Email
-	contact.Phone = request.Phone
+	contact.FirstName = req.FirstName
+	contact.LastName = req.LastName
+	contact.Email = req.Email
+	contact.Phone = req.Phone
 
 	if err := u.ContactRepository.Update(tx, contact); err != nil {
 		u.Log.WithError(err).Error("error updating contact")
@@ -137,18 +137,18 @@ func (u *ContactUseCaseImpl) Update(ctx context.Context, request *model.UpdateCo
 	return converter.ContactToResponse(contact), nil
 }
 
-func (u *ContactUseCaseImpl) Get(ctx context.Context, request *model.GetContactRequest) (*model.ContactResponse, error) {
+func (u *ContactUseCaseImpl) Get(ctx context.Context, req *model.GetContactRequest) (*model.ContactResponse, error) {
 	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	if err := u.Validate.Struct(request); err != nil {
+	if err := u.Validate.Struct(req); err != nil {
 		u.Log.WithError(err).Error("error validating request body")
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, request.ID, request.UserId); err != nil {
+	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, req.ID, req.UserId); err != nil {
 		u.Log.WithError(err).Error("error getting contact")
 		return nil, errkit.AddFuncName(err)
 	}
@@ -161,18 +161,18 @@ func (u *ContactUseCaseImpl) Get(ctx context.Context, request *model.GetContactR
 	return converter.ContactToResponse(contact), nil
 }
 
-func (u *ContactUseCaseImpl) Delete(ctx context.Context, request *model.DeleteContactRequest) error {
+func (u *ContactUseCaseImpl) Delete(ctx context.Context, req *model.DeleteContactRequest) error {
 	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	if err := u.Validate.Struct(request); err != nil {
+	if err := u.Validate.Struct(req); err != nil {
 		u.Log.WithError(err).Error("error validating request body")
 		err = errkit.BadRequest(err)
 		return errkit.AddFuncName(err)
 	}
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, request.ID, request.UserId); err != nil {
+	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, req.ID, req.UserId); err != nil {
 		u.Log.WithError(err).Error("error getting contact")
 		return errkit.AddFuncName(err)
 	}
@@ -190,17 +190,17 @@ func (u *ContactUseCaseImpl) Delete(ctx context.Context, request *model.DeleteCo
 	return nil
 }
 
-func (u *ContactUseCaseImpl) Search(ctx context.Context, request *model.SearchContactRequest) ([]model.ContactResponse, int64, error) {
+func (u *ContactUseCaseImpl) Search(ctx context.Context, req *model.SearchContactRequest) ([]model.ContactResponse, int64, error) {
 	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	if err := u.Validate.Struct(request); err != nil {
+	if err := u.Validate.Struct(req); err != nil {
 		u.Log.WithError(err).Error("error validating request body")
 		err = errkit.BadRequest(err)
 		return nil, 0, errkit.AddFuncName(err)
 	}
 
-	contacts, total, err := u.ContactRepository.Search(tx, request)
+	contacts, total, err := u.ContactRepository.Search(tx, req)
 	if err != nil {
 		u.Log.WithError(err).Error("error getting contacts")
 		return nil, 0, errkit.AddFuncName(err)
@@ -211,10 +211,10 @@ func (u *ContactUseCaseImpl) Search(ctx context.Context, request *model.SearchCo
 		return nil, 0, errkit.AddFuncName(err)
 	}
 
-	responses := make([]model.ContactResponse, len(contacts))
+	res := make([]model.ContactResponse, len(contacts))
 	for i, contact := range contacts {
-		responses[i] = *converter.ContactToResponse(&contact)
+		res[i] = *converter.ContactToResponse(&contact)
 	}
 
-	return responses, total, nil
+	return res, total, nil
 }

@@ -16,11 +16,11 @@ import (
 )
 
 type AddressUseCase interface {
-	Create(ctx context.Context, request *model.CreateAddressRequest) (*model.AddressResponse, error)
-	Update(ctx context.Context, request *model.UpdateAddressRequest) (*model.AddressResponse, error)
-	Get(ctx context.Context, request *model.GetAddressRequest) (*model.AddressResponse, error)
-	Delete(ctx context.Context, request *model.DeleteAddressRequest) error
-	List(ctx context.Context, request *model.ListAddressRequest) ([]model.AddressResponse, error)
+	Create(ctx context.Context, req *model.CreateAddressRequest) (*model.AddressResponse, error)
+	Update(ctx context.Context, req *model.UpdateAddressRequest) (*model.AddressResponse, error)
+	Get(ctx context.Context, req *model.GetAddressRequest) (*model.AddressResponse, error)
+	Delete(ctx context.Context, req *model.DeleteAddressRequest) error
+	List(ctx context.Context, req *model.ListAddressRequest) ([]model.AddressResponse, error)
 }
 
 var _ AddressUseCase = &AddressUseCaseImpl{}
@@ -62,18 +62,18 @@ func NewAddressUseCase(
 	}
 }
 
-func (u *AddressUseCaseImpl) Create(ctx context.Context, request *model.CreateAddressRequest) (*model.AddressResponse, error) {
+func (u *AddressUseCaseImpl) Create(ctx context.Context, req *model.CreateAddressRequest) (*model.AddressResponse, error) {
 	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	if err := u.Validate.Struct(request); err != nil {
+	if err := u.Validate.Struct(req); err != nil {
 		u.Log.WithError(err).Error("failed to validate request body")
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, request.ContactId, request.UserId); err != nil {
+	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, req.ContactId, req.UserId); err != nil {
 		u.Log.WithError(err).Error("failed to find contact")
 		return nil, errkit.AddFuncName(err)
 	}
@@ -81,11 +81,11 @@ func (u *AddressUseCaseImpl) Create(ctx context.Context, request *model.CreateAd
 	address := &entity.Address{
 		ID:         uuid.NewString(),
 		ContactId:  contact.ID,
-		Street:     request.Street,
-		City:       request.City,
-		Province:   request.Province,
-		PostalCode: request.PostalCode,
-		Country:    request.Country,
+		Street:     req.Street,
+		City:       req.City,
+		Province:   req.Province,
+		PostalCode: req.PostalCode,
+		Country:    req.Country,
 	}
 
 	if err := u.AddressRepository.Create(tx, address); err != nil {
@@ -112,33 +112,33 @@ func (u *AddressUseCaseImpl) Create(ctx context.Context, request *model.CreateAd
 	return converter.AddressToResponse(address), nil
 }
 
-func (u *AddressUseCaseImpl) Update(ctx context.Context, request *model.UpdateAddressRequest) (*model.AddressResponse, error) {
+func (u *AddressUseCaseImpl) Update(ctx context.Context, req *model.UpdateAddressRequest) (*model.AddressResponse, error) {
 	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	if err := u.Validate.Struct(request); err != nil {
+	if err := u.Validate.Struct(req); err != nil {
 		u.Log.WithError(err).Error("failed to validate request body")
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, request.ContactId, request.UserId); err != nil {
+	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, req.ContactId, req.UserId); err != nil {
 		u.Log.WithError(err).Error("failed to find contact")
 		return nil, errkit.AddFuncName(err)
 	}
 
 	address := new(entity.Address)
-	if err := u.AddressRepository.FindByIdAndContactId(tx, address, request.ID, contact.ID); err != nil {
+	if err := u.AddressRepository.FindByIdAndContactId(tx, address, req.ID, contact.ID); err != nil {
 		u.Log.WithError(err).Error("failed to find address")
 		return nil, errkit.AddFuncName(err)
 	}
 
-	address.Street = request.Street
-	address.City = request.City
-	address.Province = request.Province
-	address.PostalCode = request.PostalCode
-	address.Country = request.Country
+	address.Street = req.Street
+	address.City = req.City
+	address.Province = req.Province
+	address.PostalCode = req.PostalCode
+	address.Country = req.Country
 
 	if err := u.AddressRepository.Update(tx, address); err != nil {
 		u.Log.WithError(err).Error("failed to update address")
@@ -159,18 +159,18 @@ func (u *AddressUseCaseImpl) Update(ctx context.Context, request *model.UpdateAd
 	return converter.AddressToResponse(address), nil
 }
 
-func (u *AddressUseCaseImpl) Get(ctx context.Context, request *model.GetAddressRequest) (*model.AddressResponse, error) {
+func (u *AddressUseCaseImpl) Get(ctx context.Context, req *model.GetAddressRequest) (*model.AddressResponse, error) {
 	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, request.ContactId, request.UserId); err != nil {
+	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, req.ContactId, req.UserId); err != nil {
 		u.Log.WithError(err).Error("failed to find contact")
 		return nil, errkit.AddFuncName(err)
 	}
 
 	address := new(entity.Address)
-	if err := u.AddressRepository.FindByIdAndContactId(tx, address, request.ID, request.ContactId); err != nil {
+	if err := u.AddressRepository.FindByIdAndContactId(tx, address, req.ID, req.ContactId); err != nil {
 		u.Log.WithError(err).Error("failed to find address")
 		return nil, errkit.AddFuncName(err)
 	}
@@ -183,18 +183,18 @@ func (u *AddressUseCaseImpl) Get(ctx context.Context, request *model.GetAddressR
 	return converter.AddressToResponse(address), nil
 }
 
-func (u *AddressUseCaseImpl) Delete(ctx context.Context, request *model.DeleteAddressRequest) error {
+func (u *AddressUseCaseImpl) Delete(ctx context.Context, req *model.DeleteAddressRequest) error {
 	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, request.ContactId, request.UserId); err != nil {
+	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, req.ContactId, req.UserId); err != nil {
 		u.Log.WithError(err).Error("failed to find contact")
 		return errkit.AddFuncName(err)
 	}
 
 	address := new(entity.Address)
-	if err := u.AddressRepository.FindByIdAndContactId(tx, address, request.ID, request.ContactId); err != nil {
+	if err := u.AddressRepository.FindByIdAndContactId(tx, address, req.ID, req.ContactId); err != nil {
 		u.Log.WithError(err).Error("failed to find address")
 		return errkit.AddFuncName(err)
 	}
@@ -212,12 +212,12 @@ func (u *AddressUseCaseImpl) Delete(ctx context.Context, request *model.DeleteAd
 	return nil
 }
 
-func (u *AddressUseCaseImpl) List(ctx context.Context, request *model.ListAddressRequest) ([]model.AddressResponse, error) {
+func (u *AddressUseCaseImpl) List(ctx context.Context, req *model.ListAddressRequest) ([]model.AddressResponse, error) {
 	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, request.ContactId, request.UserId); err != nil {
+	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, req.ContactId, req.UserId); err != nil {
 		u.Log.WithError(err).Error("failed to find contact")
 		return nil, errkit.AddFuncName(err)
 	}
@@ -233,10 +233,10 @@ func (u *AddressUseCaseImpl) List(ctx context.Context, request *model.ListAddres
 		return nil, errkit.AddFuncName(err)
 	}
 
-	responses := make([]model.AddressResponse, len(addresses))
+	res := make([]model.AddressResponse, len(addresses))
 	for i, address := range addresses {
-		responses[i] = *converter.AddressToResponse(&address)
+		res[i] = *converter.AddressToResponse(&address)
 	}
 
-	return responses, nil
+	return res, nil
 }

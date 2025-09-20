@@ -18,12 +18,12 @@ import (
 )
 
 type UserUseCase interface {
-	Verify(ctx context.Context, request *model.VerifyUserRequest) (*model.Auth, error)
-	Create(ctx context.Context, request *model.RegisterUserRequest) (*model.UserResponse, error)
-	Login(ctx context.Context, request *model.LoginUserRequest) (*model.UserResponse, error)
-	Current(ctx context.Context, request *model.GetUserRequest) (*model.UserResponse, error)
-	Logout(ctx context.Context, request *model.LogoutUserRequest) (bool, error)
-	Update(ctx context.Context, request *model.UpdateUserRequest) (*model.UserResponse, error)
+	Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error)
+	Create(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error)
+	Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error)
+	Current(ctx context.Context, req *model.GetUserRequest) (*model.UserResponse, error)
+	Logout(ctx context.Context, req *model.LogoutUserRequest) (bool, error)
+	Update(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error)
 }
 
 var _ UserUseCase = &UserUseCaseImpl{}
@@ -62,11 +62,11 @@ func NewUserUseCase(
 	}
 }
 
-func (u *UserUseCaseImpl) Verify(ctx context.Context, request *model.VerifyUserRequest) (*model.Auth, error) {
+func (u *UserUseCaseImpl) Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error) {
 	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	err := u.Validate.Struct(request)
+	err := u.Validate.Struct(req)
 	if err != nil {
 		u.Log.Warnf("Invalid request body : %+v", err)
 		err = errkit.BadRequest(err)
@@ -74,7 +74,7 @@ func (u *UserUseCaseImpl) Verify(ctx context.Context, request *model.VerifyUserR
 	}
 
 	user := new(entity.User)
-	if err := u.UserRepository.FindByToken(tx, user, request.Token); err != nil {
+	if err := u.UserRepository.FindByToken(tx, user, req.Token); err != nil {
 		u.Log.Warnf("Failed find user by token : %+v", err)
 		return nil, errkit.AddFuncName(err)
 	}
@@ -87,18 +87,18 @@ func (u *UserUseCaseImpl) Verify(ctx context.Context, request *model.VerifyUserR
 	return &model.Auth{ID: user.ID}, nil
 }
 
-func (u *UserUseCaseImpl) Create(ctx context.Context, request *model.RegisterUserRequest) (*model.UserResponse, error) {
+func (u *UserUseCaseImpl) Create(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error) {
 	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	err := u.Validate.Struct(request)
+	err := u.Validate.Struct(req)
 	if err != nil {
 		u.Log.Warnf("Invalid request body : %+v", err)
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
-	total, err := u.UserRepository.CountById(tx, request.ID)
+	total, err := u.UserRepository.CountById(tx, req.ID)
 	if err != nil {
 		u.Log.Warnf("Failed count user from database : %+v", err)
 		return nil, errkit.AddFuncName(err)
@@ -111,16 +111,16 @@ func (u *UserUseCaseImpl) Create(ctx context.Context, request *model.RegisterUse
 		return nil, errkit.AddFuncName(err)
 	}
 
-	password, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+	password, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		u.Log.Warnf("Failed to generate bcrype hash : %+v", err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	user := &entity.User{
-		ID:       request.ID,
+		ID:       req.ID,
 		Password: string(password),
-		Name:     request.Name,
+		Name:     req.Name,
 	}
 
 	if err := u.UserRepository.Create(tx, user); err != nil {
@@ -142,24 +142,24 @@ func (u *UserUseCaseImpl) Create(ctx context.Context, request *model.RegisterUse
 	return converter.UserToResponse(user), nil
 }
 
-func (u *UserUseCaseImpl) Login(ctx context.Context, request *model.LoginUserRequest) (*model.UserResponse, error) {
+func (u *UserUseCaseImpl) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error) {
 	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	if err := u.Validate.Struct(request); err != nil {
+	if err := u.Validate.Struct(req); err != nil {
 		u.Log.Warnf("Invalid request body  : %+v", err)
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	user := new(entity.User)
-	if err := u.UserRepository.FindById(tx, user, request.ID); err != nil {
+	if err := u.UserRepository.FindById(tx, user, req.ID); err != nil {
 		u.Log.Warnf("Failed find user by id : %+v", err)
 		err = errkit.Unauthorized(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password)); err != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		u.Log.Warnf("Failed to compare user password with bcrype hash : %+v", err)
 		err = errkit.Unauthorized(err)
 		return nil, errkit.AddFuncName(err)
@@ -185,18 +185,18 @@ func (u *UserUseCaseImpl) Login(ctx context.Context, request *model.LoginUserReq
 	return converter.UserToTokenResponse(user), nil
 }
 
-func (u *UserUseCaseImpl) Current(ctx context.Context, request *model.GetUserRequest) (*model.UserResponse, error) {
+func (u *UserUseCaseImpl) Current(ctx context.Context, req *model.GetUserRequest) (*model.UserResponse, error) {
 	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	if err := u.Validate.Struct(request); err != nil {
+	if err := u.Validate.Struct(req); err != nil {
 		u.Log.Warnf("Invalid request body : %+v", err)
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	user := new(entity.User)
-	if err := u.UserRepository.FindById(tx, user, request.ID); err != nil {
+	if err := u.UserRepository.FindById(tx, user, req.ID); err != nil {
 		u.Log.Warnf("Failed find user by id : %+v", err)
 		return nil, errkit.AddFuncName(err)
 	}
@@ -209,18 +209,18 @@ func (u *UserUseCaseImpl) Current(ctx context.Context, request *model.GetUserReq
 	return converter.UserToResponse(user), nil
 }
 
-func (u *UserUseCaseImpl) Logout(ctx context.Context, request *model.LogoutUserRequest) (bool, error) {
+func (u *UserUseCaseImpl) Logout(ctx context.Context, req *model.LogoutUserRequest) (bool, error) {
 	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	if err := u.Validate.Struct(request); err != nil {
+	if err := u.Validate.Struct(req); err != nil {
 		u.Log.Warnf("Invalid request body : %+v", err)
 		err = errkit.BadRequest(err)
 		return false, errkit.AddFuncName(err)
 	}
 
 	user := new(entity.User)
-	if err := u.UserRepository.FindById(tx, user, request.ID); err != nil {
+	if err := u.UserRepository.FindById(tx, user, req.ID); err != nil {
 		u.Log.Warnf("Failed find user by id : %+v", err)
 		return false, errkit.AddFuncName(err)
 	}
@@ -246,28 +246,28 @@ func (u *UserUseCaseImpl) Logout(ctx context.Context, request *model.LogoutUserR
 	return true, nil
 }
 
-func (u *UserUseCaseImpl) Update(ctx context.Context, request *model.UpdateUserRequest) (*model.UserResponse, error) {
+func (u *UserUseCaseImpl) Update(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error) {
 	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	if err := u.Validate.Struct(request); err != nil {
+	if err := u.Validate.Struct(req); err != nil {
 		u.Log.Warnf("Invalid request body : %+v", err)
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	user := new(entity.User)
-	if err := u.UserRepository.FindById(tx, user, request.ID); err != nil {
+	if err := u.UserRepository.FindById(tx, user, req.ID); err != nil {
 		u.Log.Warnf("Failed find user by id : %+v", err)
 		return nil, errkit.AddFuncName(err)
 	}
 
-	if request.Name != "" {
-		user.Name = request.Name
+	if req.Name != "" {
+		user.Name = req.Name
 	}
 
-	if request.Password != "" {
-		password, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+	if req.Password != "" {
+		password, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 		if err != nil {
 			u.Log.Warnf("Failed to generate bcrype hash : %+v", err)
 			return nil, errkit.AddFuncName(err)
