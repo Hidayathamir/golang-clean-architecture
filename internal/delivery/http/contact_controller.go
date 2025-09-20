@@ -40,18 +40,14 @@ func (c *ContactController) Create(ctx *fiber.Ctx) error {
 
 	req := new(model.CreateContactRequest)
 	if err := ctx.BodyParser(req); err != nil {
-		c.Log.WithError(err).Error("error parsing request body")
 		err = errkit.BadRequest(err)
-		err = errkit.AddFuncName(err)
-		return response.Error(ctx, err)
+		return errkit.AddFuncName(err)
 	}
 	req.UserId = auth.ID
 
 	res, err := c.UseCase.Create(ctx.UserContext(), req)
 	if err != nil {
-		c.Log.WithError(err).Error("error creating contact")
-		err = errkit.AddFuncName(err)
-		return response.Error(ctx, err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -84,9 +80,7 @@ func (c *ContactController) List(ctx *fiber.Ctx) error {
 
 	res, total, err := c.UseCase.Search(ctx.UserContext(), req)
 	if err != nil {
-		c.Log.WithError(err).Error("error searching contact")
-		err = errkit.AddFuncName(err)
-		return response.Error(ctx, err)
+		return errkit.AddFuncName(err)
 	}
 
 	paging := &response.PageMetadata{
@@ -118,9 +112,7 @@ func (c *ContactController) Get(ctx *fiber.Ctx) error {
 
 	res, err := c.UseCase.Get(ctx.UserContext(), req)
 	if err != nil {
-		c.Log.WithError(err).Error("error getting contact")
-		err = errkit.AddFuncName(err)
-		return response.Error(ctx, err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -142,10 +134,8 @@ func (c *ContactController) Update(ctx *fiber.Ctx) error {
 
 	req := new(model.UpdateContactRequest)
 	if err := ctx.BodyParser(req); err != nil {
-		c.Log.WithError(err).Error("error parsing request body")
 		err = errkit.BadRequest(err)
-		err = errkit.AddFuncName(err)
-		return response.Error(ctx, err)
+		return errkit.AddFuncName(err)
 	}
 
 	req.UserId = auth.ID
@@ -153,9 +143,7 @@ func (c *ContactController) Update(ctx *fiber.Ctx) error {
 
 	res, err := c.UseCase.Update(ctx.UserContext(), req)
 	if err != nil {
-		c.Log.WithError(err).Error("error updating contact")
-		err = errkit.AddFuncName(err)
-		return response.Error(ctx, err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -180,9 +168,7 @@ func (c *ContactController) Delete(ctx *fiber.Ctx) error {
 	}
 
 	if err := c.UseCase.Delete(ctx.UserContext(), req); err != nil {
-		c.Log.WithError(err).Error("error deleting contact")
-		err = errkit.AddFuncName(err)
-		return response.Error(ctx, err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, true)

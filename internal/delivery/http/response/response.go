@@ -37,7 +37,7 @@ func DataPaging(ctx *fiber.Ctx, status int, data any, paging *PageMetadata) erro
 
 func Error(ctx *fiber.Ctx, err error) error {
 	if err == nil {
-		return nil
+		return ctx.Status(http.StatusInternalServerError).SendString("something wrong")
 	}
 
 	httpErr := LoadErrAsHTTPError(err)

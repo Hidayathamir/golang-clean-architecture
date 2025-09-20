@@ -40,10 +40,8 @@ func (c *AddressController) Create(ctx *fiber.Ctx) error {
 
 	req := new(model.CreateAddressRequest)
 	if err := ctx.BodyParser(req); err != nil {
-		c.Log.WithError(err).Error("failed to parse request body")
 		err = errkit.BadRequest(err)
-		err = errkit.AddFuncName(err)
-		return response.Error(ctx, err)
+		return errkit.AddFuncName(err)
 	}
 
 	req.UserId = auth.ID
@@ -51,9 +49,7 @@ func (c *AddressController) Create(ctx *fiber.Ctx) error {
 
 	res, err := c.UseCase.Create(ctx.UserContext(), req)
 	if err != nil {
-		c.Log.WithError(err).Error("failed to create address")
-		err = errkit.AddFuncName(err)
-		return response.Error(ctx, err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -79,9 +75,7 @@ func (c *AddressController) List(ctx *fiber.Ctx) error {
 
 	res, err := c.UseCase.List(ctx.UserContext(), req)
 	if err != nil {
-		c.Log.WithError(err).Error("failed to list addresses")
-		err = errkit.AddFuncName(err)
-		return response.Error(ctx, err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -110,9 +104,7 @@ func (c *AddressController) Get(ctx *fiber.Ctx) error {
 
 	res, err := c.UseCase.Get(ctx.UserContext(), req)
 	if err != nil {
-		c.Log.WithError(err).Error("failed to get address")
-		err = errkit.AddFuncName(err)
-		return response.Error(ctx, err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -135,10 +127,8 @@ func (c *AddressController) Update(ctx *fiber.Ctx) error {
 
 	req := new(model.UpdateAddressRequest)
 	if err := ctx.BodyParser(req); err != nil {
-		c.Log.WithError(err).Error("failed to parse request body")
 		err = errkit.BadRequest(err)
-		err = errkit.AddFuncName(err)
-		return response.Error(ctx, err)
+		return errkit.AddFuncName(err)
 	}
 
 	req.UserId = auth.ID
@@ -147,9 +137,7 @@ func (c *AddressController) Update(ctx *fiber.Ctx) error {
 
 	res, err := c.UseCase.Update(ctx.UserContext(), req)
 	if err != nil {
-		c.Log.WithError(err).Error("failed to update address")
-		err = errkit.AddFuncName(err)
-		return response.Error(ctx, err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -177,9 +165,7 @@ func (c *AddressController) Delete(ctx *fiber.Ctx) error {
 	}
 
 	if err := c.UseCase.Delete(ctx.UserContext(), req); err != nil {
-		c.Log.WithError(err).Error("failed to delete address")
-		err = errkit.AddFuncName(err)
-		return response.Error(ctx, err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, true)
