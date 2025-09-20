@@ -1,6 +1,8 @@
 package config
 
 import (
+	"golang-clean-architecture/pkg/constant/configkey"
+
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -8,7 +10,7 @@ import (
 func NewLogger(viper *viper.Viper) *logrus.Logger {
 	log := logrus.New()
 
-	log.SetLevel(logrus.Level(viper.GetInt32("log.level")))
+	log.SetLevel(logrus.Level(viper.GetInt32(configkey.LogLevel)))
 	log.SetFormatter(&logrus.JSONFormatter{})
 
 	return log

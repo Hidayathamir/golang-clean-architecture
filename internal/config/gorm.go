@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"golang-clean-architecture/pkg/constant/configkey"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -12,14 +13,14 @@ import (
 )
 
 func NewDatabase(viper *viper.Viper, log *logrus.Logger) *gorm.DB {
-	username := viper.GetString("database.username")
-	password := viper.GetString("database.password")
-	host := viper.GetString("database.host")
-	port := viper.GetInt("database.port")
-	database := viper.GetString("database.name")
-	idleConnection := viper.GetInt("database.pool.idle")
-	maxConnection := viper.GetInt("database.pool.max")
-	maxLifeTimeConnection := viper.GetInt("database.pool.lifetime")
+	username := viper.GetString(configkey.DatabaseUsername)
+	password := viper.GetString(configkey.DatabasePassword)
+	host := viper.GetString(configkey.DatabaseHost)
+	port := viper.GetInt(configkey.DatabasePort)
+	database := viper.GetString(configkey.DatabaseName)
+	idleConnection := viper.GetInt(configkey.DatabasePoolIdle)
+	maxConnection := viper.GetInt(configkey.DatabasePoolMax)
+	maxLifeTimeConnection := viper.GetInt(configkey.DatabasePoolLifetime)
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", username, password, host, port, database)
 
