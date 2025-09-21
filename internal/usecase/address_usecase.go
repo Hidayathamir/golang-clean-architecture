@@ -4,6 +4,7 @@ import (
 	"context"
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/gateway/messaging"
+	"golang-clean-architecture/internal/gateway/rest"
 	"golang-clean-architecture/internal/model"
 	"golang-clean-architecture/internal/model/converter"
 	"golang-clean-architecture/internal/repository"
@@ -36,6 +37,9 @@ type AddressUseCaseImpl struct {
 
 	// producer
 	AddressProducer messaging.AddressProducer
+
+	// client
+	PaymentClient rest.PaymentClient
 }
 
 func NewAddressUseCase(
@@ -47,6 +51,9 @@ func NewAddressUseCase(
 
 	// producer
 	addressProducer messaging.AddressProducer,
+
+	// client
+	paymentClient rest.PaymentClient,
 ) *AddressUseCaseImpl {
 	return &AddressUseCaseImpl{
 		DB:       db,
@@ -59,6 +66,9 @@ func NewAddressUseCase(
 
 		// producer
 		AddressProducer: addressProducer,
+
+		// client
+		PaymentClient: paymentClient,
 	}
 }
 
@@ -175,6 +185,10 @@ func (u *AddressUseCaseImpl) Delete(ctx context.Context, req *model.DeleteAddres
 
 	address := new(entity.Address)
 	if err := u.AddressRepository.FindByIdAndContactId(ctx, tx, address, req.ID, req.ContactId); err != nil {
+		return errkit.AddFuncName(err)
+	}
+
+	if _, err := u.PaymentClient.Refund(ctx, address.ID); err != nil {
 		return errkit.AddFuncName(err)
 	}
 

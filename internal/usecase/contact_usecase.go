@@ -4,6 +4,7 @@ import (
 	"context"
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/gateway/messaging"
+	"golang-clean-architecture/internal/gateway/rest"
 	"golang-clean-architecture/internal/model"
 	"golang-clean-architecture/internal/model/converter"
 	"golang-clean-architecture/internal/repository"
@@ -35,6 +36,9 @@ type ContactUseCaseImpl struct {
 
 	// producer
 	ContactProducer messaging.ContactProducer
+
+	// client
+	SlackClient rest.SlackClient
 }
 
 func NewContactUseCase(
@@ -45,6 +49,9 @@ func NewContactUseCase(
 
 	// producer
 	contactProducer messaging.ContactProducer,
+
+	// client
+	SlackClient rest.SlackClient,
 ) *ContactUseCaseImpl {
 	return &ContactUseCaseImpl{
 		DB:       db,
@@ -56,6 +63,9 @@ func NewContactUseCase(
 
 		// producer
 		ContactProducer: contactProducer,
+
+		// client
+		SlackClient: SlackClient,
 	}
 }
 
@@ -117,6 +127,10 @@ func (u *ContactUseCaseImpl) Update(ctx context.Context, req *model.UpdateContac
 	}
 
 	if err := tx.Commit().Error; err != nil {
+		return nil, errkit.AddFuncName(err)
+	}
+
+	if _, err := u.SlackClient.IsConnected(ctx); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 

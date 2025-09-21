@@ -5,6 +5,7 @@ import (
 	"errors"
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/gateway/messaging"
+	"golang-clean-architecture/internal/gateway/rest"
 	"golang-clean-architecture/internal/model"
 	"golang-clean-architecture/internal/model/converter"
 	"golang-clean-architecture/internal/repository"
@@ -38,6 +39,10 @@ type UserUseCaseImpl struct {
 
 	// producer
 	UserProducer messaging.UserProducer
+
+	// client
+	S3Client    rest.S3Client
+	SlackClient rest.SlackClient
 }
 
 func NewUserUseCase(
@@ -48,6 +53,10 @@ func NewUserUseCase(
 
 	// producer
 	userProducer messaging.UserProducer,
+
+	// client
+	s3Client rest.S3Client,
+	slackClient rest.SlackClient,
 ) *UserUseCaseImpl {
 	return &UserUseCaseImpl{
 		DB:       db,
@@ -59,6 +68,10 @@ func NewUserUseCase(
 
 		// producer
 		UserProducer: userProducer,
+
+		// client
+		S3Client:    s3Client,
+		SlackClient: slackClient,
 	}
 }
 
@@ -161,6 +174,10 @@ func (u *UserUseCaseImpl) Login(ctx context.Context, req *model.LoginUserRequest
 		return nil, errkit.AddFuncName(err)
 	}
 
+	if _, err := u.SlackClient.IsConnected(ctx); err != nil {
+		return nil, errkit.AddFuncName(err)
+	}
+
 	event := converter.UserToEvent(user)
 	if err := u.UserProducer.Send(ctx, event); err != nil {
 		return nil, errkit.AddFuncName(err)
@@ -211,6 +228,10 @@ func (u *UserUseCaseImpl) Logout(ctx context.Context, req *model.LogoutUserReque
 	}
 
 	if err := tx.Commit().Error; err != nil {
+		return false, errkit.AddFuncName(err)
+	}
+
+	if _, err := u.S3Client.DeleteObject(ctx, "user-bucket", user.ID); err != nil {
 		return false, errkit.AddFuncName(err)
 	}
 
