@@ -16,6 +16,8 @@ type ContactProducer interface {
 	Send(ctx context.Context, event *model.ContactEvent) error
 }
 
+var _ ContactProducer = &ContactProducerImpl{}
+
 type ContactProducerImpl struct {
 	Producer sarama.SyncProducer
 	Topic    string

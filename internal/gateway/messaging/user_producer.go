@@ -16,6 +16,8 @@ type UserProducer interface {
 	Send(ctx context.Context, event *model.UserEvent) error
 }
 
+var _ UserProducer = &UserProducerImpl{}
+
 type UserProducerImpl struct {
 	Producer sarama.SyncProducer
 	Topic    string

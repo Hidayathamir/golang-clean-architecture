@@ -16,6 +16,8 @@ type AddressProducer interface {
 	Send(ctx context.Context, event *model.AddressEvent) error
 }
 
+var _ AddressProducer = &AddressProducerImpl{}
+
 type AddressProducerImpl struct {
 	Producer sarama.SyncProducer
 	Topic    string
