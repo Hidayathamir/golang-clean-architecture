@@ -4,197 +4,212 @@ import (
 	"context"
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/gateway/messaging"
+	"golang-clean-architecture/internal/gateway/rest"
 	"golang-clean-architecture/internal/model"
 	"golang-clean-architecture/internal/model/converter"
 	"golang-clean-architecture/internal/repository"
+	"golang-clean-architecture/pkg/errkit"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
-type ContactUseCase struct {
-	DB                *gorm.DB
-	Log               *logrus.Logger
-	Validate          *validator.Validate
-	ContactRepository *repository.ContactRepository
-	ContactProducer   *messaging.ContactProducer
+type ContactUseCase interface {
+	Create(ctx context.Context, req *model.CreateContactRequest) (*model.ContactResponse, error)
+	Update(ctx context.Context, req *model.UpdateContactRequest) (*model.ContactResponse, error)
+	Get(ctx context.Context, req *model.GetContactRequest) (*model.ContactResponse, error)
+	Delete(ctx context.Context, req *model.DeleteContactRequest) error
+	Search(ctx context.Context, req *model.SearchContactRequest) ([]model.ContactResponse, int64, error)
 }
 
-func NewContactUseCase(db *gorm.DB, logger *logrus.Logger, validate *validator.Validate,
-	contactRepository *repository.ContactRepository, contactProducer *messaging.ContactProducer) *ContactUseCase {
-	return &ContactUseCase{
-		DB:                db,
-		Log:               logger,
-		Validate:          validate,
+var _ ContactUseCase = &ContactUseCaseImpl{}
+
+type ContactUseCaseImpl struct {
+	DB       *gorm.DB
+	Log      *logrus.Logger
+	Validate *validator.Validate
+
+	// repository
+	ContactRepository repository.ContactRepository
+
+	// producer
+	ContactProducer messaging.ContactProducer
+
+	// client
+	SlackClient rest.SlackClient
+}
+
+func NewContactUseCase(
+	db *gorm.DB, logger *logrus.Logger, validate *validator.Validate,
+
+	// repository
+	contactRepository repository.ContactRepository,
+
+	// producer
+	contactProducer messaging.ContactProducer,
+
+	// client
+	SlackClient rest.SlackClient,
+) *ContactUseCaseImpl {
+	return &ContactUseCaseImpl{
+		DB:       db,
+		Log:      logger,
+		Validate: validate,
+
+		// repository
 		ContactRepository: contactRepository,
-		ContactProducer:   contactProducer,
+
+		// producer
+		ContactProducer: contactProducer,
+
+		// client
+		SlackClient: SlackClient,
 	}
 }
 
-func (c *ContactUseCase) Create(ctx context.Context, request *model.CreateContactRequest) (*model.ContactResponse, error) {
-	tx := c.DB.WithContext(ctx).Begin()
+func (u *ContactUseCaseImpl) Create(ctx context.Context, req *model.CreateContactRequest) (*model.ContactResponse, error) {
+	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	if err := c.Validate.Struct(request); err != nil {
-		c.Log.WithError(err).Error("error validating request body")
-		return nil, fiber.ErrBadRequest
+	if err := u.Validate.Struct(req); err != nil {
+		err = errkit.BadRequest(err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	contact := &entity.Contact{
 		ID:        uuid.New().String(),
-		FirstName: request.FirstName,
-		LastName:  request.LastName,
-		Email:     request.Email,
-		Phone:     request.Phone,
-		UserId:    request.UserId,
+		FirstName: req.FirstName,
+		LastName:  req.LastName,
+		Email:     req.Email,
+		Phone:     req.Phone,
+		UserId:    req.UserId,
 	}
 
-	if err := c.ContactRepository.Create(tx, contact); err != nil {
-		c.Log.WithError(err).Error("error creating contact")
-		return nil, fiber.ErrInternalServerError
+	if err := u.ContactRepository.Create(ctx, tx, contact); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		c.Log.WithError(err).Error("error creating contact")
-		return nil, fiber.ErrInternalServerError
+		return nil, errkit.AddFuncName(err)
 	}
 
-	if c.ContactProducer != nil {
-		event := converter.ContactToEvent(contact)
-		if err := c.ContactProducer.Send(event); err != nil {
-			c.Log.WithError(err).Error("error publishing contact created event")
-			return nil, fiber.ErrInternalServerError
-		}
-		c.Log.Info("Published contact created event")
-	} else {
-		c.Log.Info("Kafka producer is disabled, skipping contact created event")
+	event := converter.ContactToEvent(contact)
+	if err := u.ContactProducer.Send(ctx, event); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	return converter.ContactToResponse(contact), nil
 }
 
-func (c *ContactUseCase) Update(ctx context.Context, request *model.UpdateContactRequest) (*model.ContactResponse, error) {
-	tx := c.DB.WithContext(ctx).Begin()
+func (u *ContactUseCaseImpl) Update(ctx context.Context, req *model.UpdateContactRequest) (*model.ContactResponse, error) {
+	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
 	contact := new(entity.Contact)
-	if err := c.ContactRepository.FindByIdAndUserId(tx, contact, request.ID, request.UserId); err != nil {
-		c.Log.WithError(err).Error("error getting contact")
-		return nil, fiber.ErrNotFound
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ID, req.UserId); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
-	if err := c.Validate.Struct(request); err != nil {
-		c.Log.WithError(err).Error("error validating request body")
-		return nil, fiber.ErrBadRequest
+	if err := u.Validate.Struct(req); err != nil {
+		err = errkit.BadRequest(err)
+		return nil, errkit.AddFuncName(err)
 	}
 
-	contact.FirstName = request.FirstName
-	contact.LastName = request.LastName
-	contact.Email = request.Email
-	contact.Phone = request.Phone
+	contact.FirstName = req.FirstName
+	contact.LastName = req.LastName
+	contact.Email = req.Email
+	contact.Phone = req.Phone
 
-	if err := c.ContactRepository.Update(tx, contact); err != nil {
-		c.Log.WithError(err).Error("error updating contact")
-		return nil, fiber.ErrInternalServerError
+	if err := u.ContactRepository.Update(ctx, tx, contact); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		c.Log.WithError(err).Error("error updating contact")
-		return nil, fiber.ErrInternalServerError
+		return nil, errkit.AddFuncName(err)
 	}
 
-	if c.ContactProducer != nil {
-		event := converter.ContactToEvent(contact)
-		if err := c.ContactProducer.Send(event); err != nil {
-			c.Log.WithError(err).Error("error publishing contact updated event")
-			return nil, fiber.ErrInternalServerError
-		}
-		c.Log.Info("Published contact updated event")
-	} else {
-		c.Log.Info("Kafka producer is disabled, skipping contact updated event")
+	if _, err := u.SlackClient.IsConnected(ctx); err != nil {
+		return nil, errkit.AddFuncName(err)
+	}
+
+	event := converter.ContactToEvent(contact)
+	if err := u.ContactProducer.Send(ctx, event); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	return converter.ContactToResponse(contact), nil
 }
 
-func (c *ContactUseCase) Get(ctx context.Context, request *model.GetContactRequest) (*model.ContactResponse, error) {
-	tx := c.DB.WithContext(ctx).Begin()
+func (u *ContactUseCaseImpl) Get(ctx context.Context, req *model.GetContactRequest) (*model.ContactResponse, error) {
+	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	if err := c.Validate.Struct(request); err != nil {
-		c.Log.WithError(err).Error("error validating request body")
-		return nil, fiber.ErrBadRequest
+	if err := u.Validate.Struct(req); err != nil {
+		err = errkit.BadRequest(err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	contact := new(entity.Contact)
-	if err := c.ContactRepository.FindByIdAndUserId(tx, contact, request.ID, request.UserId); err != nil {
-		c.Log.WithError(err).Error("error getting contact")
-		return nil, fiber.ErrNotFound
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ID, req.UserId); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		c.Log.WithError(err).Error("error getting contact")
-		return nil, fiber.ErrInternalServerError
+		return nil, errkit.AddFuncName(err)
 	}
 
 	return converter.ContactToResponse(contact), nil
 }
 
-func (c *ContactUseCase) Delete(ctx context.Context, request *model.DeleteContactRequest) error {
-	tx := c.DB.WithContext(ctx).Begin()
+func (u *ContactUseCaseImpl) Delete(ctx context.Context, req *model.DeleteContactRequest) error {
+	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	if err := c.Validate.Struct(request); err != nil {
-		c.Log.WithError(err).Error("error validating request body")
-		return fiber.ErrBadRequest
+	if err := u.Validate.Struct(req); err != nil {
+		err = errkit.BadRequest(err)
+		return errkit.AddFuncName(err)
 	}
 
 	contact := new(entity.Contact)
-	if err := c.ContactRepository.FindByIdAndUserId(tx, contact, request.ID, request.UserId); err != nil {
-		c.Log.WithError(err).Error("error getting contact")
-		return fiber.ErrNotFound
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ID, req.UserId); err != nil {
+		return errkit.AddFuncName(err)
 	}
 
-	if err := c.ContactRepository.Delete(tx, contact); err != nil {
-		c.Log.WithError(err).Error("error deleting contact")
-		return fiber.ErrInternalServerError
+	if err := u.ContactRepository.Delete(ctx, tx, contact); err != nil {
+		return errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		c.Log.WithError(err).Error("error deleting contact")
-		return fiber.ErrInternalServerError
+		return errkit.AddFuncName(err)
 	}
 
 	return nil
 }
 
-func (c *ContactUseCase) Search(ctx context.Context, request *model.SearchContactRequest) ([]model.ContactResponse, int64, error) {
-	tx := c.DB.WithContext(ctx).Begin()
+func (u *ContactUseCaseImpl) Search(ctx context.Context, req *model.SearchContactRequest) ([]model.ContactResponse, int64, error) {
+	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	if err := c.Validate.Struct(request); err != nil {
-		c.Log.WithError(err).Error("error validating request body")
-		return nil, 0, fiber.ErrBadRequest
+	if err := u.Validate.Struct(req); err != nil {
+		err = errkit.BadRequest(err)
+		return nil, 0, errkit.AddFuncName(err)
 	}
 
-	contacts, total, err := c.ContactRepository.Search(tx, request)
+	contacts, total, err := u.ContactRepository.Search(ctx, tx, req)
 	if err != nil {
-		c.Log.WithError(err).Error("error getting contacts")
-		return nil, 0, fiber.ErrInternalServerError
+		return nil, 0, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		c.Log.WithError(err).Error("error getting contacts")
-		return nil, 0, fiber.ErrInternalServerError
+		return nil, 0, errkit.AddFuncName(err)
 	}
 
-	responses := make([]model.ContactResponse, len(contacts))
+	res := make([]model.ContactResponse, len(contacts))
 	for i, contact := range contacts {
-		responses[i] = *converter.ContactToResponse(&contact)
+		res[i] = *converter.ContactToResponse(&contact)
 	}
 
-	return responses, total, nil
+	return res, total, nil
 }

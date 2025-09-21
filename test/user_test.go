@@ -2,6 +2,7 @@ package test
 
 import (
 	"encoding/json"
+	"golang-clean-architecture/internal/delivery/http/response"
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/model"
 	"io"
@@ -25,21 +26,21 @@ func TestRegister(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodPost, "/api/users", strings.NewReader(string(bodyJson)))
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
+	req := httptest.NewRequest(http.MethodPost, "/api/users", strings.NewReader(string(bodyJson)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, requestBody.ID, responseBody.Data.ID)
 	assert.Equal(t, requestBody.Name, responseBody.Data.Name)
 	assert.NotNil(t, responseBody.Data.CreatedAt)
@@ -57,22 +58,22 @@ func TestRegisterError(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodPost, "/api/users", strings.NewReader(string(bodyJson)))
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
+	req := httptest.NewRequest(http.MethodPost, "/api/users", strings.NewReader(string(bodyJson)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusBadRequest, response.StatusCode)
-	assert.NotNil(t, responseBody.Errors)
+	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
 }
 
 func TestRegisterDuplicate(t *testing.T) {
@@ -88,22 +89,22 @@ func TestRegisterDuplicate(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodPost, "/api/users", strings.NewReader(string(bodyJson)))
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
+	req := httptest.NewRequest(http.MethodPost, "/api/users", strings.NewReader(string(bodyJson)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusConflict, response.StatusCode)
-	assert.NotNil(t, responseBody.Errors)
+	assert.Equal(t, http.StatusConflict, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
 }
 
 func TestLogin(t *testing.T) {
@@ -117,21 +118,21 @@ func TestLogin(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodPost, "/api/users/_login", strings.NewReader(string(bodyJson)))
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
+	req := httptest.NewRequest(http.MethodPost, "/api/users/_login", strings.NewReader(string(bodyJson)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.NotNil(t, responseBody.Data.Token)
 
 	user := new(entity.User)
@@ -152,22 +153,22 @@ func TestLoginWrongUsername(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodPost, "/api/users/_login", strings.NewReader(string(bodyJson)))
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
+	req := httptest.NewRequest(http.MethodPost, "/api/users/_login", strings.NewReader(string(bodyJson)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusUnauthorized, response.StatusCode)
-	assert.NotNil(t, responseBody.Errors)
+	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
 }
 
 func TestLoginWrongPassword(t *testing.T) {
@@ -182,22 +183,22 @@ func TestLoginWrongPassword(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodPost, "/api/users/_login", strings.NewReader(string(bodyJson)))
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
+	req := httptest.NewRequest(http.MethodPost, "/api/users/_login", strings.NewReader(string(bodyJson)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusUnauthorized, response.StatusCode)
-	assert.NotNil(t, responseBody.Errors)
+	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
 }
 
 func TestLogout(t *testing.T) {
@@ -208,22 +209,22 @@ func TestLogout(t *testing.T) {
 	err := db.Where("id = ?", "khannedy").First(user).Error
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodDelete, "/api/users", nil)
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodDelete, "/api/users", nil)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[bool])
+	responseBody := new(response.WebResponse[bool])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.True(t, responseBody.Data)
 }
 
@@ -231,23 +232,23 @@ func TestLogoutWrongAuthorization(t *testing.T) {
 	ClearAll()
 	TestLogin(t) // login success
 
-	request := httptest.NewRequest(http.MethodDelete, "/api/users", nil)
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", "wrong")
+	req := httptest.NewRequest(http.MethodDelete, "/api/users", nil)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", "wrong")
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[bool])
+	responseBody := new(response.WebResponse[bool])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusUnauthorized, response.StatusCode)
-	assert.NotNil(t, responseBody.Errors)
+	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
 }
 
 func TestGetCurrentUser(t *testing.T) {
@@ -258,22 +259,22 @@ func TestGetCurrentUser(t *testing.T) {
 	err := db.Where("id = ?", "khannedy").First(user).Error
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodGet, "/api/users/_current", nil)
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodGet, "/api/users/_current", nil)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, user.ID, responseBody.Data.ID)
 	assert.Equal(t, user.Name, responseBody.Data.Name)
 	assert.Equal(t, user.CreatedAt, responseBody.Data.CreatedAt)
@@ -284,23 +285,23 @@ func TestGetCurrentUserFailed(t *testing.T) {
 	ClearAll()
 	TestLogin(t) // login success
 
-	request := httptest.NewRequest(http.MethodGet, "/api/users/_current", nil)
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", "wrong")
+	req := httptest.NewRequest(http.MethodGet, "/api/users/_current", nil)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", "wrong")
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusUnauthorized, response.StatusCode)
-	assert.NotNil(t, responseBody.Errors)
+	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
 }
 
 func TestUpdateUserName(t *testing.T) {
@@ -318,22 +319,22 @@ func TestUpdateUserName(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodPatch, "/api/users/_current", strings.NewReader(string(bodyJson)))
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodPatch, "/api/users/_current", strings.NewReader(string(bodyJson)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, user.ID, responseBody.Data.ID)
 	assert.Equal(t, requestBody.Name, responseBody.Data.Name)
 	assert.NotNil(t, responseBody.Data.CreatedAt)
@@ -355,22 +356,22 @@ func TestUpdateUserPassword(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodPatch, "/api/users/_current", strings.NewReader(string(bodyJson)))
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", user.Token)
+	req := httptest.NewRequest(http.MethodPatch, "/api/users/_current", strings.NewReader(string(bodyJson)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", user.Token)
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, user.ID, responseBody.Data.ID)
 	assert.NotNil(t, responseBody.Data.CreatedAt)
 	assert.NotNil(t, responseBody.Data.UpdatedAt)
@@ -394,21 +395,21 @@ func TestUpdateFailed(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	request := httptest.NewRequest(http.MethodPatch, "/api/users/_current", strings.NewReader(string(bodyJson)))
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Authorization", "wrong")
+	req := httptest.NewRequest(http.MethodPatch, "/api/users/_current", strings.NewReader(string(bodyJson)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", "wrong")
 
-	response, err := app.Test(request)
+	res, err := app.Test(req)
 	assert.Nil(t, err)
 
-	bytes, err := io.ReadAll(response.Body)
+	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(model.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusUnauthorized, response.StatusCode)
-	assert.NotNil(t, responseBody.Errors)
+	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
 }

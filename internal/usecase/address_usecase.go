@@ -4,217 +4,227 @@ import (
 	"context"
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/gateway/messaging"
+	"golang-clean-architecture/internal/gateway/rest"
 	"golang-clean-architecture/internal/model"
 	"golang-clean-architecture/internal/model/converter"
 	"golang-clean-architecture/internal/repository"
+	"golang-clean-architecture/pkg/errkit"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
-type AddressUseCase struct {
-	DB                *gorm.DB
-	Log               *logrus.Logger
-	Validate          *validator.Validate
-	AddressRepository *repository.AddressRepository
-	ContactRepository *repository.ContactRepository
-	AddressProducer   *messaging.AddressProducer
+type AddressUseCase interface {
+	Create(ctx context.Context, req *model.CreateAddressRequest) (*model.AddressResponse, error)
+	Update(ctx context.Context, req *model.UpdateAddressRequest) (*model.AddressResponse, error)
+	Get(ctx context.Context, req *model.GetAddressRequest) (*model.AddressResponse, error)
+	Delete(ctx context.Context, req *model.DeleteAddressRequest) error
+	List(ctx context.Context, req *model.ListAddressRequest) ([]model.AddressResponse, error)
 }
 
-func NewAddressUseCase(db *gorm.DB, logger *logrus.Logger, validate *validator.Validate,
-	contactRepository *repository.ContactRepository, addressRepository *repository.AddressRepository,
-	addressProducer *messaging.AddressProducer) *AddressUseCase {
-	return &AddressUseCase{
-		DB:                db,
-		Log:               logger,
-		Validate:          validate,
+var _ AddressUseCase = &AddressUseCaseImpl{}
+
+type AddressUseCaseImpl struct {
+	DB       *gorm.DB
+	Log      *logrus.Logger
+	Validate *validator.Validate
+
+	// repository
+	AddressRepository repository.AddressRepository
+	ContactRepository repository.ContactRepository
+
+	// producer
+	AddressProducer messaging.AddressProducer
+
+	// client
+	PaymentClient rest.PaymentClient
+}
+
+func NewAddressUseCase(
+	db *gorm.DB, logger *logrus.Logger, validate *validator.Validate,
+
+	// repository
+	contactRepository repository.ContactRepository,
+	addressRepository repository.AddressRepository,
+
+	// producer
+	addressProducer messaging.AddressProducer,
+
+	// client
+	paymentClient rest.PaymentClient,
+) *AddressUseCaseImpl {
+	return &AddressUseCaseImpl{
+		DB:       db,
+		Log:      logger,
+		Validate: validate,
+
+		// repository
 		ContactRepository: contactRepository,
 		AddressRepository: addressRepository,
-		AddressProducer:   addressProducer,
+
+		// producer
+		AddressProducer: addressProducer,
+
+		// client
+		PaymentClient: paymentClient,
 	}
 }
 
-func (c *AddressUseCase) Create(ctx context.Context, request *model.CreateAddressRequest) (*model.AddressResponse, error) {
-	tx := c.DB.WithContext(ctx).Begin()
+func (u *AddressUseCaseImpl) Create(ctx context.Context, req *model.CreateAddressRequest) (*model.AddressResponse, error) {
+	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	if err := c.Validate.Struct(request); err != nil {
-		c.Log.WithError(err).Error("failed to validate request body")
-		return nil, fiber.ErrBadRequest
+	if err := u.Validate.Struct(req); err != nil {
+		err = errkit.BadRequest(err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	contact := new(entity.Contact)
-	if err := c.ContactRepository.FindByIdAndUserId(tx, contact, request.ContactId, request.UserId); err != nil {
-		c.Log.WithError(err).Error("failed to find contact")
-		return nil, fiber.ErrNotFound
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ContactId, req.UserId); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	address := &entity.Address{
 		ID:         uuid.NewString(),
 		ContactId:  contact.ID,
-		Street:     request.Street,
-		City:       request.City,
-		Province:   request.Province,
-		PostalCode: request.PostalCode,
-		Country:    request.Country,
+		Street:     req.Street,
+		City:       req.City,
+		Province:   req.Province,
+		PostalCode: req.PostalCode,
+		Country:    req.Country,
 	}
 
-	if err := c.AddressRepository.Create(tx, address); err != nil {
-		c.Log.WithError(err).Error("failed to create address")
-		return nil, fiber.ErrInternalServerError
+	if err := u.AddressRepository.Create(ctx, tx, address); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		c.Log.WithError(err).Error("failed to commit transaction")
-		return nil, fiber.ErrInternalServerError
+		return nil, errkit.AddFuncName(err)
 	}
 
-	if c.AddressProducer != nil {
-		event := converter.AddressToEvent(address)
-		if err := c.AddressProducer.Send(event); err != nil {
-			c.Log.WithError(err).Error("failed to publish address created event")
-			return nil, fiber.ErrInternalServerError
-		}
-		c.Log.Info("Published address created event")
-	} else {
-		c.Log.Info("Kafka producer is disabled, skipping address created event")
+	event := converter.AddressToEvent(address)
+	if err := u.AddressProducer.Send(ctx, event); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	return converter.AddressToResponse(address), nil
 }
 
-func (c *AddressUseCase) Update(ctx context.Context, request *model.UpdateAddressRequest) (*model.AddressResponse, error) {
-	tx := c.DB.WithContext(ctx).Begin()
+func (u *AddressUseCaseImpl) Update(ctx context.Context, req *model.UpdateAddressRequest) (*model.AddressResponse, error) {
+	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	if err := c.Validate.Struct(request); err != nil {
-		c.Log.WithError(err).Error("failed to validate request body")
-		return nil, fiber.ErrBadRequest
+	if err := u.Validate.Struct(req); err != nil {
+		err = errkit.BadRequest(err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	contact := new(entity.Contact)
-	if err := c.ContactRepository.FindByIdAndUserId(tx, contact, request.ContactId, request.UserId); err != nil {
-		c.Log.WithError(err).Error("failed to find contact")
-		return nil, fiber.ErrNotFound
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ContactId, req.UserId); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	address := new(entity.Address)
-	if err := c.AddressRepository.FindByIdAndContactId(tx, address, request.ID, contact.ID); err != nil {
-		c.Log.WithError(err).Error("failed to find address")
-		return nil, fiber.ErrNotFound
+	if err := u.AddressRepository.FindByIdAndContactId(ctx, tx, address, req.ID, contact.ID); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
-	address.Street = request.Street
-	address.City = request.City
-	address.Province = request.Province
-	address.PostalCode = request.PostalCode
-	address.Country = request.Country
+	address.Street = req.Street
+	address.City = req.City
+	address.Province = req.Province
+	address.PostalCode = req.PostalCode
+	address.Country = req.Country
 
-	if err := c.AddressRepository.Update(tx, address); err != nil {
-		c.Log.WithError(err).Error("failed to update address")
-		return nil, fiber.ErrInternalServerError
+	if err := u.AddressRepository.Update(ctx, tx, address); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		c.Log.WithError(err).Error("failed to commit transaction")
-		return nil, fiber.ErrInternalServerError
+		return nil, errkit.AddFuncName(err)
 	}
 
-	if c.AddressProducer != nil {
-		event := converter.AddressToEvent(address)
-		if err := c.AddressProducer.Send(event); err != nil {
-			c.Log.WithError(err).Error("failed to publish address updated event")
-			return nil, fiber.ErrInternalServerError
-		}
-		c.Log.Info("Published address updated event")
-	} else {
-		c.Log.Info("Kafka producer is disabled, skipping address updated event")
+	event := converter.AddressToEvent(address)
+	if err := u.AddressProducer.Send(ctx, event); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	return converter.AddressToResponse(address), nil
 }
 
-func (c *AddressUseCase) Get(ctx context.Context, request *model.GetAddressRequest) (*model.AddressResponse, error) {
-	tx := c.DB.WithContext(ctx).Begin()
+func (u *AddressUseCaseImpl) Get(ctx context.Context, req *model.GetAddressRequest) (*model.AddressResponse, error) {
+	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
 	contact := new(entity.Contact)
-	if err := c.ContactRepository.FindByIdAndUserId(tx, contact, request.ContactId, request.UserId); err != nil {
-		c.Log.WithError(err).Error("failed to find contact")
-		return nil, fiber.ErrNotFound
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ContactId, req.UserId); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	address := new(entity.Address)
-	if err := c.AddressRepository.FindByIdAndContactId(tx, address, request.ID, request.ContactId); err != nil {
-		c.Log.WithError(err).Error("failed to find address")
-		return nil, fiber.ErrNotFound
+	if err := u.AddressRepository.FindByIdAndContactId(ctx, tx, address, req.ID, req.ContactId); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		c.Log.WithError(err).Error("failed to commit transaction")
-		return nil, fiber.ErrInternalServerError
+		return nil, errkit.AddFuncName(err)
 	}
 
 	return converter.AddressToResponse(address), nil
 }
 
-func (c *AddressUseCase) Delete(ctx context.Context, request *model.DeleteAddressRequest) error {
-	tx := c.DB.WithContext(ctx).Begin()
+func (u *AddressUseCaseImpl) Delete(ctx context.Context, req *model.DeleteAddressRequest) error {
+	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
 	contact := new(entity.Contact)
-	if err := c.ContactRepository.FindByIdAndUserId(tx, contact, request.ContactId, request.UserId); err != nil {
-		c.Log.WithError(err).Error("failed to find contact")
-		return fiber.ErrNotFound
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ContactId, req.UserId); err != nil {
+		return errkit.AddFuncName(err)
 	}
 
 	address := new(entity.Address)
-	if err := c.AddressRepository.FindByIdAndContactId(tx, address, request.ID, request.ContactId); err != nil {
-		c.Log.WithError(err).Error("failed to find address")
-		return fiber.ErrNotFound
+	if err := u.AddressRepository.FindByIdAndContactId(ctx, tx, address, req.ID, req.ContactId); err != nil {
+		return errkit.AddFuncName(err)
 	}
 
-	if err := c.AddressRepository.Delete(tx, address); err != nil {
-		c.Log.WithError(err).Error("failed to delete address")
-		return fiber.ErrInternalServerError
+	if _, err := u.PaymentClient.Refund(ctx, address.ID); err != nil {
+		return errkit.AddFuncName(err)
+	}
+
+	if err := u.AddressRepository.Delete(ctx, tx, address); err != nil {
+		return errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		c.Log.WithError(err).Error("failed to commit transaction")
-		return fiber.ErrInternalServerError
+		return errkit.AddFuncName(err)
 	}
 
 	return nil
 }
 
-func (c *AddressUseCase) List(ctx context.Context, request *model.ListAddressRequest) ([]model.AddressResponse, error) {
-	tx := c.DB.WithContext(ctx).Begin()
+func (u *AddressUseCaseImpl) List(ctx context.Context, req *model.ListAddressRequest) ([]model.AddressResponse, error) {
+	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
 	contact := new(entity.Contact)
-	if err := c.ContactRepository.FindByIdAndUserId(tx, contact, request.ContactId, request.UserId); err != nil {
-		c.Log.WithError(err).Error("failed to find contact")
-		return nil, fiber.ErrNotFound
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ContactId, req.UserId); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
-	addresses, err := c.AddressRepository.FindAllByContactId(tx, contact.ID)
+	addresses, err := u.AddressRepository.FindAllByContactId(ctx, tx, contact.ID)
 	if err != nil {
-		c.Log.WithError(err).Error("failed to find addresses")
-		return nil, fiber.ErrInternalServerError
+		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		c.Log.WithError(err).Error("failed to commit transaction")
-		return nil, fiber.ErrInternalServerError
+		return nil, errkit.AddFuncName(err)
 	}
 
-	responses := make([]model.AddressResponse, len(addresses))
+	res := make([]model.AddressResponse, len(addresses))
 	for i, address := range addresses {
-		responses[i] = *converter.AddressToResponse(&address)
+		res[i] = *converter.AddressToResponse(&address)
 	}
 
-	return responses, nil
+	return res, nil
 }

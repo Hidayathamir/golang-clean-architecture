@@ -2,106 +2,153 @@ package http
 
 import (
 	"golang-clean-architecture/internal/delivery/http/middleware"
+	"golang-clean-architecture/internal/delivery/http/response"
 	"golang-clean-architecture/internal/model"
 	"golang-clean-architecture/internal/usecase"
+	"golang-clean-architecture/pkg/errkit"
+	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 )
 
 type UserController struct {
+	UseCase usecase.UserUseCase
 	Log     *logrus.Logger
-	UseCase *usecase.UserUseCase
 }
 
-func NewUserController(useCase *usecase.UserUseCase, logger *logrus.Logger) *UserController {
+func NewUserController(useCase usecase.UserUseCase, logger *logrus.Logger) *UserController {
 	return &UserController{
-		Log:     logger,
 		UseCase: useCase,
+		Log:     logger,
 	}
 }
 
+// Register godoc
+//
+//	@Summary		Register user
+//	@Description	Register a new user account
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		model.RegisterUserRequest	true	"Register User Request"
+//	@Success		200		{object}	response.WebResponse[model.UserResponse]
+//	@Router			/api/users [post]
 func (c *UserController) Register(ctx *fiber.Ctx) error {
-	request := new(model.RegisterUserRequest)
-	err := ctx.BodyParser(request)
+	req := new(model.RegisterUserRequest)
+	err := ctx.BodyParser(req)
 	if err != nil {
-		c.Log.Warnf("Failed to parse request body : %+v", err)
-		return fiber.ErrBadRequest
+		err = errkit.BadRequest(err)
+		return errkit.AddFuncName(err)
 	}
 
-	response, err := c.UseCase.Create(ctx.UserContext(), request)
+	res, err := c.UseCase.Create(ctx.UserContext(), req)
 	if err != nil {
-		c.Log.Warnf("Failed to register user : %+v", err)
-		return err
+		return errkit.AddFuncName(err)
 	}
 
-	return ctx.JSON(model.WebResponse[*model.UserResponse]{Data: response})
+	return response.Data(ctx, http.StatusOK, res)
 }
 
+// Login godoc
+//
+//	@Summary		Login user
+//	@Description	Authenticate a user and return access token
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		model.LoginUserRequest	true	"Login User Request"
+//	@Success		200		{object}	response.WebResponse[model.UserResponse]
+//	@Router			/api/users/_login [post]
 func (c *UserController) Login(ctx *fiber.Ctx) error {
-	request := new(model.LoginUserRequest)
-	err := ctx.BodyParser(request)
+	req := new(model.LoginUserRequest)
+	err := ctx.BodyParser(req)
 	if err != nil {
-		c.Log.Warnf("Failed to parse request body : %+v", err)
-		return fiber.ErrBadRequest
+		err = errkit.BadRequest(err)
+		return errkit.AddFuncName(err)
 	}
 
-	response, err := c.UseCase.Login(ctx.UserContext(), request)
+	res, err := c.UseCase.Login(ctx.UserContext(), req)
 	if err != nil {
-		c.Log.Warnf("Failed to login user : %+v", err)
-		return err
+		return errkit.AddFuncName(err)
 	}
 
-	return ctx.JSON(model.WebResponse[*model.UserResponse]{Data: response})
+	return response.Data(ctx, http.StatusOK, res)
 }
 
+// Current godoc
+//
+//	@Summary		Get current user
+//	@Description	Get profile of the currently authenticated user
+//	@Tags			users
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Success		200	{object}	response.WebResponse[model.UserResponse]
+//	@Router			/api/users/_current [get]
 func (c *UserController) Current(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 
-	request := &model.GetUserRequest{
+	req := &model.GetUserRequest{
 		ID: auth.ID,
 	}
 
-	response, err := c.UseCase.Current(ctx.UserContext(), request)
+	res, err := c.UseCase.Current(ctx.UserContext(), req)
 	if err != nil {
-		c.Log.WithError(err).Warnf("Failed to get current user")
-		return err
+		return errkit.AddFuncName(err)
 	}
 
-	return ctx.JSON(model.WebResponse[*model.UserResponse]{Data: response})
+	return response.Data(ctx, http.StatusOK, res)
 }
 
+// Logout godoc
+//
+//	@Summary		Logout user
+//	@Description	Logout the current authenticated user
+//	@Tags			users
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Success		200	{object}	response.WebResponse[bool]
+//	@Router			/api/users [delete]
 func (c *UserController) Logout(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 
-	request := &model.LogoutUserRequest{
+	req := &model.LogoutUserRequest{
 		ID: auth.ID,
 	}
 
-	response, err := c.UseCase.Logout(ctx.UserContext(), request)
+	res, err := c.UseCase.Logout(ctx.UserContext(), req)
 	if err != nil {
-		c.Log.WithError(err).Warnf("Failed to logout user")
-		return err
+		return errkit.AddFuncName(err)
 	}
 
-	return ctx.JSON(model.WebResponse[bool]{Data: response})
+	return response.Data(ctx, http.StatusOK, res)
 }
 
+// Update godoc
+//
+//	@Summary		Update user
+//	@Description	Update profile of the current authenticated user
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			request	body		model.UpdateUserRequest	true	"Update User Request"
+//	@Success		200		{object}	response.WebResponse[model.UserResponse]
+//	@Router			/api/users/_current [patch]
 func (c *UserController) Update(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 
-	request := new(model.UpdateUserRequest)
-	if err := ctx.BodyParser(request); err != nil {
-		c.Log.Warnf("Failed to parse request body : %+v", err)
-		return fiber.ErrBadRequest
+	req := new(model.UpdateUserRequest)
+	if err := ctx.BodyParser(req); err != nil {
+		err = errkit.BadRequest(err)
+		return errkit.AddFuncName(err)
 	}
 
-	request.ID = auth.ID
-	response, err := c.UseCase.Update(ctx.UserContext(), request)
+	req.ID = auth.ID
+	res, err := c.UseCase.Update(ctx.UserContext(), req)
 	if err != nil {
-		c.Log.WithError(err).Warnf("Failed to update user")
-		return err
+		return errkit.AddFuncName(err)
 	}
 
-	return ctx.JSON(model.WebResponse[*model.UserResponse]{Data: response})
+	return response.Data(ctx, http.StatusOK, res)
 }

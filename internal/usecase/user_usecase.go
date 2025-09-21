@@ -2,276 +2,284 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/gateway/messaging"
+	"golang-clean-architecture/internal/gateway/rest"
 	"golang-clean-architecture/internal/model"
 	"golang-clean-architecture/internal/model/converter"
 	"golang-clean-architecture/internal/repository"
+	"golang-clean-architecture/pkg/errkit"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
-type UserUseCase struct {
-	DB             *gorm.DB
-	Log            *logrus.Logger
-	Validate       *validator.Validate
-	UserRepository *repository.UserRepository
-	UserProducer   *messaging.UserProducer
+type UserUseCase interface {
+	Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error)
+	Create(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error)
+	Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error)
+	Current(ctx context.Context, req *model.GetUserRequest) (*model.UserResponse, error)
+	Logout(ctx context.Context, req *model.LogoutUserRequest) (bool, error)
+	Update(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error)
 }
 
-func NewUserUseCase(db *gorm.DB, logger *logrus.Logger, validate *validator.Validate,
-	userRepository *repository.UserRepository, userProducer *messaging.UserProducer) *UserUseCase {
-	return &UserUseCase{
-		DB:             db,
-		Log:            logger,
-		Validate:       validate,
+var _ UserUseCase = &UserUseCaseImpl{}
+
+type UserUseCaseImpl struct {
+	DB       *gorm.DB
+	Log      *logrus.Logger
+	Validate *validator.Validate
+
+	// repository
+	UserRepository repository.UserRepository
+
+	// producer
+	UserProducer messaging.UserProducer
+
+	// client
+	S3Client    rest.S3Client
+	SlackClient rest.SlackClient
+}
+
+func NewUserUseCase(
+	db *gorm.DB, logger *logrus.Logger, validate *validator.Validate,
+
+	// repository
+	userRepository repository.UserRepository,
+
+	// producer
+	userProducer messaging.UserProducer,
+
+	// client
+	s3Client rest.S3Client,
+	slackClient rest.SlackClient,
+) *UserUseCaseImpl {
+	return &UserUseCaseImpl{
+		DB:       db,
+		Log:      logger,
+		Validate: validate,
+
+		// repository
 		UserRepository: userRepository,
-		UserProducer:   userProducer,
+
+		// producer
+		UserProducer: userProducer,
+
+		// client
+		S3Client:    s3Client,
+		SlackClient: slackClient,
 	}
 }
 
-func (c *UserUseCase) Verify(ctx context.Context, request *model.VerifyUserRequest) (*model.Auth, error) {
-	tx := c.DB.WithContext(ctx).Begin()
+func (u *UserUseCaseImpl) Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error) {
+	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	err := c.Validate.Struct(request)
+	err := u.Validate.Struct(req)
 	if err != nil {
-		c.Log.Warnf("Invalid request body : %+v", err)
-		return nil, fiber.ErrBadRequest
+		err = errkit.BadRequest(err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	user := new(entity.User)
-	if err := c.UserRepository.FindByToken(tx, user, request.Token); err != nil {
-		c.Log.Warnf("Failed find user by token : %+v", err)
-		return nil, fiber.ErrNotFound
+	if err := u.UserRepository.FindByToken(ctx, tx, user, req.Token); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		c.Log.Warnf("Failed commit transaction : %+v", err)
-		return nil, fiber.ErrInternalServerError
+		return nil, errkit.AddFuncName(err)
 	}
 
 	return &model.Auth{ID: user.ID}, nil
 }
 
-func (c *UserUseCase) Create(ctx context.Context, request *model.RegisterUserRequest) (*model.UserResponse, error) {
-	tx := c.DB.WithContext(ctx).Begin()
+func (u *UserUseCaseImpl) Create(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error) {
+	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	err := c.Validate.Struct(request)
+	err := u.Validate.Struct(req)
 	if err != nil {
-		c.Log.Warnf("Invalid request body : %+v", err)
-		return nil, fiber.ErrBadRequest
+		err = errkit.BadRequest(err)
+		return nil, errkit.AddFuncName(err)
 	}
 
-	total, err := c.UserRepository.CountById(tx, request.ID)
+	total, err := u.UserRepository.CountById(ctx, tx, req.ID)
 	if err != nil {
-		c.Log.Warnf("Failed count user from database : %+v", err)
-		return nil, fiber.ErrInternalServerError
+		return nil, errkit.AddFuncName(err)
 	}
 
 	if total > 0 {
-		c.Log.Warnf("User already exists : %+v", err)
-		return nil, fiber.ErrConflict
+		err = errors.New("user already exists")
+		err = errkit.Conflict(err)
+		return nil, errkit.AddFuncName(err)
 	}
 
-	password, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+	password, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-		c.Log.Warnf("Failed to generate bcrype hash : %+v", err)
-		return nil, fiber.ErrInternalServerError
+		return nil, errkit.AddFuncName(err)
 	}
 
 	user := &entity.User{
-		ID:       request.ID,
+		ID:       req.ID,
 		Password: string(password),
-		Name:     request.Name,
+		Name:     req.Name,
 	}
 
-	if err := c.UserRepository.Create(tx, user); err != nil {
-		c.Log.Warnf("Failed create user to database : %+v", err)
-		return nil, fiber.ErrInternalServerError
+	if err := u.UserRepository.Create(ctx, tx, user); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		c.Log.Warnf("Failed commit transaction : %+v", err)
-		return nil, fiber.ErrInternalServerError
+		return nil, errkit.AddFuncName(err)
 	}
 
-	if c.UserProducer != nil {
-		event := converter.UserToEvent(user)
-		c.Log.Info("Publishing user created event")
-		if err = c.UserProducer.Send(event); err != nil {
-			c.Log.Warnf("Failed publish user created event : %+v", err)
-			return nil, fiber.ErrInternalServerError
-		}
-	} else {
-		c.Log.Info("Kafka producer is disabled, skipping user created event")
+	event := converter.UserToEvent(user)
+	if err = u.UserProducer.Send(ctx, event); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	return converter.UserToResponse(user), nil
 }
 
-func (c *UserUseCase) Login(ctx context.Context, request *model.LoginUserRequest) (*model.UserResponse, error) {
-	tx := c.DB.WithContext(ctx).Begin()
+func (u *UserUseCaseImpl) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error) {
+	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	if err := c.Validate.Struct(request); err != nil {
-		c.Log.Warnf("Invalid request body  : %+v", err)
-		return nil, fiber.ErrBadRequest
+	if err := u.Validate.Struct(req); err != nil {
+		err = errkit.BadRequest(err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	user := new(entity.User)
-	if err := c.UserRepository.FindById(tx, user, request.ID); err != nil {
-		c.Log.Warnf("Failed find user by id : %+v", err)
-		return nil, fiber.ErrUnauthorized
+	if err := u.UserRepository.FindById(ctx, tx, user, req.ID); err != nil {
+		err = errkit.Unauthorized(err)
+		return nil, errkit.AddFuncName(err)
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password)); err != nil {
-		c.Log.Warnf("Failed to compare user password with bcrype hash : %+v", err)
-		return nil, fiber.ErrUnauthorized
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		err = errkit.Unauthorized(err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	user.Token = uuid.New().String()
-	if err := c.UserRepository.Update(tx, user); err != nil {
-		c.Log.Warnf("Failed save user : %+v", err)
-		return nil, fiber.ErrInternalServerError
+	if err := u.UserRepository.Update(ctx, tx, user); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		c.Log.Warnf("Failed commit transaction : %+v", err)
-		return nil, fiber.ErrInternalServerError
+		return nil, errkit.AddFuncName(err)
 	}
 
-	if c.UserProducer != nil {
-		event := converter.UserToEvent(user)
-		c.Log.Info("Publishing user login event")
-		if err := c.UserProducer.Send(event); err != nil {
-			c.Log.Warnf("Failed publish user login event : %+v", err)
-			return nil, fiber.ErrInternalServerError
-		}
-	} else {
-		c.Log.Info("Kafka producer is disabled, skipping user login event")
+	if _, err := u.SlackClient.IsConnected(ctx); err != nil {
+		return nil, errkit.AddFuncName(err)
+	}
+
+	event := converter.UserToEvent(user)
+	if err := u.UserProducer.Send(ctx, event); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	return converter.UserToTokenResponse(user), nil
 }
 
-func (c *UserUseCase) Current(ctx context.Context, request *model.GetUserRequest) (*model.UserResponse, error) {
-	tx := c.DB.WithContext(ctx).Begin()
+func (u *UserUseCaseImpl) Current(ctx context.Context, req *model.GetUserRequest) (*model.UserResponse, error) {
+	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	if err := c.Validate.Struct(request); err != nil {
-		c.Log.Warnf("Invalid request body : %+v", err)
-		return nil, fiber.ErrBadRequest
+	if err := u.Validate.Struct(req); err != nil {
+		err = errkit.BadRequest(err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	user := new(entity.User)
-	if err := c.UserRepository.FindById(tx, user, request.ID); err != nil {
-		c.Log.Warnf("Failed find user by id : %+v", err)
-		return nil, fiber.ErrNotFound
+	if err := u.UserRepository.FindById(ctx, tx, user, req.ID); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		c.Log.Warnf("Failed commit transaction : %+v", err)
-		return nil, fiber.ErrInternalServerError
+		return nil, errkit.AddFuncName(err)
 	}
 
 	return converter.UserToResponse(user), nil
 }
 
-func (c *UserUseCase) Logout(ctx context.Context, request *model.LogoutUserRequest) (bool, error) {
-	tx := c.DB.WithContext(ctx).Begin()
+func (u *UserUseCaseImpl) Logout(ctx context.Context, req *model.LogoutUserRequest) (bool, error) {
+	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	if err := c.Validate.Struct(request); err != nil {
-		c.Log.Warnf("Invalid request body : %+v", err)
-		return false, fiber.ErrBadRequest
+	if err := u.Validate.Struct(req); err != nil {
+		err = errkit.BadRequest(err)
+		return false, errkit.AddFuncName(err)
 	}
 
 	user := new(entity.User)
-	if err := c.UserRepository.FindById(tx, user, request.ID); err != nil {
-		c.Log.Warnf("Failed find user by id : %+v", err)
-		return false, fiber.ErrNotFound
+	if err := u.UserRepository.FindById(ctx, tx, user, req.ID); err != nil {
+		return false, errkit.AddFuncName(err)
 	}
 
 	user.Token = ""
 
-	if err := c.UserRepository.Update(tx, user); err != nil {
-		c.Log.Warnf("Failed save user : %+v", err)
-		return false, fiber.ErrInternalServerError
+	if err := u.UserRepository.Update(ctx, tx, user); err != nil {
+		return false, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		c.Log.Warnf("Failed commit transaction : %+v", err)
-		return false, fiber.ErrInternalServerError
+		return false, errkit.AddFuncName(err)
 	}
 
-	if c.UserProducer != nil {
-		event := converter.UserToEvent(user)
-		c.Log.Info("Publishing user logout event")
-		if err := c.UserProducer.Send(event); err != nil {
-			c.Log.Warnf("Failed publish user logout event : %+v", err)
-			return false, fiber.ErrInternalServerError
-		}
-	} else {
-		c.Log.Info("Kafka producer is disabled, skipping user logout event")
+	if _, err := u.S3Client.DeleteObject(ctx, "user-bucket", user.ID); err != nil {
+		return false, errkit.AddFuncName(err)
+	}
+
+	event := converter.UserToEvent(user)
+	if err := u.UserProducer.Send(ctx, event); err != nil {
+		return false, errkit.AddFuncName(err)
 	}
 
 	return true, nil
 }
 
-func (c *UserUseCase) Update(ctx context.Context, request *model.UpdateUserRequest) (*model.UserResponse, error) {
-	tx := c.DB.WithContext(ctx).Begin()
+func (u *UserUseCaseImpl) Update(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error) {
+	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
-	if err := c.Validate.Struct(request); err != nil {
-		c.Log.Warnf("Invalid request body : %+v", err)
-		return nil, fiber.ErrBadRequest
+	if err := u.Validate.Struct(req); err != nil {
+		err = errkit.BadRequest(err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	user := new(entity.User)
-	if err := c.UserRepository.FindById(tx, user, request.ID); err != nil {
-		c.Log.Warnf("Failed find user by id : %+v", err)
-		return nil, fiber.ErrNotFound
+	if err := u.UserRepository.FindById(ctx, tx, user, req.ID); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
-	if request.Name != "" {
-		user.Name = request.Name
+	if req.Name != "" {
+		user.Name = req.Name
 	}
 
-	if request.Password != "" {
-		password, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+	if req.Password != "" {
+		password, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 		if err != nil {
-			c.Log.Warnf("Failed to generate bcrype hash : %+v", err)
-			return nil, fiber.ErrInternalServerError
+			return nil, errkit.AddFuncName(err)
 		}
 		user.Password = string(password)
 	}
 
-	if err := c.UserRepository.Update(tx, user); err != nil {
-		c.Log.Warnf("Failed save user : %+v", err)
-		return nil, fiber.ErrInternalServerError
+	if err := u.UserRepository.Update(ctx, tx, user); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		c.Log.Warnf("Failed commit transaction : %+v", err)
-		return nil, fiber.ErrInternalServerError
+		return nil, errkit.AddFuncName(err)
 	}
 
-	if c.UserProducer != nil {
-		event := converter.UserToEvent(user)
-		c.Log.Info("Publishing user updated event")
-		if err := c.UserProducer.Send(event); err != nil {
-			c.Log.Warnf("Failed publish user updated event : %+v", err)
-			return nil, fiber.ErrInternalServerError
-		}
-	} else {
-		c.Log.Info("Kafka producer is disabled, skipping user updated event")
+	event := converter.UserToEvent(user)
+	if err := u.UserProducer.Send(ctx, event); err != nil {
+		return nil, errkit.AddFuncName(err)
 	}
 
 	return converter.UserToResponse(user), nil

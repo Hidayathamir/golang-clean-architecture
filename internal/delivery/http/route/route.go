@@ -1,9 +1,11 @@
 package route
 
 import (
+	_ "golang-clean-architecture/api" // need import for swagger
 	"golang-clean-architecture/internal/delivery/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/swagger"
 )
 
 type RouteConfig struct {
@@ -12,20 +14,37 @@ type RouteConfig struct {
 	ContactController *http.ContactController
 	AddressController *http.AddressController
 	AuthMiddleware    fiber.Handler
+	TraceIDMiddleware fiber.Handler
 }
 
 func (c *RouteConfig) Setup() {
+	c.SetupHomeRoute()
+	c.SetupSwaggerRoute()
 	c.SetupGuestRoute()
 	c.SetupAuthRoute()
 }
 
+func (c *RouteConfig) SetupHomeRoute() {
+	c.App.Get("/", func(ctx *fiber.Ctx) error {
+		return ctx.SendString("hi")
+	})
+}
+
+func (c *RouteConfig) SetupSwaggerRoute() {
+	c.App.Get("/swagger/*", swagger.HandlerDefault)
+}
+
 func (c *RouteConfig) SetupGuestRoute() {
+	c.App.Use(c.TraceIDMiddleware)
+
 	c.App.Post("/api/users", c.UserController.Register)
 	c.App.Post("/api/users/_login", c.UserController.Login)
 }
 
 func (c *RouteConfig) SetupAuthRoute() {
+	c.App.Use(c.TraceIDMiddleware)
 	c.App.Use(c.AuthMiddleware)
+
 	c.App.Delete("/api/users", c.UserController.Logout)
 	c.App.Patch("/api/users/_current", c.UserController.Update)
 	c.App.Get("/api/users/_current", c.UserController.Current)

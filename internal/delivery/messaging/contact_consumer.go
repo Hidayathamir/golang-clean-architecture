@@ -3,6 +3,7 @@ package messaging
 import (
 	"encoding/json"
 	"golang-clean-architecture/internal/model"
+	"golang-clean-architecture/pkg/errkit"
 
 	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
@@ -22,7 +23,7 @@ func (c ContactConsumer) Consume(message *sarama.ConsumerMessage) error {
 	ContactEvent := new(model.ContactEvent)
 	if err := json.Unmarshal(message.Value, ContactEvent); err != nil {
 		c.Log.WithError(err).Error("error unmarshalling Contact event")
-		return err
+		return errkit.AddFuncName(err)
 	}
 
 	// TODO process event

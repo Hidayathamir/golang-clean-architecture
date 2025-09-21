@@ -3,7 +3,10 @@ package main
 import (
 	"fmt"
 	"golang-clean-architecture/internal/config"
+	"golang-clean-architecture/pkg/constant/configkey"
 )
+
+//	@title	Golang Clean Architecture
 
 func main() {
 	viperConfig := config.NewViper()
@@ -22,7 +25,7 @@ func main() {
 		Producer: producer,
 	})
 
-	webPort := viperConfig.GetInt("web.port")
+	webPort := viperConfig.GetInt(configkey.WebPort)
 	err := app.Listen(fmt.Sprintf(":%d", webPort))
 	if err != nil {
 		log.Fatalf("Failed to start server: %v", err)
