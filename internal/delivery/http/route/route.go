@@ -18,9 +18,16 @@ type RouteConfig struct {
 }
 
 func (c *RouteConfig) Setup() {
+	c.SetupHomeRoute()
 	c.SetupSwaggerRoute()
 	c.SetupGuestRoute()
 	c.SetupAuthRoute()
+}
+
+func (c *RouteConfig) SetupHomeRoute() {
+	c.App.Get("/", func(ctx *fiber.Ctx) error {
+		return ctx.SendString("hi")
+	})
 }
 
 func (c *RouteConfig) SetupSwaggerRoute() {
