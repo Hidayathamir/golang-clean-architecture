@@ -41,7 +41,7 @@ func NewKafkaProducer(config *viper.Viper, log *logrus.Logger) sarama.SyncProduc
 	saramaConfig.Producer.RequiredAcks = sarama.WaitForAll
 	saramaConfig.Producer.Retry.Max = 3
 
-	brokers := strings.Split(config.GetString("kafka.bootstrap.servers"), ",")
+	brokers := strings.Split(config.GetString(configkey.KafkaBootstrapServers), ",")
 
 	producer, err := sarama.NewSyncProducer(brokers, saramaConfig)
 	if err != nil {
