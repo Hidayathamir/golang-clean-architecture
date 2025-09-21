@@ -86,7 +86,7 @@ All configuration is in `config.json` file.
 
 ## API Spec
 
-All API Spec is in `api` folder.
+All API Spec is in `api` folder. Auto generate with command `make swag`.
 
 ## Database Migration
 
@@ -101,7 +101,7 @@ migrate create -ext sql -dir db/migrations create_table_xxx
 ### Run Migration
 
 ```shell
-migrate -database "mysql://root:@tcp(localhost:3306)/golang_clean_architecture?charset=utf8mb4&parseTime=True&loc=Local" -path db/migrations up
+make migrate
 ```
 
 ## Run Application
@@ -109,17 +109,17 @@ migrate -database "mysql://root:@tcp(localhost:3306)/golang_clean_architecture?c
 ### Run unit test
 
 ```bash
-go test -v ./test/
+make test
 ```
 
 ### Run web server
 
 ```bash
-go run cmd/web/main.go
+make run
 ```
 
 ### Run worker
 
 ```bash
-go run cmd/worker/main.go
+make run-worker
 ```
