@@ -1,6 +1,7 @@
 package repositorymwlogger
 
 import (
+	"context"
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/repository"
 	"golang-clean-architecture/pkg/helper"
@@ -24,60 +25,60 @@ func NewAddressRepository(logger *logrus.Logger, next repository.AddressReposito
 	}
 }
 
-func (r *AddressRepositoryImpl) FindAllByContactId(db *gorm.DB, contactId string) ([]entity.Address, error) {
-	addresses, err := r.next.FindAllByContactId(db, contactId)
+func (r *AddressRepositoryImpl) FindAllByContactId(ctx context.Context, db *gorm.DB, contactId string) ([]entity.Address, error) {
+	addresses, err := r.next.FindAllByContactId(ctx, db, contactId)
 
 	fields := logrus.Fields{
 		"contactId": contactId,
 		"addresses": addresses,
 	}
-	helper.Log(r.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return addresses, err
 }
 
-func (r *AddressRepositoryImpl) FindByIdAndContactId(db *gorm.DB, address *entity.Address, id string, contactId string) error {
-	err := r.next.FindByIdAndContactId(db, address, id, contactId)
+func (r *AddressRepositoryImpl) FindByIdAndContactId(ctx context.Context, db *gorm.DB, address *entity.Address, id string, contactId string) error {
+	err := r.next.FindByIdAndContactId(ctx, db, address, id, contactId)
 
 	fields := logrus.Fields{
 		"address":   address,
 		"id":        id,
 		"contactId": contactId,
 	}
-	helper.Log(r.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return err
 }
 
-func (r *AddressRepositoryImpl) Create(db *gorm.DB, entity *entity.Address) error {
-	err := r.next.Create(db, entity)
+func (r *AddressRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity *entity.Address) error {
+	err := r.next.Create(ctx, db, entity)
 
 	fields := logrus.Fields{
 		"entity": entity,
 	}
-	helper.Log(r.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return err
 }
 
-func (r *AddressRepositoryImpl) Delete(db *gorm.DB, entity *entity.Address) error {
-	err := r.next.Delete(db, entity)
+func (r *AddressRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, entity *entity.Address) error {
+	err := r.next.Delete(ctx, db, entity)
 
 	fields := logrus.Fields{
 		"entity": entity,
 	}
-	helper.Log(r.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return err
 }
 
-func (r *AddressRepositoryImpl) Update(db *gorm.DB, entity *entity.Address) error {
-	err := r.next.Update(db, entity)
+func (r *AddressRepositoryImpl) Update(ctx context.Context, db *gorm.DB, entity *entity.Address) error {
+	err := r.next.Update(ctx, db, entity)
 
 	fields := logrus.Fields{
 		"entity": entity,
 	}
-	helper.Log(r.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return err
 }

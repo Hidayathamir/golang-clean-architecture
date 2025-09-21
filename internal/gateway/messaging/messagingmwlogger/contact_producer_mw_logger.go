@@ -1,6 +1,7 @@
 package messagingmwlogger
 
 import (
+	"context"
 	"golang-clean-architecture/internal/gateway/messaging"
 	"golang-clean-architecture/internal/model"
 	"golang-clean-architecture/pkg/helper"
@@ -23,13 +24,13 @@ func NewContactProducer(logger *logrus.Logger, next messaging.ContactProducer) *
 	}
 }
 
-func (p *ContactProducerImpl) Send(event *model.ContactEvent) error {
-	err := p.next.Send(event)
+func (p *ContactProducerImpl) Send(ctx context.Context, event *model.ContactEvent) error {
+	err := p.next.Send(ctx, event)
 
 	fields := logrus.Fields{
 		"event": event,
 	}
-	helper.Log(p.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return err
 }

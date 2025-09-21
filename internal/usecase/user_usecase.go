@@ -73,7 +73,7 @@ func (u *UserUseCaseImpl) Verify(ctx context.Context, req *model.VerifyUserReque
 	}
 
 	user := new(entity.User)
-	if err := u.UserRepository.FindByToken(tx, user, req.Token); err != nil {
+	if err := u.UserRepository.FindByToken(ctx, tx, user, req.Token); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -94,7 +94,7 @@ func (u *UserUseCaseImpl) Create(ctx context.Context, req *model.RegisterUserReq
 		return nil, errkit.AddFuncName(err)
 	}
 
-	total, err := u.UserRepository.CountById(tx, req.ID)
+	total, err := u.UserRepository.CountById(ctx, tx, req.ID)
 	if err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
@@ -116,7 +116,7 @@ func (u *UserUseCaseImpl) Create(ctx context.Context, req *model.RegisterUserReq
 		Name:     req.Name,
 	}
 
-	if err := u.UserRepository.Create(tx, user); err != nil {
+	if err := u.UserRepository.Create(ctx, tx, user); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -125,7 +125,7 @@ func (u *UserUseCaseImpl) Create(ctx context.Context, req *model.RegisterUserReq
 	}
 
 	event := converter.UserToEvent(user)
-	if err = u.UserProducer.Send(event); err != nil {
+	if err = u.UserProducer.Send(ctx, event); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -142,7 +142,7 @@ func (u *UserUseCaseImpl) Login(ctx context.Context, req *model.LoginUserRequest
 	}
 
 	user := new(entity.User)
-	if err := u.UserRepository.FindById(tx, user, req.ID); err != nil {
+	if err := u.UserRepository.FindById(ctx, tx, user, req.ID); err != nil {
 		err = errkit.Unauthorized(err)
 		return nil, errkit.AddFuncName(err)
 	}
@@ -153,7 +153,7 @@ func (u *UserUseCaseImpl) Login(ctx context.Context, req *model.LoginUserRequest
 	}
 
 	user.Token = uuid.New().String()
-	if err := u.UserRepository.Update(tx, user); err != nil {
+	if err := u.UserRepository.Update(ctx, tx, user); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -162,7 +162,7 @@ func (u *UserUseCaseImpl) Login(ctx context.Context, req *model.LoginUserRequest
 	}
 
 	event := converter.UserToEvent(user)
-	if err := u.UserProducer.Send(event); err != nil {
+	if err := u.UserProducer.Send(ctx, event); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -179,7 +179,7 @@ func (u *UserUseCaseImpl) Current(ctx context.Context, req *model.GetUserRequest
 	}
 
 	user := new(entity.User)
-	if err := u.UserRepository.FindById(tx, user, req.ID); err != nil {
+	if err := u.UserRepository.FindById(ctx, tx, user, req.ID); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -200,13 +200,13 @@ func (u *UserUseCaseImpl) Logout(ctx context.Context, req *model.LogoutUserReque
 	}
 
 	user := new(entity.User)
-	if err := u.UserRepository.FindById(tx, user, req.ID); err != nil {
+	if err := u.UserRepository.FindById(ctx, tx, user, req.ID); err != nil {
 		return false, errkit.AddFuncName(err)
 	}
 
 	user.Token = ""
 
-	if err := u.UserRepository.Update(tx, user); err != nil {
+	if err := u.UserRepository.Update(ctx, tx, user); err != nil {
 		return false, errkit.AddFuncName(err)
 	}
 
@@ -215,7 +215,7 @@ func (u *UserUseCaseImpl) Logout(ctx context.Context, req *model.LogoutUserReque
 	}
 
 	event := converter.UserToEvent(user)
-	if err := u.UserProducer.Send(event); err != nil {
+	if err := u.UserProducer.Send(ctx, event); err != nil {
 		return false, errkit.AddFuncName(err)
 	}
 
@@ -232,7 +232,7 @@ func (u *UserUseCaseImpl) Update(ctx context.Context, req *model.UpdateUserReque
 	}
 
 	user := new(entity.User)
-	if err := u.UserRepository.FindById(tx, user, req.ID); err != nil {
+	if err := u.UserRepository.FindById(ctx, tx, user, req.ID); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -248,7 +248,7 @@ func (u *UserUseCaseImpl) Update(ctx context.Context, req *model.UpdateUserReque
 		user.Password = string(password)
 	}
 
-	if err := u.UserRepository.Update(tx, user); err != nil {
+	if err := u.UserRepository.Update(ctx, tx, user); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -257,7 +257,7 @@ func (u *UserUseCaseImpl) Update(ctx context.Context, req *model.UpdateUserReque
 	}
 
 	event := converter.UserToEvent(user)
-	if err := u.UserProducer.Send(event); err != nil {
+	if err := u.UserProducer.Send(ctx, event); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 

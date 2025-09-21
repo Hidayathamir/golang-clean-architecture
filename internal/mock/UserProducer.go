@@ -4,6 +4,7 @@
 package mock
 
 import (
+	"context"
 	"golang-clean-architecture/internal/gateway/messaging"
 	"golang-clean-architecture/internal/model"
 	"sync"
@@ -19,7 +20,7 @@ var _ messaging.UserProducer = &UserProducerMock{}
 //
 //		// make and configure a mocked messaging.UserProducer
 //		mockedUserProducer := &UserProducerMock{
-//			SendFunc: func(event *model.UserEvent) error {
+//			SendFunc: func(ctx context.Context, event *model.UserEvent) error {
 //				panic("mock out the Send method")
 //			},
 //		}
@@ -30,12 +31,14 @@ var _ messaging.UserProducer = &UserProducerMock{}
 //	}
 type UserProducerMock struct {
 	// SendFunc mocks the Send method.
-	SendFunc func(event *model.UserEvent) error
+	SendFunc func(ctx context.Context, event *model.UserEvent) error
 
 	// calls tracks calls to the methods.
 	calls struct {
 		// Send holds details about calls to the Send method.
 		Send []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
 			// Event is the event argument value.
 			Event *model.UserEvent
 		}
@@ -44,19 +47,21 @@ type UserProducerMock struct {
 }
 
 // Send calls SendFunc.
-func (mock *UserProducerMock) Send(event *model.UserEvent) error {
+func (mock *UserProducerMock) Send(ctx context.Context, event *model.UserEvent) error {
 	if mock.SendFunc == nil {
 		panic("UserProducerMock.SendFunc: method is nil but UserProducer.Send was just called")
 	}
 	callInfo := struct {
+		Ctx   context.Context
 		Event *model.UserEvent
 	}{
+		Ctx:   ctx,
 		Event: event,
 	}
 	mock.lockSend.Lock()
 	mock.calls.Send = append(mock.calls.Send, callInfo)
 	mock.lockSend.Unlock()
-	return mock.SendFunc(event)
+	return mock.SendFunc(ctx, event)
 }
 
 // SendCalls gets all the calls that were made to Send.
@@ -64,9 +69,11 @@ func (mock *UserProducerMock) Send(event *model.UserEvent) error {
 //
 //	len(mockedUserProducer.SendCalls())
 func (mock *UserProducerMock) SendCalls() []struct {
+	Ctx   context.Context
 	Event *model.UserEvent
 } {
 	var calls []struct {
+		Ctx   context.Context
 		Event *model.UserEvent
 	}
 	mock.lockSend.RLock()

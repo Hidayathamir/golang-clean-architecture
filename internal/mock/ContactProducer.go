@@ -4,6 +4,7 @@
 package mock
 
 import (
+	"context"
 	"golang-clean-architecture/internal/gateway/messaging"
 	"golang-clean-architecture/internal/model"
 	"sync"
@@ -19,7 +20,7 @@ var _ messaging.ContactProducer = &ContactProducerMock{}
 //
 //		// make and configure a mocked messaging.ContactProducer
 //		mockedContactProducer := &ContactProducerMock{
-//			SendFunc: func(event *model.ContactEvent) error {
+//			SendFunc: func(ctx context.Context, event *model.ContactEvent) error {
 //				panic("mock out the Send method")
 //			},
 //		}
@@ -30,12 +31,14 @@ var _ messaging.ContactProducer = &ContactProducerMock{}
 //	}
 type ContactProducerMock struct {
 	// SendFunc mocks the Send method.
-	SendFunc func(event *model.ContactEvent) error
+	SendFunc func(ctx context.Context, event *model.ContactEvent) error
 
 	// calls tracks calls to the methods.
 	calls struct {
 		// Send holds details about calls to the Send method.
 		Send []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
 			// Event is the event argument value.
 			Event *model.ContactEvent
 		}
@@ -44,19 +47,21 @@ type ContactProducerMock struct {
 }
 
 // Send calls SendFunc.
-func (mock *ContactProducerMock) Send(event *model.ContactEvent) error {
+func (mock *ContactProducerMock) Send(ctx context.Context, event *model.ContactEvent) error {
 	if mock.SendFunc == nil {
 		panic("ContactProducerMock.SendFunc: method is nil but ContactProducer.Send was just called")
 	}
 	callInfo := struct {
+		Ctx   context.Context
 		Event *model.ContactEvent
 	}{
+		Ctx:   ctx,
 		Event: event,
 	}
 	mock.lockSend.Lock()
 	mock.calls.Send = append(mock.calls.Send, callInfo)
 	mock.lockSend.Unlock()
-	return mock.SendFunc(event)
+	return mock.SendFunc(ctx, event)
 }
 
 // SendCalls gets all the calls that were made to Send.
@@ -64,9 +69,11 @@ func (mock *ContactProducerMock) Send(event *model.ContactEvent) error {
 //
 //	len(mockedContactProducer.SendCalls())
 func (mock *ContactProducerMock) SendCalls() []struct {
+	Ctx   context.Context
 	Event *model.ContactEvent
 } {
 	var calls []struct {
+		Ctx   context.Context
 		Event *model.ContactEvent
 	}
 	mock.lockSend.RLock()

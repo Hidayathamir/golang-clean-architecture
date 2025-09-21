@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/pkg/errkit"
 
@@ -11,11 +12,11 @@ import (
 //go:generate moq -out=../mock/UserRepository.go -pkg=mock . UserRepository
 
 type UserRepository interface {
-	FindByToken(db *gorm.DB, user *entity.User, token string) error
-	Create(db *gorm.DB, entity *entity.User) error
-	Update(db *gorm.DB, entity *entity.User) error
-	CountById(db *gorm.DB, id string) (int64, error)
-	FindById(db *gorm.DB, entity *entity.User, id string) error
+	FindByToken(ctx context.Context, db *gorm.DB, user *entity.User, token string) error
+	Create(ctx context.Context, db *gorm.DB, entity *entity.User) error
+	Update(ctx context.Context, db *gorm.DB, entity *entity.User) error
+	CountById(ctx context.Context, db *gorm.DB, id string) (int64, error)
+	FindById(ctx context.Context, db *gorm.DB, entity *entity.User, id string) error
 }
 
 var _ UserRepository = &UserRepositoryImpl{}
@@ -30,7 +31,7 @@ func NewUserRepository(log *logrus.Logger) *UserRepositoryImpl {
 	}
 }
 
-func (r *UserRepositoryImpl) FindByToken(db *gorm.DB, user *entity.User, token string) error {
+func (r *UserRepositoryImpl) FindByToken(ctx context.Context, db *gorm.DB, user *entity.User, token string) error {
 	err := db.Where("token = ?", token).First(user).Error
 	if err != nil {
 		err = errkit.NotFound(err)
@@ -39,7 +40,7 @@ func (r *UserRepositoryImpl) FindByToken(db *gorm.DB, user *entity.User, token s
 	return nil
 }
 
-func (r *UserRepositoryImpl) Create(db *gorm.DB, entity *entity.User) error {
+func (r *UserRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity *entity.User) error {
 	err := db.Create(entity).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
@@ -47,7 +48,7 @@ func (r *UserRepositoryImpl) Create(db *gorm.DB, entity *entity.User) error {
 	return nil
 }
 
-func (r *UserRepositoryImpl) Update(db *gorm.DB, entity *entity.User) error {
+func (r *UserRepositoryImpl) Update(ctx context.Context, db *gorm.DB, entity *entity.User) error {
 	err := db.Save(entity).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
@@ -55,7 +56,7 @@ func (r *UserRepositoryImpl) Update(db *gorm.DB, entity *entity.User) error {
 	return nil
 }
 
-func (r *UserRepositoryImpl) Delete(db *gorm.DB, entity *entity.User) error {
+func (r *UserRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, entity *entity.User) error {
 	err := db.Delete(entity).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
@@ -63,7 +64,7 @@ func (r *UserRepositoryImpl) Delete(db *gorm.DB, entity *entity.User) error {
 	return nil
 }
 
-func (r *UserRepositoryImpl) CountById(db *gorm.DB, id string) (int64, error) {
+func (r *UserRepositoryImpl) CountById(ctx context.Context, db *gorm.DB, id string) (int64, error) {
 	var total int64
 	err := db.Model(new(entity.User)).Where("id = ?", id).Count(&total).Error
 	if err != nil {
@@ -72,7 +73,7 @@ func (r *UserRepositoryImpl) CountById(db *gorm.DB, id string) (int64, error) {
 	return total, nil
 }
 
-func (r *UserRepositoryImpl) FindById(db *gorm.DB, entity *entity.User, id string) error {
+func (r *UserRepositoryImpl) FindById(ctx context.Context, db *gorm.DB, entity *entity.User, id string) error {
 	err := db.Where("id = ?", id).Take(entity).Error
 	if err != nil {
 		err = errkit.NotFound(err)

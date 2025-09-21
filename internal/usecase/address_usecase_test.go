@@ -40,11 +40,11 @@ func TestAddressUseCaseImpl_Get_Success(t *testing.T) {
 	db.ExpectBegin()
 	db.ExpectCommit()
 
-	ContactRepository.FindByIdAndUserIdFunc = func(db *gorm.DB, contact *entity.Contact, id, userId string) error {
+	ContactRepository.FindByIdAndUserIdFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userId string) error {
 		return nil
 	}
 
-	AddressRepository.FindByIdAndContactIdFunc = func(db *gorm.DB, address *entity.Address, id, contactId string) error {
+	AddressRepository.FindByIdAndContactIdFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactId string) error {
 		return nil
 	}
 
@@ -73,11 +73,11 @@ func TestAddressUseCaseImpl_Get_Fail1(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	ContactRepository.FindByIdAndUserIdFunc = func(db *gorm.DB, contact *entity.Contact, id, userId string) error {
+	ContactRepository.FindByIdAndUserIdFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userId string) error {
 		return nil
 	}
 
-	AddressRepository.FindByIdAndContactIdFunc = func(db *gorm.DB, address *entity.Address, id, contactId string) error {
+	AddressRepository.FindByIdAndContactIdFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactId string) error {
 		return assert.AnError
 	}
 

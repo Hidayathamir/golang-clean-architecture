@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/pkg/errkit"
 
@@ -11,11 +12,11 @@ import (
 //go:generate moq -out=../mock/AddressRepository.go -pkg=mock . AddressRepository
 
 type AddressRepository interface {
-	FindByIdAndContactId(db *gorm.DB, address *entity.Address, id string, contactId string) error
-	FindAllByContactId(db *gorm.DB, contactId string) ([]entity.Address, error)
-	Create(db *gorm.DB, entity *entity.Address) error
-	Update(db *gorm.DB, entity *entity.Address) error
-	Delete(db *gorm.DB, entity *entity.Address) error
+	FindByIdAndContactId(ctx context.Context, db *gorm.DB, address *entity.Address, id string, contactId string) error
+	FindAllByContactId(ctx context.Context, db *gorm.DB, contactId string) ([]entity.Address, error)
+	Create(ctx context.Context, db *gorm.DB, entity *entity.Address) error
+	Update(ctx context.Context, db *gorm.DB, entity *entity.Address) error
+	Delete(ctx context.Context, db *gorm.DB, entity *entity.Address) error
 }
 
 var _ AddressRepository = &AddressRepositoryImpl{}
@@ -30,7 +31,7 @@ func NewAddressRepository(log *logrus.Logger) *AddressRepositoryImpl {
 	}
 }
 
-func (r *AddressRepositoryImpl) FindByIdAndContactId(db *gorm.DB, address *entity.Address, id string, contactId string) error {
+func (r *AddressRepositoryImpl) FindByIdAndContactId(ctx context.Context, db *gorm.DB, address *entity.Address, id string, contactId string) error {
 	err := db.Where("id = ? AND contact_id = ?", id, contactId).First(address).Error
 	if err != nil {
 		err = errkit.NotFound(err)
@@ -40,7 +41,7 @@ func (r *AddressRepositoryImpl) FindByIdAndContactId(db *gorm.DB, address *entit
 
 }
 
-func (r *AddressRepositoryImpl) FindAllByContactId(db *gorm.DB, contactId string) ([]entity.Address, error) {
+func (r *AddressRepositoryImpl) FindAllByContactId(ctx context.Context, db *gorm.DB, contactId string) ([]entity.Address, error) {
 	var addresses []entity.Address
 	if err := db.Where("contact_id = ?", contactId).Find(&addresses).Error; err != nil {
 		return nil, errkit.AddFuncName(err)
@@ -48,7 +49,7 @@ func (r *AddressRepositoryImpl) FindAllByContactId(db *gorm.DB, contactId string
 	return addresses, nil
 }
 
-func (r *AddressRepositoryImpl) Create(db *gorm.DB, entity *entity.Address) error {
+func (r *AddressRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity *entity.Address) error {
 	err := db.Create(entity).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
@@ -56,7 +57,7 @@ func (r *AddressRepositoryImpl) Create(db *gorm.DB, entity *entity.Address) erro
 	return nil
 }
 
-func (r *AddressRepositoryImpl) Update(db *gorm.DB, entity *entity.Address) error {
+func (r *AddressRepositoryImpl) Update(ctx context.Context, db *gorm.DB, entity *entity.Address) error {
 	err := db.Save(entity).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
@@ -64,7 +65,7 @@ func (r *AddressRepositoryImpl) Update(db *gorm.DB, entity *entity.Address) erro
 	return nil
 }
 
-func (r *AddressRepositoryImpl) Delete(db *gorm.DB, entity *entity.Address) error {
+func (r *AddressRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, entity *entity.Address) error {
 	err := db.Delete(entity).Error
 	if err != nil {
 		return errkit.AddFuncName(err)

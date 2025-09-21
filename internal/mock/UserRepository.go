@@ -4,6 +4,7 @@
 package mock
 
 import (
+	"context"
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/repository"
 	"gorm.io/gorm"
@@ -20,19 +21,19 @@ var _ repository.UserRepository = &UserRepositoryMock{}
 //
 //		// make and configure a mocked repository.UserRepository
 //		mockedUserRepository := &UserRepositoryMock{
-//			CountByIdFunc: func(db *gorm.DB, id string) (int64, error) {
+//			CountByIdFunc: func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
 //				panic("mock out the CountById method")
 //			},
-//			CreateFunc: func(db *gorm.DB, entityMoqParam *entity.User) error {
+//			CreateFunc: func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User) error {
 //				panic("mock out the Create method")
 //			},
-//			FindByIdFunc: func(db *gorm.DB, entityMoqParam *entity.User, id string) error {
+//			FindByIdFunc: func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 //				panic("mock out the FindById method")
 //			},
-//			FindByTokenFunc: func(db *gorm.DB, user *entity.User, token string) error {
+//			FindByTokenFunc: func(ctx context.Context, db *gorm.DB, user *entity.User, token string) error {
 //				panic("mock out the FindByToken method")
 //			},
-//			UpdateFunc: func(db *gorm.DB, entityMoqParam *entity.User) error {
+//			UpdateFunc: func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User) error {
 //				panic("mock out the Update method")
 //			},
 //		}
@@ -43,24 +44,26 @@ var _ repository.UserRepository = &UserRepositoryMock{}
 //	}
 type UserRepositoryMock struct {
 	// CountByIdFunc mocks the CountById method.
-	CountByIdFunc func(db *gorm.DB, id string) (int64, error)
+	CountByIdFunc func(ctx context.Context, db *gorm.DB, id string) (int64, error)
 
 	// CreateFunc mocks the Create method.
-	CreateFunc func(db *gorm.DB, entityMoqParam *entity.User) error
+	CreateFunc func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User) error
 
 	// FindByIdFunc mocks the FindById method.
-	FindByIdFunc func(db *gorm.DB, entityMoqParam *entity.User, id string) error
+	FindByIdFunc func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error
 
 	// FindByTokenFunc mocks the FindByToken method.
-	FindByTokenFunc func(db *gorm.DB, user *entity.User, token string) error
+	FindByTokenFunc func(ctx context.Context, db *gorm.DB, user *entity.User, token string) error
 
 	// UpdateFunc mocks the Update method.
-	UpdateFunc func(db *gorm.DB, entityMoqParam *entity.User) error
+	UpdateFunc func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User) error
 
 	// calls tracks calls to the methods.
 	calls struct {
 		// CountById holds details about calls to the CountById method.
 		CountById []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
 			// Db is the db argument value.
 			Db *gorm.DB
 			// ID is the id argument value.
@@ -68,6 +71,8 @@ type UserRepositoryMock struct {
 		}
 		// Create holds details about calls to the Create method.
 		Create []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
 			// Db is the db argument value.
 			Db *gorm.DB
 			// EntityMoqParam is the entityMoqParam argument value.
@@ -75,6 +80,8 @@ type UserRepositoryMock struct {
 		}
 		// FindById holds details about calls to the FindById method.
 		FindById []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
 			// Db is the db argument value.
 			Db *gorm.DB
 			// EntityMoqParam is the entityMoqParam argument value.
@@ -84,6 +91,8 @@ type UserRepositoryMock struct {
 		}
 		// FindByToken holds details about calls to the FindByToken method.
 		FindByToken []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
 			// Db is the db argument value.
 			Db *gorm.DB
 			// User is the user argument value.
@@ -93,6 +102,8 @@ type UserRepositoryMock struct {
 		}
 		// Update holds details about calls to the Update method.
 		Update []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
 			// Db is the db argument value.
 			Db *gorm.DB
 			// EntityMoqParam is the entityMoqParam argument value.
@@ -107,21 +118,23 @@ type UserRepositoryMock struct {
 }
 
 // CountById calls CountByIdFunc.
-func (mock *UserRepositoryMock) CountById(db *gorm.DB, id string) (int64, error) {
+func (mock *UserRepositoryMock) CountById(ctx context.Context, db *gorm.DB, id string) (int64, error) {
 	if mock.CountByIdFunc == nil {
 		panic("UserRepositoryMock.CountByIdFunc: method is nil but UserRepository.CountById was just called")
 	}
 	callInfo := struct {
-		Db *gorm.DB
-		ID string
+		Ctx context.Context
+		Db  *gorm.DB
+		ID  string
 	}{
-		Db: db,
-		ID: id,
+		Ctx: ctx,
+		Db:  db,
+		ID:  id,
 	}
 	mock.lockCountById.Lock()
 	mock.calls.CountById = append(mock.calls.CountById, callInfo)
 	mock.lockCountById.Unlock()
-	return mock.CountByIdFunc(db, id)
+	return mock.CountByIdFunc(ctx, db, id)
 }
 
 // CountByIdCalls gets all the calls that were made to CountById.
@@ -129,12 +142,14 @@ func (mock *UserRepositoryMock) CountById(db *gorm.DB, id string) (int64, error)
 //
 //	len(mockedUserRepository.CountByIdCalls())
 func (mock *UserRepositoryMock) CountByIdCalls() []struct {
-	Db *gorm.DB
-	ID string
+	Ctx context.Context
+	Db  *gorm.DB
+	ID  string
 } {
 	var calls []struct {
-		Db *gorm.DB
-		ID string
+		Ctx context.Context
+		Db  *gorm.DB
+		ID  string
 	}
 	mock.lockCountById.RLock()
 	calls = mock.calls.CountById
@@ -143,21 +158,23 @@ func (mock *UserRepositoryMock) CountByIdCalls() []struct {
 }
 
 // Create calls CreateFunc.
-func (mock *UserRepositoryMock) Create(db *gorm.DB, entityMoqParam *entity.User) error {
+func (mock *UserRepositoryMock) Create(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User) error {
 	if mock.CreateFunc == nil {
 		panic("UserRepositoryMock.CreateFunc: method is nil but UserRepository.Create was just called")
 	}
 	callInfo := struct {
+		Ctx            context.Context
 		Db             *gorm.DB
 		EntityMoqParam *entity.User
 	}{
+		Ctx:            ctx,
 		Db:             db,
 		EntityMoqParam: entityMoqParam,
 	}
 	mock.lockCreate.Lock()
 	mock.calls.Create = append(mock.calls.Create, callInfo)
 	mock.lockCreate.Unlock()
-	return mock.CreateFunc(db, entityMoqParam)
+	return mock.CreateFunc(ctx, db, entityMoqParam)
 }
 
 // CreateCalls gets all the calls that were made to Create.
@@ -165,10 +182,12 @@ func (mock *UserRepositoryMock) Create(db *gorm.DB, entityMoqParam *entity.User)
 //
 //	len(mockedUserRepository.CreateCalls())
 func (mock *UserRepositoryMock) CreateCalls() []struct {
+	Ctx            context.Context
 	Db             *gorm.DB
 	EntityMoqParam *entity.User
 } {
 	var calls []struct {
+		Ctx            context.Context
 		Db             *gorm.DB
 		EntityMoqParam *entity.User
 	}
@@ -179,15 +198,17 @@ func (mock *UserRepositoryMock) CreateCalls() []struct {
 }
 
 // FindById calls FindByIdFunc.
-func (mock *UserRepositoryMock) FindById(db *gorm.DB, entityMoqParam *entity.User, id string) error {
+func (mock *UserRepositoryMock) FindById(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 	if mock.FindByIdFunc == nil {
 		panic("UserRepositoryMock.FindByIdFunc: method is nil but UserRepository.FindById was just called")
 	}
 	callInfo := struct {
+		Ctx            context.Context
 		Db             *gorm.DB
 		EntityMoqParam *entity.User
 		ID             string
 	}{
+		Ctx:            ctx,
 		Db:             db,
 		EntityMoqParam: entityMoqParam,
 		ID:             id,
@@ -195,7 +216,7 @@ func (mock *UserRepositoryMock) FindById(db *gorm.DB, entityMoqParam *entity.Use
 	mock.lockFindById.Lock()
 	mock.calls.FindById = append(mock.calls.FindById, callInfo)
 	mock.lockFindById.Unlock()
-	return mock.FindByIdFunc(db, entityMoqParam, id)
+	return mock.FindByIdFunc(ctx, db, entityMoqParam, id)
 }
 
 // FindByIdCalls gets all the calls that were made to FindById.
@@ -203,11 +224,13 @@ func (mock *UserRepositoryMock) FindById(db *gorm.DB, entityMoqParam *entity.Use
 //
 //	len(mockedUserRepository.FindByIdCalls())
 func (mock *UserRepositoryMock) FindByIdCalls() []struct {
+	Ctx            context.Context
 	Db             *gorm.DB
 	EntityMoqParam *entity.User
 	ID             string
 } {
 	var calls []struct {
+		Ctx            context.Context
 		Db             *gorm.DB
 		EntityMoqParam *entity.User
 		ID             string
@@ -219,15 +242,17 @@ func (mock *UserRepositoryMock) FindByIdCalls() []struct {
 }
 
 // FindByToken calls FindByTokenFunc.
-func (mock *UserRepositoryMock) FindByToken(db *gorm.DB, user *entity.User, token string) error {
+func (mock *UserRepositoryMock) FindByToken(ctx context.Context, db *gorm.DB, user *entity.User, token string) error {
 	if mock.FindByTokenFunc == nil {
 		panic("UserRepositoryMock.FindByTokenFunc: method is nil but UserRepository.FindByToken was just called")
 	}
 	callInfo := struct {
+		Ctx   context.Context
 		Db    *gorm.DB
 		User  *entity.User
 		Token string
 	}{
+		Ctx:   ctx,
 		Db:    db,
 		User:  user,
 		Token: token,
@@ -235,7 +260,7 @@ func (mock *UserRepositoryMock) FindByToken(db *gorm.DB, user *entity.User, toke
 	mock.lockFindByToken.Lock()
 	mock.calls.FindByToken = append(mock.calls.FindByToken, callInfo)
 	mock.lockFindByToken.Unlock()
-	return mock.FindByTokenFunc(db, user, token)
+	return mock.FindByTokenFunc(ctx, db, user, token)
 }
 
 // FindByTokenCalls gets all the calls that were made to FindByToken.
@@ -243,11 +268,13 @@ func (mock *UserRepositoryMock) FindByToken(db *gorm.DB, user *entity.User, toke
 //
 //	len(mockedUserRepository.FindByTokenCalls())
 func (mock *UserRepositoryMock) FindByTokenCalls() []struct {
+	Ctx   context.Context
 	Db    *gorm.DB
 	User  *entity.User
 	Token string
 } {
 	var calls []struct {
+		Ctx   context.Context
 		Db    *gorm.DB
 		User  *entity.User
 		Token string
@@ -259,21 +286,23 @@ func (mock *UserRepositoryMock) FindByTokenCalls() []struct {
 }
 
 // Update calls UpdateFunc.
-func (mock *UserRepositoryMock) Update(db *gorm.DB, entityMoqParam *entity.User) error {
+func (mock *UserRepositoryMock) Update(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User) error {
 	if mock.UpdateFunc == nil {
 		panic("UserRepositoryMock.UpdateFunc: method is nil but UserRepository.Update was just called")
 	}
 	callInfo := struct {
+		Ctx            context.Context
 		Db             *gorm.DB
 		EntityMoqParam *entity.User
 	}{
+		Ctx:            ctx,
 		Db:             db,
 		EntityMoqParam: entityMoqParam,
 	}
 	mock.lockUpdate.Lock()
 	mock.calls.Update = append(mock.calls.Update, callInfo)
 	mock.lockUpdate.Unlock()
-	return mock.UpdateFunc(db, entityMoqParam)
+	return mock.UpdateFunc(ctx, db, entityMoqParam)
 }
 
 // UpdateCalls gets all the calls that were made to Update.
@@ -281,10 +310,12 @@ func (mock *UserRepositoryMock) Update(db *gorm.DB, entityMoqParam *entity.User)
 //
 //	len(mockedUserRepository.UpdateCalls())
 func (mock *UserRepositoryMock) UpdateCalls() []struct {
+	Ctx            context.Context
 	Db             *gorm.DB
 	EntityMoqParam *entity.User
 } {
 	var calls []struct {
+		Ctx            context.Context
 		Db             *gorm.DB
 		EntityMoqParam *entity.User
 	}

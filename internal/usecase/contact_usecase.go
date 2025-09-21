@@ -77,7 +77,7 @@ func (u *ContactUseCaseImpl) Create(ctx context.Context, req *model.CreateContac
 		UserId:    req.UserId,
 	}
 
-	if err := u.ContactRepository.Create(tx, contact); err != nil {
+	if err := u.ContactRepository.Create(ctx, tx, contact); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -86,7 +86,7 @@ func (u *ContactUseCaseImpl) Create(ctx context.Context, req *model.CreateContac
 	}
 
 	event := converter.ContactToEvent(contact)
-	if err := u.ContactProducer.Send(event); err != nil {
+	if err := u.ContactProducer.Send(ctx, event); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -98,7 +98,7 @@ func (u *ContactUseCaseImpl) Update(ctx context.Context, req *model.UpdateContac
 	defer tx.Rollback()
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, req.ID, req.UserId); err != nil {
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ID, req.UserId); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -112,7 +112,7 @@ func (u *ContactUseCaseImpl) Update(ctx context.Context, req *model.UpdateContac
 	contact.Email = req.Email
 	contact.Phone = req.Phone
 
-	if err := u.ContactRepository.Update(tx, contact); err != nil {
+	if err := u.ContactRepository.Update(ctx, tx, contact); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -121,7 +121,7 @@ func (u *ContactUseCaseImpl) Update(ctx context.Context, req *model.UpdateContac
 	}
 
 	event := converter.ContactToEvent(contact)
-	if err := u.ContactProducer.Send(event); err != nil {
+	if err := u.ContactProducer.Send(ctx, event); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -138,7 +138,7 @@ func (u *ContactUseCaseImpl) Get(ctx context.Context, req *model.GetContactReque
 	}
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, req.ID, req.UserId); err != nil {
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ID, req.UserId); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -159,11 +159,11 @@ func (u *ContactUseCaseImpl) Delete(ctx context.Context, req *model.DeleteContac
 	}
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, req.ID, req.UserId); err != nil {
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ID, req.UserId); err != nil {
 		return errkit.AddFuncName(err)
 	}
 
-	if err := u.ContactRepository.Delete(tx, contact); err != nil {
+	if err := u.ContactRepository.Delete(ctx, tx, contact); err != nil {
 		return errkit.AddFuncName(err)
 	}
 
@@ -183,7 +183,7 @@ func (u *ContactUseCaseImpl) Search(ctx context.Context, req *model.SearchContac
 		return nil, 0, errkit.AddFuncName(err)
 	}
 
-	contacts, total, err := u.ContactRepository.Search(tx, req)
+	contacts, total, err := u.ContactRepository.Search(ctx, tx, req)
 	if err != nil {
 		return nil, 0, errkit.AddFuncName(err)
 	}

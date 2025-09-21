@@ -75,6 +75,7 @@ func Bootstrap(config *BootstrapConfig) {
 
 	// setup middleware
 	authMiddleware := middleware.NewAuth(userUseCase)
+	traceIDMiddleware := middleware.NewTraceID()
 
 	routeConfig := route.RouteConfig{
 		App:               config.App,
@@ -82,6 +83,7 @@ func Bootstrap(config *BootstrapConfig) {
 		ContactController: contactController,
 		AddressController: addressController,
 		AuthMiddleware:    authMiddleware,
+		TraceIDMiddleware: traceIDMiddleware,
 	}
 
 	routeConfig.Setup()

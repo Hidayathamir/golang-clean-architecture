@@ -31,7 +31,7 @@ func (u *UserUseCaseImpl) Create(ctx context.Context, req *model.RegisterUserReq
 		"req": req,
 		"res": res,
 	}
-	helper.Log(u.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return res, err
 }
@@ -43,7 +43,7 @@ func (u *UserUseCaseImpl) Current(ctx context.Context, req *model.GetUserRequest
 		"req": req,
 		"res": res,
 	}
-	helper.Log(u.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return res, err
 }
@@ -55,7 +55,7 @@ func (u *UserUseCaseImpl) Login(ctx context.Context, req *model.LoginUserRequest
 		"req": req,
 		"res": res,
 	}
-	helper.Log(u.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return res, err
 }
@@ -67,7 +67,7 @@ func (u *UserUseCaseImpl) Logout(ctx context.Context, req *model.LogoutUserReque
 		"req": req,
 		"res": res,
 	}
-	helper.Log(u.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return res, err
 }
@@ -79,7 +79,7 @@ func (u *UserUseCaseImpl) Update(ctx context.Context, req *model.UpdateUserReque
 		"req": req,
 		"res": res,
 	}
-	helper.Log(u.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return res, err
 }
@@ -91,7 +91,7 @@ func (u *UserUseCaseImpl) Verify(ctx context.Context, req *model.VerifyUserReque
 		"req": req,
 		"res": res,
 	}
-	helper.Log(u.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return res, err
 }

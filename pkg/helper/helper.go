@@ -1,16 +1,21 @@
 package helper
 
 import (
+	"context"
 	"encoding/json"
 	"golang-clean-architecture/pkg/caller"
 
 	"github.com/sirupsen/logrus"
 )
 
-func Log(logger *logrus.Logger, fields logrus.Fields, err error) {
+var logger *logrus.Logger
+
+func SetLogger(l *logrus.Logger) { logger = l }
+
+func Log(ctx context.Context, fields logrus.Fields, err error) {
 	level, errMsg := getLevelAndErrMsg(err)
 
-	logger.WithFields(logrus.Fields{
+	logger.WithContext(ctx).WithFields(logrus.Fields{
 		"fields": limitJSON(fields),
 		"err":    errMsg,
 	}).Log(level, caller.FuncName(caller.WithSkip(1)))

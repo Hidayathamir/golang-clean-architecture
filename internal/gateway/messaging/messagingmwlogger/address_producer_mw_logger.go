@@ -1,6 +1,7 @@
 package messagingmwlogger
 
 import (
+	"context"
 	"golang-clean-architecture/internal/gateway/messaging"
 	"golang-clean-architecture/internal/model"
 	"golang-clean-architecture/pkg/helper"
@@ -23,13 +24,13 @@ func NewAddressProducer(logger *logrus.Logger, next messaging.AddressProducer) *
 	}
 }
 
-func (p *AddressProducerImpl) Send(event *model.AddressEvent) error {
-	err := p.next.Send(event)
+func (p *AddressProducerImpl) Send(ctx context.Context, event *model.AddressEvent) error {
+	err := p.next.Send(ctx, event)
 
 	fields := logrus.Fields{
 		"event": event,
 	}
-	helper.Log(p.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return err
 }

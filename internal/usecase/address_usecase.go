@@ -72,7 +72,7 @@ func (u *AddressUseCaseImpl) Create(ctx context.Context, req *model.CreateAddres
 	}
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, req.ContactId, req.UserId); err != nil {
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ContactId, req.UserId); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -86,7 +86,7 @@ func (u *AddressUseCaseImpl) Create(ctx context.Context, req *model.CreateAddres
 		Country:    req.Country,
 	}
 
-	if err := u.AddressRepository.Create(tx, address); err != nil {
+	if err := u.AddressRepository.Create(ctx, tx, address); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -95,7 +95,7 @@ func (u *AddressUseCaseImpl) Create(ctx context.Context, req *model.CreateAddres
 	}
 
 	event := converter.AddressToEvent(address)
-	if err := u.AddressProducer.Send(event); err != nil {
+	if err := u.AddressProducer.Send(ctx, event); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -112,12 +112,12 @@ func (u *AddressUseCaseImpl) Update(ctx context.Context, req *model.UpdateAddres
 	}
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, req.ContactId, req.UserId); err != nil {
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ContactId, req.UserId); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
 	address := new(entity.Address)
-	if err := u.AddressRepository.FindByIdAndContactId(tx, address, req.ID, contact.ID); err != nil {
+	if err := u.AddressRepository.FindByIdAndContactId(ctx, tx, address, req.ID, contact.ID); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -127,7 +127,7 @@ func (u *AddressUseCaseImpl) Update(ctx context.Context, req *model.UpdateAddres
 	address.PostalCode = req.PostalCode
 	address.Country = req.Country
 
-	if err := u.AddressRepository.Update(tx, address); err != nil {
+	if err := u.AddressRepository.Update(ctx, tx, address); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -136,7 +136,7 @@ func (u *AddressUseCaseImpl) Update(ctx context.Context, req *model.UpdateAddres
 	}
 
 	event := converter.AddressToEvent(address)
-	if err := u.AddressProducer.Send(event); err != nil {
+	if err := u.AddressProducer.Send(ctx, event); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -148,12 +148,12 @@ func (u *AddressUseCaseImpl) Get(ctx context.Context, req *model.GetAddressReque
 	defer tx.Rollback()
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, req.ContactId, req.UserId); err != nil {
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ContactId, req.UserId); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
 	address := new(entity.Address)
-	if err := u.AddressRepository.FindByIdAndContactId(tx, address, req.ID, req.ContactId); err != nil {
+	if err := u.AddressRepository.FindByIdAndContactId(ctx, tx, address, req.ID, req.ContactId); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -169,16 +169,16 @@ func (u *AddressUseCaseImpl) Delete(ctx context.Context, req *model.DeleteAddres
 	defer tx.Rollback()
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, req.ContactId, req.UserId); err != nil {
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ContactId, req.UserId); err != nil {
 		return errkit.AddFuncName(err)
 	}
 
 	address := new(entity.Address)
-	if err := u.AddressRepository.FindByIdAndContactId(tx, address, req.ID, req.ContactId); err != nil {
+	if err := u.AddressRepository.FindByIdAndContactId(ctx, tx, address, req.ID, req.ContactId); err != nil {
 		return errkit.AddFuncName(err)
 	}
 
-	if err := u.AddressRepository.Delete(tx, address); err != nil {
+	if err := u.AddressRepository.Delete(ctx, tx, address); err != nil {
 		return errkit.AddFuncName(err)
 	}
 
@@ -194,11 +194,11 @@ func (u *AddressUseCaseImpl) List(ctx context.Context, req *model.ListAddressReq
 	defer tx.Rollback()
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(tx, contact, req.ContactId, req.UserId); err != nil {
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ContactId, req.UserId); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
-	addresses, err := u.AddressRepository.FindAllByContactId(tx, contact.ID)
+	addresses, err := u.AddressRepository.FindAllByContactId(ctx, tx, contact.ID)
 	if err != nil {
 		return nil, errkit.AddFuncName(err)
 	}

@@ -1,6 +1,7 @@
 package messaging
 
 import (
+	"context"
 	"encoding/json"
 	"golang-clean-architecture/internal/model"
 	"golang-clean-architecture/pkg/errkit"
@@ -12,7 +13,7 @@ import (
 //go:generate moq -out=../../mock/AddressProducer.go -pkg=mock . AddressProducer
 
 type AddressProducer interface {
-	Send(event *model.AddressEvent) error
+	Send(ctx context.Context, event *model.AddressEvent) error
 }
 
 type AddressProducerImpl struct {
@@ -29,7 +30,7 @@ func NewAddressProducer(producer sarama.SyncProducer, log *logrus.Logger) *Addre
 	}
 }
 
-func (p *AddressProducerImpl) Send(event *model.AddressEvent) error {
+func (p *AddressProducerImpl) Send(ctx context.Context, event *model.AddressEvent) error {
 	if p.Producer == nil {
 		p.Log.Warn("Kafka producer is disabled")
 		return nil

@@ -31,7 +31,7 @@ func (u *AddressUseCaseImpl) Create(ctx context.Context, req *model.CreateAddres
 		"req": req,
 		"res": res,
 	}
-	helper.Log(u.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return res, err
 }
@@ -42,7 +42,7 @@ func (u *AddressUseCaseImpl) Delete(ctx context.Context, req *model.DeleteAddres
 	fields := logrus.Fields{
 		"req": req,
 	}
-	helper.Log(u.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return err
 }
@@ -54,7 +54,7 @@ func (u *AddressUseCaseImpl) Get(ctx context.Context, req *model.GetAddressReque
 		"req": req,
 		"res": res,
 	}
-	helper.Log(u.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return res, err
 }
@@ -66,7 +66,7 @@ func (u *AddressUseCaseImpl) List(ctx context.Context, req *model.ListAddressReq
 		"req": req,
 		"res": res,
 	}
-	helper.Log(u.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return res, err
 }
@@ -78,7 +78,7 @@ func (u *AddressUseCaseImpl) Update(ctx context.Context, req *model.UpdateAddres
 		"req": req,
 		"res": res,
 	}
-	helper.Log(u.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return res, err
 }

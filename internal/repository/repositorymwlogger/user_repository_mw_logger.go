@@ -1,6 +1,7 @@
 package repositorymwlogger
 
 import (
+	"context"
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/repository"
 	"golang-clean-architecture/pkg/helper"
@@ -24,60 +25,60 @@ func NewUserRepository(logger *logrus.Logger, next repository.UserRepository) *U
 	}
 }
 
-func (r *UserRepositoryImpl) FindByToken(db *gorm.DB, user *entity.User, token string) error {
-	err := r.next.FindByToken(db, user, token)
+func (r *UserRepositoryImpl) FindByToken(ctx context.Context, db *gorm.DB, user *entity.User, token string) error {
+	err := r.next.FindByToken(ctx, db, user, token)
 
 	fields := logrus.Fields{
 		"user":  user,
 		"token": token,
 	}
-	helper.Log(r.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return err
 }
 
-func (r *UserRepositoryImpl) CountById(db *gorm.DB, id string) (int64, error) {
-	total, err := r.next.CountById(db, id)
+func (r *UserRepositoryImpl) CountById(ctx context.Context, db *gorm.DB, id string) (int64, error) {
+	total, err := r.next.CountById(ctx, db, id)
 
 	fields := logrus.Fields{
 		"id":    id,
 		"total": total,
 	}
-	helper.Log(r.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return total, err
 }
 
-func (r *UserRepositoryImpl) Create(db *gorm.DB, entity *entity.User) error {
-	err := r.next.Create(db, entity)
+func (r *UserRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity *entity.User) error {
+	err := r.next.Create(ctx, db, entity)
 
 	fields := logrus.Fields{
 		"entity": entity,
 	}
-	helper.Log(r.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return err
 }
 
-func (r *UserRepositoryImpl) FindById(db *gorm.DB, entity *entity.User, id string) error {
-	err := r.next.FindById(db, entity, id)
+func (r *UserRepositoryImpl) FindById(ctx context.Context, db *gorm.DB, entity *entity.User, id string) error {
+	err := r.next.FindById(ctx, db, entity, id)
 
 	fields := logrus.Fields{
 		"id":     id,
 		"entity": entity,
 	}
-	helper.Log(r.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return err
 }
 
-func (r *UserRepositoryImpl) Update(db *gorm.DB, entity *entity.User) error {
-	err := r.next.Update(db, entity)
+func (r *UserRepositoryImpl) Update(ctx context.Context, db *gorm.DB, entity *entity.User) error {
+	err := r.next.Update(ctx, db, entity)
 
 	fields := logrus.Fields{
 		"entity": entity,
 	}
-	helper.Log(r.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return err
 }

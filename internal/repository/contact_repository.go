@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/model"
 	"golang-clean-architecture/pkg/errkit"
@@ -12,11 +13,11 @@ import (
 //go:generate moq -out=../mock/ContactRepository.go -pkg=mock . ContactRepository
 
 type ContactRepository interface {
-	FindByIdAndUserId(db *gorm.DB, contact *entity.Contact, id string, userId string) error
-	Search(db *gorm.DB, req *model.SearchContactRequest) ([]entity.Contact, int64, error)
-	Create(db *gorm.DB, entity *entity.Contact) error
-	Update(db *gorm.DB, entity *entity.Contact) error
-	Delete(db *gorm.DB, entity *entity.Contact) error
+	FindByIdAndUserId(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userId string) error
+	Search(ctx context.Context, db *gorm.DB, req *model.SearchContactRequest) ([]entity.Contact, int64, error)
+	Create(ctx context.Context, db *gorm.DB, entity *entity.Contact) error
+	Update(ctx context.Context, db *gorm.DB, entity *entity.Contact) error
+	Delete(ctx context.Context, db *gorm.DB, entity *entity.Contact) error
 }
 
 var _ ContactRepository = &ContactRepositoryImpl{}
@@ -31,7 +32,7 @@ func NewContactRepository(log *logrus.Logger) *ContactRepositoryImpl {
 	}
 }
 
-func (r *ContactRepositoryImpl) FindByIdAndUserId(db *gorm.DB, contact *entity.Contact, id string, userId string) error {
+func (r *ContactRepositoryImpl) FindByIdAndUserId(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userId string) error {
 	err := db.Where("id = ? AND user_id = ?", id, userId).Take(contact).Error
 	if err != nil {
 		err = errkit.NotFound(err)
@@ -40,7 +41,7 @@ func (r *ContactRepositoryImpl) FindByIdAndUserId(db *gorm.DB, contact *entity.C
 	return nil
 }
 
-func (r *ContactRepositoryImpl) Search(db *gorm.DB, req *model.SearchContactRequest) ([]entity.Contact, int64, error) {
+func (r *ContactRepositoryImpl) Search(ctx context.Context, db *gorm.DB, req *model.SearchContactRequest) ([]entity.Contact, int64, error) {
 	var contacts []entity.Contact
 	if err := db.Scopes(r.filterContact(req)).Offset((req.Page - 1) * req.Size).Limit(req.Size).Find(&contacts).Error; err != nil {
 		return nil, 0, errkit.AddFuncName(err)
@@ -77,7 +78,7 @@ func (r *ContactRepositoryImpl) filterContact(req *model.SearchContactRequest) f
 	}
 }
 
-func (r *ContactRepositoryImpl) Create(db *gorm.DB, entity *entity.Contact) error {
+func (r *ContactRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity *entity.Contact) error {
 	err := db.Create(entity).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
@@ -85,7 +86,7 @@ func (r *ContactRepositoryImpl) Create(db *gorm.DB, entity *entity.Contact) erro
 	return nil
 }
 
-func (r *ContactRepositoryImpl) Update(db *gorm.DB, entity *entity.Contact) error {
+func (r *ContactRepositoryImpl) Update(ctx context.Context, db *gorm.DB, entity *entity.Contact) error {
 	err := db.Save(entity).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
@@ -93,7 +94,7 @@ func (r *ContactRepositoryImpl) Update(db *gorm.DB, entity *entity.Contact) erro
 	return nil
 }
 
-func (r *ContactRepositoryImpl) Delete(db *gorm.DB, entity *entity.Contact) error {
+func (r *ContactRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, entity *entity.Contact) error {
 	err := db.Delete(entity).Error
 	if err != nil {
 		return errkit.AddFuncName(err)

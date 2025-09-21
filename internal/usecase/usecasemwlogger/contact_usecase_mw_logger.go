@@ -31,7 +31,7 @@ func (u *ContactUseCaseImpl) Create(ctx context.Context, req *model.CreateContac
 		"req": req,
 		"res": res,
 	}
-	helper.Log(u.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return res, err
 }
@@ -42,7 +42,7 @@ func (u *ContactUseCaseImpl) Delete(ctx context.Context, req *model.DeleteContac
 	fields := logrus.Fields{
 		"req": req,
 	}
-	helper.Log(u.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return err
 }
@@ -54,7 +54,7 @@ func (u *ContactUseCaseImpl) Get(ctx context.Context, req *model.GetContactReque
 		"req": req,
 		"res": res,
 	}
-	helper.Log(u.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return res, err
 }
@@ -66,7 +66,7 @@ func (u *ContactUseCaseImpl) Search(ctx context.Context, req *model.SearchContac
 		"req": req,
 		"res": res,
 	}
-	helper.Log(u.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return res, total, err
 }
@@ -78,7 +78,7 @@ func (u *ContactUseCaseImpl) Update(ctx context.Context, req *model.UpdateContac
 		"req": req,
 		"res": res,
 	}
-	helper.Log(u.logger, fields, err)
+	helper.Log(ctx, fields, err)
 
 	return res, err
 }
