@@ -6,7 +6,7 @@ run:
 run-worker:
 	go run cmd/worker/main.go
 
-test:
+go-test:
 	go test -v ./test/
 
 migrate:

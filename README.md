@@ -36,7 +36,7 @@ Fork from https://github.com/khannedy/golang-clean-architecture with this featur
         "res": null
     },
     "level": "error",
-    "msg": "usecasemwlogger.(*UserUsecaseImpl).Create",
+    "msg": "user.(*UserUsecaseMwLogger).Create",
     "time": "2025-09-21T18:20:59+07:00",
     "trace_id": "62dff97d-f0b5-4d88-89e6-3f78bed04c4e"
 }
@@ -110,7 +110,7 @@ make migrate
 ### Run unit test
 
 ```bash
-make test
+make go-test
 ```
 
 ### Run web server
@@ -124,3 +124,29 @@ make run
 ```bash
 make run-worker
 ```
+
+## Run Application With Docker
+
+I recommend run with docker for testing.
+
+1. Run docker compose.
+
+```bash
+make docker-compose
+```
+
+This will run docker compose that create folder `data/` to save it's data. You can remove that folder and re run docker compose to start fresh.
+
+2. Keep docker container running. From another terminal, run migration and run application.
+
+```bash
+make migrate
+```
+
+This will run migration.
+
+```bash
+make run
+```
+
+This will run application. Go to swagger http://localhost:3000/swagger.
