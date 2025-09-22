@@ -4,7 +4,7 @@ import (
 	"golang-clean-architecture/internal/delivery/http/middleware"
 	"golang-clean-architecture/internal/delivery/http/response"
 	"golang-clean-architecture/internal/model"
-	"golang-clean-architecture/internal/usecase"
+	"golang-clean-architecture/internal/usecase/address"
 	"golang-clean-architecture/pkg/errkit"
 	"net/http"
 
@@ -13,11 +13,11 @@ import (
 )
 
 type AddressController struct {
-	UseCase usecase.AddressUseCase
+	UseCase address.AddressUseCase
 	Log     *logrus.Logger
 }
 
-func NewAddressController(useCase usecase.AddressUseCase, log *logrus.Logger) *AddressController {
+func NewAddressController(useCase address.AddressUseCase, log *logrus.Logger) *AddressController {
 	return &AddressController{
 		UseCase: useCase,
 		Log:     log,

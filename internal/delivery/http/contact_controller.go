@@ -4,7 +4,7 @@ import (
 	"golang-clean-architecture/internal/delivery/http/middleware"
 	"golang-clean-architecture/internal/delivery/http/response"
 	"golang-clean-architecture/internal/model"
-	"golang-clean-architecture/internal/usecase"
+	"golang-clean-architecture/internal/usecase/contact"
 	"golang-clean-architecture/pkg/errkit"
 	"math"
 	"net/http"
@@ -14,11 +14,11 @@ import (
 )
 
 type ContactController struct {
-	UseCase usecase.ContactUseCase
+	UseCase contact.ContactUseCase
 	Log     *logrus.Logger
 }
 
-func NewContactController(useCase usecase.ContactUseCase, log *logrus.Logger) *ContactController {
+func NewContactController(useCase contact.ContactUseCase, log *logrus.Logger) *ContactController {
 	return &ContactController{
 		UseCase: useCase,
 		Log:     log,

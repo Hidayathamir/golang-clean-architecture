@@ -4,7 +4,7 @@ import (
 	"golang-clean-architecture/internal/delivery/http/middleware"
 	"golang-clean-architecture/internal/delivery/http/response"
 	"golang-clean-architecture/internal/model"
-	"golang-clean-architecture/internal/usecase"
+	"golang-clean-architecture/internal/usecase/user"
 	"golang-clean-architecture/pkg/errkit"
 	"net/http"
 
@@ -13,11 +13,11 @@ import (
 )
 
 type UserController struct {
-	UseCase usecase.UserUseCase
+	UseCase user.UserUseCase
 	Log     *logrus.Logger
 }
 
-func NewUserController(useCase usecase.UserUseCase, logger *logrus.Logger) *UserController {
+func NewUserController(useCase user.UserUseCase, logger *logrus.Logger) *UserController {
 	return &UserController{
 		UseCase: useCase,
 		Log:     logger,

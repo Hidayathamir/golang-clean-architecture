@@ -1,31 +1,30 @@
-package repositorymwlogger
+package repository
 
 import (
 	"context"
 	"golang-clean-architecture/internal/entity"
-	"golang-clean-architecture/internal/repository"
 	"golang-clean-architecture/pkg/helper"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
-var _ repository.AddressRepository = &AddressRepositoryImpl{}
+var _ AddressRepository = &AddressRepositoryMwLogger{}
 
-type AddressRepositoryImpl struct {
+type AddressRepositoryMwLogger struct {
 	logger *logrus.Logger
 
-	next repository.AddressRepository
+	next AddressRepository
 }
 
-func NewAddressRepository(logger *logrus.Logger, next repository.AddressRepository) *AddressRepositoryImpl {
-	return &AddressRepositoryImpl{
+func NewAddressRepositoryMwLogger(logger *logrus.Logger, next AddressRepository) *AddressRepositoryMwLogger {
+	return &AddressRepositoryMwLogger{
 		logger: logger,
 		next:   next,
 	}
 }
 
-func (r *AddressRepositoryImpl) FindAllByContactId(ctx context.Context, db *gorm.DB, contactId string) ([]entity.Address, error) {
+func (r *AddressRepositoryMwLogger) FindAllByContactId(ctx context.Context, db *gorm.DB, contactId string) ([]entity.Address, error) {
 	addresses, err := r.next.FindAllByContactId(ctx, db, contactId)
 
 	fields := logrus.Fields{
@@ -37,7 +36,7 @@ func (r *AddressRepositoryImpl) FindAllByContactId(ctx context.Context, db *gorm
 	return addresses, err
 }
 
-func (r *AddressRepositoryImpl) FindByIdAndContactId(ctx context.Context, db *gorm.DB, address *entity.Address, id string, contactId string) error {
+func (r *AddressRepositoryMwLogger) FindByIdAndContactId(ctx context.Context, db *gorm.DB, address *entity.Address, id string, contactId string) error {
 	err := r.next.FindByIdAndContactId(ctx, db, address, id, contactId)
 
 	fields := logrus.Fields{
@@ -50,7 +49,7 @@ func (r *AddressRepositoryImpl) FindByIdAndContactId(ctx context.Context, db *go
 	return err
 }
 
-func (r *AddressRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity *entity.Address) error {
+func (r *AddressRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, entity *entity.Address) error {
 	err := r.next.Create(ctx, db, entity)
 
 	fields := logrus.Fields{
@@ -61,7 +60,7 @@ func (r *AddressRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity 
 	return err
 }
 
-func (r *AddressRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, entity *entity.Address) error {
+func (r *AddressRepositoryMwLogger) Delete(ctx context.Context, db *gorm.DB, entity *entity.Address) error {
 	err := r.next.Delete(ctx, db, entity)
 
 	fields := logrus.Fields{
@@ -72,7 +71,7 @@ func (r *AddressRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, entity 
 	return err
 }
 
-func (r *AddressRepositoryImpl) Update(ctx context.Context, db *gorm.DB, entity *entity.Address) error {
+func (r *AddressRepositoryMwLogger) Update(ctx context.Context, db *gorm.DB, entity *entity.Address) error {
 	err := r.next.Update(ctx, db, entity)
 
 	fields := logrus.Fields{

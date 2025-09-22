@@ -1,11 +1,11 @@
-package usecase_test
+package address_test
 
 import (
 	"context"
 	"golang-clean-architecture/internal/entity"
 	"golang-clean-architecture/internal/mock"
 	"golang-clean-architecture/internal/model"
-	"golang-clean-architecture/internal/usecase"
+	"golang-clean-architecture/internal/usecase/address"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -28,7 +28,7 @@ func TestAddressUseCaseImpl_Get_Success(t *testing.T) {
 	gormDB, db := newFakeDB()
 	AddressRepository := &mock.AddressRepositoryMock{}
 	ContactRepository := &mock.ContactRepositoryMock{}
-	u := &usecase.AddressUseCaseImpl{
+	u := &address.AddressUseCaseImpl{
 		DB:                gormDB,
 		Log:               logrus.New(),
 		AddressRepository: AddressRepository,
@@ -64,7 +64,7 @@ func TestAddressUseCaseImpl_Get_Fail1(t *testing.T) {
 	gormDB, _ := newFakeDB()
 	AddressRepository := &mock.AddressRepositoryMock{}
 	ContactRepository := &mock.ContactRepositoryMock{}
-	u := &usecase.AddressUseCaseImpl{
+	u := &address.AddressUseCaseImpl{
 		DB:                gormDB,
 		Log:               logrus.New(),
 		AddressRepository: AddressRepository,

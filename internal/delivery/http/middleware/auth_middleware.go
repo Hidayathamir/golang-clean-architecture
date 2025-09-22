@@ -2,13 +2,13 @@ package middleware
 
 import (
 	"golang-clean-architecture/internal/model"
-	"golang-clean-architecture/internal/usecase"
+	"golang-clean-architecture/internal/usecase/user"
 	"golang-clean-architecture/pkg/errkit"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func NewAuth(userUserCase usecase.UserUseCase) fiber.Handler {
+func NewAuth(userUserCase user.UserUseCase) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		request := &model.VerifyUserRequest{Token: ctx.Get("Authorization", "NOT_FOUND")}
 

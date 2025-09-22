@@ -1,0 +1,66 @@
+package contact
+
+import (
+	"context"
+	"golang-clean-architecture/internal/gateway/messaging"
+	"golang-clean-architecture/internal/gateway/rest"
+	"golang-clean-architecture/internal/model"
+	"golang-clean-architecture/internal/repository"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
+)
+
+type ContactUseCase interface {
+	Create(ctx context.Context, req *model.CreateContactRequest) (*model.ContactResponse, error)
+	Update(ctx context.Context, req *model.UpdateContactRequest) (*model.ContactResponse, error)
+	Get(ctx context.Context, req *model.GetContactRequest) (*model.ContactResponse, error)
+	Delete(ctx context.Context, req *model.DeleteContactRequest) error
+	Search(ctx context.Context, req *model.SearchContactRequest) ([]model.ContactResponse, int64, error)
+}
+
+var _ ContactUseCase = &ContactUseCaseImpl{}
+
+type ContactUseCaseImpl struct {
+	DB       *gorm.DB
+	Log      *logrus.Logger
+	Validate *validator.Validate
+
+	// repository
+	ContactRepository repository.ContactRepository
+
+	// producer
+	ContactProducer messaging.ContactProducer
+
+	// client
+	SlackClient rest.SlackClient
+}
+
+func NewContactUseCase(
+	db *gorm.DB, logger *logrus.Logger, validate *validator.Validate,
+
+	// repository
+	contactRepository repository.ContactRepository,
+
+	// producer
+	contactProducer messaging.ContactProducer,
+
+	// client
+	SlackClient rest.SlackClient,
+) *ContactUseCaseImpl {
+	return &ContactUseCaseImpl{
+		DB:       db,
+		Log:      logger,
+		Validate: validate,
+
+		// repository
+		ContactRepository: contactRepository,
+
+		// producer
+		ContactProducer: contactProducer,
+
+		// client
+		SlackClient: SlackClient,
+	}
+}

@@ -1,31 +1,30 @@
-package repositorymwlogger
+package repository
 
 import (
 	"context"
 	"golang-clean-architecture/internal/entity"
-	"golang-clean-architecture/internal/repository"
 	"golang-clean-architecture/pkg/helper"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
-var _ repository.UserRepository = &UserRepositoryImpl{}
+var _ UserRepository = &UserRepositoryMwLogger{}
 
-type UserRepositoryImpl struct {
+type UserRepositoryMwLogger struct {
 	logger *logrus.Logger
 
-	next repository.UserRepository
+	next UserRepository
 }
 
-func NewUserRepository(logger *logrus.Logger, next repository.UserRepository) *UserRepositoryImpl {
-	return &UserRepositoryImpl{
+func NewUserRepositoryMwLogger(logger *logrus.Logger, next UserRepository) *UserRepositoryMwLogger {
+	return &UserRepositoryMwLogger{
 		logger: logger,
 		next:   next,
 	}
 }
 
-func (r *UserRepositoryImpl) FindByToken(ctx context.Context, db *gorm.DB, user *entity.User, token string) error {
+func (r *UserRepositoryMwLogger) FindByToken(ctx context.Context, db *gorm.DB, user *entity.User, token string) error {
 	err := r.next.FindByToken(ctx, db, user, token)
 
 	fields := logrus.Fields{
@@ -37,7 +36,7 @@ func (r *UserRepositoryImpl) FindByToken(ctx context.Context, db *gorm.DB, user 
 	return err
 }
 
-func (r *UserRepositoryImpl) CountById(ctx context.Context, db *gorm.DB, id string) (int64, error) {
+func (r *UserRepositoryMwLogger) CountById(ctx context.Context, db *gorm.DB, id string) (int64, error) {
 	total, err := r.next.CountById(ctx, db, id)
 
 	fields := logrus.Fields{
@@ -49,7 +48,7 @@ func (r *UserRepositoryImpl) CountById(ctx context.Context, db *gorm.DB, id stri
 	return total, err
 }
 
-func (r *UserRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity *entity.User) error {
+func (r *UserRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, entity *entity.User) error {
 	err := r.next.Create(ctx, db, entity)
 
 	fields := logrus.Fields{
@@ -60,7 +59,7 @@ func (r *UserRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity *en
 	return err
 }
 
-func (r *UserRepositoryImpl) FindById(ctx context.Context, db *gorm.DB, entity *entity.User, id string) error {
+func (r *UserRepositoryMwLogger) FindById(ctx context.Context, db *gorm.DB, entity *entity.User, id string) error {
 	err := r.next.FindById(ctx, db, entity, id)
 
 	fields := logrus.Fields{
@@ -72,7 +71,7 @@ func (r *UserRepositoryImpl) FindById(ctx context.Context, db *gorm.DB, entity *
 	return err
 }
 
-func (r *UserRepositoryImpl) Update(ctx context.Context, db *gorm.DB, entity *entity.User) error {
+func (r *UserRepositoryMwLogger) Update(ctx context.Context, db *gorm.DB, entity *entity.User) error {
 	err := r.next.Update(ctx, db, entity)
 
 	fields := logrus.Fields{

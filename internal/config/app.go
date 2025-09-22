@@ -5,13 +5,11 @@ import (
 	"golang-clean-architecture/internal/delivery/http/middleware"
 	"golang-clean-architecture/internal/delivery/http/route"
 	"golang-clean-architecture/internal/gateway/messaging"
-	"golang-clean-architecture/internal/gateway/messaging/messagingmwlogger"
 	"golang-clean-architecture/internal/gateway/rest"
-	"golang-clean-architecture/internal/gateway/rest/restmwlogger"
 	"golang-clean-architecture/internal/repository"
-	"golang-clean-architecture/internal/repository/repositorymwlogger"
-	"golang-clean-architecture/internal/usecase"
-	"golang-clean-architecture/internal/usecase/usecasemwlogger"
+	"golang-clean-architecture/internal/usecase/address"
+	"golang-clean-architecture/internal/usecase/contact"
+	"golang-clean-architecture/internal/usecase/user"
 
 	"github.com/IBM/sarama"
 	"github.com/go-playground/validator/v10"
@@ -34,54 +32,54 @@ func Bootstrap(config *BootstrapConfig) {
 	// setup repositories
 	var userRepository repository.UserRepository
 	userRepository = repository.NewUserRepository(config.Log)
-	userRepository = repositorymwlogger.NewUserRepository(config.Log, userRepository)
+	userRepository = repository.NewUserRepositoryMwLogger(config.Log, userRepository)
 
 	var contactRepository repository.ContactRepository
 	contactRepository = repository.NewContactRepository(config.Log)
-	contactRepository = repositorymwlogger.NewContactRepository(config.Log, contactRepository)
+	contactRepository = repository.NewContactRepositoryMwLogger(config.Log, contactRepository)
 
 	var addressRepository repository.AddressRepository
 	addressRepository = repository.NewAddressRepository(config.Log)
-	addressRepository = repositorymwlogger.NewAddressRepository(config.Log, addressRepository)
+	addressRepository = repository.NewAddressRepositoryMwLogger(config.Log, addressRepository)
 
 	// setup producer
 	var userProducer messaging.UserProducer
 	userProducer = messaging.NewUserProducer(config.Producer, config.Log)
-	userProducer = messagingmwlogger.NewUserProducer(config.Log, userProducer)
+	userProducer = messaging.NewUserProducerMwLogger(config.Log, userProducer)
 
 	var contactProducer messaging.ContactProducer
 	contactProducer = messaging.NewContactProducer(config.Producer, config.Log)
-	contactProducer = messagingmwlogger.NewContactProducer(config.Log, contactProducer)
+	contactProducer = messaging.NewContactProducerMwLogger(config.Log, contactProducer)
 
 	var addressProducer messaging.AddressProducer
 	addressProducer = messaging.NewAddressProducer(config.Producer, config.Log)
-	addressProducer = messagingmwlogger.NewAddressProducer(config.Log, addressProducer)
+	addressProducer = messaging.NewAddressProducerMwLogger(config.Log, addressProducer)
 
 	// setup client
 	var paymentClient rest.PaymentClient
 	paymentClient = rest.NewPaymentClient()
-	paymentClient = restmwlogger.NewPaymentClient(config.Log, paymentClient)
+	paymentClient = rest.NewPaymentClientMwLogger(config.Log, paymentClient)
 
 	var s3Client rest.S3Client
 	s3Client = rest.NewS3Client()
-	s3Client = restmwlogger.NewS3Client(config.Log, s3Client)
+	s3Client = rest.NewS3ClientMwLogger(config.Log, s3Client)
 
 	var slackClient rest.SlackClient
 	slackClient = rest.NewSlackClient()
-	slackClient = restmwlogger.NewSlackClient(config.Log, slackClient)
+	slackClient = rest.NewSlackClientMwLogger(config.Log, slackClient)
 
 	// setup use cases
-	var userUseCase usecase.UserUseCase
-	userUseCase = usecase.NewUserUseCase(config.DB, config.Log, config.Validate, userRepository, userProducer, s3Client, slackClient)
-	userUseCase = usecasemwlogger.NewUserUseCase(config.Log, userUseCase)
+	var userUseCase user.UserUseCase
+	userUseCase = user.NewUserUseCase(config.DB, config.Log, config.Validate, userRepository, userProducer, s3Client, slackClient)
+	userUseCase = user.NewUserUseCaseMwLogger(config.Log, userUseCase)
 
-	var contactUseCase usecase.ContactUseCase
-	contactUseCase = usecase.NewContactUseCase(config.DB, config.Log, config.Validate, contactRepository, contactProducer, slackClient)
-	contactUseCase = usecasemwlogger.NewContactUseCase(config.Log, contactUseCase)
+	var contactUseCase contact.ContactUseCase
+	contactUseCase = contact.NewContactUseCase(config.DB, config.Log, config.Validate, contactRepository, contactProducer, slackClient)
+	contactUseCase = contact.NewContactUseCaseMwLogger(config.Log, contactUseCase)
 
-	var addressUseCase usecase.AddressUseCase
-	addressUseCase = usecase.NewAddressUseCase(config.DB, config.Log, config.Validate, contactRepository, addressRepository, addressProducer, paymentClient)
-	addressUseCase = usecasemwlogger.NewAddressUseCase(config.Log, addressUseCase)
+	var addressUseCase address.AddressUseCase
+	addressUseCase = address.NewAddressUseCase(config.DB, config.Log, config.Validate, contactRepository, addressRepository, addressProducer, paymentClient)
+	addressUseCase = address.NewAddressUseCaseMwLogger(config.Log, addressUseCase)
 
 	// setup controller
 	userController := http.NewUserController(userUseCase, config.Log)

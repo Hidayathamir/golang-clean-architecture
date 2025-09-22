@@ -1,29 +1,28 @@
-package restmwlogger
+package rest
 
 import (
 	"context"
-	"golang-clean-architecture/internal/gateway/rest"
 	"golang-clean-architecture/pkg/helper"
 
 	"github.com/sirupsen/logrus"
 )
 
-var _ rest.PaymentClient = &PaymentClientImpl{}
+var _ PaymentClient = &PaymentClientMwLogger{}
 
-type PaymentClientImpl struct {
+type PaymentClientMwLogger struct {
 	logger *logrus.Logger
 
-	next rest.PaymentClient
+	next PaymentClient
 }
 
-func NewPaymentClient(logger *logrus.Logger, next rest.PaymentClient) *PaymentClientImpl {
-	return &PaymentClientImpl{
+func NewPaymentClientMwLogger(logger *logrus.Logger, next PaymentClient) *PaymentClientMwLogger {
+	return &PaymentClientMwLogger{
 		logger: logger,
 		next:   next,
 	}
 }
 
-func (c *PaymentClientImpl) Refund(ctx context.Context, transactionID string) (bool, error) {
+func (c *PaymentClientMwLogger) Refund(ctx context.Context, transactionID string) (bool, error) {
 	ok, err := c.next.Refund(ctx, transactionID)
 
 	fields := logrus.Fields{
@@ -35,7 +34,7 @@ func (c *PaymentClientImpl) Refund(ctx context.Context, transactionID string) (b
 	return ok, err
 }
 
-func (c *PaymentClientImpl) GetStatus(ctx context.Context, transactionID string) (string, error) {
+func (c *PaymentClientMwLogger) GetStatus(ctx context.Context, transactionID string) (string, error) {
 	status, err := c.next.GetStatus(ctx, transactionID)
 
 	fields := logrus.Fields{

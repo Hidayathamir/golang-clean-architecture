@@ -7,9 +7,9 @@ This is golang clean architecture template.
 Fork from https://github.com/khannedy/golang-clean-architecture with this feature:
 
 1. Better delivery return handling. See [example](internal/delivery/http/address_controller.go).
-2. Better logging using middleware. See [usecase](internal/usecase/address_usecase.go) clean, logging in [usecase middleware log](internal/usecase/usecasemwlogger/address_usecase_mw_logger.go).
-3. Better error handling. See [errkit.BadRequest(err)](internal/usecase/address_usecase.go) will handled in [response.Error](internal/config/fiber.go).
-4. Better error handling 2. See [errkit.AddFuncName](internal/usecase/address_usecase.go). Example response json:
+2. Better logging using middleware. See [usecase](internal/usecase/address/address_usecase.go) clean, logging in [usecase middleware log](internal/usecase/address/address_usecase_mw_logger.go).
+3. Better error handling. See [errkit.BadRequest(err)](internal/usecase/address/address_usecase.go) will handled in [response.Error](internal/config/fiber.go).
+4. Better error handling 2. See [errkit.AddFuncName](internal/usecase/address/address_usecase.go). Example response json:
 ```json
 {
   "data": null,
@@ -42,11 +42,12 @@ Fork from https://github.com/khannedy/golang-clean-architecture with this featur
 }
 ```
 7. Swagger auto generated. See [example](internal/delivery/http/address_controller.go).
-8. Using interface make it easier to test. See [example](internal/usecase/address_usecase.go).
+8. Using interface make it easier to test. See [example](internal/usecase/address/address_usecase.go).
 9. Command shortcut using [Makefile](Makefile).
 10. Gateway rest api client. See [example](internal/gateway/rest/slack_client.go).
 11. Simple repository without generic. See [example](internal/repository/user_repository.go).
-11. Simple call kafka producer. See [c.UserProducer.Send](internal/usecase/address_usecase.go).
+12. Simple call kafka producer. See [c.UserProducer.Send](internal/usecase/address/address_usecase.go).
+13. Splitted usecase. See [example](internal/repository/user_repository.go).
 
 ## Architecture
 

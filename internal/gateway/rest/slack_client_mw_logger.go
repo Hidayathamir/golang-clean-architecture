@@ -1,29 +1,28 @@
-package restmwlogger
+package rest
 
 import (
 	"context"
-	"golang-clean-architecture/internal/gateway/rest"
 	"golang-clean-architecture/pkg/helper"
 
 	"github.com/sirupsen/logrus"
 )
 
-var _ rest.SlackClient = &SlackClientImpl{}
+var _ SlackClient = &SlackClientMwLogger{}
 
-type SlackClientImpl struct {
+type SlackClientMwLogger struct {
 	logger *logrus.Logger
 
-	next rest.SlackClient
+	next SlackClient
 }
 
-func NewSlackClient(logger *logrus.Logger, next rest.SlackClient) *SlackClientImpl {
-	return &SlackClientImpl{
+func NewSlackClientMwLogger(logger *logrus.Logger, next SlackClient) *SlackClientMwLogger {
+	return &SlackClientMwLogger{
 		logger: logger,
 		next:   next,
 	}
 }
 
-func (c *SlackClientImpl) GetChannelList(ctx context.Context) ([]string, error) {
+func (c *SlackClientMwLogger) GetChannelList(ctx context.Context) ([]string, error) {
 	channelList, err := c.next.GetChannelList(ctx)
 
 	fields := logrus.Fields{
@@ -34,7 +33,7 @@ func (c *SlackClientImpl) GetChannelList(ctx context.Context) ([]string, error) 
 	return channelList, err
 }
 
-func (c *SlackClientImpl) IsConnected(ctx context.Context) (bool, error) {
+func (c *SlackClientMwLogger) IsConnected(ctx context.Context) (bool, error) {
 	isConnect, err := c.next.IsConnected(ctx)
 
 	fields := logrus.Fields{

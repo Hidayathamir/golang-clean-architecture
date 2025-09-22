@@ -1,29 +1,28 @@
-package restmwlogger
+package rest
 
 import (
 	"context"
-	"golang-clean-architecture/internal/gateway/rest"
 	"golang-clean-architecture/pkg/helper"
 
 	"github.com/sirupsen/logrus"
 )
 
-var _ rest.S3Client = &S3ClientImpl{}
+var _ S3Client = &S3ClientMwLogger{}
 
-type S3ClientImpl struct {
+type S3ClientMwLogger struct {
 	logger *logrus.Logger
 
-	next rest.S3Client
+	next S3Client
 }
 
-func NewS3Client(logger *logrus.Logger, next rest.S3Client) *S3ClientImpl {
-	return &S3ClientImpl{
+func NewS3ClientMwLogger(logger *logrus.Logger, next S3Client) *S3ClientMwLogger {
+	return &S3ClientMwLogger{
 		logger: logger,
 		next:   next,
 	}
 }
 
-func (c *S3ClientImpl) Download(ctx context.Context, bucket, key string) (string, error) {
+func (c *S3ClientMwLogger) Download(ctx context.Context, bucket, key string) (string, error) {
 	ok, err := c.next.Download(ctx, bucket, key)
 
 	fields := logrus.Fields{
@@ -36,7 +35,7 @@ func (c *S3ClientImpl) Download(ctx context.Context, bucket, key string) (string
 	return ok, err
 }
 
-func (c *S3ClientImpl) DeleteObject(ctx context.Context, bucket, key string) (bool, error) {
+func (c *S3ClientMwLogger) DeleteObject(ctx context.Context, bucket, key string) (bool, error) {
 	ok, err := c.next.DeleteObject(ctx, bucket, key)
 
 	fields := logrus.Fields{
