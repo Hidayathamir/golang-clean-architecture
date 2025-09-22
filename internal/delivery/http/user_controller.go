@@ -13,13 +13,13 @@ import (
 )
 
 type UserController struct {
-	UseCase user.UserUseCase
+	Usecase user.UserUsecase
 	Log     *logrus.Logger
 }
 
-func NewUserController(useCase user.UserUseCase, logger *logrus.Logger) *UserController {
+func NewUserController(useCase user.UserUsecase, logger *logrus.Logger) *UserController {
 	return &UserController{
-		UseCase: useCase,
+		Usecase: useCase,
 		Log:     logger,
 	}
 }
@@ -42,7 +42,7 @@ func (c *UserController) Register(ctx *fiber.Ctx) error {
 		return errkit.AddFuncName(err)
 	}
 
-	res, err := c.UseCase.Create(ctx.UserContext(), req)
+	res, err := c.Usecase.Create(ctx.UserContext(), req)
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
@@ -68,7 +68,7 @@ func (c *UserController) Login(ctx *fiber.Ctx) error {
 		return errkit.AddFuncName(err)
 	}
 
-	res, err := c.UseCase.Login(ctx.UserContext(), req)
+	res, err := c.Usecase.Login(ctx.UserContext(), req)
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
@@ -92,7 +92,7 @@ func (c *UserController) Current(ctx *fiber.Ctx) error {
 		ID: auth.ID,
 	}
 
-	res, err := c.UseCase.Current(ctx.UserContext(), req)
+	res, err := c.Usecase.Current(ctx.UserContext(), req)
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
@@ -116,7 +116,7 @@ func (c *UserController) Logout(ctx *fiber.Ctx) error {
 		ID: auth.ID,
 	}
 
-	res, err := c.UseCase.Logout(ctx.UserContext(), req)
+	res, err := c.Usecase.Logout(ctx.UserContext(), req)
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
@@ -145,7 +145,7 @@ func (c *UserController) Update(ctx *fiber.Ctx) error {
 	}
 
 	req.ID = auth.ID
-	res, err := c.UseCase.Update(ctx.UserContext(), req)
+	res, err := c.Usecase.Update(ctx.UserContext(), req)
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}

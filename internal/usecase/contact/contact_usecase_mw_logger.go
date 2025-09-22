@@ -8,22 +8,22 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var _ ContactUseCase = &ContactUseCaseMwLogger{}
+var _ ContactUsecase = &ContactUsecaseMwLogger{}
 
-type ContactUseCaseMwLogger struct {
+type ContactUsecaseMwLogger struct {
 	logger *logrus.Logger
 
-	next ContactUseCase
+	next ContactUsecase
 }
 
-func NewContactUseCaseMwLogger(logger *logrus.Logger, next ContactUseCase) *ContactUseCaseMwLogger {
-	return &ContactUseCaseMwLogger{
+func NewContactUsecaseMwLogger(logger *logrus.Logger, next ContactUsecase) *ContactUsecaseMwLogger {
+	return &ContactUsecaseMwLogger{
 		logger: logger,
 		next:   next,
 	}
 }
 
-func (u *ContactUseCaseMwLogger) Create(ctx context.Context, req *model.CreateContactRequest) (*model.ContactResponse, error) {
+func (u *ContactUsecaseMwLogger) Create(ctx context.Context, req *model.CreateContactRequest) (*model.ContactResponse, error) {
 	res, err := u.next.Create(ctx, req)
 
 	fields := logrus.Fields{
@@ -35,7 +35,7 @@ func (u *ContactUseCaseMwLogger) Create(ctx context.Context, req *model.CreateCo
 	return res, err
 }
 
-func (u *ContactUseCaseMwLogger) Delete(ctx context.Context, req *model.DeleteContactRequest) error {
+func (u *ContactUsecaseMwLogger) Delete(ctx context.Context, req *model.DeleteContactRequest) error {
 	err := u.next.Delete(ctx, req)
 
 	fields := logrus.Fields{
@@ -46,7 +46,7 @@ func (u *ContactUseCaseMwLogger) Delete(ctx context.Context, req *model.DeleteCo
 	return err
 }
 
-func (u *ContactUseCaseMwLogger) Get(ctx context.Context, req *model.GetContactRequest) (*model.ContactResponse, error) {
+func (u *ContactUsecaseMwLogger) Get(ctx context.Context, req *model.GetContactRequest) (*model.ContactResponse, error) {
 	res, err := u.next.Get(ctx, req)
 
 	fields := logrus.Fields{
@@ -58,7 +58,7 @@ func (u *ContactUseCaseMwLogger) Get(ctx context.Context, req *model.GetContactR
 	return res, err
 }
 
-func (u *ContactUseCaseMwLogger) Search(ctx context.Context, req *model.SearchContactRequest) ([]model.ContactResponse, int64, error) {
+func (u *ContactUsecaseMwLogger) Search(ctx context.Context, req *model.SearchContactRequest) ([]model.ContactResponse, int64, error) {
 	res, total, err := u.next.Search(ctx, req)
 
 	fields := logrus.Fields{
@@ -70,7 +70,7 @@ func (u *ContactUseCaseMwLogger) Search(ctx context.Context, req *model.SearchCo
 	return res, total, err
 }
 
-func (u *ContactUseCaseMwLogger) Update(ctx context.Context, req *model.UpdateContactRequest) (*model.ContactResponse, error) {
+func (u *ContactUsecaseMwLogger) Update(ctx context.Context, req *model.UpdateContactRequest) (*model.ContactResponse, error) {
 	res, err := u.next.Update(ctx, req)
 
 	fields := logrus.Fields{

@@ -8,7 +8,7 @@ import (
 	"golang-clean-architecture/pkg/errkit"
 )
 
-func (u *ContactUseCaseImpl) Get(ctx context.Context, req *model.GetContactRequest) (*model.ContactResponse, error) {
+func (u *ContactUsecaseImpl) Get(ctx context.Context, req *model.GetContactRequest) (*model.ContactResponse, error) {
 	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 

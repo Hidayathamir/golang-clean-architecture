@@ -16,7 +16,7 @@ Fork from https://github.com/khannedy/golang-clean-architecture with this featur
   "error_message": "conflict",
   "error_detail": [
     "http.(*UserController).Register",
-    "usecase.(*UserUseCaseImpl).Create",
+    "usecase.(*UserUsecaseImpl).Create",
     "[409] conflict",
     "user already exists"
   ]
@@ -26,7 +26,7 @@ Fork from https://github.com/khannedy/golang-clean-architecture with this featur
 6. Better searching log with trace id. Example log:
 ```json
 {
-    "err": "usecase.(*UserUseCaseImpl).Create:: [409] conflict:: user already exists",
+    "err": "usecase.(*UserUsecaseImpl).Create:: [409] conflict:: user already exists",
     "fields": {
         "req": {
             "id": "joko",
@@ -36,7 +36,7 @@ Fork from https://github.com/khannedy/golang-clean-architecture with this featur
         "res": null
     },
     "level": "error",
-    "msg": "usecasemwlogger.(*UserUseCaseImpl).Create",
+    "msg": "usecasemwlogger.(*UserUsecaseImpl).Create",
     "time": "2025-09-21T18:20:59+07:00",
     "trace_id": "62dff97d-f0b5-4d88-89e6-3f78bed04c4e"
 }

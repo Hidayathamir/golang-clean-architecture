@@ -14,13 +14,13 @@ import (
 )
 
 type ContactController struct {
-	UseCase contact.ContactUseCase
+	Usecase contact.ContactUsecase
 	Log     *logrus.Logger
 }
 
-func NewContactController(useCase contact.ContactUseCase, log *logrus.Logger) *ContactController {
+func NewContactController(useCase contact.ContactUsecase, log *logrus.Logger) *ContactController {
 	return &ContactController{
-		UseCase: useCase,
+		Usecase: useCase,
 		Log:     log,
 	}
 }
@@ -45,7 +45,7 @@ func (c *ContactController) Create(ctx *fiber.Ctx) error {
 	}
 	req.UserId = auth.ID
 
-	res, err := c.UseCase.Create(ctx.UserContext(), req)
+	res, err := c.Usecase.Create(ctx.UserContext(), req)
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
@@ -78,7 +78,7 @@ func (c *ContactController) List(ctx *fiber.Ctx) error {
 		Size:   ctx.QueryInt("size", 10),
 	}
 
-	res, total, err := c.UseCase.Search(ctx.UserContext(), req)
+	res, total, err := c.Usecase.Search(ctx.UserContext(), req)
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
@@ -110,7 +110,7 @@ func (c *ContactController) Get(ctx *fiber.Ctx) error {
 		ID:     ctx.Params("contactId"),
 	}
 
-	res, err := c.UseCase.Get(ctx.UserContext(), req)
+	res, err := c.Usecase.Get(ctx.UserContext(), req)
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
@@ -141,7 +141,7 @@ func (c *ContactController) Update(ctx *fiber.Ctx) error {
 	req.UserId = auth.ID
 	req.ID = ctx.Params("contactId")
 
-	res, err := c.UseCase.Update(ctx.UserContext(), req)
+	res, err := c.Usecase.Update(ctx.UserContext(), req)
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
@@ -167,7 +167,7 @@ func (c *ContactController) Delete(ctx *fiber.Ctx) error {
 		ID:     contactId,
 	}
 
-	if err := c.UseCase.Delete(ctx.UserContext(), req); err != nil {
+	if err := c.Usecase.Delete(ctx.UserContext(), req); err != nil {
 		return errkit.AddFuncName(err)
 	}
 

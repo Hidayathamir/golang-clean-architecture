@@ -8,22 +8,22 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var _ AddressUseCase = &AddressUseCaseMwLogger{}
+var _ AddressUsecase = &AddressUsecaseMwLogger{}
 
-type AddressUseCaseMwLogger struct {
+type AddressUsecaseMwLogger struct {
 	logger *logrus.Logger
 
-	next AddressUseCase
+	next AddressUsecase
 }
 
-func NewAddressUseCaseMwLogger(logger *logrus.Logger, next AddressUseCase) *AddressUseCaseMwLogger {
-	return &AddressUseCaseMwLogger{
+func NewAddressUsecaseMwLogger(logger *logrus.Logger, next AddressUsecase) *AddressUsecaseMwLogger {
+	return &AddressUsecaseMwLogger{
 		logger: logger,
 		next:   next,
 	}
 }
 
-func (u *AddressUseCaseMwLogger) Create(ctx context.Context, req *model.CreateAddressRequest) (*model.AddressResponse, error) {
+func (u *AddressUsecaseMwLogger) Create(ctx context.Context, req *model.CreateAddressRequest) (*model.AddressResponse, error) {
 	res, err := u.next.Create(ctx, req)
 
 	fields := logrus.Fields{
@@ -35,7 +35,7 @@ func (u *AddressUseCaseMwLogger) Create(ctx context.Context, req *model.CreateAd
 	return res, err
 }
 
-func (u *AddressUseCaseMwLogger) Delete(ctx context.Context, req *model.DeleteAddressRequest) error {
+func (u *AddressUsecaseMwLogger) Delete(ctx context.Context, req *model.DeleteAddressRequest) error {
 	err := u.next.Delete(ctx, req)
 
 	fields := logrus.Fields{
@@ -46,7 +46,7 @@ func (u *AddressUseCaseMwLogger) Delete(ctx context.Context, req *model.DeleteAd
 	return err
 }
 
-func (u *AddressUseCaseMwLogger) Get(ctx context.Context, req *model.GetAddressRequest) (*model.AddressResponse, error) {
+func (u *AddressUsecaseMwLogger) Get(ctx context.Context, req *model.GetAddressRequest) (*model.AddressResponse, error) {
 	res, err := u.next.Get(ctx, req)
 
 	fields := logrus.Fields{
@@ -58,7 +58,7 @@ func (u *AddressUseCaseMwLogger) Get(ctx context.Context, req *model.GetAddressR
 	return res, err
 }
 
-func (u *AddressUseCaseMwLogger) List(ctx context.Context, req *model.ListAddressRequest) ([]model.AddressResponse, error) {
+func (u *AddressUsecaseMwLogger) List(ctx context.Context, req *model.ListAddressRequest) ([]model.AddressResponse, error) {
 	res, err := u.next.List(ctx, req)
 
 	fields := logrus.Fields{
@@ -70,7 +70,7 @@ func (u *AddressUseCaseMwLogger) List(ctx context.Context, req *model.ListAddres
 	return res, err
 }
 
-func (u *AddressUseCaseMwLogger) Update(ctx context.Context, req *model.UpdateAddressRequest) (*model.AddressResponse, error) {
+func (u *AddressUsecaseMwLogger) Update(ctx context.Context, req *model.UpdateAddressRequest) (*model.AddressResponse, error) {
 	res, err := u.next.Update(ctx, req)
 
 	fields := logrus.Fields{

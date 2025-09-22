@@ -7,7 +7,7 @@ import (
 	"golang-clean-architecture/pkg/errkit"
 )
 
-func (u *ContactUseCaseImpl) Search(ctx context.Context, req *model.SearchContactRequest) ([]model.ContactResponse, int64, error) {
+func (u *ContactUsecaseImpl) Search(ctx context.Context, req *model.SearchContactRequest) ([]model.ContactResponse, int64, error) {
 	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 

@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserUseCase interface {
+type UserUsecase interface {
 	Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error)
 	Create(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error)
 	Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error)
@@ -21,9 +21,9 @@ type UserUseCase interface {
 	Update(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error)
 }
 
-var _ UserUseCase = &UserUseCaseImpl{}
+var _ UserUsecase = &UserUsecaseImpl{}
 
-type UserUseCaseImpl struct {
+type UserUsecaseImpl struct {
 	DB       *gorm.DB
 	Log      *logrus.Logger
 	Validate *validator.Validate
@@ -39,7 +39,7 @@ type UserUseCaseImpl struct {
 	SlackClient rest.SlackClient
 }
 
-func NewUserUseCase(
+func NewUserUsecase(
 	db *gorm.DB, logger *logrus.Logger, validate *validator.Validate,
 
 	// repository
@@ -51,8 +51,8 @@ func NewUserUseCase(
 	// client
 	s3Client rest.S3Client,
 	slackClient rest.SlackClient,
-) *UserUseCaseImpl {
-	return &UserUseCaseImpl{
+) *UserUsecaseImpl {
+	return &UserUsecaseImpl{
 		DB:       db,
 		Log:      logger,
 		Validate: validate,

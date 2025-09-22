@@ -8,22 +8,22 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var _ UserUseCase = &UserUseCaseMwLogger{}
+var _ UserUsecase = &UserUsecaseMwLogger{}
 
-type UserUseCaseMwLogger struct {
+type UserUsecaseMwLogger struct {
 	logger *logrus.Logger
 
-	next UserUseCase
+	next UserUsecase
 }
 
-func NewUserUseCaseMwLogger(logger *logrus.Logger, next UserUseCase) *UserUseCaseMwLogger {
-	return &UserUseCaseMwLogger{
+func NewUserUsecaseMwLogger(logger *logrus.Logger, next UserUsecase) *UserUsecaseMwLogger {
+	return &UserUsecaseMwLogger{
 		logger: logger,
 		next:   next,
 	}
 }
 
-func (u *UserUseCaseMwLogger) Create(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error) {
+func (u *UserUsecaseMwLogger) Create(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error) {
 	res, err := u.next.Create(ctx, req)
 
 	fields := logrus.Fields{
@@ -35,7 +35,7 @@ func (u *UserUseCaseMwLogger) Create(ctx context.Context, req *model.RegisterUse
 	return res, err
 }
 
-func (u *UserUseCaseMwLogger) Current(ctx context.Context, req *model.GetUserRequest) (*model.UserResponse, error) {
+func (u *UserUsecaseMwLogger) Current(ctx context.Context, req *model.GetUserRequest) (*model.UserResponse, error) {
 	res, err := u.next.Current(ctx, req)
 
 	fields := logrus.Fields{
@@ -47,7 +47,7 @@ func (u *UserUseCaseMwLogger) Current(ctx context.Context, req *model.GetUserReq
 	return res, err
 }
 
-func (u *UserUseCaseMwLogger) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error) {
+func (u *UserUsecaseMwLogger) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error) {
 	res, err := u.next.Login(ctx, req)
 
 	fields := logrus.Fields{
@@ -59,7 +59,7 @@ func (u *UserUseCaseMwLogger) Login(ctx context.Context, req *model.LoginUserReq
 	return res, err
 }
 
-func (u *UserUseCaseMwLogger) Logout(ctx context.Context, req *model.LogoutUserRequest) (bool, error) {
+func (u *UserUsecaseMwLogger) Logout(ctx context.Context, req *model.LogoutUserRequest) (bool, error) {
 	res, err := u.next.Logout(ctx, req)
 
 	fields := logrus.Fields{
@@ -71,7 +71,7 @@ func (u *UserUseCaseMwLogger) Logout(ctx context.Context, req *model.LogoutUserR
 	return res, err
 }
 
-func (u *UserUseCaseMwLogger) Update(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error) {
+func (u *UserUsecaseMwLogger) Update(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error) {
 	res, err := u.next.Update(ctx, req)
 
 	fields := logrus.Fields{
@@ -83,7 +83,7 @@ func (u *UserUseCaseMwLogger) Update(ctx context.Context, req *model.UpdateUserR
 	return res, err
 }
 
-func (u *UserUseCaseMwLogger) Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error) {
+func (u *UserUsecaseMwLogger) Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error) {
 	res, err := u.next.Verify(ctx, req)
 
 	fields := logrus.Fields{

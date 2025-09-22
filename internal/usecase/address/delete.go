@@ -7,7 +7,7 @@ import (
 	"golang-clean-architecture/pkg/errkit"
 )
 
-func (u *AddressUseCaseImpl) Delete(ctx context.Context, req *model.DeleteAddressRequest) error {
+func (u *AddressUsecaseImpl) Delete(ctx context.Context, req *model.DeleteAddressRequest) error {
 	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 

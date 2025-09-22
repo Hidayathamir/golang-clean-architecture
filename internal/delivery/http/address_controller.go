@@ -13,13 +13,13 @@ import (
 )
 
 type AddressController struct {
-	UseCase address.AddressUseCase
+	Usecase address.AddressUsecase
 	Log     *logrus.Logger
 }
 
-func NewAddressController(useCase address.AddressUseCase, log *logrus.Logger) *AddressController {
+func NewAddressController(useCase address.AddressUsecase, log *logrus.Logger) *AddressController {
 	return &AddressController{
-		UseCase: useCase,
+		Usecase: useCase,
 		Log:     log,
 	}
 }
@@ -47,7 +47,7 @@ func (c *AddressController) Create(ctx *fiber.Ctx) error {
 	req.UserId = auth.ID
 	req.ContactId = ctx.Params("contactId")
 
-	res, err := c.UseCase.Create(ctx.UserContext(), req)
+	res, err := c.Usecase.Create(ctx.UserContext(), req)
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
@@ -73,7 +73,7 @@ func (c *AddressController) List(ctx *fiber.Ctx) error {
 		ContactId: contactId,
 	}
 
-	res, err := c.UseCase.List(ctx.UserContext(), req)
+	res, err := c.Usecase.List(ctx.UserContext(), req)
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
@@ -102,7 +102,7 @@ func (c *AddressController) Get(ctx *fiber.Ctx) error {
 		ID:        addressId,
 	}
 
-	res, err := c.UseCase.Get(ctx.UserContext(), req)
+	res, err := c.Usecase.Get(ctx.UserContext(), req)
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
@@ -135,7 +135,7 @@ func (c *AddressController) Update(ctx *fiber.Ctx) error {
 	req.ContactId = ctx.Params("contactId")
 	req.ID = ctx.Params("addressId")
 
-	res, err := c.UseCase.Update(ctx.UserContext(), req)
+	res, err := c.Usecase.Update(ctx.UserContext(), req)
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
@@ -164,7 +164,7 @@ func (c *AddressController) Delete(ctx *fiber.Ctx) error {
 		ID:        addressId,
 	}
 
-	if err := c.UseCase.Delete(ctx.UserContext(), req); err != nil {
+	if err := c.Usecase.Delete(ctx.UserContext(), req); err != nil {
 		return errkit.AddFuncName(err)
 	}
 

@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type ContactUseCase interface {
+type ContactUsecase interface {
 	Create(ctx context.Context, req *model.CreateContactRequest) (*model.ContactResponse, error)
 	Update(ctx context.Context, req *model.UpdateContactRequest) (*model.ContactResponse, error)
 	Get(ctx context.Context, req *model.GetContactRequest) (*model.ContactResponse, error)
@@ -20,9 +20,9 @@ type ContactUseCase interface {
 	Search(ctx context.Context, req *model.SearchContactRequest) ([]model.ContactResponse, int64, error)
 }
 
-var _ ContactUseCase = &ContactUseCaseImpl{}
+var _ ContactUsecase = &ContactUsecaseImpl{}
 
-type ContactUseCaseImpl struct {
+type ContactUsecaseImpl struct {
 	DB       *gorm.DB
 	Log      *logrus.Logger
 	Validate *validator.Validate
@@ -37,7 +37,7 @@ type ContactUseCaseImpl struct {
 	SlackClient rest.SlackClient
 }
 
-func NewContactUseCase(
+func NewContactUsecase(
 	db *gorm.DB, logger *logrus.Logger, validate *validator.Validate,
 
 	// repository
@@ -48,8 +48,8 @@ func NewContactUseCase(
 
 	// client
 	SlackClient rest.SlackClient,
-) *ContactUseCaseImpl {
-	return &ContactUseCaseImpl{
+) *ContactUsecaseImpl {
+	return &ContactUsecaseImpl{
 		DB:       db,
 		Log:      logger,
 		Validate: validate,

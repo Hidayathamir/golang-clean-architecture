@@ -7,7 +7,7 @@ import (
 	"golang-clean-architecture/pkg/errkit"
 )
 
-func (u *UserUseCaseImpl) Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error) {
+func (u *UserUsecaseImpl) Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error) {
 	tx := u.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 

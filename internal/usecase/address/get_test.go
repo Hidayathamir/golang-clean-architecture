@@ -24,11 +24,11 @@ func newFakeDB() (*gorm.DB, sqlmock.Sqlmock) {
 	return gormDB, db
 }
 
-func TestAddressUseCaseImpl_Get_Success(t *testing.T) {
+func TestAddressUsecaseImpl_Get_Success(t *testing.T) {
 	gormDB, db := newFakeDB()
 	AddressRepository := &mock.AddressRepositoryMock{}
 	ContactRepository := &mock.ContactRepositoryMock{}
-	u := &address.AddressUseCaseImpl{
+	u := &address.AddressUsecaseImpl{
 		DB:                gormDB,
 		Log:               logrus.New(),
 		AddressRepository: AddressRepository,
@@ -60,11 +60,11 @@ func TestAddressUseCaseImpl_Get_Success(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
-func TestAddressUseCaseImpl_Get_Fail1(t *testing.T) {
+func TestAddressUsecaseImpl_Get_Fail1(t *testing.T) {
 	gormDB, _ := newFakeDB()
 	AddressRepository := &mock.AddressRepositoryMock{}
 	ContactRepository := &mock.ContactRepositoryMock{}
-	u := &address.AddressUseCaseImpl{
+	u := &address.AddressUsecaseImpl{
 		DB:                gormDB,
 		Log:               logrus.New(),
 		AddressRepository: AddressRepository,

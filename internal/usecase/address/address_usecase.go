@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type AddressUseCase interface {
+type AddressUsecase interface {
 	Create(ctx context.Context, req *model.CreateAddressRequest) (*model.AddressResponse, error)
 	Update(ctx context.Context, req *model.UpdateAddressRequest) (*model.AddressResponse, error)
 	Get(ctx context.Context, req *model.GetAddressRequest) (*model.AddressResponse, error)
@@ -20,9 +20,9 @@ type AddressUseCase interface {
 	List(ctx context.Context, req *model.ListAddressRequest) ([]model.AddressResponse, error)
 }
 
-var _ AddressUseCase = &AddressUseCaseImpl{}
+var _ AddressUsecase = &AddressUsecaseImpl{}
 
-type AddressUseCaseImpl struct {
+type AddressUsecaseImpl struct {
 	DB       *gorm.DB
 	Log      *logrus.Logger
 	Validate *validator.Validate
@@ -38,7 +38,7 @@ type AddressUseCaseImpl struct {
 	PaymentClient rest.PaymentClient
 }
 
-func NewAddressUseCase(
+func NewAddressUsecase(
 	db *gorm.DB, logger *logrus.Logger, validate *validator.Validate,
 
 	// repository
@@ -50,8 +50,8 @@ func NewAddressUseCase(
 
 	// client
 	paymentClient rest.PaymentClient,
-) *AddressUseCaseImpl {
-	return &AddressUseCaseImpl{
+) *AddressUsecaseImpl {
+	return &AddressUsecaseImpl{
 		DB:       db,
 		Log:      logger,
 		Validate: validate,

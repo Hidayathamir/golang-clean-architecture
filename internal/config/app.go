@@ -69,25 +69,25 @@ func Bootstrap(config *BootstrapConfig) {
 	slackClient = rest.NewSlackClientMwLogger(config.Log, slackClient)
 
 	// setup use cases
-	var userUseCase user.UserUseCase
-	userUseCase = user.NewUserUseCase(config.DB, config.Log, config.Validate, userRepository, userProducer, s3Client, slackClient)
-	userUseCase = user.NewUserUseCaseMwLogger(config.Log, userUseCase)
+	var userUsecase user.UserUsecase
+	userUsecase = user.NewUserUsecase(config.DB, config.Log, config.Validate, userRepository, userProducer, s3Client, slackClient)
+	userUsecase = user.NewUserUsecaseMwLogger(config.Log, userUsecase)
 
-	var contactUseCase contact.ContactUseCase
-	contactUseCase = contact.NewContactUseCase(config.DB, config.Log, config.Validate, contactRepository, contactProducer, slackClient)
-	contactUseCase = contact.NewContactUseCaseMwLogger(config.Log, contactUseCase)
+	var contactUsecase contact.ContactUsecase
+	contactUsecase = contact.NewContactUsecase(config.DB, config.Log, config.Validate, contactRepository, contactProducer, slackClient)
+	contactUsecase = contact.NewContactUsecaseMwLogger(config.Log, contactUsecase)
 
-	var addressUseCase address.AddressUseCase
-	addressUseCase = address.NewAddressUseCase(config.DB, config.Log, config.Validate, contactRepository, addressRepository, addressProducer, paymentClient)
-	addressUseCase = address.NewAddressUseCaseMwLogger(config.Log, addressUseCase)
+	var addressUsecase address.AddressUsecase
+	addressUsecase = address.NewAddressUsecase(config.DB, config.Log, config.Validate, contactRepository, addressRepository, addressProducer, paymentClient)
+	addressUsecase = address.NewAddressUsecaseMwLogger(config.Log, addressUsecase)
 
 	// setup controller
-	userController := http.NewUserController(userUseCase, config.Log)
-	contactController := http.NewContactController(contactUseCase, config.Log)
-	addressController := http.NewAddressController(addressUseCase, config.Log)
+	userController := http.NewUserController(userUsecase, config.Log)
+	contactController := http.NewContactController(contactUsecase, config.Log)
+	addressController := http.NewAddressController(addressUsecase, config.Log)
 
 	// setup middleware
-	authMiddleware := middleware.NewAuth(userUseCase)
+	authMiddleware := middleware.NewAuth(userUsecase)
 	traceIDMiddleware := middleware.NewTraceID()
 
 	routeConfig := route.RouteConfig{
