@@ -282,19 +282,17 @@ paths:
         in: query
         name: size
         type: integer
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-array_golang-clean-architecture_internal_model_ContactResponse'
+      security:
+      - SimpleApiKeyAuth: []
       summary: List contacts
       tags:
       - contacts
     post:
-      consumes:
-      - application/json
       description: Create a new contact
       parameters:
       - description: Create Contact Request
@@ -303,13 +301,13 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/golang-clean-architecture_internal_model.CreateContactRequest'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_ContactResponse'
+      security:
+      - SimpleApiKeyAuth: []
       summary: Create contact
       tags:
       - contacts
@@ -322,13 +320,13 @@ paths:
         name: contactId
         required: true
         type: string
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-bool'
+      security:
+      - SimpleApiKeyAuth: []
       summary: Delete contact
       tags:
       - contacts
@@ -340,19 +338,17 @@ paths:
         name: contactId
         required: true
         type: string
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_ContactResponse'
+      security:
+      - SimpleApiKeyAuth: []
       summary: Get contact
       tags:
       - contacts
     put:
-      consumes:
-      - application/json
       description: Update an existing contact by ID
       parameters:
       - description: Contact ID
@@ -366,13 +362,13 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/golang-clean-architecture_internal_model.UpdateContactRequest'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_ContactResponse'
+      security:
+      - SimpleApiKeyAuth: []
       summary: Update contact
       tags:
       - contacts
@@ -385,19 +381,17 @@ paths:
         name: contactId
         required: true
         type: string
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-array_golang-clean-architecture_internal_model_AddressResponse'
+      security:
+      - SimpleApiKeyAuth: []
       summary: List addresses
       tags:
       - addresses
     post:
-      consumes:
-      - application/json
       description: Create a new address for a contact
       parameters:
       - description: Contact ID
@@ -411,13 +405,13 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/golang-clean-architecture_internal_model.CreateAddressRequest'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_AddressResponse'
+      security:
+      - SimpleApiKeyAuth: []
       summary: Create address
       tags:
       - addresses
@@ -435,13 +429,13 @@ paths:
         name: addressId
         required: true
         type: string
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-bool'
+      security:
+      - SimpleApiKeyAuth: []
       summary: Delete address
       tags:
       - addresses
@@ -458,19 +452,17 @@ paths:
         name: addressId
         required: true
         type: string
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_AddressResponse'
+      security:
+      - SimpleApiKeyAuth: []
       summary: Get address
       tags:
       - addresses
     put:
-      consumes:
-      - application/json
       description: Update an existing address by ID
       parameters:
       - description: Contact ID
@@ -489,34 +481,30 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/golang-clean-architecture_internal_model.UpdateAddressRequest'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_AddressResponse'
+      security:
+      - SimpleApiKeyAuth: []
       summary: Update address
       tags:
       - addresses
   /api/users:
     delete:
       description: Logout the current authenticated user
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-bool'
       security:
-      - BearerAuth: []
+      - SimpleApiKeyAuth: []
       summary: Logout user
       tags:
       - users
     post:
-      consumes:
-      - application/json
       description: Register a new user account
       parameters:
       - description: Register User Request
@@ -525,8 +513,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/golang-clean-architecture_internal_model.RegisterUserRequest'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -538,21 +524,17 @@ paths:
   /api/users/_current:
     get:
       description: Get profile of the currently authenticated user
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_UserResponse'
       security:
-      - BearerAuth: []
+      - SimpleApiKeyAuth: []
       summary: Get current user
       tags:
       - users
     patch:
-      consumes:
-      - application/json
       description: Update profile of the current authenticated user
       parameters:
       - description: Update User Request
@@ -561,22 +543,18 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/golang-clean-architecture_internal_model.UpdateUserRequest'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_UserResponse'
       security:
-      - BearerAuth: []
+      - SimpleApiKeyAuth: []
       summary: Update user
       tags:
       - users
   /api/users/_login:
     post:
-      consumes:
-      - application/json
       description: Authenticate a user and return access token
       parameters:
       - description: Login User Request
@@ -585,8 +563,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/golang-clean-architecture_internal_model.LoginUserRequest'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -595,4 +571,10 @@ paths:
       summary: Login user
       tags:
       - users
+securityDefinitions:
+  SimpleApiKeyAuth:
+    description: Simple token authorization
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

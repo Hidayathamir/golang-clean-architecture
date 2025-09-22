@@ -16,7 +16,7 @@ migrate-new:
 	echo "please run: migrate create -ext sql -dir db/migrations create_table_xxx"
 
 generate:
-	go generate ./...
+	go generate ./internal/...
 
 swag:
 	swag fmt && swag init --parseDependency --parseInternal --generalInfo ./cmd/web/main.go --output ./api/

@@ -17,10 +17,12 @@ const docTemplate = `{
     "paths": {
         "/api/contacts": {
             "get": {
-                "description": "Search and list contacts with filters and pagination",
-                "produces": [
-                    "application/json"
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
                 ],
+                "description": "Search and list contacts with filters and pagination",
                 "tags": [
                     "contacts"
                 ],
@@ -69,13 +71,12 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
+                ],
                 "description": "Create a new contact",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "contacts"
                 ],
@@ -103,10 +104,12 @@ const docTemplate = `{
         },
         "/api/contacts/{contactId}": {
             "get": {
-                "description": "Get a specific contact by ID",
-                "produces": [
-                    "application/json"
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
                 ],
+                "description": "Get a specific contact by ID",
                 "tags": [
                     "contacts"
                 ],
@@ -130,13 +133,12 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
+                ],
                 "description": "Update an existing contact by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "contacts"
                 ],
@@ -169,10 +171,12 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Delete a contact by ID",
-                "produces": [
-                    "application/json"
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
                 ],
+                "description": "Delete a contact by ID",
                 "tags": [
                     "contacts"
                 ],
@@ -198,10 +202,12 @@ const docTemplate = `{
         },
         "/api/contacts/{contactId}/addresses": {
             "get": {
-                "description": "Get all addresses for a contact",
-                "produces": [
-                    "application/json"
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
                 ],
+                "description": "Get all addresses for a contact",
                 "tags": [
                     "addresses"
                 ],
@@ -225,13 +231,12 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
+                ],
                 "description": "Create a new address for a contact",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "addresses"
                 ],
@@ -266,10 +271,12 @@ const docTemplate = `{
         },
         "/api/contacts/{contactId}/addresses/{addressId}": {
             "get": {
-                "description": "Get a specific address by ID",
-                "produces": [
-                    "application/json"
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
                 ],
+                "description": "Get a specific address by ID",
                 "tags": [
                     "addresses"
                 ],
@@ -300,13 +307,12 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
+                ],
                 "description": "Update an existing address by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "addresses"
                 ],
@@ -346,10 +352,12 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Delete an address by ID",
-                "produces": [
-                    "application/json"
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
                 ],
+                "description": "Delete an address by ID",
                 "tags": [
                     "addresses"
                 ],
@@ -383,12 +391,6 @@ const docTemplate = `{
         "/api/users": {
             "post": {
                 "description": "Register a new user account",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "users"
                 ],
@@ -416,13 +418,10 @@ const docTemplate = `{
             "delete": {
                 "security": [
                     {
-                        "BearerAuth": []
+                        "SimpleApiKeyAuth": []
                     }
                 ],
                 "description": "Logout the current authenticated user",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "users"
                 ],
@@ -441,13 +440,10 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "BearerAuth": []
+                        "SimpleApiKeyAuth": []
                     }
                 ],
                 "description": "Get profile of the currently authenticated user",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "users"
                 ],
@@ -464,16 +460,10 @@ const docTemplate = `{
             "patch": {
                 "security": [
                     {
-                        "BearerAuth": []
+                        "SimpleApiKeyAuth": []
                     }
                 ],
                 "description": "Update profile of the current authenticated user",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "users"
                 ],
@@ -502,12 +492,6 @@ const docTemplate = `{
         "/api/users/_login": {
             "post": {
                 "description": "Authenticate a user and return access token",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "users"
                 ],
@@ -908,6 +892,14 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "SimpleApiKeyAuth": {
+            "description": "Simple token authorization",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

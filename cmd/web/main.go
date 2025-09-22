@@ -6,7 +6,15 @@ import (
 	"golang-clean-architecture/pkg/constant/configkey"
 )
 
+// General API Info
+// for swag (https://github.com/swaggo/swag)
+
 //	@title	Golang Clean Architecture
+
+//	@securityDefinitions.apikey	SimpleApiKeyAuth
+//	@in							header
+//	@name						Authorization
+//	@description				Simple token authorization
 
 func main() {
 	viperConfig := config.NewViper()

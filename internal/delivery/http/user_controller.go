@@ -29,8 +29,6 @@ func NewUserController(useCase user.UserUsecase, logger *logrus.Logger) *UserCon
 //	@Summary		Register user
 //	@Description	Register a new user account
 //	@Tags			users
-//	@Accept			json
-//	@Produce		json
 //	@Param			request	body		model.RegisterUserRequest	true	"Register User Request"
 //	@Success		200		{object}	response.WebResponse[model.UserResponse]
 //	@Router			/api/users [post]
@@ -55,8 +53,6 @@ func (c *UserController) Register(ctx *fiber.Ctx) error {
 //	@Summary		Login user
 //	@Description	Authenticate a user and return access token
 //	@Tags			users
-//	@Accept			json
-//	@Produce		json
 //	@Param			request	body		model.LoginUserRequest	true	"Login User Request"
 //	@Success		200		{object}	response.WebResponse[model.UserResponse]
 //	@Router			/api/users/_login [post]
@@ -81,8 +77,7 @@ func (c *UserController) Login(ctx *fiber.Ctx) error {
 //	@Summary		Get current user
 //	@Description	Get profile of the currently authenticated user
 //	@Tags			users
-//	@Produce		json
-//	@Security		BearerAuth
+//	@Security		SimpleApiKeyAuth
 //	@Success		200	{object}	response.WebResponse[model.UserResponse]
 //	@Router			/api/users/_current [get]
 func (c *UserController) Current(ctx *fiber.Ctx) error {
@@ -105,8 +100,7 @@ func (c *UserController) Current(ctx *fiber.Ctx) error {
 //	@Summary		Logout user
 //	@Description	Logout the current authenticated user
 //	@Tags			users
-//	@Produce		json
-//	@Security		BearerAuth
+//	@Security		SimpleApiKeyAuth
 //	@Success		200	{object}	response.WebResponse[bool]
 //	@Router			/api/users [delete]
 func (c *UserController) Logout(ctx *fiber.Ctx) error {
@@ -129,9 +123,7 @@ func (c *UserController) Logout(ctx *fiber.Ctx) error {
 //	@Summary		Update user
 //	@Description	Update profile of the current authenticated user
 //	@Tags			users
-//	@Accept			json
-//	@Produce		json
-//	@Security		BearerAuth
+//	@Security		SimpleApiKeyAuth
 //	@Param			request	body		model.UpdateUserRequest	true	"Update User Request"
 //	@Success		200		{object}	response.WebResponse[model.UserResponse]
 //	@Router			/api/users/_current [patch]

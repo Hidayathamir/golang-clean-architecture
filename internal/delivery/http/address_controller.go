@@ -29,11 +29,10 @@ func NewAddressController(useCase address.AddressUsecase, log *logrus.Logger) *A
 //	@Summary		Create address
 //	@Description	Create a new address for a contact
 //	@Tags			addresses
-//	@Accept			json
-//	@Produce		json
-//	@Param			contactId	path		string						true	"Contact ID"
-//	@Param			request		body		model.CreateAddressRequest	true	"Create Address Request"
-//	@Success		200			{object}	response.WebResponse[model.AddressResponse]
+//	@Param			contactId	path	string						true	"Contact ID"
+//	@Param			request		body	model.CreateAddressRequest	true	"Create Address Request"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[model.AddressResponse]
 //	@Router			/api/contacts/{contactId}/addresses [post]
 func (c *AddressController) Create(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
@@ -60,9 +59,9 @@ func (c *AddressController) Create(ctx *fiber.Ctx) error {
 //	@Summary		List addresses
 //	@Description	Get all addresses for a contact
 //	@Tags			addresses
-//	@Produce		json
-//	@Param			contactId	path		string	true	"Contact ID"
-//	@Success		200			{object}	response.WebResponse[[]model.AddressResponse]
+//	@Param			contactId	path	string	true	"Contact ID"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[[]model.AddressResponse]
 //	@Router			/api/contacts/{contactId}/addresses [get]
 func (c *AddressController) List(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
@@ -86,10 +85,10 @@ func (c *AddressController) List(ctx *fiber.Ctx) error {
 //	@Summary		Get address
 //	@Description	Get a specific address by ID
 //	@Tags			addresses
-//	@Produce		json
-//	@Param			contactId	path		string	true	"Contact ID"
-//	@Param			addressId	path		string	true	"Address ID"
-//	@Success		200			{object}	response.WebResponse[model.AddressResponse]
+//	@Param			contactId	path	string	true	"Contact ID"
+//	@Param			addressId	path	string	true	"Address ID"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[model.AddressResponse]
 //	@Router			/api/contacts/{contactId}/addresses/{addressId} [get]
 func (c *AddressController) Get(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
@@ -115,12 +114,11 @@ func (c *AddressController) Get(ctx *fiber.Ctx) error {
 //	@Summary		Update address
 //	@Description	Update an existing address by ID
 //	@Tags			addresses
-//	@Accept			json
-//	@Produce		json
-//	@Param			contactId	path		string						true	"Contact ID"
-//	@Param			addressId	path		string						true	"Address ID"
-//	@Param			request		body		model.UpdateAddressRequest	true	"Update Address Request"
-//	@Success		200			{object}	response.WebResponse[model.AddressResponse]
+//	@Param			contactId	path	string						true	"Contact ID"
+//	@Param			addressId	path	string						true	"Address ID"
+//	@Param			request		body	model.UpdateAddressRequest	true	"Update Address Request"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[model.AddressResponse]
 //	@Router			/api/contacts/{contactId}/addresses/{addressId} [put]
 func (c *AddressController) Update(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
@@ -148,10 +146,10 @@ func (c *AddressController) Update(ctx *fiber.Ctx) error {
 //	@Summary		Delete address
 //	@Description	Delete an address by ID
 //	@Tags			addresses
-//	@Produce		json
-//	@Param			contactId	path		string	true	"Contact ID"
-//	@Param			addressId	path		string	true	"Address ID"
-//	@Success		200			{object}	response.WebResponse[bool]
+//	@Param			contactId	path	string	true	"Contact ID"
+//	@Param			addressId	path	string	true	"Address ID"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[bool]
 //	@Router			/api/contacts/{contactId}/addresses/{addressId} [delete]
 func (c *AddressController) Delete(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
