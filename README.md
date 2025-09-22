@@ -107,26 +107,6 @@ make migrate
 
 ## Run Application
 
-### Run unit test
-
-```bash
-make go-test
-```
-
-### Run web server
-
-```bash
-make run
-```
-
-### Run worker
-
-```bash
-make run-worker
-```
-
-## Run Application With Docker
-
 I recommend run with docker for testing.
 
 1. Run docker compose.
