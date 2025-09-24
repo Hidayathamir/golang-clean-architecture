@@ -19,7 +19,7 @@ generate:
 	go generate ./internal/...
 
 swag:
-	swag fmt && swag init --parseDependency --parseInternal --generalInfo ./cmd/web/main.go --output ./api/
+	swag fmt --exclude ./internal/mock && swag init --parseDependency --parseInternal --generalInfo ./cmd/web/main.go --output ./api/
 
 docker-compose:
 	docker compose down && docker compose up
