@@ -8,6 +8,7 @@ const (
 
 	LogLevel = "log.level"
 
+	DatabaseMigrations   = "database.migrations"
 	DatabaseUsername     = "database.username"
 	DatabasePassword     = "database.password"
 	DatabaseHost         = "database.host"

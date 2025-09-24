@@ -10,6 +10,7 @@
     "level": 6
   },
   "database": {
+    "migrations": "db/migrations",
     "username": "root",
     "password": "",
     "host": "localhost",
