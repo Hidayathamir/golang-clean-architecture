@@ -27,6 +27,9 @@ func (c ContactConsumer) Consume(message *sarama.ConsumerMessage) error {
 	}
 
 	// TODO process event
-	c.Log.Infof("Received topic contacts with event: %v from partition %d", ContactEvent, message.Partition)
+	c.Log.WithFields(logrus.Fields{
+		"event":     ContactEvent,
+		"partition": message.Partition,
+	}).Info("Received topic contacts")
 	return nil
 }

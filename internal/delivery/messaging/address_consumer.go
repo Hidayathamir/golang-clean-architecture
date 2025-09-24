@@ -28,5 +28,9 @@ func (c AddressConsumer) Consume(message *sarama.ConsumerMessage) error {
 
 	// TODO process event
 	c.Log.Infof("Received topic addresses with event: %v from partition %d", addressEvent, message.Partition)
+	c.Log.WithFields(logrus.Fields{
+		"event":     addressEvent,
+		"partition": message.Partition,
+	}).Info("Received topic address")
 	return nil
 }

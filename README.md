@@ -49,6 +49,8 @@ Fork from https://github.com/khannedy/golang-clean-architecture with this featur
 12. Simple call kafka producer. See [c.UserProducer.Send](internal/usecase/address/address_usecase.go).
 13. Splitted usecase. See [example](internal/repository/user_repository.go).
 14. Test will use container db. See [example](test/init_test.go).
+15. Run application with docker container. See [Run Application](#run-application) & [docker-compose.yml](docker-compose.yml).
+
 
 ## Architecture
 
@@ -116,7 +118,7 @@ I recommend run with docker for testing.
 make docker-compose
 ```
 
-This will run docker compose that create folder `data/` to save it's data. You can remove that folder and re run docker compose to start fresh.
+This will run docker compose that will run mysql & kafka. Go to http://localhost:8080/ to see kafka.
 
 2. Keep docker container running. From another terminal, run migration and run application.
 

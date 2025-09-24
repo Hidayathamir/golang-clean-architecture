@@ -42,6 +42,7 @@ func TestMain(m *testing.M) {
 	viperConfig.Set(configkey.DatabaseMigrations, "../db/migrations")
 	config.Migrate(viperConfig, log)
 	db = config.NewDatabase(viperConfig, log)
+	kafkaContainer := newKafkaContainer(viperConfig)
 	producer := config.NewKafkaProducer(viperConfig, log)
 
 	config.Bootstrap(&config.BootstrapConfig{
@@ -55,8 +56,8 @@ func TestMain(m *testing.M) {
 
 	code := m.Run()
 
-	err := testcontainers.TerminateContainer(mysqlContainer)
-	panicIfErr(err)
+	panicIfErr(testcontainers.TerminateContainer(mysqlContainer))
+	panicIfErr(testcontainers.TerminateContainer(kafkaContainer))
 
 	os.Exit(code)
 }
@@ -98,7 +99,7 @@ func newMysqlContainer(viperConfig *viper.Viper) (mysqlContainer *mysql.MySQLCon
 	return mysqlContainer
 }
 
-func newKafkaContainer() (kafkaContainer *kafka.KafkaContainer) {
+func newKafkaContainer(viperConfig *viper.Viper) (kafkaContainer *kafka.KafkaContainer) {
 	var err error
 	kafkaContainer, err = kafka.Run(context.Background(),
 		"confluentinc/cp-kafka:7.2.15",
@@ -109,5 +110,10 @@ func newKafkaContainer() (kafkaContainer *kafka.KafkaContainer) {
 	if !state.Running {
 		panic("kafka container not running")
 	}
+
+	brokers, err := kafkaContainer.Brokers(context.Background())
+	panicIfErr(err)
+	viperConfig.Set(configkey.KafkaBootstrapServers, brokers[0])
+
 	return kafkaContainer
 }
