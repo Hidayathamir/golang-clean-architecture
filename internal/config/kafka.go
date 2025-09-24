@@ -25,7 +25,7 @@ func NewKafkaConsumerGroup(config *viper.Viper, log *logrus.Logger) sarama.Consu
 
 	consumerGroup, err := sarama.NewConsumerGroup(brokers, groupID, saramaConfig)
 	if err != nil {
-		log.Fatalf("Failed to create consumer group: %v", err)
+		log.Panicf("Failed to create consumer group: %v", err)
 	}
 	return consumerGroup
 }
@@ -45,7 +45,7 @@ func NewKafkaProducer(config *viper.Viper, log *logrus.Logger) sarama.SyncProduc
 
 	producer, err := sarama.NewSyncProducer(brokers, saramaConfig)
 	if err != nil {
-		log.Fatalf("Failed to create producer: %v", err)
+		log.Panicf("Failed to create producer: %v", err)
 	}
 	return producer
 }

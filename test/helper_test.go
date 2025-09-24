@@ -18,26 +18,26 @@ func ClearAll() {
 func ClearUsers() {
 	err := db.Where("id is not null").Delete(&entity.User{}).Error
 	if err != nil {
-		log.Fatalf("Failed clear user data : %+v", err)
+		log.Panicf("Failed clear user data : %+v", err)
 	}
 }
 
 func ClearContact() {
 	err := db.Where("id is not null").Delete(&entity.Contact{}).Error
 	if err != nil {
-		log.Fatalf("Failed clear contact data : %+v", err)
+		log.Panicf("Failed clear contact data : %+v", err)
 	}
 }
 
 func ClearAddresses() {
 	err := db.Where("id is not null").Delete(&entity.Address{}).Error
 	if err != nil {
-		log.Fatalf("Failed clear address data : %+v", err)
+		log.Panicf("Failed clear address data : %+v", err)
 	}
 }
 
 func CreateContacts(user *entity.User, total int) {
-	for i := 0; i < total; i++ {
+	for i := range total {
 		contact := &entity.Contact{
 			ID:        uuid.NewString(),
 			FirstName: "Contact",
@@ -48,13 +48,13 @@ func CreateContacts(user *entity.User, total int) {
 		}
 		err := db.Create(contact).Error
 		if err != nil {
-			log.Fatalf("Failed create contact data : %+v", err)
+			log.Panicf("Failed create contact data : %+v", err)
 		}
 	}
 }
 
 func CreateAddresses(t *testing.T, contact *entity.Contact, total int) {
-	for i := 0; i < total; i++ {
+	for range total {
 		address := &entity.Address{
 			ID:         uuid.NewString(),
 			ContactId:  contact.ID,

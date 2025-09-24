@@ -37,6 +37,6 @@ func main() {
 	fmt.Printf("Go to swagger http://localhost:%d/swagger\n", webPort)
 	err := app.Listen(fmt.Sprintf(":%d", webPort))
 	if err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+		log.Panicf("Failed to start server: %v", err)
 	}
 }
