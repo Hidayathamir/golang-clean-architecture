@@ -48,6 +48,7 @@ Fork from https://github.com/khannedy/golang-clean-architecture with this featur
 11. Simple repository without generic. See [example](internal/repository/user_repository.go).
 12. Simple call kafka producer. See [c.UserProducer.Send](internal/usecase/address/address_usecase.go).
 13. Splitted usecase. See [example](internal/repository/user_repository.go).
+14. Test will use container db. See [example](test/init_test.go).
 
 ## Architecture
 
