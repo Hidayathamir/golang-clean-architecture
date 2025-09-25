@@ -6,7 +6,7 @@ This is golang clean architecture template.
 
 Fork from https://github.com/khannedy/golang-clean-architecture with this feature:
 
-1. Better delivery return handling. See [example](internal/delivery/http/address_controller.go).
+1. Better delivery return handling. See [return response.Data(ctx, http.StatusOK, res)](internal/delivery/http/address_controller.go).
 2. Better logging using middleware. See [usecase](internal/usecase/address/create.go) clean, logging in [usecase middleware log](internal/usecase/address/address_usecase_mw_logger.go).
 3. Better error handling. See [errkit.BadRequest(err)](internal/usecase/address/create.go) will handled in [response.Error](internal/config/fiber.go).
 4. Better error handling 2. See [errkit.AddFuncName](internal/usecase/address/create.go). Example response json:
