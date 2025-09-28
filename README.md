@@ -20,118 +20,24 @@ This is golang clean architecture template.
 10. The Gateway using Model data to construct request to external system 
 11. The Gateway perform request to external system (HTTP, gRPC, Messaging, etc)
 
-## Tech Stack
+## How To Use This Project
 
-- Golang : https://github.com/golang/go
-- MySQL (Database) : https://github.com/mysql/mysql-server
-- Apache Kafka : https://github.com/apache/kafka
-
-## Framework & Library
-
-- GoFiber (HTTP Framework) : https://github.com/gofiber/fiber
-- GORM (ORM) : https://github.com/go-gorm/gorm
-- Viper (Configuration) : https://github.com/spf13/viper
-- Golang Migrate (Database Migration) : https://github.com/golang-migrate/migrate
-- Go Playground Validator (Validation) : https://github.com/go-playground/validator
-- Logrus (Logger) : https://github.com/sirupsen/logrus
-- Sarama (Kafka Client) : https://github.com/IBM/sarama
-
-## Configuration
-
-All configuration is in `config.json` file.
-
-## API Spec
-
-All API Spec is in `api` folder. Auto generate with command `make swag`.
-
-## Database Migration
-
-All database migration is in `db/migrations` folder.
-
-### Create Migration
+1. Check required tool
 
 ```shell
-migrate create -ext sql -dir db/migrations create_table_xxx
+make check-tools
 ```
 
-### Run Migration
+2. Rename go module name
 
 ```shell
-make migrate
+make rename-go-mod
 ```
 
-## Run Application
+Now the project is yours.
 
-I recommend run with docker for testing.
+Next, see [How To Run Application](run_app.md).
 
-1. Run docker compose.
+Check also other command in [Makefile](Makefile).
 
-```bash
-make docker-compose
-```
-
-This will run docker compose that will run mysql & kafka. Go to http://localhost:8080/ to see kafka.
-
-2. Keep docker container running. From another terminal, run migration and run application.
-
-```bash
-make migrate
-```
-
-This will run migration.
-
-```bash
-make run
-```
-
-This will run application. Go to swagger http://localhost:3000/swagger.
-
-## My Note
-
-This project is fork from https://github.com/khannedy/golang-clean-architecture with this feature:
-
-1. Better delivery return handling. See [return response.Data(ctx, http.StatusOK, res)](internal/delivery/http/address_controller.go).
-2. Better logging using middleware. See [usecase](internal/usecase/address/create.go) clean, logging in [usecase middleware log](internal/usecase/address/address_usecase_mw_logger.go).
-3. Better error handling. See [errkit.BadRequest(err)](internal/usecase/address/create.go) will handled in [response.Error](internal/config/fiber.go).
-4. Better error handling 2. See [errkit.AddFuncName](internal/usecase/address/create.go). Example response json:
-```json
-{
-  "data": null,
-  "error_message": "conflict",
-  "error_detail": [
-    "http.(*UserController).Register",
-    "usecase.(*UserUsecaseImpl).Create",
-    "[409] conflict",
-    "user already exists"
-  ]
-}
-```
-5. Request has trace id. See [example](internal/delivery/http/middleware/trace_id_middleware.go).
-6. Better searching log with trace id. Example log:
-```json
-{
-    "err": "usecase.(*UserUsecaseImpl).Create:: [409] conflict:: user already exists",
-    "fields": {
-        "req": {
-            "id": "joko",
-            "password": "joko",
-            "name": "Joko"
-        },
-        "res": null
-    },
-    "level": "error",
-    "msg": "user.(*UserUsecaseMwLogger).Create",
-    "time": "2025-09-21T18:20:59+07:00",
-    "trace_id": "62dff97d-f0b5-4d88-89e6-3f78bed04c4e"
-}
-```
-7. Swagger auto generated. See [example](internal/delivery/http/address_controller.go). See http://localhost:3000/swagger
-8. Using interface make it easier to test. See [example](internal/usecase/address/address_usecase.go).
-9. Unit test example. See [usecase address](internal/usecase/address).
-10. Command shortcut using [Makefile](Makefile).
-11. Gateway rest api client. See [example](internal/gateway/rest/slack_client.go).
-12. Simple repository without generic. See [example](internal/repository/user_repository.go).
-13. Simple call kafka producer. See [u.AddressProducer.Send](internal/usecase/address/create.go).
-14. Splitted usecase. See [example](internal/usecase/address).
-15. Test will use container db. See [example](test/init_test.go).
-16. Run application with docker container. See [Run Application](#run-application) & [docker-compose.yml](docker-compose.yml).
+Check also [My Note](README_my_note.md).
