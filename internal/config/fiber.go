@@ -3,7 +3,6 @@ package config
 import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/spf13/viper"
 )

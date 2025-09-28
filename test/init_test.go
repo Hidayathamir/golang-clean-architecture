@@ -8,7 +8,6 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
-
 	"github.com/go-playground/validator/v10"
 	gosqldrivermysql "github.com/go-sql-driver/mysql"
 	"github.com/gofiber/fiber/v2"

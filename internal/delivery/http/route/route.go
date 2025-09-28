@@ -3,7 +3,6 @@ package route
 import (
 	_ "github.com/Hidayathamir/golang-clean-architecture/api" // need import for swagger
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
 )

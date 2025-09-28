@@ -4,7 +4,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/helper"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logrushook"
-
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )

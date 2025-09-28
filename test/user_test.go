@@ -11,7 +11,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/bcrypt"
 )

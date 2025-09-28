@@ -9,7 +9,6 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/messaging"
-
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )

@@ -5,7 +5,6 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/helper"
-
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/caller"
-
 	"github.com/sirupsen/logrus"
 )
 

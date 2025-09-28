@@ -2,7 +2,6 @@ package logrushook
 
 import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/traceidctx"
-
 	"github.com/sirupsen/logrus"
 )
 

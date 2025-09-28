@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/traceidctx"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )

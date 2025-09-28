@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-
 	"github.com/gofiber/fiber/v2"
 )
 

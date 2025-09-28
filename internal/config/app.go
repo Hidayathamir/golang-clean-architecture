@@ -10,7 +10,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/address"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/contact"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
-
 	"github.com/IBM/sarama"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
