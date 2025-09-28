@@ -1,4 +1,4 @@
-module golang-clean-architecture
+module github.com/Hidayathamir/golang-clean-architecture
 
 go 1.25
 

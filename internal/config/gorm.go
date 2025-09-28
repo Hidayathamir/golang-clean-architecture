@@ -2,8 +2,9 @@ package config
 
 import (
 	"fmt"
-	"golang-clean-architecture/pkg/constant/configkey"
 	"time"
+
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"

@@ -1,8 +1,8 @@
 package route
 
 import (
-	_ "golang-clean-architecture/api" // need import for swagger
-	"golang-clean-architecture/internal/delivery/http"
+	_ "github.com/Hidayathamir/golang-clean-architecture/api" // need import for swagger
+	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"

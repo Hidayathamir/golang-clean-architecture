@@ -2,8 +2,9 @@ package address
 
 import (
 	"context"
-	"golang-clean-architecture/internal/model"
-	"golang-clean-architecture/pkg/helper"
+
+	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/helper"
 
 	"github.com/sirupsen/logrus"
 )

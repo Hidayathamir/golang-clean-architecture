@@ -1,8 +1,8 @@
 package config
 
 import (
-	"golang-clean-architecture/internal/delivery/http/response"
-	"golang-clean-architecture/pkg/constant/configkey"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/spf13/viper"

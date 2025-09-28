@@ -1,12 +1,13 @@
 package address_test
 
 import (
-	"golang-clean-architecture/internal/gateway/messaging"
-	"golang-clean-architecture/internal/gateway/rest"
-	"golang-clean-architecture/internal/mock"
-	"golang-clean-architecture/internal/repository"
-	"golang-clean-architecture/internal/usecase/address"
 	"testing"
+
+	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/messaging"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/rest"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/address"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"

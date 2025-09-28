@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "golang-clean-architecture"
+    "name": "github.com/Hidayathamir/golang-clean-architecture"
   },
   "web": {
     "prefork": false,
@@ -27,7 +27,7 @@
       "servers": "localhost:9092"
     },
     "group": {
-      "id": "golang-clean-architecture"
+      "id": "github.com/Hidayathamir/golang-clean-architecture"
     },
     "auto": {
       "offset": {

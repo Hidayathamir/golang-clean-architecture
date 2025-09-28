@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
-	"golang-clean-architecture/internal/config"
-	"golang-clean-architecture/internal/delivery/messaging"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/messaging"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"

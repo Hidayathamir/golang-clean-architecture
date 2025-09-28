@@ -1,7 +1,7 @@
 package errkit
 
 import (
-	"golang-clean-architecture/pkg/caller"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/caller"
 )
 
 type OptAddFuncName struct {

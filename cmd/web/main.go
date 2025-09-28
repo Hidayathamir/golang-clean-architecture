@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"golang-clean-architecture/internal/config"
-	"golang-clean-architecture/pkg/constant/configkey"
+
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 )
 
 // General API Info

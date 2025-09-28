@@ -1,7 +1,7 @@
 package config
 
 import (
-	"golang-clean-architecture/pkg/constant/configkey"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/mysql"

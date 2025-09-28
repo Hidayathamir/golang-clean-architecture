@@ -1,9 +1,9 @@
 package config
 
 import (
-	"golang-clean-architecture/pkg/constant/configkey"
-	"golang-clean-architecture/pkg/helper"
-	"golang-clean-architecture/pkg/logrushook"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/helper"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logrushook"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"

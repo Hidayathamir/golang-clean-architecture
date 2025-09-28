@@ -1,13 +1,14 @@
 package http
 
 import (
-	"golang-clean-architecture/internal/delivery/http/middleware"
-	"golang-clean-architecture/internal/delivery/http/response"
-	"golang-clean-architecture/internal/model"
-	"golang-clean-architecture/internal/usecase/contact"
-	"golang-clean-architecture/pkg/errkit"
 	"math"
 	"net/http"
+
+	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/middleware"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/contact"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"

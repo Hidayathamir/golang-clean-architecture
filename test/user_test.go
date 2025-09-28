@@ -2,14 +2,15 @@ package test
 
 import (
 	"encoding/json"
-	"golang-clean-architecture/internal/delivery/http/response"
-	"golang-clean-architecture/internal/entity"
-	"golang-clean-architecture/internal/model"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/bcrypt"

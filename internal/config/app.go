@@ -1,15 +1,15 @@
 package config
 
 import (
-	"golang-clean-architecture/internal/delivery/http"
-	"golang-clean-architecture/internal/delivery/http/middleware"
-	"golang-clean-architecture/internal/delivery/http/route"
-	"golang-clean-architecture/internal/gateway/messaging"
-	"golang-clean-architecture/internal/gateway/rest"
-	"golang-clean-architecture/internal/repository"
-	"golang-clean-architecture/internal/usecase/address"
-	"golang-clean-architecture/internal/usecase/contact"
-	"golang-clean-architecture/internal/usecase/user"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/middleware"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/route"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/messaging"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/rest"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/address"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/contact"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 
 	"github.com/IBM/sarama"
 	"github.com/go-playground/validator/v10"

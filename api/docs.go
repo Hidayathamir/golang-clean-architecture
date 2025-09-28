@@ -65,7 +65,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-array_golang-clean-architecture_internal_model_ContactResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-array_github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponse"
                         }
                     }
                 }
@@ -88,7 +88,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_model.CreateContactRequest"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.CreateContactRequest"
                         }
                     }
                 ],
@@ -96,7 +96,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_ContactResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponse"
                         }
                     }
                 }
@@ -127,7 +127,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_ContactResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponse"
                         }
                     }
                 }
@@ -157,7 +157,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_model.UpdateContactRequest"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateContactRequest"
                         }
                     }
                 ],
@@ -165,7 +165,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_ContactResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponse"
                         }
                     }
                 }
@@ -194,7 +194,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-bool"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-bool"
                         }
                     }
                 }
@@ -225,7 +225,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-array_golang-clean-architecture_internal_model_AddressResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-array_github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponse"
                         }
                     }
                 }
@@ -255,7 +255,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_model.CreateAddressRequest"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.CreateAddressRequest"
                         }
                     }
                 ],
@@ -263,7 +263,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_AddressResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponse"
                         }
                     }
                 }
@@ -301,7 +301,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_AddressResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponse"
                         }
                     }
                 }
@@ -338,7 +338,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_model.UpdateAddressRequest"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateAddressRequest"
                         }
                     }
                 ],
@@ -346,7 +346,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_AddressResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponse"
                         }
                     }
                 }
@@ -382,7 +382,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-bool"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-bool"
                         }
                     }
                 }
@@ -402,7 +402,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_model.RegisterUserRequest"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.RegisterUserRequest"
                         }
                     }
                 ],
@@ -410,7 +410,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_UserResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse"
                         }
                     }
                 }
@@ -430,7 +430,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-bool"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-bool"
                         }
                     }
                 }
@@ -452,7 +452,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_UserResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse"
                         }
                     }
                 }
@@ -475,7 +475,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_model.UpdateUserRequest"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateUserRequest"
                         }
                     }
                 ],
@@ -483,7 +483,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_UserResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse"
                         }
                     }
                 }
@@ -503,7 +503,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_model.LoginUserRequest"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.LoginUserRequest"
                         }
                     }
                 ],
@@ -511,7 +511,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_UserResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse"
                         }
                     }
                 }
@@ -519,7 +519,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "golang-clean-architecture_internal_delivery_http_response.PageMetadata": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata": {
             "type": "object",
             "properties": {
                 "page": {
@@ -536,13 +536,13 @@ const docTemplate = `{
                 }
             }
         },
-        "golang-clean-architecture_internal_delivery_http_response.WebResponse-array_golang-clean-architecture_internal_model_AddressResponse": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-array_github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponse": {
             "type": "object",
             "properties": {
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/golang-clean-architecture_internal_model.AddressResponse"
+                        "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.AddressResponse"
                     }
                 },
                 "error_detail": {
@@ -555,17 +555,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "paging": {
-                    "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.PageMetadata"
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata"
                 }
             }
         },
-        "golang-clean-architecture_internal_delivery_http_response.WebResponse-array_golang-clean-architecture_internal_model_ContactResponse": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-array_github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponse": {
             "type": "object",
             "properties": {
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/golang-clean-architecture_internal_model.ContactResponse"
+                        "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.ContactResponse"
                     }
                 },
                 "error_detail": {
@@ -578,11 +578,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "paging": {
-                    "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.PageMetadata"
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata"
                 }
             }
         },
-        "golang-clean-architecture_internal_delivery_http_response.WebResponse-bool": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-bool": {
             "type": "object",
             "properties": {
                 "data": {
@@ -598,15 +598,15 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "paging": {
-                    "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.PageMetadata"
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata"
                 }
             }
         },
-        "golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_AddressResponse": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/golang-clean-architecture_internal_model.AddressResponse"
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.AddressResponse"
                 },
                 "error_detail": {
                     "type": "array",
@@ -618,15 +618,15 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "paging": {
-                    "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.PageMetadata"
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata"
                 }
             }
         },
-        "golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_ContactResponse": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/golang-clean-architecture_internal_model.ContactResponse"
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.ContactResponse"
                 },
                 "error_detail": {
                     "type": "array",
@@ -638,15 +638,15 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "paging": {
-                    "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.PageMetadata"
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata"
                 }
             }
         },
-        "golang-clean-architecture_internal_delivery_http_response.WebResponse-golang-clean-architecture_internal_model_UserResponse": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/golang-clean-architecture_internal_model.UserResponse"
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UserResponse"
                 },
                 "error_detail": {
                     "type": "array",
@@ -658,11 +658,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "paging": {
-                    "$ref": "#/definitions/golang-clean-architecture_internal_delivery_http_response.PageMetadata"
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata"
                 }
             }
         },
-        "golang-clean-architecture_internal_model.AddressResponse": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.AddressResponse": {
             "type": "object",
             "properties": {
                 "city": {
@@ -691,13 +691,13 @@ const docTemplate = `{
                 }
             }
         },
-        "golang-clean-architecture_internal_model.ContactResponse": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.ContactResponse": {
             "type": "object",
             "properties": {
                 "addresses": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/golang-clean-architecture_internal_model.AddressResponse"
+                        "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.AddressResponse"
                     }
                 },
                 "created_at": {
@@ -723,7 +723,7 @@ const docTemplate = `{
                 }
             }
         },
-        "golang-clean-architecture_internal_model.CreateAddressRequest": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.CreateAddressRequest": {
             "type": "object",
             "properties": {
                 "city": {
@@ -748,7 +748,7 @@ const docTemplate = `{
                 }
             }
         },
-        "golang-clean-architecture_internal_model.CreateContactRequest": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.CreateContactRequest": {
             "type": "object",
             "required": [
                 "first_name"
@@ -772,7 +772,7 @@ const docTemplate = `{
                 }
             }
         },
-        "golang-clean-architecture_internal_model.LoginUserRequest": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.LoginUserRequest": {
             "type": "object",
             "required": [
                 "id",
@@ -789,7 +789,7 @@ const docTemplate = `{
                 }
             }
         },
-        "golang-clean-architecture_internal_model.RegisterUserRequest": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.RegisterUserRequest": {
             "type": "object",
             "required": [
                 "id",
@@ -811,7 +811,7 @@ const docTemplate = `{
                 }
             }
         },
-        "golang-clean-architecture_internal_model.UpdateAddressRequest": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateAddressRequest": {
             "type": "object",
             "properties": {
                 "city": {
@@ -836,7 +836,7 @@ const docTemplate = `{
                 }
             }
         },
-        "golang-clean-architecture_internal_model.UpdateContactRequest": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateContactRequest": {
             "type": "object",
             "required": [
                 "first_name"
@@ -860,7 +860,7 @@ const docTemplate = `{
                 }
             }
         },
-        "golang-clean-architecture_internal_model.UpdateUserRequest": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateUserRequest": {
             "type": "object",
             "properties": {
                 "name": {
@@ -873,7 +873,7 @@ const docTemplate = `{
                 }
             }
         },
-        "golang-clean-architecture_internal_model.UserResponse": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.UserResponse": {
             "type": "object",
             "properties": {
                 "created_at": {

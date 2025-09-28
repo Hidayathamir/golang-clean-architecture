@@ -2,10 +2,11 @@ package response_test
 
 import (
 	"errors"
-	"golang-clean-architecture/internal/delivery/http/response"
-	"golang-clean-architecture/pkg/errkit"
 	"net/http"
 	"testing"
+
+	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 
 	"github.com/stretchr/testify/assert"
 )

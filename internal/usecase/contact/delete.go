@@ -2,9 +2,10 @@ package contact
 
 import (
 	"context"
-	"golang-clean-architecture/internal/entity"
-	"golang-clean-architecture/internal/model"
-	"golang-clean-architecture/pkg/errkit"
+
+	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 )
 
 func (u *ContactUsecaseImpl) Delete(ctx context.Context, req *model.DeleteContactRequest) error {

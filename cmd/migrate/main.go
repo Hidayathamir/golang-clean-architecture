@@ -1,7 +1,7 @@
 package main
 
 import (
-	"golang-clean-architecture/internal/config"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )

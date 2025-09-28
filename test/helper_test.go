@@ -1,9 +1,10 @@
 package test
 
 import (
-	"golang-clean-architecture/internal/entity"
 	"strconv"
 	"testing"
+
+	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"

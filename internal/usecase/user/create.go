@@ -3,10 +3,11 @@ package user
 import (
 	"context"
 	"errors"
-	"golang-clean-architecture/internal/entity"
-	"golang-clean-architecture/internal/model"
-	"golang-clean-architecture/internal/model/converter"
-	"golang-clean-architecture/pkg/errkit"
+
+	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/model/converter"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 
 	"golang.org/x/crypto/bcrypt"
 )

@@ -88,7 +88,7 @@ This will run application. Go to swagger http://localhost:3000/swagger.
 
 ## My Note
 
-This project is fork from https://github.com/khannedy/golang-clean-architecture with this feature:
+This project is fork from https://github.com/khannedy/github.com/Hidayathamir/golang-clean-architecture with this feature:
 
 1. Better delivery return handling. See [return response.Data(ctx, http.StatusOK, res)](internal/delivery/http/address_controller.go).
 2. Better logging using middleware. See [usecase](internal/usecase/address/create.go) clean, logging in [usecase middleware log](internal/usecase/address/address_usecase_mw_logger.go).

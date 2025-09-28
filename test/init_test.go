@@ -2,11 +2,12 @@ package test
 
 import (
 	"context"
-	"golang-clean-architecture/internal/config"
-	"golang-clean-architecture/pkg/constant/configkey"
 	"net"
 	"os"
 	"testing"
+
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 
 	"github.com/go-playground/validator/v10"
 	gosqldrivermysql "github.com/go-sql-driver/mysql"

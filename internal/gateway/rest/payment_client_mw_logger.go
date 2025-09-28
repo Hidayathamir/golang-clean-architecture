@@ -2,7 +2,8 @@ package rest
 
 import (
 	"context"
-	"golang-clean-architecture/pkg/helper"
+
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/helper"
 
 	"github.com/sirupsen/logrus"
 )

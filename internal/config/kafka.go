@@ -1,8 +1,9 @@
 package config
 
 import (
-	"golang-clean-architecture/pkg/constant/configkey"
 	"strings"
+
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 
 	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"

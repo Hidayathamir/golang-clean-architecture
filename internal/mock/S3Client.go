@@ -5,7 +5,7 @@ package mock
 
 import (
 	"context"
-	"golang-clean-architecture/internal/gateway/rest"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/rest"
 	"sync"
 )
 
