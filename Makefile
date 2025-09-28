@@ -47,3 +47,21 @@ check-tools:
 		echo "❌ swag not found. Install: https://github.com/swaggo/swag"; \
 	fi
 	@echo "✅ Done checking tools."
+
+OLD_MODULE := github.com/Hidayathamir/golang-clean-architecture
+
+# Detect OS (Darwin = macOS, Linux = Linux/WSL)
+OS := $(shell uname)
+
+rename-go-mod:
+	@read -p "👉 Enter new Go module name: " NEW_MODULE; \
+	echo "🔄 Setting module to $$NEW_MODULE"; \
+	if [ "$(OS)" = "Darwin" ]; then \
+		grep -rl "$(OLD_MODULE)" . | xargs sed -i '' "s|$(OLD_MODULE)|$$NEW_MODULE|g"; \
+	else \
+		grep -rl "$(OLD_MODULE)" . | xargs sed -i "s|$(OLD_MODULE)|$$NEW_MODULE|g"; \
+	fi; \
+	echo "⚙️ Running 'make generate'"; \
+	$(MAKE) generate; \
+	echo "⚙️ Running 'make swag'"; \
+	$(MAKE) swag
