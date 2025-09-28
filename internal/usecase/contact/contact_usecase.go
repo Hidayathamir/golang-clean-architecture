@@ -12,6 +12,8 @@ import (
 	"gorm.io/gorm"
 )
 
+//go:generate moq -out=../../mock/ContactUsecase.go -pkg=mock . ContactUsecase
+
 type ContactUsecase interface {
 	Create(ctx context.Context, req *model.CreateContactRequest) (*model.ContactResponse, error)
 	Update(ctx context.Context, req *model.UpdateContactRequest) (*model.ContactResponse, error)

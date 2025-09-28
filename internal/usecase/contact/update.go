@@ -10,16 +10,13 @@ import (
 )
 
 func (u *ContactUsecaseImpl) Update(ctx context.Context, req *model.UpdateContactRequest) (*model.ContactResponse, error) {
-	tx := u.DB.WithContext(ctx).Begin()
-	defer tx.Rollback()
-
-	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ID, req.UserId); err != nil {
+	if err := u.Validate.Struct(req); err != nil {
+		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
-	if err := u.Validate.Struct(req); err != nil {
-		err = errkit.BadRequest(err)
+	contact := new(entity.Contact)
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, u.DB.WithContext(ctx), contact, req.ID, req.UserId); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -28,11 +25,7 @@ func (u *ContactUsecaseImpl) Update(ctx context.Context, req *model.UpdateContac
 	contact.Email = req.Email
 	contact.Phone = req.Phone
 
-	if err := u.ContactRepository.Update(ctx, tx, contact); err != nil {
-		return nil, errkit.AddFuncName(err)
-	}
-
-	if err := tx.Commit().Error; err != nil {
+	if err := u.ContactRepository.Update(ctx, u.DB.WithContext(ctx), contact); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 

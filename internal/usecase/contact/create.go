@@ -11,9 +11,6 @@ import (
 )
 
 func (u *ContactUsecaseImpl) Create(ctx context.Context, req *model.CreateContactRequest) (*model.ContactResponse, error) {
-	tx := u.DB.WithContext(ctx).Begin()
-	defer tx.Rollback()
-
 	if err := u.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
@@ -28,11 +25,7 @@ func (u *ContactUsecaseImpl) Create(ctx context.Context, req *model.CreateContac
 		UserId:    req.UserId,
 	}
 
-	if err := u.ContactRepository.Create(ctx, tx, contact); err != nil {
-		return nil, errkit.AddFuncName(err)
-	}
-
-	if err := tx.Commit().Error; err != nil {
+	if err := u.ContactRepository.Create(ctx, u.DB.WithContext(ctx), contact); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 

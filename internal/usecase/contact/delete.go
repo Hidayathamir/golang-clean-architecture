@@ -9,24 +9,17 @@ import (
 )
 
 func (u *ContactUsecaseImpl) Delete(ctx context.Context, req *model.DeleteContactRequest) error {
-	tx := u.DB.WithContext(ctx).Begin()
-	defer tx.Rollback()
-
 	if err := u.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
 		return errkit.AddFuncName(err)
 	}
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ID, req.UserId); err != nil {
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, u.DB.WithContext(ctx), contact, req.ID, req.UserId); err != nil {
 		return errkit.AddFuncName(err)
 	}
 
-	if err := u.ContactRepository.Delete(ctx, tx, contact); err != nil {
-		return errkit.AddFuncName(err)
-	}
-
-	if err := tx.Commit().Error; err != nil {
+	if err := u.ContactRepository.Delete(ctx, u.DB.WithContext(ctx), contact); err != nil {
 		return errkit.AddFuncName(err)
 	}
 
