@@ -11,20 +11,17 @@ import (
 var _ AddressProducer = &AddressProducerMwLogger{}
 
 type AddressProducerMwLogger struct {
-	logger *logrus.Logger
-
-	next AddressProducer
+	Next AddressProducer
 }
 
-func NewAddressProducerMwLogger(logger *logrus.Logger, next AddressProducer) *AddressProducerMwLogger {
+func NewAddressProducerMwLogger(next AddressProducer) *AddressProducerMwLogger {
 	return &AddressProducerMwLogger{
-		logger: logger,
-		next:   next,
+		Next: next,
 	}
 }
 
 func (p *AddressProducerMwLogger) Send(ctx context.Context, event *model.AddressEvent) error {
-	err := p.next.Send(ctx, event)
+	err := p.Next.Send(ctx, event)
 
 	fields := logrus.Fields{
 		"event": event,

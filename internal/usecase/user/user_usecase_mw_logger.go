@@ -11,20 +11,17 @@ import (
 var _ UserUsecase = &UserUsecaseMwLogger{}
 
 type UserUsecaseMwLogger struct {
-	logger *logrus.Logger
-
-	next UserUsecase
+	Next UserUsecase
 }
 
-func NewUserUsecaseMwLogger(logger *logrus.Logger, next UserUsecase) *UserUsecaseMwLogger {
+func NewUserUsecaseMwLogger(next UserUsecase) *UserUsecaseMwLogger {
 	return &UserUsecaseMwLogger{
-		logger: logger,
-		next:   next,
+		Next: next,
 	}
 }
 
 func (u *UserUsecaseMwLogger) Create(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error) {
-	res, err := u.next.Create(ctx, req)
+	res, err := u.Next.Create(ctx, req)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -36,7 +33,7 @@ func (u *UserUsecaseMwLogger) Create(ctx context.Context, req *model.RegisterUse
 }
 
 func (u *UserUsecaseMwLogger) Current(ctx context.Context, req *model.GetUserRequest) (*model.UserResponse, error) {
-	res, err := u.next.Current(ctx, req)
+	res, err := u.Next.Current(ctx, req)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -48,7 +45,7 @@ func (u *UserUsecaseMwLogger) Current(ctx context.Context, req *model.GetUserReq
 }
 
 func (u *UserUsecaseMwLogger) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error) {
-	res, err := u.next.Login(ctx, req)
+	res, err := u.Next.Login(ctx, req)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -60,7 +57,7 @@ func (u *UserUsecaseMwLogger) Login(ctx context.Context, req *model.LoginUserReq
 }
 
 func (u *UserUsecaseMwLogger) Logout(ctx context.Context, req *model.LogoutUserRequest) (bool, error) {
-	res, err := u.next.Logout(ctx, req)
+	res, err := u.Next.Logout(ctx, req)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -72,7 +69,7 @@ func (u *UserUsecaseMwLogger) Logout(ctx context.Context, req *model.LogoutUserR
 }
 
 func (u *UserUsecaseMwLogger) Update(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error) {
-	res, err := u.next.Update(ctx, req)
+	res, err := u.Next.Update(ctx, req)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -84,7 +81,7 @@ func (u *UserUsecaseMwLogger) Update(ctx context.Context, req *model.UpdateUserR
 }
 
 func (u *UserUsecaseMwLogger) Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error) {
-	res, err := u.next.Verify(ctx, req)
+	res, err := u.Next.Verify(ctx, req)
 
 	fields := logrus.Fields{
 		"req": req,

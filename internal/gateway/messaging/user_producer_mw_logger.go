@@ -11,20 +11,17 @@ import (
 var _ UserProducer = &UserProducerMwLogger{}
 
 type UserProducerMwLogger struct {
-	logger *logrus.Logger
-
-	next UserProducer
+	Next UserProducer
 }
 
-func NewUserProducerMwLogger(logger *logrus.Logger, next UserProducer) *UserProducerMwLogger {
+func NewUserProducerMwLogger(next UserProducer) *UserProducerMwLogger {
 	return &UserProducerMwLogger{
-		logger: logger,
-		next:   next,
+		Next: next,
 	}
 }
 
 func (p *UserProducerMwLogger) Send(ctx context.Context, event *model.UserEvent) error {
-	err := p.next.Send(ctx, event)
+	err := p.Next.Send(ctx, event)
 
 	fields := logrus.Fields{
 		"event": event,

@@ -11,20 +11,17 @@ import (
 var _ ContactUsecase = &ContactUsecaseMwLogger{}
 
 type ContactUsecaseMwLogger struct {
-	logger *logrus.Logger
-
-	next ContactUsecase
+	Next ContactUsecase
 }
 
-func NewContactUsecaseMwLogger(logger *logrus.Logger, next ContactUsecase) *ContactUsecaseMwLogger {
+func NewContactUsecaseMwLogger(next ContactUsecase) *ContactUsecaseMwLogger {
 	return &ContactUsecaseMwLogger{
-		logger: logger,
-		next:   next,
+		Next: next,
 	}
 }
 
 func (u *ContactUsecaseMwLogger) Create(ctx context.Context, req *model.CreateContactRequest) (*model.ContactResponse, error) {
-	res, err := u.next.Create(ctx, req)
+	res, err := u.Next.Create(ctx, req)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -36,7 +33,7 @@ func (u *ContactUsecaseMwLogger) Create(ctx context.Context, req *model.CreateCo
 }
 
 func (u *ContactUsecaseMwLogger) Delete(ctx context.Context, req *model.DeleteContactRequest) error {
-	err := u.next.Delete(ctx, req)
+	err := u.Next.Delete(ctx, req)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -47,7 +44,7 @@ func (u *ContactUsecaseMwLogger) Delete(ctx context.Context, req *model.DeleteCo
 }
 
 func (u *ContactUsecaseMwLogger) Get(ctx context.Context, req *model.GetContactRequest) (*model.ContactResponse, error) {
-	res, err := u.next.Get(ctx, req)
+	res, err := u.Next.Get(ctx, req)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -59,7 +56,7 @@ func (u *ContactUsecaseMwLogger) Get(ctx context.Context, req *model.GetContactR
 }
 
 func (u *ContactUsecaseMwLogger) Search(ctx context.Context, req *model.SearchContactRequest) ([]model.ContactResponse, int64, error) {
-	res, total, err := u.next.Search(ctx, req)
+	res, total, err := u.Next.Search(ctx, req)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -71,7 +68,7 @@ func (u *ContactUsecaseMwLogger) Search(ctx context.Context, req *model.SearchCo
 }
 
 func (u *ContactUsecaseMwLogger) Update(ctx context.Context, req *model.UpdateContactRequest) (*model.ContactResponse, error) {
-	res, err := u.next.Update(ctx, req)
+	res, err := u.Next.Update(ctx, req)
 
 	fields := logrus.Fields{
 		"req": req,

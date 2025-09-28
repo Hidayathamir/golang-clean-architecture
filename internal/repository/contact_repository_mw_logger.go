@@ -13,20 +13,17 @@ import (
 var _ ContactRepository = &ContactRepositoryMwLogger{}
 
 type ContactRepositoryMwLogger struct {
-	logger *logrus.Logger
-
-	next ContactRepository
+	Next ContactRepository
 }
 
-func NewContactRepositoryMwLogger(logger *logrus.Logger, next ContactRepository) *ContactRepositoryMwLogger {
+func NewContactRepositoryMwLogger(next ContactRepository) *ContactRepositoryMwLogger {
 	return &ContactRepositoryMwLogger{
-		logger: logger,
-		next:   next,
+		Next: next,
 	}
 }
 
 func (r *ContactRepositoryMwLogger) FindByIdAndUserId(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userId string) error {
-	err := r.next.FindByIdAndUserId(ctx, db, contact, id, userId)
+	err := r.Next.FindByIdAndUserId(ctx, db, contact, id, userId)
 
 	fields := logrus.Fields{
 		"contact": contact,
@@ -39,7 +36,7 @@ func (r *ContactRepositoryMwLogger) FindByIdAndUserId(ctx context.Context, db *g
 }
 
 func (r *ContactRepositoryMwLogger) Search(ctx context.Context, db *gorm.DB, req *model.SearchContactRequest) ([]entity.Contact, int64, error) {
-	contacts, total, err := r.next.Search(ctx, db, req)
+	contacts, total, err := r.Next.Search(ctx, db, req)
 
 	fields := logrus.Fields{
 		"req":      req,
@@ -52,7 +49,7 @@ func (r *ContactRepositoryMwLogger) Search(ctx context.Context, db *gorm.DB, req
 }
 
 func (r *ContactRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, entity *entity.Contact) error {
-	err := r.next.Create(ctx, db, entity)
+	err := r.Next.Create(ctx, db, entity)
 
 	fields := logrus.Fields{
 		"entity": entity,
@@ -63,7 +60,7 @@ func (r *ContactRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, ent
 }
 
 func (r *ContactRepositoryMwLogger) Delete(ctx context.Context, db *gorm.DB, entity *entity.Contact) error {
-	err := r.next.Delete(ctx, db, entity)
+	err := r.Next.Delete(ctx, db, entity)
 
 	fields := logrus.Fields{
 		"entity": entity,
@@ -74,7 +71,7 @@ func (r *ContactRepositoryMwLogger) Delete(ctx context.Context, db *gorm.DB, ent
 }
 
 func (r *ContactRepositoryMwLogger) Update(ctx context.Context, db *gorm.DB, entity *entity.Contact) error {
-	err := r.next.Update(ctx, db, entity)
+	err := r.Next.Update(ctx, db, entity)
 
 	fields := logrus.Fields{
 		"entity": entity,

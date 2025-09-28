@@ -12,6 +12,8 @@ import (
 	"gorm.io/gorm"
 )
 
+//go:generate moq -out=../../mock/AddressUsecase.go -pkg=mock . AddressUsecase
+
 type AddressUsecase interface {
 	Create(ctx context.Context, req *model.CreateAddressRequest) (*model.AddressResponse, error)
 	Update(ctx context.Context, req *model.UpdateAddressRequest) (*model.AddressResponse, error)

@@ -10,20 +10,17 @@ import (
 var _ S3Client = &S3ClientMwLogger{}
 
 type S3ClientMwLogger struct {
-	logger *logrus.Logger
-
-	next S3Client
+	Next S3Client
 }
 
-func NewS3ClientMwLogger(logger *logrus.Logger, next S3Client) *S3ClientMwLogger {
+func NewS3ClientMwLogger(next S3Client) *S3ClientMwLogger {
 	return &S3ClientMwLogger{
-		logger: logger,
-		next:   next,
+		Next: next,
 	}
 }
 
 func (c *S3ClientMwLogger) Download(ctx context.Context, bucket, key string) (string, error) {
-	ok, err := c.next.Download(ctx, bucket, key)
+	ok, err := c.Next.Download(ctx, bucket, key)
 
 	fields := logrus.Fields{
 		"bucket": bucket,
@@ -36,7 +33,7 @@ func (c *S3ClientMwLogger) Download(ctx context.Context, bucket, key string) (st
 }
 
 func (c *S3ClientMwLogger) DeleteObject(ctx context.Context, bucket, key string) (bool, error) {
-	ok, err := c.next.DeleteObject(ctx, bucket, key)
+	ok, err := c.Next.DeleteObject(ctx, bucket, key)
 
 	fields := logrus.Fields{
 		"bucket": bucket,

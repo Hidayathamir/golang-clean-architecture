@@ -11,16 +11,13 @@ import (
 )
 
 func (u *AddressUsecaseImpl) Create(ctx context.Context, req *model.CreateAddressRequest) (*model.AddressResponse, error) {
-	tx := u.DB.WithContext(ctx).Begin()
-	defer tx.Rollback()
-
 	if err := u.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ContactId, req.UserId); err != nil {
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, u.DB.WithContext(ctx), contact, req.ContactId, req.UserId); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -34,11 +31,7 @@ func (u *AddressUsecaseImpl) Create(ctx context.Context, req *model.CreateAddres
 		Country:    req.Country,
 	}
 
-	if err := u.AddressRepository.Create(ctx, tx, address); err != nil {
-		return nil, errkit.AddFuncName(err)
-	}
-
-	if err := tx.Commit().Error; err != nil {
+	if err := u.AddressRepository.Create(ctx, u.DB.WithContext(ctx), address); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 

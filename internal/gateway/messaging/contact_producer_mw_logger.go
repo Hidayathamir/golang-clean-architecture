@@ -11,20 +11,17 @@ import (
 var _ ContactProducer = &ContactProducerMwLogger{}
 
 type ContactProducerMwLogger struct {
-	logger *logrus.Logger
-
-	next ContactProducer
+	Next ContactProducer
 }
 
-func NewContactProducerMwLogger(logger *logrus.Logger, next ContactProducer) *ContactProducerMwLogger {
+func NewContactProducerMwLogger(next ContactProducer) *ContactProducerMwLogger {
 	return &ContactProducerMwLogger{
-		logger: logger,
-		next:   next,
+		Next: next,
 	}
 }
 
 func (p *ContactProducerMwLogger) Send(ctx context.Context, event *model.ContactEvent) error {
-	err := p.next.Send(ctx, event)
+	err := p.Next.Send(ctx, event)
 
 	fields := logrus.Fields{
 		"event": event,

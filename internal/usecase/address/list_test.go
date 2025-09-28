@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestAddressUsecaseImpl_Get_Success(t *testing.T) {
+func TestAddressUsecaseImpl_List_Successs(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	AddressRepository := &mock.AddressRepositoryMock{}
 	ContactRepository := &mock.ContactRepositoryMock{}
@@ -24,29 +24,30 @@ func TestAddressUsecaseImpl_Get_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	req := &model.GetAddressRequest{}
+	req := &model.ListAddressRequest{}
 
 	ContactRepository.FindByIdAndUserIdFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userId string) error {
 		return nil
 	}
 
-	AddressRepository.FindByIdAndContactIdFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactId string) error {
-		return nil
+	addresses := []entity.Address{{}}
+	AddressRepository.FindAllByContactIdFunc = func(ctx context.Context, db *gorm.DB, contactId string) ([]entity.Address, error) {
+		return addresses, nil
 	}
 
 	// ------------------------------------------------------- //
 
-	res, err := u.Get(context.Background(), req)
+	res, err := u.List(context.Background(), req)
 
 	// ------------------------------------------------------- //
 
-	expected := &model.AddressResponse{}
+	expected := []model.AddressResponse{{}}
 
 	assert.Equal(t, expected, res)
 	assert.Nil(t, err)
 }
 
-func TestAddressUsecaseImpl_Get_Fail_FindByIdAndUserId(t *testing.T) {
+func TestAddressUsecaseImpl_List_Fail_FindByIdAndUserId(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	AddressRepository := &mock.AddressRepositoryMock{}
 	ContactRepository := &mock.ContactRepositoryMock{}
@@ -58,30 +59,31 @@ func TestAddressUsecaseImpl_Get_Fail_FindByIdAndUserId(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	req := &model.GetAddressRequest{}
+	req := &model.ListAddressRequest{}
 
 	ContactRepository.FindByIdAndUserIdFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userId string) error {
 		return assert.AnError
 	}
 
-	AddressRepository.FindByIdAndContactIdFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactId string) error {
-		return nil
+	var addresses []entity.Address
+	AddressRepository.FindAllByContactIdFunc = func(ctx context.Context, db *gorm.DB, contactId string) ([]entity.Address, error) {
+		return addresses, nil
 	}
 
 	// ------------------------------------------------------- //
 
-	res, err := u.Get(context.Background(), req)
+	res, err := u.List(context.Background(), req)
 
 	// ------------------------------------------------------- //
 
-	var expected *model.AddressResponse
+	var expected []model.AddressResponse
 
 	assert.Equal(t, expected, res)
 	assert.NotNil(t, err)
 	assert.ErrorIs(t, err, assert.AnError)
 }
 
-func TestAddressUsecaseImpl_Get_Fail_FindByIdAndContactId(t *testing.T) {
+func TestAddressUsecaseImpl_List_Fail_FindAllByContactId(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	AddressRepository := &mock.AddressRepositoryMock{}
 	ContactRepository := &mock.ContactRepositoryMock{}
@@ -93,23 +95,23 @@ func TestAddressUsecaseImpl_Get_Fail_FindByIdAndContactId(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	req := &model.GetAddressRequest{}
+	req := &model.ListAddressRequest{}
 
 	ContactRepository.FindByIdAndUserIdFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userId string) error {
 		return nil
 	}
 
-	AddressRepository.FindByIdAndContactIdFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactId string) error {
-		return assert.AnError
+	AddressRepository.FindAllByContactIdFunc = func(ctx context.Context, db *gorm.DB, contactId string) ([]entity.Address, error) {
+		return nil, assert.AnError
 	}
 
 	// ------------------------------------------------------- //
 
-	res, err := u.Get(context.Background(), req)
+	res, err := u.List(context.Background(), req)
 
 	// ------------------------------------------------------- //
 
-	var expected *model.AddressResponse
+	var expected []model.AddressResponse
 
 	assert.Equal(t, expected, res)
 	assert.NotNil(t, err)

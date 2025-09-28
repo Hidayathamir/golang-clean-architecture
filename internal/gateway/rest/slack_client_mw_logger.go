@@ -10,20 +10,17 @@ import (
 var _ SlackClient = &SlackClientMwLogger{}
 
 type SlackClientMwLogger struct {
-	logger *logrus.Logger
-
-	next SlackClient
+	Next SlackClient
 }
 
-func NewSlackClientMwLogger(logger *logrus.Logger, next SlackClient) *SlackClientMwLogger {
+func NewSlackClientMwLogger(next SlackClient) *SlackClientMwLogger {
 	return &SlackClientMwLogger{
-		logger: logger,
-		next:   next,
+		Next: next,
 	}
 }
 
 func (c *SlackClientMwLogger) GetChannelList(ctx context.Context) ([]string, error) {
-	channelList, err := c.next.GetChannelList(ctx)
+	channelList, err := c.Next.GetChannelList(ctx)
 
 	fields := logrus.Fields{
 		"channelList": channelList,
@@ -34,7 +31,7 @@ func (c *SlackClientMwLogger) GetChannelList(ctx context.Context) ([]string, err
 }
 
 func (c *SlackClientMwLogger) IsConnected(ctx context.Context) (bool, error) {
-	isConnect, err := c.next.IsConnected(ctx)
+	isConnect, err := c.Next.IsConnected(ctx)
 
 	fields := logrus.Fields{
 		"isConnect": isConnect,

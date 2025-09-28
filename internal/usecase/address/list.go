@@ -9,20 +9,13 @@ import (
 )
 
 func (u *AddressUsecaseImpl) List(ctx context.Context, req *model.ListAddressRequest) ([]model.AddressResponse, error) {
-	tx := u.DB.WithContext(ctx).Begin()
-	defer tx.Rollback()
-
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ContactId, req.UserId); err != nil {
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, u.DB.WithContext(ctx), contact, req.ContactId, req.UserId); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
-	addresses, err := u.AddressRepository.FindAllByContactId(ctx, tx, contact.ID)
+	addresses, err := u.AddressRepository.FindAllByContactId(ctx, u.DB.WithContext(ctx), contact.ID)
 	if err != nil {
-		return nil, errkit.AddFuncName(err)
-	}
-
-	if err := tx.Commit().Error; err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 

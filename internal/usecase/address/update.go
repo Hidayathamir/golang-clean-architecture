@@ -9,21 +9,18 @@ import (
 )
 
 func (u *AddressUsecaseImpl) Update(ctx context.Context, req *model.UpdateAddressRequest) (*model.AddressResponse, error) {
-	tx := u.DB.WithContext(ctx).Begin()
-	defer tx.Rollback()
-
 	if err := u.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(ctx, tx, contact, req.ContactId, req.UserId); err != nil {
+	if err := u.ContactRepository.FindByIdAndUserId(ctx, u.DB.WithContext(ctx), contact, req.ContactId, req.UserId); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
 	address := new(entity.Address)
-	if err := u.AddressRepository.FindByIdAndContactId(ctx, tx, address, req.ID, contact.ID); err != nil {
+	if err := u.AddressRepository.FindByIdAndContactId(ctx, u.DB.WithContext(ctx), address, req.ID, contact.ID); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
@@ -33,11 +30,7 @@ func (u *AddressUsecaseImpl) Update(ctx context.Context, req *model.UpdateAddres
 	address.PostalCode = req.PostalCode
 	address.Country = req.Country
 
-	if err := u.AddressRepository.Update(ctx, tx, address); err != nil {
-		return nil, errkit.AddFuncName(err)
-	}
-
-	if err := tx.Commit().Error; err != nil {
+	if err := u.AddressRepository.Update(ctx, u.DB.WithContext(ctx), address); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 

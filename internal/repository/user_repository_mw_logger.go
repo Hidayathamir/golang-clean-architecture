@@ -12,20 +12,17 @@ import (
 var _ UserRepository = &UserRepositoryMwLogger{}
 
 type UserRepositoryMwLogger struct {
-	logger *logrus.Logger
-
-	next UserRepository
+	Next UserRepository
 }
 
-func NewUserRepositoryMwLogger(logger *logrus.Logger, next UserRepository) *UserRepositoryMwLogger {
+func NewUserRepositoryMwLogger(next UserRepository) *UserRepositoryMwLogger {
 	return &UserRepositoryMwLogger{
-		logger: logger,
-		next:   next,
+		Next: next,
 	}
 }
 
 func (r *UserRepositoryMwLogger) FindByToken(ctx context.Context, db *gorm.DB, user *entity.User, token string) error {
-	err := r.next.FindByToken(ctx, db, user, token)
+	err := r.Next.FindByToken(ctx, db, user, token)
 
 	fields := logrus.Fields{
 		"user":  user,
@@ -37,7 +34,7 @@ func (r *UserRepositoryMwLogger) FindByToken(ctx context.Context, db *gorm.DB, u
 }
 
 func (r *UserRepositoryMwLogger) CountById(ctx context.Context, db *gorm.DB, id string) (int64, error) {
-	total, err := r.next.CountById(ctx, db, id)
+	total, err := r.Next.CountById(ctx, db, id)
 
 	fields := logrus.Fields{
 		"id":    id,
@@ -49,7 +46,7 @@ func (r *UserRepositoryMwLogger) CountById(ctx context.Context, db *gorm.DB, id 
 }
 
 func (r *UserRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, entity *entity.User) error {
-	err := r.next.Create(ctx, db, entity)
+	err := r.Next.Create(ctx, db, entity)
 
 	fields := logrus.Fields{
 		"entity": entity,
@@ -60,7 +57,7 @@ func (r *UserRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, entity
 }
 
 func (r *UserRepositoryMwLogger) FindById(ctx context.Context, db *gorm.DB, entity *entity.User, id string) error {
-	err := r.next.FindById(ctx, db, entity, id)
+	err := r.Next.FindById(ctx, db, entity, id)
 
 	fields := logrus.Fields{
 		"id":     id,
@@ -72,7 +69,7 @@ func (r *UserRepositoryMwLogger) FindById(ctx context.Context, db *gorm.DB, enti
 }
 
 func (r *UserRepositoryMwLogger) Update(ctx context.Context, db *gorm.DB, entity *entity.User) error {
-	err := r.next.Update(ctx, db, entity)
+	err := r.Next.Update(ctx, db, entity)
 
 	fields := logrus.Fields{
 		"entity": entity,

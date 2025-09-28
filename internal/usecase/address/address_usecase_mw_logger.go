@@ -11,20 +11,17 @@ import (
 var _ AddressUsecase = &AddressUsecaseMwLogger{}
 
 type AddressUsecaseMwLogger struct {
-	logger *logrus.Logger
-
-	next AddressUsecase
+	Next AddressUsecase
 }
 
-func NewAddressUsecaseMwLogger(logger *logrus.Logger, next AddressUsecase) *AddressUsecaseMwLogger {
+func NewAddressUsecaseMwLogger(next AddressUsecase) *AddressUsecaseMwLogger {
 	return &AddressUsecaseMwLogger{
-		logger: logger,
-		next:   next,
+		Next: next,
 	}
 }
 
 func (u *AddressUsecaseMwLogger) Create(ctx context.Context, req *model.CreateAddressRequest) (*model.AddressResponse, error) {
-	res, err := u.next.Create(ctx, req)
+	res, err := u.Next.Create(ctx, req)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -36,7 +33,7 @@ func (u *AddressUsecaseMwLogger) Create(ctx context.Context, req *model.CreateAd
 }
 
 func (u *AddressUsecaseMwLogger) Delete(ctx context.Context, req *model.DeleteAddressRequest) error {
-	err := u.next.Delete(ctx, req)
+	err := u.Next.Delete(ctx, req)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -47,7 +44,7 @@ func (u *AddressUsecaseMwLogger) Delete(ctx context.Context, req *model.DeleteAd
 }
 
 func (u *AddressUsecaseMwLogger) Get(ctx context.Context, req *model.GetAddressRequest) (*model.AddressResponse, error) {
-	res, err := u.next.Get(ctx, req)
+	res, err := u.Next.Get(ctx, req)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -59,7 +56,7 @@ func (u *AddressUsecaseMwLogger) Get(ctx context.Context, req *model.GetAddressR
 }
 
 func (u *AddressUsecaseMwLogger) List(ctx context.Context, req *model.ListAddressRequest) ([]model.AddressResponse, error) {
-	res, err := u.next.List(ctx, req)
+	res, err := u.Next.List(ctx, req)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -71,7 +68,7 @@ func (u *AddressUsecaseMwLogger) List(ctx context.Context, req *model.ListAddres
 }
 
 func (u *AddressUsecaseMwLogger) Update(ctx context.Context, req *model.UpdateAddressRequest) (*model.AddressResponse, error) {
-	res, err := u.next.Update(ctx, req)
+	res, err := u.Next.Update(ctx, req)
 
 	fields := logrus.Fields{
 		"req": req,
