@@ -7,7 +7,10 @@ run-worker:
 	go run cmd/worker/main.go
 
 go-test:
-	go test -v ./test/
+	go test -v ./internal/...
+
+go-integration-test:
+	go test -v ./integrationtest/...
 
 migrate:
 	go run cmd/migrate/main.go
