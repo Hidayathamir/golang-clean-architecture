@@ -12,16 +12,13 @@ import (
 )
 
 func (u *UserUsecaseImpl) Create(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error) {
-	tx := u.DB.WithContext(ctx).Begin()
-	defer tx.Rollback()
-
 	err := u.Validate.Struct(req)
 	if err != nil {
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
 	}
 
-	total, err := u.UserRepository.CountById(ctx, tx, req.ID)
+	total, err := u.UserRepository.CountById(ctx, u.DB.WithContext(ctx), req.ID)
 	if err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
@@ -43,11 +40,7 @@ func (u *UserUsecaseImpl) Create(ctx context.Context, req *model.RegisterUserReq
 		Name:     req.Name,
 	}
 
-	if err := u.UserRepository.Create(ctx, tx, user); err != nil {
-		return nil, errkit.AddFuncName(err)
-	}
-
-	if err := tx.Commit().Error; err != nil {
+	if err := u.UserRepository.Create(ctx, u.DB.WithContext(ctx), user); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 

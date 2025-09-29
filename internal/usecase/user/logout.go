@@ -10,26 +10,19 @@ import (
 )
 
 func (u *UserUsecaseImpl) Logout(ctx context.Context, req *model.LogoutUserRequest) (bool, error) {
-	tx := u.DB.WithContext(ctx).Begin()
-	defer tx.Rollback()
-
 	if err := u.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
 		return false, errkit.AddFuncName(err)
 	}
 
 	user := new(entity.User)
-	if err := u.UserRepository.FindById(ctx, tx, user, req.ID); err != nil {
+	if err := u.UserRepository.FindById(ctx, u.DB.WithContext(ctx), user, req.ID); err != nil {
 		return false, errkit.AddFuncName(err)
 	}
 
 	user.Token = ""
 
-	if err := u.UserRepository.Update(ctx, tx, user); err != nil {
-		return false, errkit.AddFuncName(err)
-	}
-
-	if err := tx.Commit().Error; err != nil {
+	if err := u.UserRepository.Update(ctx, u.DB.WithContext(ctx), user); err != nil {
 		return false, errkit.AddFuncName(err)
 	}
 
