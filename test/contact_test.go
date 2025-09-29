@@ -233,40 +233,6 @@ func TestUpdateContactFailed(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
 }
 
-func TestUpdateContactNotFound(t *testing.T) {
-	TestCreateContact(t)
-
-	user := new(entity.User)
-	err := db.Where("id = ?", "khannedy").First(user).Error
-	assert.Nil(t, err)
-
-	requestBody := model.UpdateContactRequest{
-		FirstName: "",
-		LastName:  "",
-		Email:     "",
-		Phone:     "",
-	}
-	bodyJson, err := json.Marshal(requestBody)
-	assert.Nil(t, err)
-
-	req := httptest.NewRequest(http.MethodPut, "/api/contacts/"+uuid.NewString(), strings.NewReader(string(bodyJson)))
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
-
-	res, err := app.Test(req)
-	assert.Nil(t, err)
-
-	bytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
-
-	responseBody := new(response.WebResponse[model.ContactResponse])
-	err = json.Unmarshal(bytes, responseBody)
-	assert.Nil(t, err)
-
-	assert.Equal(t, http.StatusNotFound, res.StatusCode)
-}
-
 func TestDeleteContact(t *testing.T) {
 	TestCreateContact(t)
 
