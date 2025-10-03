@@ -4,18 +4,21 @@ import (
 	"encoding/json"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/address"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
 )
 
 type AddressConsumer struct {
-	Log *logrus.Logger
+	Usecase address.AddressUsecase
+	Log     *logrus.Logger
 }
 
-func NewAddressConsumer(log *logrus.Logger) *AddressConsumer {
+func NewAddressConsumer(usecase address.AddressUsecase, log *logrus.Logger) *AddressConsumer {
 	return &AddressConsumer{
-		Log: log,
+		Usecase: usecase,
+		Log:     log,
 	}
 }
 

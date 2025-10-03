@@ -1,9 +1,9 @@
 package config
 
 import (
-	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/middleware"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/route"
+	// "github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http"
+	// "github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/middleware"
+	// "github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/route"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/rest"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
@@ -18,40 +18,44 @@ import (
 	"gorm.io/gorm"
 )
 
-type BootstrapConfig struct {
-	DB       *gorm.DB
-	App      *fiber.App
-	Log      *logrus.Logger
-	Validate *validator.Validate
-	Config   *viper.Viper
-	Producer sarama.SyncProducer
+type Usecases struct {
+	UserUsecase    user.UserUsecase
+	ContactUsecase contact.ContactUsecase
+	AddressUsecase address.AddressUsecase
 }
 
-func Bootstrap(config *BootstrapConfig) {
+func SetupUsecases(
+	db *gorm.DB,
+	app *fiber.App,
+	log *logrus.Logger,
+	validate *validator.Validate,
+	viperConfig *viper.Viper,
+	producer sarama.SyncProducer,
+) *Usecases {
 	// setup repositories
 	var userRepository repository.UserRepository
-	userRepository = repository.NewUserRepository(config.Log)
+	userRepository = repository.NewUserRepository(log)
 	userRepository = repository.NewUserRepositoryMwLogger(userRepository)
 
 	var contactRepository repository.ContactRepository
-	contactRepository = repository.NewContactRepository(config.Log)
+	contactRepository = repository.NewContactRepository(log)
 	contactRepository = repository.NewContactRepositoryMwLogger(contactRepository)
 
 	var addressRepository repository.AddressRepository
-	addressRepository = repository.NewAddressRepository(config.Log)
+	addressRepository = repository.NewAddressRepository(log)
 	addressRepository = repository.NewAddressRepositoryMwLogger(addressRepository)
 
 	// setup producer
 	var userProducer messaging.UserProducer
-	userProducer = messaging.NewUserProducer(config.Producer, config.Log)
+	userProducer = messaging.NewUserProducer(producer, log)
 	userProducer = messaging.NewUserProducerMwLogger(userProducer)
 
 	var contactProducer messaging.ContactProducer
-	contactProducer = messaging.NewContactProducer(config.Producer, config.Log)
+	contactProducer = messaging.NewContactProducer(producer, log)
 	contactProducer = messaging.NewContactProducerMwLogger(contactProducer)
 
 	var addressProducer messaging.AddressProducer
-	addressProducer = messaging.NewAddressProducer(config.Producer, config.Log)
+	addressProducer = messaging.NewAddressProducer(producer, log)
 	addressProducer = messaging.NewAddressProducerMwLogger(addressProducer)
 
 	// setup client
@@ -69,34 +73,20 @@ func Bootstrap(config *BootstrapConfig) {
 
 	// setup use cases
 	var userUsecase user.UserUsecase
-	userUsecase = user.NewUserUsecase(config.DB, config.Log, config.Validate, userRepository, userProducer, s3Client, slackClient)
+	userUsecase = user.NewUserUsecase(db, log, validate, userRepository, userProducer, s3Client, slackClient)
 	userUsecase = user.NewUserUsecaseMwLogger(userUsecase)
 
 	var contactUsecase contact.ContactUsecase
-	contactUsecase = contact.NewContactUsecase(config.DB, config.Log, config.Validate, contactRepository, contactProducer, slackClient)
+	contactUsecase = contact.NewContactUsecase(db, log, validate, contactRepository, contactProducer, slackClient)
 	contactUsecase = contact.NewContactUsecaseMwLogger(contactUsecase)
 
 	var addressUsecase address.AddressUsecase
-	addressUsecase = address.NewAddressUsecase(config.DB, config.Log, config.Validate, contactRepository, addressRepository, addressProducer, paymentClient)
+	addressUsecase = address.NewAddressUsecase(db, log, validate, contactRepository, addressRepository, addressProducer, paymentClient)
 	addressUsecase = address.NewAddressUsecaseMwLogger(addressUsecase)
 
-	// setup controller
-	userController := http.NewUserController(userUsecase, config.Log)
-	contactController := http.NewContactController(contactUsecase, config.Log)
-	addressController := http.NewAddressController(addressUsecase, config.Log)
-
-	// setup middleware
-	authMiddleware := middleware.NewAuth(userUsecase)
-	traceIDMiddleware := middleware.NewTraceID()
-
-	routeConfig := route.RouteConfig{
-		App:               config.App,
-		UserController:    userController,
-		ContactController: contactController,
-		AddressController: addressController,
-		AuthMiddleware:    authMiddleware,
-		TraceIDMiddleware: traceIDMiddleware,
+	return &Usecases{
+		UserUsecase:    userUsecase,
+		ContactUsecase: contactUsecase,
+		AddressUsecase: addressUsecase,
 	}
-
-	routeConfig.Setup()
 }

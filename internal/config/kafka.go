@@ -30,8 +30,8 @@ func NewKafkaConsumerGroup(config *viper.Viper, log *logrus.Logger) sarama.Consu
 	return consumerGroup
 }
 
-func NewKafkaProducer(config *viper.Viper, log *logrus.Logger) sarama.SyncProducer {
-	if !config.GetBool(configkey.KafkaProducerEnabled) {
+func NewKafkaProducer(viperConfig *viper.Viper, log *logrus.Logger) sarama.SyncProducer {
+	if !viperConfig.GetBool(configkey.KafkaProducerEnabled) {
 		log.Info("Kafka producer is disabled")
 		return nil
 	}
@@ -41,7 +41,7 @@ func NewKafkaProducer(config *viper.Viper, log *logrus.Logger) sarama.SyncProduc
 	saramaConfig.Producer.RequiredAcks = sarama.WaitForAll
 	saramaConfig.Producer.Retry.Max = 3
 
-	brokers := strings.Split(config.GetString(configkey.KafkaBootstrapServers), ",")
+	brokers := strings.Split(viperConfig.GetString(configkey.KafkaBootstrapServers), ",")
 
 	producer, err := sarama.NewSyncProducer(brokers, saramaConfig)
 	if err != nil {

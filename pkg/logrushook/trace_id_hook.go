@@ -5,6 +5,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+var _ logrus.Hook = &TraceID{}
+
 type TraceID struct{}
 
 func NewTraceID() *TraceID {

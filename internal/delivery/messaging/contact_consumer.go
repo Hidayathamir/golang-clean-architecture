@@ -4,18 +4,21 @@ import (
 	"encoding/json"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/contact"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
 )
 
 type ContactConsumer struct {
-	Log *logrus.Logger
+	Usecase contact.ContactUsecase
+	Log     *logrus.Logger
 }
 
-func NewContactConsumer(log *logrus.Logger) *ContactConsumer {
+func NewContactConsumer(usecase contact.ContactUsecase, log *logrus.Logger) *ContactConsumer {
 	return &ContactConsumer{
-		Log: log,
+		Usecase: usecase,
+		Log:     log,
 	}
 }
 

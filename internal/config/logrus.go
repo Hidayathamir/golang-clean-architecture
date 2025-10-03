@@ -8,10 +8,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-func NewLogger(viper *viper.Viper) *logrus.Logger {
+func NewLogger(viperConfig *viper.Viper) *logrus.Logger {
 	log := logrus.New()
 
-	log.SetLevel(logrus.Level(viper.GetInt32(configkey.LogLevel)))
+	log.SetLevel(logrus.Level(viperConfig.GetInt32(configkey.LogLevel)))
 	log.SetFormatter(&logrus.JSONFormatter{})
 
 	log.AddHook(logrushook.NewTraceID())

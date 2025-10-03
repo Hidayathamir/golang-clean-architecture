@@ -4,6 +4,9 @@ import (
 	"fmt"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/middleware"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/route"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 )
 
@@ -25,18 +28,27 @@ func main() {
 	app := config.NewFiber(viperConfig)
 	producer := config.NewKafkaProducer(viperConfig, log)
 
-	config.Bootstrap(&config.BootstrapConfig{
-		DB:       db,
-		App:      app,
-		Log:      log,
-		Validate: validate,
-		Config:   viperConfig,
-		Producer: producer,
-	})
+	usecases := config.SetupUsecases(db, app, log, validate, viperConfig, producer)
 
-	webPort := viperConfig.GetInt(configkey.WebPort)
-	fmt.Printf("Go to swagger http://localhost:%d/swagger\n", webPort)
-	err := app.Listen(fmt.Sprintf(":%d", webPort))
+	userController := http.NewUserController(usecases.UserUsecase, log)
+	contactController := http.NewContactController(usecases.ContactUsecase, log)
+	addressController := http.NewAddressController(usecases.AddressUsecase, log)
+
+	authMiddleware := middleware.NewAuth(usecases.UserUsecase)
+	traceIDMiddleware := middleware.NewTraceID()
+
+	route.Setup(
+		app,
+		userController,
+		contactController,
+		addressController,
+		authMiddleware,
+		traceIDMiddleware,
+	)
+
+	webPort := viperConfig.GetString(configkey.WebPort)
+	fmt.Printf("Go to swagger http://localhost:%s/swagger\n", webPort)
+	err := app.Listen(":" + webPort)
 	if err != nil {
 		log.Panicf("Failed to start server: %v", err)
 	}

@@ -7,11 +7,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-func NewFiber(config *viper.Viper) *fiber.App {
+func NewFiber(viperConfig *viper.Viper) *fiber.App {
 	var app = fiber.New(fiber.Config{
-		AppName:      config.GetString(configkey.AppName),
+		AppName:      viperConfig.GetString(configkey.AppName),
 		ErrorHandler: response.Error,
-		Prefork:      config.GetBool(configkey.WebPrefork),
+		Prefork:      viperConfig.GetBool(configkey.WebPrefork),
 	})
 
 	return app

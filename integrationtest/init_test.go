@@ -7,6 +7,9 @@ import (
 	"testing"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/middleware"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/route"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/go-playground/validator/v10"
 	gosqldrivermysql "github.com/go-sql-driver/mysql"
@@ -45,14 +48,23 @@ func TestMain(m *testing.M) {
 	kafkaContainer := newKafkaContainer(viperConfig)
 	producer := config.NewKafkaProducer(viperConfig, log)
 
-	config.Bootstrap(&config.BootstrapConfig{
-		DB:       db,
-		App:      app,
-		Log:      log,
-		Validate: validate,
-		Config:   viperConfig,
-		Producer: producer,
-	})
+	usecases := config.SetupUsecases(db, app, log, validate, viperConfig, producer)
+
+	userController := http.NewUserController(usecases.UserUsecase, log)
+	contactController := http.NewContactController(usecases.ContactUsecase, log)
+	addressController := http.NewAddressController(usecases.AddressUsecase, log)
+
+	authMiddleware := middleware.NewAuth(usecases.UserUsecase)
+	traceIDMiddleware := middleware.NewTraceID()
+
+	route.Setup(
+		app,
+		userController,
+		contactController,
+		addressController,
+		authMiddleware,
+		traceIDMiddleware,
+	)
 
 	code := m.Run()
 
