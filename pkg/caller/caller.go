@@ -1,21 +1,22 @@
 package caller
 
 import (
+	"fmt"
 	"runtime"
 	"strings"
 )
 
-type OptFuncName struct {
+type Opt struct {
 	Skip int
 }
 
-type OptionFuncName func(*OptFuncName)
+type Option func(*Opt)
 
 const defaultSkip = 1
 
 // FuncName will return caller function name. Use WithSkip to skip frame.
-func FuncName(options ...OptionFuncName) string {
-	option := &OptFuncName{Skip: defaultSkip}
+func FuncName(options ...Option) string {
+	option := &Opt{Skip: defaultSkip}
 	for _, opt := range options {
 		opt(option)
 	}
@@ -37,8 +38,23 @@ func FuncName(options ...OptionFuncName) string {
 	return funcName
 }
 
-func WithSkip(skip int) OptionFuncName {
-	return func(o *OptFuncName) {
+// FileLine return caller "file.go:123". Use WithSkip to skip frame.
+func FileLine(options ...Option) string {
+	option := &Opt{Skip: defaultSkip}
+	for _, opt := range options {
+		opt(option)
+	}
+
+	_, file, line, ok := runtime.Caller(option.Skip)
+	if !ok {
+		return "?"
+	}
+
+	return fmt.Sprintf("%s:%d", file, line)
+}
+
+func WithSkip(skip int) Option {
+	return func(o *Opt) {
 		o.Skip = skip + defaultSkip
 	}
 }

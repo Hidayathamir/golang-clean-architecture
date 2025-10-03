@@ -18,6 +18,7 @@ func Log(ctx context.Context, fields logrus.Fields, err error) {
 	logger.WithContext(ctx).WithFields(logrus.Fields{
 		"fields": limitJSON(fields),
 		"err":    errMsg,
+		"source": caller.FileLine(caller.WithSkip(1)),
 	}).Log(level, caller.FuncName(caller.WithSkip(1)))
 }
 
