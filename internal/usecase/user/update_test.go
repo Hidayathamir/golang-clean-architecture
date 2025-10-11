@@ -50,7 +50,7 @@ func TestUserUsecaseImpl_Update_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected *model.UserResponse = &model.UserResponse{Name: "name1"}
+	var expected = &model.UserResponse{Name: "name1"}
 
 	assert.Equal(t, expected, res)
 	assert.Nil(t, err)

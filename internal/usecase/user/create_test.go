@@ -50,7 +50,7 @@ func TestUserUsecaseImpl_Create_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected *model.UserResponse = &model.UserResponse{
+	var expected = &model.UserResponse{
 		ID:        "id1",
 		Name:      "name1",
 		Token:     "",

@@ -17,24 +17,24 @@ type ListAddressRequest struct {
 }
 
 type CreateAddressRequest struct {
-	UserId     string `json:"-" validate:"required"`
-	ContactId  string `json:"-" validate:"required,max=100,uuid"`
-	Street     string `json:"street" validate:"max=255"`
-	City       string `json:"city" validate:"max=255"`
-	Province   string `json:"province" validate:"max=255"`
+	UserId     string `json:"-"           validate:"required"`
+	ContactId  string `json:"-"           validate:"required,max=100,uuid"`
+	Street     string `json:"street"      validate:"max=255"`
+	City       string `json:"city"        validate:"max=255"`
+	Province   string `json:"province"    validate:"max=255"`
 	PostalCode string `json:"postal_code" validate:"max=10"`
-	Country    string `json:"country" validate:"max=100"`
+	Country    string `json:"country"     validate:"max=100"`
 }
 
 type UpdateAddressRequest struct {
-	UserId     string `json:"-" validate:"required"`
-	ContactId  string `json:"-" validate:"required,max=100,uuid"`
-	ID         string `json:"-" validate:"required,max=100,uuid"`
-	Street     string `json:"street" validate:"max=255"`
-	City       string `json:"city" validate:"max=255"`
-	Province   string `json:"province" validate:"max=255"`
+	UserId     string `json:"-"           validate:"required"`
+	ContactId  string `json:"-"           validate:"required,max=100,uuid"`
+	ID         string `json:"-"           validate:"required,max=100,uuid"`
+	Street     string `json:"street"      validate:"max=255"`
+	City       string `json:"city"        validate:"max=255"`
+	Province   string `json:"province"    validate:"max=255"`
 	PostalCode string `json:"postal_code" validate:"max=10"`
-	Country    string `json:"country" validate:"max=100"`
+	Country    string `json:"country"     validate:"max=100"`
 }
 
 type GetAddressRequest struct {

@@ -61,7 +61,7 @@ func TestUserUsecaseImpl_Login_Success(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	res.Token = ""
-	var expected *model.UserResponse = &model.UserResponse{}
+	var expected = &model.UserResponse{}
 
 	assert.Equal(t, expected, res)
 	assert.Nil(t, err)

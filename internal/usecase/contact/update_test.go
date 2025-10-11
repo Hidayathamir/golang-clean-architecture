@@ -58,7 +58,7 @@ func TestContactUsecaseImpl_Update_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected *model.ContactResponse = &model.ContactResponse{
+	var expected = &model.ContactResponse{
 		ID:        "",
 		FirstName: "firstname1",
 		LastName:  "",

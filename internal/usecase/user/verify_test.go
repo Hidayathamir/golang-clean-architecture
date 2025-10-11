@@ -38,7 +38,7 @@ func TestUserUsecaseImpl_Verify_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected *model.Auth = &model.Auth{}
+	var expected = &model.Auth{}
 
 	assert.Equal(t, expected, res)
 	assert.Nil(t, err)

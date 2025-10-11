@@ -11,14 +11,13 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"gorm.io/gorm"
 )
 
 func TestNewUserUsecase(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
-	var DB *gorm.DB = gormDB
-	var Log *logrus.Logger = logrus.New()
-	var Validate *validator.Validate = validator.New()
+	var DB = gormDB
+	var Log = logrus.New()
+	var Validate = validator.New()
 
 	var UserRepository repository.UserRepository = &mock.UserRepositoryMock{}
 

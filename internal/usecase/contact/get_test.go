@@ -40,7 +40,7 @@ func TestContactUsecaseImpl_Get_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected *model.ContactResponse = &model.ContactResponse{}
+	var expected = &model.ContactResponse{}
 
 	assert.Equal(t, expected, res)
 	assert.Nil(t, err)

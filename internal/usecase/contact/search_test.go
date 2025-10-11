@@ -40,7 +40,7 @@ func TestContactUsecaseImpl_Search_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected []model.ContactResponse = []model.ContactResponse{{}}
+	var expected = []model.ContactResponse{{}}
 
 	assert.Equal(t, expected, res)
 	assert.Equal(t, int64(12), total)

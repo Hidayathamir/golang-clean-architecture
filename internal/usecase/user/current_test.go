@@ -38,7 +38,7 @@ func TestUserUsecaseImpl_Current_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected *model.UserResponse = &model.UserResponse{}
+	var expected = &model.UserResponse{}
 
 	assert.Equal(t, expected, res)
 	assert.Nil(t, err)

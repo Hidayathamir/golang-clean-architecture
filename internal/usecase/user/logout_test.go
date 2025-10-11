@@ -54,7 +54,7 @@ func TestUserUsecaseImpl_Logout_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected bool = true
+	var expected = true
 
 	assert.Equal(t, expected, res)
 	assert.Nil(t, err)

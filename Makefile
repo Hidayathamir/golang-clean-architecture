@@ -12,20 +12,36 @@ go-test:
 go-integration-test:
 	go test -v ./integrationtest/...
 
+#################################### 
+
 migrate:
 	go run cmd/migrate/main.go
 
 migrate-new:
 	echo "please run: migrate create -ext sql -dir db/migrations create_table_xxx"
 
+#################################### 
+
+docker-compose:
+	docker compose down && docker compose up
+
+#################################### 
+
+run-clean:
+	$(MAKE) errkitcli
+	$(MAKE) format
+	$(MAKE) swag
+	$(MAKE) generate
+	$(MAKE) run
+
+format:
+	golangci-lint run ./... --fix
+
 generate:
 	go generate ./internal/...
 
 swag:
 	swag fmt --exclude ./internal/mock && swag init --parseDependency --parseInternal --generalInfo ./cmd/web/main.go --output ./api/
-
-docker-compose:
-	docker compose down && docker compose up
 
 errkitcli:
 	go run pkg/errkit/errkitcli/main.go
@@ -51,6 +67,11 @@ check-tools:
 		echo "✔ swag installed"; \
 	else \
 		echo "❌ swag not found. Install: https://github.com/swaggo/swag"; \
+	fi
+	@if command -v golangci-lint >/dev/null 2>&1; then \
+		echo "✔ golangci-lint installed"; \
+	else \
+		echo "❌ golangci-lint not found. Install: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest"; \
 	fi
 	@echo "✅ Done checking tools."
 
