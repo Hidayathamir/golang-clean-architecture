@@ -40,13 +40,13 @@ func (c *ContactController) Create(ctx *fiber.Ctx) error {
 	req := new(model.CreateContactRequest)
 	if err := ctx.BodyParser(req); err != nil {
 		err = errkit.BadRequest(err)
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("http.(*ContactController).Create", err)
 	}
 	req.UserId = auth.ID
 
 	res, err := c.Usecase.Create(ctx.UserContext(), req)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("http.(*ContactController).Create", err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -79,7 +79,7 @@ func (c *ContactController) List(ctx *fiber.Ctx) error {
 
 	res, total, err := c.Usecase.Search(ctx.UserContext(), req)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("http.(*ContactController).List", err)
 	}
 
 	paging := &response.PageMetadata{
@@ -111,7 +111,7 @@ func (c *ContactController) Get(ctx *fiber.Ctx) error {
 
 	res, err := c.Usecase.Get(ctx.UserContext(), req)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("http.(*ContactController).Get", err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -133,7 +133,7 @@ func (c *ContactController) Update(ctx *fiber.Ctx) error {
 	req := new(model.UpdateContactRequest)
 	if err := ctx.BodyParser(req); err != nil {
 		err = errkit.BadRequest(err)
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("http.(*ContactController).Update", err)
 	}
 
 	req.UserId = auth.ID
@@ -141,7 +141,7 @@ func (c *ContactController) Update(ctx *fiber.Ctx) error {
 
 	res, err := c.Usecase.Update(ctx.UserContext(), req)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("http.(*ContactController).Update", err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -166,7 +166,7 @@ func (c *ContactController) Delete(ctx *fiber.Ctx) error {
 	}
 
 	if err := c.Usecase.Delete(ctx.UserContext(), req); err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("http.(*ContactController).Delete", err)
 	}
 
 	return response.Data(ctx, http.StatusOK, true)

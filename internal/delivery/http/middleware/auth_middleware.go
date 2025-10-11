@@ -14,7 +14,7 @@ func NewAuth(userUserCase user.UserUsecase) fiber.Handler {
 		auth, err := userUserCase.Verify(ctx.UserContext(), request)
 		if err != nil {
 			err = errkit.Unauthorized(err)
-			return errkit.AddFuncName(err)
+			return errkit.AddFuncName("middleware.NewAuth", err)
 		}
 
 		ctx.Locals("auth", auth)

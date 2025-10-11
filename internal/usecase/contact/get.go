@@ -12,12 +12,12 @@ import (
 func (u *ContactUsecaseImpl) Get(ctx context.Context, req *model.GetContactRequest) (*model.ContactResponse, error) {
 	if err := u.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
-		return nil, errkit.AddFuncName(err)
+		return nil, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Get", err)
 	}
 
 	contact := new(entity.Contact)
 	if err := u.ContactRepository.FindByIdAndUserId(ctx, u.DB.WithContext(ctx), contact, req.ID, req.UserId); err != nil {
-		return nil, errkit.AddFuncName(err)
+		return nil, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Get", err)
 	}
 
 	return converter.ContactToResponse(contact), nil

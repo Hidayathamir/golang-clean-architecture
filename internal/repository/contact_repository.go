@@ -36,7 +36,7 @@ func (r *ContactRepositoryImpl) FindByIdAndUserId(ctx context.Context, db *gorm.
 	err := db.Where("id = ? AND user_id = ?", id, userId).Take(contact).Error
 	if err != nil {
 		err = errkit.NotFound(err)
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("repository.(*ContactRepositoryImpl).FindByIdAndUserId", err)
 	}
 	return nil
 }
@@ -44,12 +44,12 @@ func (r *ContactRepositoryImpl) FindByIdAndUserId(ctx context.Context, db *gorm.
 func (r *ContactRepositoryImpl) Search(ctx context.Context, db *gorm.DB, req *model.SearchContactRequest) ([]entity.Contact, int64, error) {
 	var contacts []entity.Contact
 	if err := db.Scopes(r.filterContact(req)).Offset((req.Page - 1) * req.Size).Limit(req.Size).Find(&contacts).Error; err != nil {
-		return nil, 0, errkit.AddFuncName(err)
+		return nil, 0, errkit.AddFuncName("repository.(*ContactRepositoryImpl).Search", err)
 	}
 
 	var total int64 = 0
 	if err := db.Model(&entity.Contact{}).Scopes(r.filterContact(req)).Count(&total).Error; err != nil {
-		return nil, 0, errkit.AddFuncName(err)
+		return nil, 0, errkit.AddFuncName("repository.(*ContactRepositoryImpl).Search", err)
 	}
 
 	return contacts, total, nil
@@ -81,7 +81,7 @@ func (r *ContactRepositoryImpl) filterContact(req *model.SearchContactRequest) f
 func (r *ContactRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity *entity.Contact) error {
 	err := db.Create(entity).Error
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("repository.(*ContactRepositoryImpl).Create", err)
 	}
 	return nil
 }
@@ -89,7 +89,7 @@ func (r *ContactRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity 
 func (r *ContactRepositoryImpl) Update(ctx context.Context, db *gorm.DB, entity *entity.Contact) error {
 	err := db.Save(entity).Error
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("repository.(*ContactRepositoryImpl).Update", err)
 	}
 	return nil
 }
@@ -97,7 +97,7 @@ func (r *ContactRepositoryImpl) Update(ctx context.Context, db *gorm.DB, entity 
 func (r *ContactRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, entity *entity.Contact) error {
 	err := db.Delete(entity).Error
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("repository.(*ContactRepositoryImpl).Delete", err)
 	}
 	return nil
 }

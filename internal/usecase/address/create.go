@@ -13,12 +13,12 @@ import (
 func (u *AddressUsecaseImpl) Create(ctx context.Context, req *model.CreateAddressRequest) (*model.AddressResponse, error) {
 	if err := u.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
-		return nil, errkit.AddFuncName(err)
+		return nil, errkit.AddFuncName("address.(*AddressUsecaseImpl).Create", err)
 	}
 
 	contact := new(entity.Contact)
 	if err := u.ContactRepository.FindByIdAndUserId(ctx, u.DB.WithContext(ctx), contact, req.ContactId, req.UserId); err != nil {
-		return nil, errkit.AddFuncName(err)
+		return nil, errkit.AddFuncName("address.(*AddressUsecaseImpl).Create", err)
 	}
 
 	address := &entity.Address{
@@ -32,12 +32,12 @@ func (u *AddressUsecaseImpl) Create(ctx context.Context, req *model.CreateAddres
 	}
 
 	if err := u.AddressRepository.Create(ctx, u.DB.WithContext(ctx), address); err != nil {
-		return nil, errkit.AddFuncName(err)
+		return nil, errkit.AddFuncName("address.(*AddressUsecaseImpl).Create", err)
 	}
 
 	event := converter.AddressToEvent(address)
 	if err := u.AddressProducer.Send(ctx, event); err != nil {
-		return nil, errkit.AddFuncName(err)
+		return nil, errkit.AddFuncName("address.(*AddressUsecaseImpl).Create", err)
 	}
 
 	return converter.AddressToResponse(address), nil

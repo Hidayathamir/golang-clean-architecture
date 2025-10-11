@@ -40,7 +40,7 @@ func (p *UserProducerImpl) Send(ctx context.Context, event *model.UserEvent) err
 
 	value, err := json.Marshal(event)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("messaging.(*UserProducerImpl).Send", err)
 	}
 
 	message := &sarama.ProducerMessage{
@@ -51,7 +51,7 @@ func (p *UserProducerImpl) Send(ctx context.Context, event *model.UserEvent) err
 
 	partition, offset, err := p.Producer.SendMessage(message)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("messaging.(*UserProducerImpl).Send", err)
 	}
 
 	p.Log.Debugf("Message sent to topic %s, partition %d, offset %d", p.Topic, partition, offset)

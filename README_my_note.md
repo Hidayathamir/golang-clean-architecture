@@ -5,14 +5,14 @@ This project is fork from https://github.com/khannedy/golang-clean-architecture 
 1. Better delivery return handling. See [return response.Data(ctx, http.StatusOK, res)](internal/delivery/http/address_controller.go).
 2. Better logging using middleware. See [usecase](internal/usecase/address/create.go) clean, logging in [usecase middleware log](internal/usecase/address/address_usecase_mw_logger.go).
 3. Better error handling. See [errkit.BadRequest(err)](internal/usecase/address/create.go) will handled in [response.Error](internal/config/fiber.go).
-4. Better error handling 2. See [errkit.AddFuncName](internal/usecase/address/create.go). Example response json:
+4. Better error handling 2. See [errkit.AddFuncName](internal/usecase/address/create.go). String func name is auto generate with command `make errkitcli`. Example response json:
 ```json
 {
   "data": null,
   "error_message": "conflict",
   "error_detail": [
     "http.(*UserController).Register",
-    "usecase.(*UserUsecaseImpl).Create",
+    "user.(*UserUsecaseImpl).Create",
     "[409] conflict",
     "user already exists"
   ]
@@ -22,7 +22,7 @@ This project is fork from https://github.com/khannedy/golang-clean-architecture 
 6. Better searching log with trace id. Example log:
 ```json
 {
-    "err": "usecase.(*UserUsecaseImpl).Create:: [409] conflict:: user already exists",
+    "err": "user.(*UserUsecaseImpl).Create:: [409] conflict:: user already exists",
     "fields": {
         "req": {
             "id": "joko",
@@ -33,8 +33,9 @@ This project is fork from https://github.com/khannedy/golang-clean-architecture 
     },
     "level": "error",
     "msg": "user.(*UserUsecaseMwLogger).Create",
-    "time": "2025-09-21T18:20:59+07:00",
-    "trace_id": "62dff97d-f0b5-4d88-89e6-3f78bed04c4e"
+    "source": "/home/hidayat/data-d/myrepo/golang-clean-architecture/internal/usecase/user/user_usecase_mw_logger.go:30",
+    "time": "2025-10-11T08:06:12+07:00",
+    "trace_id": "080eb9d7-a5db-44e8-8493-0ae302f612d9"
 }
 ```
 7. Swagger auto generated. See [example](internal/delivery/http/address_controller.go). See http://localhost:3000/swagger

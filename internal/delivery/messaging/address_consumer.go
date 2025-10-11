@@ -26,7 +26,7 @@ func (c AddressConsumer) Consume(message *sarama.ConsumerMessage) error {
 	addressEvent := new(model.AddressEvent)
 	if err := json.Unmarshal(message.Value, addressEvent); err != nil {
 		c.Log.WithError(err).Error("error unmarshalling address event")
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("messaging.AddressConsumer.Consume", err)
 	}
 
 	// TODO process event

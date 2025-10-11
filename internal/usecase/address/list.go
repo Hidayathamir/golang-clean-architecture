@@ -12,12 +12,12 @@ import (
 func (u *AddressUsecaseImpl) List(ctx context.Context, req *model.ListAddressRequest) ([]model.AddressResponse, error) {
 	contact := new(entity.Contact)
 	if err := u.ContactRepository.FindByIdAndUserId(ctx, u.DB.WithContext(ctx), contact, req.ContactId, req.UserId); err != nil {
-		return nil, errkit.AddFuncName(err)
+		return nil, errkit.AddFuncName("address.(*AddressUsecaseImpl).List", err)
 	}
 
 	addresses, err := u.AddressRepository.FindAllByContactId(ctx, u.DB.WithContext(ctx), contact.ID)
 	if err != nil {
-		return nil, errkit.AddFuncName(err)
+		return nil, errkit.AddFuncName("address.(*AddressUsecaseImpl).List", err)
 	}
 
 	res := make([]model.AddressResponse, len(addresses))

@@ -40,7 +40,7 @@ func (p *AddressProducerImpl) Send(ctx context.Context, event *model.AddressEven
 
 	value, err := json.Marshal(event)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("messaging.(*AddressProducerImpl).Send", err)
 	}
 
 	message := &sarama.ProducerMessage{
@@ -51,7 +51,7 @@ func (p *AddressProducerImpl) Send(ctx context.Context, event *model.AddressEven
 
 	partition, offset, err := p.Producer.SendMessage(message)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("messaging.(*AddressProducerImpl).Send", err)
 	}
 
 	p.Log.Debugf("Message sent to topic %s, partition %d, offset %d", p.Topic, partition, offset)

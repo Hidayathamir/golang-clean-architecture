@@ -35,7 +35,7 @@ func (r *UserRepositoryImpl) FindByToken(ctx context.Context, db *gorm.DB, user 
 	err := db.Where("token = ?", token).First(user).Error
 	if err != nil {
 		err = errkit.NotFound(err)
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("repository.(*UserRepositoryImpl).FindByToken", err)
 	}
 	return nil
 }
@@ -43,7 +43,7 @@ func (r *UserRepositoryImpl) FindByToken(ctx context.Context, db *gorm.DB, user 
 func (r *UserRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity *entity.User) error {
 	err := db.Create(entity).Error
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("repository.(*UserRepositoryImpl).Create", err)
 	}
 	return nil
 }
@@ -51,7 +51,7 @@ func (r *UserRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity *en
 func (r *UserRepositoryImpl) Update(ctx context.Context, db *gorm.DB, entity *entity.User) error {
 	err := db.Save(entity).Error
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("repository.(*UserRepositoryImpl).Update", err)
 	}
 	return nil
 }
@@ -59,7 +59,7 @@ func (r *UserRepositoryImpl) Update(ctx context.Context, db *gorm.DB, entity *en
 func (r *UserRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, entity *entity.User) error {
 	err := db.Delete(entity).Error
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("repository.(*UserRepositoryImpl).Delete", err)
 	}
 	return nil
 }
@@ -68,7 +68,7 @@ func (r *UserRepositoryImpl) CountById(ctx context.Context, db *gorm.DB, id stri
 	var total int64
 	err := db.Model(new(entity.User)).Where("id = ?", id).Count(&total).Error
 	if err != nil {
-		return 0, errkit.AddFuncName(err)
+		return 0, errkit.AddFuncName("repository.(*UserRepositoryImpl).CountById", err)
 	}
 	return total, nil
 }
@@ -77,7 +77,7 @@ func (r *UserRepositoryImpl) FindById(ctx context.Context, db *gorm.DB, entity *
 	err := db.Where("id = ?", id).Take(entity).Error
 	if err != nil {
 		err = errkit.NotFound(err)
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName("repository.(*UserRepositoryImpl).FindById", err)
 	}
 	return nil
 }

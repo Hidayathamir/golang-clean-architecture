@@ -27,6 +27,9 @@ swag:
 docker-compose:
 	docker compose down && docker compose up
 
+errkitcli:
+	go run pkg/errkit/errkitcli/main.go
+
 check-tools:
 	@echo "🔍 Checking required tools..."
 	@if command -v go >/dev/null 2>&1; then \
