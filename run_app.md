@@ -8,7 +8,7 @@ I recommend run with docker for testing.
 make docker-compose
 ```
 
-This will run docker compose that will run mysql & kafka. Go to http://localhost:8080/ to see kafka.
+This will run docker compose that will run PostgreSQL & Kafka. Go to http://localhost:8080/ to see Kafka.
 
 2. Keep docker container running. From another terminal, run migration and run application.
 

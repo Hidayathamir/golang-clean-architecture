@@ -2,8 +2,8 @@ package integrationtest
 
 import (
 	"context"
-	"net"
 	"os"
+	"strconv"
 	"testing"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
@@ -12,13 +12,12 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/route"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/go-playground/validator/v10"
-	gosqldrivermysql "github.com/go-sql-driver/mysql"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/kafka"
-	"github.com/testcontainers/testcontainers-go/modules/mysql"
+	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"gorm.io/gorm"
 )
 
@@ -34,14 +33,14 @@ var validate *validator.Validate
 
 // TestMain is the entry point for all tests in this package.
 // It sets up global dependencies (logger, validator, Fiber app, DB, Kafka producer),
-// starts a MySQL container, runs database migrations, bootstraps the application,
+// starts a PostgreSQL container, runs database migrations, bootstraps the application,
 // executes test, and finally terminates the container before exiting.
 func TestMain(m *testing.M) {
 	viperConfig = config.NewViper()
 	log = config.NewLogger(viperConfig)
 	validate = config.NewValidator(viperConfig)
 	app = config.NewFiber(viperConfig)
-	mysqlContainer := newMysqlContainer(viperConfig)
+	postgresContainer := newPostgresContainer(viperConfig)
 	viperConfig.Set(configkey.DatabaseMigrations, "../db/migrations")
 	config.Migrate(viperConfig, log)
 	db = config.NewDatabase(viperConfig, log)
@@ -68,7 +67,7 @@ func TestMain(m *testing.M) {
 
 	code := m.Run()
 
-	panicIfErr(testcontainers.TerminateContainer(mysqlContainer))
+	panicIfErr(testcontainers.TerminateContainer(postgresContainer))
 	panicIfErr(testcontainers.TerminateContainer(kafkaContainer))
 
 	os.Exit(code)
@@ -80,35 +79,37 @@ func panicIfErr(err error) {
 	}
 }
 
-func newMysqlContainer(viperConfig *viper.Viper) (mysqlContainer *mysql.MySQLContainer) {
+func newPostgresContainer(viperConfig *viper.Viper) (postgresContainer *postgres.PostgresContainer) {
 	database := viperConfig.GetString(configkey.DatabaseName)
 	username := viperConfig.GetString(configkey.DatabaseUsername)
 	password := viperConfig.GetString(configkey.DatabasePassword)
 
 	var err error
-	mysqlContainer, err = mysql.Run(context.Background(),
-		"mysql:8.0.36",
-		mysql.WithDatabase(database),
-		mysql.WithUsername(username),
-		mysql.WithPassword(password),
+	postgresContainer, err = postgres.Run(context.Background(),
+		"postgres:15",
+		postgres.WithDatabase(database),
+		postgres.WithUsername(username),
+		postgres.WithPassword(password),
+		postgres.BasicWaitStrategies(),
 	)
 	panicIfErr(err)
-	state, err := mysqlContainer.State(context.Background())
+	state, err := postgresContainer.State(context.Background())
 	panicIfErr(err)
 	if !state.Running {
-		panic("mysql container not running")
+		panic("postgres container not running")
 	}
 
-	dbURL, err := mysqlContainer.ConnectionString(context.Background())
+	host, err := postgresContainer.Host(context.Background())
 	panicIfErr(err)
-	cfg, err := gosqldrivermysql.ParseDSN(dbURL)
+	mappedPort, err := postgresContainer.MappedPort(context.Background(), "5432/tcp")
 	panicIfErr(err)
 
-	_, port, err := net.SplitHostPort(cfg.Addr)
+	port, err := strconv.Atoi(mappedPort.Port())
 	panicIfErr(err)
+	viperConfig.Set(configkey.DatabaseHost, host)
 	viperConfig.Set(configkey.DatabasePort, port)
 
-	return mysqlContainer
+	return postgresContainer
 }
 
 func newKafkaContainer(viperConfig *viper.Viper) (kafkaContainer *kafka.KafkaContainer) {

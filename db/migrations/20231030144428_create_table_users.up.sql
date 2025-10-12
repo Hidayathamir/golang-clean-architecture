@@ -1,4 +1,4 @@
-create table users
+create table if not exists users
 (
     id         varchar(100) not null,
     name       varchar(100) not null,
@@ -7,4 +7,4 @@ create table users
     created_at bigint       not null,
     updated_at bigint       not null,
     primary key (id)
-) engine = InnoDB;
+);

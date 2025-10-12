@@ -41,3 +41,5 @@ Next, see [How To Run Application](run_app.md).
 Check also other command in [Makefile](Makefile).
 
 Check also [My Note](README_my_note.md).
+
+For contributor instructions, see [Repository Guidelines](AGENTS.md).
