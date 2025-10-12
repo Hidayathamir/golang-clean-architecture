@@ -41,14 +41,19 @@ This project is forked from [khannedy/golang-clean-architecture](https://github.
      {
        "err": "user.(*UserUsecaseImpl).Create:: [409] conflict:: user already exists",
        "fields": {
-         "req": { "id": "joko", "password": "joko", "name": "Joko" },
+         "req": {
+           "id": "joko",
+           "password": "joko",
+           "name": "Joko"
+         },
          "res": null
        },
+       "funcName": "user.(*UserUsecaseMwLogger).Create",
        "level": "error",
-       "msg": "user.(*UserUsecaseMwLogger).Create",
+       "msg": "log",
        "source": "/home/hidayat/data-d/myrepo/golang-clean-architecture/internal/usecase/user/user_usecase_mw_logger.go:30",
-       "time": "2025-10-11T08:06:12+07:00",
-       "trace_id": "080eb9d7-a5db-44e8-8493-0ae302f612d9"
+       "time": "2025-10-12T15:59:28+07:00",
+       "trace_id": "67275406-c9c4-4a28-be8a-40ff2aa87e86"
      }
      ```
 

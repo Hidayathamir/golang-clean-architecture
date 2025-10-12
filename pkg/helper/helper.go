@@ -15,11 +15,14 @@ func SetLogger(l *logrus.Logger) { logger = l }
 func Log(ctx context.Context, fields logrus.Fields, err error) {
 	level, errMsg := getLevelAndErrMsg(err)
 
+	fileLine, funcName := caller.Info(caller.WithSkip(1))
+
 	logger.WithContext(ctx).WithFields(logrus.Fields{
-		"fields": limitJSON(fields),
-		"err":    errMsg,
-		"source": caller.FileLine(caller.WithSkip(1)),
-	}).Log(level, caller.FuncName(caller.WithSkip(1)))
+		"fields":   limitJSON(fields),
+		"err":      errMsg,
+		"source":   fileLine,
+		"funcName": funcName,
+	}).Log(level, "log")
 }
 
 func getLevelAndErrMsg(err error) (logrus.Level, string) {

@@ -53,6 +53,32 @@ func FileLine(options ...Option) string {
 	return fmt.Sprintf("%s:%d", file, line)
 }
 
+// Info return caller file line and func name.
+func Info(options ...Option) (fileLine string, funcName string) {
+	option := &Opt{Skip: defaultSkip}
+	for _, opt := range options {
+		opt(option)
+	}
+
+	pc, file, line, ok := runtime.Caller(option.Skip)
+	if !ok {
+		return "?", "?"
+	}
+
+	fn := runtime.FuncForPC(pc)
+	if fn == nil {
+		return "?", "?"
+	}
+
+	funcNameWithModule := fn.Name()
+	funcNameWithModuleSplit := strings.Split(funcNameWithModule, "/")
+	funcName = funcNameWithModuleSplit[len(funcNameWithModuleSplit)-1]
+
+	fileLine = fmt.Sprintf("%s:%d", file, line)
+
+	return fileLine, funcName
+}
+
 func WithSkip(skip int) Option {
 	return func(o *Opt) {
 		o.Skip = skip + defaultSkip
