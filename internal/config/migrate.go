@@ -3,7 +3,7 @@ package config
 import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/mysql"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -15,12 +15,12 @@ func Migrate(viperConfig *viper.Viper, log *logrus.Logger) {
 	sqlDB, err := db.DB()
 	panicIfErr(err)
 
-	driver, err := mysql.WithInstance(sqlDB, &mysql.Config{})
+	driver, err := postgres.WithInstance(sqlDB, &postgres.Config{})
 	panicIfErr(err)
 
 	m, err := migrate.NewWithDatabaseInstance(
 		"file://"+viperConfig.GetString(configkey.DatabaseMigrations),
-		"mysql",
+		"postgres",
 		driver,
 	)
 	panicIfErr(err)

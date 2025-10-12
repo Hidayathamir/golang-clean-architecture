@@ -61,17 +61,17 @@ func (r *ContactRepositoryImpl) filterContact(req *model.SearchContactRequest) f
 
 		if name := req.Name; name != "" {
 			name = "%" + name + "%"
-			tx = tx.Where("first_name LIKE ? OR last_name LIKE ?", name, name)
+			tx = tx.Where("first_name ILIKE ? OR last_name ILIKE ?", name, name)
 		}
 
 		if phone := req.Phone; phone != "" {
 			phone = "%" + phone + "%"
-			tx = tx.Where("phone LIKE ?", phone)
+			tx = tx.Where("phone ILIKE ?", phone)
 		}
 
 		if email := req.Email; email != "" {
 			email = "%" + email + "%"
-			tx = tx.Where("email LIKE ?", email)
+			tx = tx.Where("email ILIKE ?", email)
 		}
 
 		return tx

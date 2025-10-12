@@ -7,7 +7,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -22,17 +22,28 @@ func NewDatabase(viperConfig *viper.Viper, log *logrus.Logger) *gorm.DB {
 	maxConnection := viperConfig.GetInt(configkey.DatabasePoolMax)
 	maxLifeTimeConnection := viperConfig.GetInt(configkey.DatabasePoolLifetime)
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", username, password, host, port, database)
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable TimeZone=UTC", host, port, username, password, database)
 
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: logger.New(&logrusWriter{Logger: log}, logger.Config{
-			SlowThreshold:             time.Second * 5,
-			Colorful:                  false,
-			IgnoreRecordNotFoundError: true,
-			ParameterizedQueries:      true,
-			LogLevel:                  logger.Info,
-		}),
+	gormLogger := logger.New(&logrusWriter{Logger: log}, logger.Config{
+		SlowThreshold:             time.Second * 5,
+		Colorful:                  false,
+		IgnoreRecordNotFoundError: true,
+		ParameterizedQueries:      true,
+		LogLevel:                  logger.Info,
 	})
+
+	const maxAttempts = 5
+
+	var db *gorm.DB
+	var err error
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: gormLogger})
+		if err == nil {
+			break
+		}
+		log.Warnf("database connection attempt %d/%d failed: %v", attempt, maxAttempts, err)
+		time.Sleep(1 * time.Second)
+	}
 	if err != nil {
 		log.Panicf("failed to connect database: %v", err)
 	}
@@ -40,6 +51,17 @@ func NewDatabase(viperConfig *viper.Viper, log *logrus.Logger) *gorm.DB {
 	connection, err := db.DB()
 	if err != nil {
 		log.Panicf("failed to connect database: %v", err)
+	}
+
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		if pingErr := connection.Ping(); pingErr == nil {
+			break
+		} else if attempt == maxAttempts {
+			log.Panicf("failed to connect database: %v", pingErr)
+		} else {
+			log.Warnf("database ping attempt %d/%d failed: %v", attempt, maxAttempts, pingErr)
+			time.Sleep(1 * time.Second)
+		}
 	}
 
 	connection.SetMaxIdleConns(idleConnection)
