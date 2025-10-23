@@ -17,6 +17,14 @@ func ContactToResponse(contact *entity.Contact) *model.ContactResponse {
 	}
 }
 
+func ContactsToResponses(contacts []entity.Contact) []model.ContactResponse {
+	responses := make([]model.ContactResponse, 0, len(contacts))
+	for _, contact := range contacts {
+		responses = append(responses, *ContactToResponse(&contact))
+	}
+	return responses
+}
+
 func ContactToEvent(contact *entity.Contact) *model.ContactEvent {
 	return &model.ContactEvent{
 		ID:        contact.ID,

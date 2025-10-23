@@ -40,6 +40,21 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
     type: object
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-array_github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse
+  : properties:
+      data:
+        items:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.TodoResponse'
+        type: array
+      error_detail:
+        items:
+          type: string
+        type: array
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
+    type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-bool:
     properties:
       data:
@@ -70,6 +85,19 @@ definitions:
   : properties:
       data:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.ContactResponse'
+      error_detail:
+        items:
+          type: string
+        type: array
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
+    type: object
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse
+  : properties:
+      data:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.TodoResponse'
       error_detail:
         items:
           type: string
@@ -167,6 +195,17 @@ definitions:
     required:
     - first_name
     type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.CreateTodoRequest:
+    properties:
+      description:
+        maxLength: 1000
+        type: string
+      title:
+        maxLength: 200
+        type: string
+    required:
+    - title
+    type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.LoginUserRequest:
     properties:
       id:
@@ -194,6 +233,23 @@ definitions:
     - id
     - name
     - password
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.TodoResponse:
+    properties:
+      completed_at:
+        type: integer
+      created_at:
+        type: integer
+      description:
+        type: string
+      id:
+        type: string
+      is_completed:
+        type: boolean
+      title:
+        type: string
+      updated_at:
+        type: integer
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateAddressRequest:
     properties:
@@ -229,6 +285,17 @@ definitions:
         type: string
     required:
     - first_name
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateTodoRequest:
+    properties:
+      description:
+        maxLength: 1000
+        type: string
+      title:
+        maxLength: 200
+        type: string
+    required:
+    - title
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateUserRequest:
     properties:
@@ -491,6 +558,137 @@ paths:
       summary: Update address
       tags:
       - addresses
+  /api/todos:
+    get:
+      description: List todos with optional filters
+      parameters:
+      - description: Filter by title
+        in: query
+        name: title
+        type: string
+      - description: Filter by completion state
+        in: query
+        name: is_completed
+        type: boolean
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Page size
+        in: query
+        name: size
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-array_github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: List todos
+      tags:
+      - todos
+    post:
+      description: Create a new todo
+      parameters:
+      - description: Create Todo Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.CreateTodoRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Create todo
+      tags:
+      - todos
+  /api/todos/{todoId}:
+    delete:
+      description: Delete todo by ID
+      parameters:
+      - description: Todo ID
+        in: path
+        name: todoId
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-bool'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Delete todo
+      tags:
+      - todos
+    get:
+      description: Get todo by ID
+      parameters:
+      - description: Todo ID
+        in: path
+        name: todoId
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Get todo
+      tags:
+      - todos
+    put:
+      description: Update todo attributes
+      parameters:
+      - description: Todo ID
+        in: path
+        name: todoId
+        required: true
+        type: string
+      - description: Update Todo Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateTodoRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Update todo
+      tags:
+      - todos
+  /api/todos/{todoId}/_complete:
+    patch:
+      description: Mark todo as completed and emit event
+      parameters:
+      - description: Todo ID
+        in: path
+        name: todoId
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Complete todo
+      tags:
+      - todos
   /api/users:
     delete:
       description: Logout the current authenticated user

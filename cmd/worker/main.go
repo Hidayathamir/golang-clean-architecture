@@ -29,6 +29,8 @@ func main() {
 	go RunUserConsumer(ctx, log, viperConfig, usecases)
 	go RunContactConsumer(ctx, log, viperConfig, usecases)
 	go RunAddressConsumer(ctx, log, viperConfig, usecases)
+	go RunTodoCommandConsumer(ctx, log, viperConfig, usecases)
+	go RunTodoCompletionConsumer(ctx, log, viperConfig)
 
 	terminateSignals := make(chan os.Signal, 1)
 	signal.Notify(terminateSignals, syscall.SIGINT, syscall.SIGTERM)
@@ -59,4 +61,18 @@ func RunUserConsumer(ctx context.Context, log *logrus.Logger, viperConfig *viper
 	userConsumerGroup := config.NewKafkaConsumerGroup(viperConfig, log)
 	userHandler := messaging.NewUserConsumer(usecases.UserUsecase, log)
 	messaging.ConsumeTopic(ctx, userConsumerGroup, "users", log, userHandler.Consume)
+}
+
+func RunTodoCommandConsumer(ctx context.Context, log *logrus.Logger, viperConfig *viper.Viper, usecases *config.Usecases) {
+	log.Info("setup todo command consumer")
+	todoCommandGroup := config.NewKafkaConsumerGroup(viperConfig, log)
+	commandHandler := messaging.NewTodoCommandConsumer(usecases.TodoUsecase, log)
+	messaging.ConsumeTopic(ctx, todoCommandGroup, "todo-commands", log, commandHandler.Consume)
+}
+
+func RunTodoCompletionConsumer(ctx context.Context, log *logrus.Logger, viperConfig *viper.Viper) {
+	log.Info("setup todo completion consumer")
+	todoCompletionGroup := config.NewKafkaConsumerGroup(viperConfig, log)
+	completionHandler := messaging.NewTodoCompletionConsumer(log)
+	messaging.ConsumeTopic(ctx, todoCompletionGroup, "todos", log, completionHandler.Consume)
 }

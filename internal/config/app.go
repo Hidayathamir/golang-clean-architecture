@@ -8,6 +8,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/address"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/contact"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/todo"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/IBM/sarama"
 	"github.com/go-playground/validator/v10"
@@ -21,6 +22,7 @@ type Usecases struct {
 	UserUsecase    user.UserUsecase
 	ContactUsecase contact.ContactUsecase
 	AddressUsecase address.AddressUsecase
+	TodoUsecase    todo.TodoUsecase
 }
 
 func SetupUsecases(
@@ -44,6 +46,10 @@ func SetupUsecases(
 	addressRepository = repository.NewAddressRepository(log)
 	addressRepository = repository.NewAddressRepositoryMwLogger(addressRepository)
 
+	var todoRepository repository.TodoRepository
+	todoRepository = repository.NewTodoRepository(log)
+	todoRepository = repository.NewTodoRepositoryMwLogger(todoRepository)
+
 	// setup producer
 	var userProducer messaging.UserProducer
 	userProducer = messaging.NewUserProducer(producer, log)
@@ -56,6 +62,10 @@ func SetupUsecases(
 	var addressProducer messaging.AddressProducer
 	addressProducer = messaging.NewAddressProducer(producer, log)
 	addressProducer = messaging.NewAddressProducerMwLogger(addressProducer)
+
+	var todoProducer messaging.TodoProducer
+	todoProducer = messaging.NewTodoProducer(producer, log)
+	todoProducer = messaging.NewTodoProducerMwLogger(todoProducer)
 
 	// setup client
 	var paymentClient rest.PaymentClient
@@ -83,10 +93,15 @@ func SetupUsecases(
 	addressUsecase = address.NewAddressUsecase(db, log, validate, contactRepository, addressRepository, addressProducer, paymentClient)
 	addressUsecase = address.NewAddressUsecaseMwLogger(addressUsecase)
 
+	var todoUsecase todo.TodoUsecase
+	todoUsecase = todo.NewTodoUsecase(db, log, validate, todoRepository, todoProducer)
+	todoUsecase = todo.NewTodoUsecaseMwLogger(todoUsecase)
+
 	return &Usecases{
 		UserUsecase:    userUsecase,
 		ContactUsecase: contactUsecase,
 		AddressUsecase: addressUsecase,
+		TodoUsecase:    todoUsecase,
 	}
 }
 
@@ -94,17 +109,20 @@ type Controllers struct {
 	UserController    *http.UserController
 	ContactController *http.ContactController
 	AddressController *http.AddressController
+	TodoController    *http.TodoController
 }
 
 func SetupControllers(usecases *Usecases, log *logrus.Logger) *Controllers {
 	userController := http.NewUserController(usecases.UserUsecase, log)
 	contactController := http.NewContactController(usecases.ContactUsecase, log)
 	addressController := http.NewAddressController(usecases.AddressUsecase, log)
+	todoController := http.NewTodoController(usecases.TodoUsecase, log)
 
 	return &Controllers{
 		UserController:    userController,
 		ContactController: contactController,
 		AddressController: addressController,
+		TodoController:    todoController,
 	}
 }
 

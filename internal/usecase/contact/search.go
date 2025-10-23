@@ -19,10 +19,5 @@ func (u *ContactUsecaseImpl) Search(ctx context.Context, req *model.SearchContac
 		return nil, 0, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Search", err)
 	}
 
-	res := make([]model.ContactResponse, len(contacts))
-	for i, contact := range contacts {
-		res[i] = *converter.ContactToResponse(&contact)
-	}
-
-	return res, total, nil
+	return converter.ContactsToResponses(contacts), total, nil
 }

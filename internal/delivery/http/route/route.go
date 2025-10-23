@@ -47,4 +47,11 @@ func setupAuthRoute(app *fiber.App, controllers *config.Controllers, middlewares
 	router.Put("/api/contacts/:contactId/addresses/:addressId", controllers.AddressController.Update)
 	router.Get("/api/contacts/:contactId/addresses/:addressId", controllers.AddressController.Get)
 	router.Delete("/api/contacts/:contactId/addresses/:addressId", controllers.AddressController.Delete)
+
+	router.Post("/api/todos", controllers.TodoController.Create)
+	router.Get("/api/todos", controllers.TodoController.List)
+	router.Get("/api/todos/:todoId", controllers.TodoController.Get)
+	router.Put("/api/todos/:todoId", controllers.TodoController.Update)
+	router.Delete("/api/todos/:todoId", controllers.TodoController.Delete)
+	router.Patch("/api/todos/:todoId/_complete", controllers.TodoController.Complete)
 }

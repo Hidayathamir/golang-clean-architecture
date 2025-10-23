@@ -29,9 +29,9 @@ docker-compose:
 
 run-clean:
 	$(MAKE) errkitcli
-	$(MAKE) format
-	$(MAKE) swag
 	$(MAKE) generate
+	$(MAKE) swag
+	$(MAKE) format
 	$(MAKE) run
 
 format:
