@@ -1,9 +1,8 @@
 package config
 
 import (
-	// "github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http"
-	// "github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/middleware"
-	// "github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/route"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/middleware"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/rest"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
@@ -88,5 +87,38 @@ func SetupUsecases(
 		UserUsecase:    userUsecase,
 		ContactUsecase: contactUsecase,
 		AddressUsecase: addressUsecase,
+	}
+}
+
+type Controllers struct {
+	UserController    *http.UserController
+	ContactController *http.ContactController
+	AddressController *http.AddressController
+}
+
+func SetupControllers(usecases *Usecases, log *logrus.Logger) *Controllers {
+	userController := http.NewUserController(usecases.UserUsecase, log)
+	contactController := http.NewContactController(usecases.ContactUsecase, log)
+	addressController := http.NewAddressController(usecases.AddressUsecase, log)
+
+	return &Controllers{
+		UserController:    userController,
+		ContactController: contactController,
+		AddressController: addressController,
+	}
+}
+
+type Middlewares struct {
+	AuthMiddleware    fiber.Handler
+	TraceIDMiddleware fiber.Handler
+}
+
+func SetupMiddlewares(usecases *Usecases) *Middlewares {
+	authMiddleware := middleware.NewAuth(usecases.UserUsecase)
+	traceIDMiddleware := middleware.NewTraceID()
+
+	return &Middlewares{
+		AuthMiddleware:    authMiddleware,
+		TraceIDMiddleware: traceIDMiddleware,
 	}
 }

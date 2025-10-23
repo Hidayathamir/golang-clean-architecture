@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/middleware"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/route"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 )
@@ -29,22 +27,10 @@ func main() {
 	producer := config.NewKafkaProducer(viperConfig, log)
 
 	usecases := config.SetupUsecases(db, app, log, validate, viperConfig, producer)
+	controllers := config.SetupControllers(usecases, log)
+	middlewares := config.SetupMiddlewares(usecases)
 
-	userController := http.NewUserController(usecases.UserUsecase, log)
-	contactController := http.NewContactController(usecases.ContactUsecase, log)
-	addressController := http.NewAddressController(usecases.AddressUsecase, log)
-
-	authMiddleware := middleware.NewAuth(usecases.UserUsecase)
-	traceIDMiddleware := middleware.NewTraceID()
-
-	route.Setup(
-		app,
-		userController,
-		contactController,
-		addressController,
-		authMiddleware,
-		traceIDMiddleware,
-	)
+	route.Setup(app, controllers, middlewares)
 
 	webPort := viperConfig.GetString(configkey.WebPort)
 	fmt.Printf("Go to swagger http://localhost:%s/swagger\n", webPort)
