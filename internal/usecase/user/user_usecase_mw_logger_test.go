@@ -7,7 +7,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/helper"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logging"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
@@ -18,7 +18,7 @@ func TestNewUserUsecaseMwLogger(t *testing.T) {
 }
 
 func TestUserUsecaseMwLogger_Create(t *testing.T) {
-	helper.SetLogger(logrus.New())
+	logging.SetLogger(logrus.New())
 	Next := &mock.UserUsecaseMock{}
 	u := &user.UserUsecaseMwLogger{
 		Next: Next,
@@ -32,7 +32,7 @@ func TestUserUsecaseMwLogger_Create(t *testing.T) {
 }
 
 func TestUserUsecaseMwLogger_Current(t *testing.T) {
-	helper.SetLogger(logrus.New())
+	logging.SetLogger(logrus.New())
 	Next := &mock.UserUsecaseMock{}
 	u := &user.UserUsecaseMwLogger{
 		Next: Next,
@@ -46,7 +46,7 @@ func TestUserUsecaseMwLogger_Current(t *testing.T) {
 }
 
 func TestUserUsecaseMwLogger_Login(t *testing.T) {
-	helper.SetLogger(logrus.New())
+	logging.SetLogger(logrus.New())
 	Next := &mock.UserUsecaseMock{}
 	u := &user.UserUsecaseMwLogger{
 		Next: Next,
@@ -60,7 +60,7 @@ func TestUserUsecaseMwLogger_Login(t *testing.T) {
 }
 
 func TestUserUsecaseMwLogger_Logout(t *testing.T) {
-	helper.SetLogger(logrus.New())
+	logging.SetLogger(logrus.New())
 	Next := &mock.UserUsecaseMock{}
 	u := &user.UserUsecaseMwLogger{
 		Next: Next,
@@ -74,7 +74,7 @@ func TestUserUsecaseMwLogger_Logout(t *testing.T) {
 }
 
 func TestUserUsecaseMwLogger_Update(t *testing.T) {
-	helper.SetLogger(logrus.New())
+	logging.SetLogger(logrus.New())
 	Next := &mock.UserUsecaseMock{}
 	u := &user.UserUsecaseMwLogger{
 		Next: Next,
@@ -88,7 +88,7 @@ func TestUserUsecaseMwLogger_Update(t *testing.T) {
 }
 
 func TestUserUsecaseMwLogger_Verify(t *testing.T) {
-	helper.SetLogger(logrus.New())
+	logging.SetLogger(logrus.New())
 	Next := &mock.UserUsecaseMock{}
 	u := &user.UserUsecaseMwLogger{
 		Next: Next,

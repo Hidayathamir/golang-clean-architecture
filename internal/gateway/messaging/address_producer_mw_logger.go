@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/helper"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logging"
 	"github.com/sirupsen/logrus"
 )
 
@@ -26,7 +26,7 @@ func (p *AddressProducerMwLogger) Send(ctx context.Context, event *model.Address
 	fields := logrus.Fields{
 		"event": event,
 	}
-	helper.Log(ctx, fields, err)
+	logging.Log(ctx, fields, err)
 
 	return err
 }

@@ -5,7 +5,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/helper"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logging"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -30,7 +30,7 @@ func (r *ContactRepositoryMwLogger) FindByIdAndUserId(ctx context.Context, db *g
 		"id":      id,
 		"userId":  userId,
 	}
-	helper.Log(ctx, fields, err)
+	logging.Log(ctx, fields, err)
 
 	return err
 }
@@ -43,7 +43,7 @@ func (r *ContactRepositoryMwLogger) Search(ctx context.Context, db *gorm.DB, req
 		"contacts": contacts,
 		"total":    total,
 	}
-	helper.Log(ctx, fields, err)
+	logging.Log(ctx, fields, err)
 
 	return contacts, total, err
 }
@@ -54,7 +54,7 @@ func (r *ContactRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, ent
 	fields := logrus.Fields{
 		"entity": entity,
 	}
-	helper.Log(ctx, fields, err)
+	logging.Log(ctx, fields, err)
 
 	return err
 }
@@ -65,7 +65,7 @@ func (r *ContactRepositoryMwLogger) Delete(ctx context.Context, db *gorm.DB, ent
 	fields := logrus.Fields{
 		"entity": entity,
 	}
-	helper.Log(ctx, fields, err)
+	logging.Log(ctx, fields, err)
 
 	return err
 }
@@ -76,7 +76,7 @@ func (r *ContactRepositoryMwLogger) Update(ctx context.Context, db *gorm.DB, ent
 	fields := logrus.Fields{
 		"entity": entity,
 	}
-	helper.Log(ctx, fields, err)
+	logging.Log(ctx, fields, err)
 
 	return err
 }

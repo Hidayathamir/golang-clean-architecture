@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/helper"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logging"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -28,7 +28,7 @@ func (r *UserRepositoryMwLogger) FindByToken(ctx context.Context, db *gorm.DB, u
 		"user":  user,
 		"token": token,
 	}
-	helper.Log(ctx, fields, err)
+	logging.Log(ctx, fields, err)
 
 	return err
 }
@@ -40,7 +40,7 @@ func (r *UserRepositoryMwLogger) CountById(ctx context.Context, db *gorm.DB, id 
 		"id":    id,
 		"total": total,
 	}
-	helper.Log(ctx, fields, err)
+	logging.Log(ctx, fields, err)
 
 	return total, err
 }
@@ -51,7 +51,7 @@ func (r *UserRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, entity
 	fields := logrus.Fields{
 		"entity": entity,
 	}
-	helper.Log(ctx, fields, err)
+	logging.Log(ctx, fields, err)
 
 	return err
 }
@@ -63,7 +63,7 @@ func (r *UserRepositoryMwLogger) FindById(ctx context.Context, db *gorm.DB, enti
 		"id":     id,
 		"entity": entity,
 	}
-	helper.Log(ctx, fields, err)
+	logging.Log(ctx, fields, err)
 
 	return err
 }
@@ -74,7 +74,7 @@ func (r *UserRepositoryMwLogger) Update(ctx context.Context, db *gorm.DB, entity
 	fields := logrus.Fields{
 		"entity": entity,
 	}
-	helper.Log(ctx, fields, err)
+	logging.Log(ctx, fields, err)
 
 	return err
 }

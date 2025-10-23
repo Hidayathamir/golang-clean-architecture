@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/helper"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logging"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logrushook"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -16,6 +16,6 @@ func NewLogger(viperConfig *viper.Viper) *logrus.Logger {
 
 	log.AddHook(logrushook.NewTraceID())
 
-	helper.SetLogger(log)
+	logging.SetLogger(log)
 	return log
 }

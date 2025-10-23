@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/helper"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logging"
 	"github.com/sirupsen/logrus"
 )
 
@@ -27,7 +27,7 @@ func (u *UserUsecaseMwLogger) Create(ctx context.Context, req *model.RegisterUse
 		"req": req,
 		"res": res,
 	}
-	helper.Log(ctx, fields, err)
+	logging.Log(ctx, fields, err)
 
 	return res, err
 }
@@ -39,7 +39,7 @@ func (u *UserUsecaseMwLogger) Current(ctx context.Context, req *model.GetUserReq
 		"req": req,
 		"res": res,
 	}
-	helper.Log(ctx, fields, err)
+	logging.Log(ctx, fields, err)
 
 	return res, err
 }
@@ -51,7 +51,7 @@ func (u *UserUsecaseMwLogger) Login(ctx context.Context, req *model.LoginUserReq
 		"req": req,
 		"res": res,
 	}
-	helper.Log(ctx, fields, err)
+	logging.Log(ctx, fields, err)
 
 	return res, err
 }
@@ -63,7 +63,7 @@ func (u *UserUsecaseMwLogger) Logout(ctx context.Context, req *model.LogoutUserR
 		"req": req,
 		"res": res,
 	}
-	helper.Log(ctx, fields, err)
+	logging.Log(ctx, fields, err)
 
 	return res, err
 }
@@ -75,7 +75,7 @@ func (u *UserUsecaseMwLogger) Update(ctx context.Context, req *model.UpdateUserR
 		"req": req,
 		"res": res,
 	}
-	helper.Log(ctx, fields, err)
+	logging.Log(ctx, fields, err)
 
 	return res, err
 }
@@ -87,7 +87,7 @@ func (u *UserUsecaseMwLogger) Verify(ctx context.Context, req *model.VerifyUserR
 		"req": req,
 		"res": res,
 	}
-	helper.Log(ctx, fields, err)
+	logging.Log(ctx, fields, err)
 
 	return res, err
 }
