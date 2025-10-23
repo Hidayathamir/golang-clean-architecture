@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"fmt"
+
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
@@ -9,9 +11,15 @@ import (
 
 func NewAuth(userUserCase user.UserUsecase) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		request := &model.VerifyUserRequest{Token: ctx.Get("Authorization", "NOT_FOUND")}
+		headerAuth := ctx.Get("Authorization")
+		if headerAuth == "" {
+			err := fmt.Errorf("header auth not found")
+			err = errkit.Unauthorized(err)
+			return errkit.AddFuncName("middleware.NewAuth", err)
+		}
 
-		auth, err := userUserCase.Verify(ctx.UserContext(), request)
+		req := &model.VerifyUserRequest{Token: headerAuth}
+		auth, err := userUserCase.Verify(ctx.UserContext(), req)
 		if err != nil {
 			err = errkit.Unauthorized(err)
 			return errkit.AddFuncName("middleware.NewAuth", err)
