@@ -12,6 +12,7 @@ import (
 func ClearAll() {
 	ClearAddresses()
 	ClearContact()
+	ClearTodos()
 	ClearUsers()
 }
 
@@ -33,6 +34,13 @@ func ClearAddresses() {
 	err := db.Where("id is not null").Delete(&entity.Address{}).Error
 	if err != nil {
 		log.Panicf("Failed clear address data : %+v", err)
+	}
+}
+
+func ClearTodos() {
+	err := db.Where("id is not null").Delete(&entity.Todo{}).Error
+	if err != nil {
+		log.Panicf("Failed clear todo data : %+v", err)
 	}
 }
 
@@ -88,4 +96,25 @@ func GetFirstAddress(t *testing.T, contact *entity.Contact) *entity.Address {
 	err := db.Where("contact_id = ?", contact.ID).First(address).Error
 	assert.Nil(t, err)
 	return address
+}
+
+func CreateTodos(t *testing.T, user *entity.User, total int) {
+	for i := range total {
+		todo := &entity.Todo{
+			ID:          uuid.NewString(),
+			UserID:      user.ID,
+			Title:       "Todo " + strconv.Itoa(i),
+			Description: "Description " + strconv.Itoa(i),
+			IsCompleted: false,
+		}
+		err := db.Create(todo).Error
+		assert.Nil(t, err)
+	}
+}
+
+func GetFirstTodo(t *testing.T, user *entity.User) *entity.Todo {
+	todo := new(entity.Todo)
+	err := db.Where("user_id = ?", user.ID).First(todo).Error
+	assert.Nil(t, err)
+	return todo
 }
