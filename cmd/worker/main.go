@@ -21,7 +21,7 @@ func main() {
 	app := config.NewFiber(viperConfig)
 	producer := config.NewKafkaProducer(viperConfig, log)
 
-	usecases := config.SetupUsecases(db, app, log, validate, viperConfig, producer)
+	usecases := config.SetupUsecases(viperConfig, log, db, app, validate, producer)
 
 	ctx, cancel := context.WithCancel(context.Background())
 

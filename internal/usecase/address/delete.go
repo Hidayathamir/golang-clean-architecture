@@ -11,12 +11,12 @@ import (
 
 func (u *AddressUsecaseImpl) Delete(ctx context.Context, req *model.DeleteAddressRequest) error {
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(ctx, u.DB.WithContext(ctx), contact, req.ContactId, req.UserId); err != nil {
+	if err := u.ContactRepository.FindByIDAndUserID(ctx, u.DB.WithContext(ctx), contact, req.ContactID, req.UserID); err != nil {
 		return errkit.AddFuncName("address.(*AddressUsecaseImpl).Delete", err)
 	}
 
 	address := new(entity.Address)
-	if err := u.AddressRepository.FindByIdAndContactId(ctx, u.DB.WithContext(ctx), address, req.ID, req.ContactId); err != nil {
+	if err := u.AddressRepository.FindByIDAndContactID(ctx, u.DB.WithContext(ctx), address, req.ID, req.ContactID); err != nil {
 		return errkit.AddFuncName("address.(*AddressUsecaseImpl).Delete", err)
 	}
 

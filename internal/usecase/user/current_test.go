@@ -28,7 +28,7 @@ func TestUserUsecaseImpl_Current_Success(t *testing.T) {
 		ID: "userid1",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		return nil
 	}
 
@@ -59,7 +59,7 @@ func TestUserUsecaseImpl_Current_Fail_ValidateStruct(t *testing.T) {
 		ID: "",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		return nil
 	}
 
@@ -77,7 +77,7 @@ func TestUserUsecaseImpl_Current_Fail_ValidateStruct(t *testing.T) {
 	assert.ErrorAs(t, err, &verrs)
 }
 
-func TestUserUsecaseImpl_Current_Fail_FindById(t *testing.T) {
+func TestUserUsecaseImpl_Current_Fail_FindByID(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
 	u := &user.UserUsecaseImpl{
@@ -92,7 +92,7 @@ func TestUserUsecaseImpl_Current_Fail_FindById(t *testing.T) {
 		ID: "userid1",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		return assert.AnError
 	}
 

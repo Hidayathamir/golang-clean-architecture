@@ -9,21 +9,19 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 )
 
-func (u *AddressUsecaseImpl) List(ctx context.Context, req *model.ListAddressRequest) ([]model.AddressResponse, error) {
+func (u *AddressUsecaseImpl) List(ctx context.Context, req *model.ListAddressRequest) (model.AddressResponseList, error) {
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(ctx, u.DB.WithContext(ctx), contact, req.ContactId, req.UserId); err != nil {
+	if err := u.ContactRepository.FindByIDAndUserID(ctx, u.DB.WithContext(ctx), contact, req.ContactID, req.UserID); err != nil {
 		return nil, errkit.AddFuncName("address.(*AddressUsecaseImpl).List", err)
 	}
 
-	addresses, err := u.AddressRepository.FindAllByContactId(ctx, u.DB.WithContext(ctx), contact.ID)
+	addresses, err := u.AddressRepository.FindAllByContactID(ctx, u.DB.WithContext(ctx), contact.ID)
 	if err != nil {
 		return nil, errkit.AddFuncName("address.(*AddressUsecaseImpl).List", err)
 	}
 
-	res := make([]model.AddressResponse, len(addresses))
-	for i, address := range addresses {
-		res[i] = *converter.AddressToResponse(&address)
-	}
+	res := make(model.AddressResponseList, len(addresses))
+	converter.EntityAddressListToModelAddressResponseList(addresses, res)
 
 	return res, nil
 }

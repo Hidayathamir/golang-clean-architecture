@@ -16,9 +16,12 @@ func (u *UserUsecaseImpl) Current(ctx context.Context, req *model.GetUserRequest
 	}
 
 	user := new(entity.User)
-	if err := u.UserRepository.FindById(ctx, u.DB.WithContext(ctx), user, req.ID); err != nil {
+	if err := u.UserRepository.FindByID(ctx, u.DB.WithContext(ctx), user, req.ID); err != nil {
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Current", err)
 	}
 
-	return converter.UserToResponse(user), nil
+	res := new(model.UserResponse)
+	converter.UserToResponse(user, res)
+
+	return res, nil
 }

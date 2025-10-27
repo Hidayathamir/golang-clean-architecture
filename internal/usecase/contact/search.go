@@ -8,7 +8,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 )
 
-func (u *ContactUsecaseImpl) Search(ctx context.Context, req *model.SearchContactRequest) ([]model.ContactResponse, int64, error) {
+func (u *ContactUsecaseImpl) Search(ctx context.Context, req *model.SearchContactRequest) (model.ContactResponseList, int64, error) {
 	if err := u.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
 		return nil, 0, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Search", err)
@@ -19,5 +19,8 @@ func (u *ContactUsecaseImpl) Search(ctx context.Context, req *model.SearchContac
 		return nil, 0, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Search", err)
 	}
 
-	return converter.ContactsToResponses(contacts), total, nil
+	res := make(model.ContactResponseList, len(contacts))
+	converter.EntityContactListToModelContactResponseList(contacts, res)
+
+	return res, total, nil
 }

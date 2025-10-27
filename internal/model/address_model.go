@@ -11,14 +11,16 @@ type AddressResponse struct {
 	UpdatedAt  int64  `json:"updated_at"`
 }
 
+type AddressResponseList []AddressResponse
+
 type ListAddressRequest struct {
-	UserId    string `json:"-" validate:"required"`
-	ContactId string `json:"-" validate:"required,max=100,uuid"`
+	UserID    string `json:"-" validate:"required"`
+	ContactID string `json:"-" validate:"required,max=100,uuid"`
 }
 
 type CreateAddressRequest struct {
-	UserId     string `json:"-"           validate:"required"`
-	ContactId  string `json:"-"           validate:"required,max=100,uuid"`
+	UserID     string `json:"-"           validate:"required"`
+	ContactID  string `json:"-"           validate:"required,max=100,uuid"`
 	Street     string `json:"street"      validate:"max=255"`
 	City       string `json:"city"        validate:"max=255"`
 	Province   string `json:"province"    validate:"max=255"`
@@ -27,8 +29,8 @@ type CreateAddressRequest struct {
 }
 
 type UpdateAddressRequest struct {
-	UserId     string `json:"-"           validate:"required"`
-	ContactId  string `json:"-"           validate:"required,max=100,uuid"`
+	UserID     string `json:"-"           validate:"required"`
+	ContactID  string `json:"-"           validate:"required,max=100,uuid"`
 	ID         string `json:"-"           validate:"required,max=100,uuid"`
 	Street     string `json:"street"      validate:"max=255"`
 	City       string `json:"city"        validate:"max=255"`
@@ -38,13 +40,13 @@ type UpdateAddressRequest struct {
 }
 
 type GetAddressRequest struct {
-	UserId    string `json:"-" validate:"required"`
-	ContactId string `json:"-" validate:"required,max=100,uuid"`
+	UserID    string `json:"-" validate:"required"`
+	ContactID string `json:"-" validate:"required,max=100,uuid"`
 	ID        string `json:"-" validate:"required,max=100,uuid"`
 }
 
 type DeleteAddressRequest struct {
-	UserId    string `json:"-" validate:"required"`
-	ContactId string `json:"-" validate:"required,max=100,uuid"`
+	UserID    string `json:"-" validate:"required"`
+	ContactID string `json:"-" validate:"required,max=100,uuid"`
 	ID        string `json:"-" validate:"required,max=100,uuid"`
 }

@@ -52,7 +52,7 @@ func CreateContacts(user *entity.User, total int) {
 			LastName:  strconv.Itoa(i),
 			Email:     "contact" + strconv.Itoa(i) + "@example.com",
 			Phone:     "08000000" + strconv.Itoa(i),
-			UserId:    user.ID,
+			UserID:    user.ID,
 		}
 		err := db.Create(contact).Error
 		if err != nil {
@@ -65,7 +65,7 @@ func CreateAddresses(t *testing.T, contact *entity.Contact, total int) {
 	for range total {
 		address := &entity.Address{
 			ID:         uuid.NewString(),
-			ContactId:  contact.ID,
+			ContactID:  contact.ID,
 			Street:     "Jalan Belum Jadi",
 			City:       "Jakarta",
 			Province:   "DKI Jakarta",

@@ -7,6 +7,6 @@ type UserEvent struct {
 	UpdatedAt int64  `json:"updated_at,omitempty"`
 }
 
-func (u *UserEvent) GetId() string {
+func (u *UserEvent) GetID() string {
 	return u.ID
 }

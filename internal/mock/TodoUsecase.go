@@ -32,7 +32,7 @@ var _ todo.TodoUsecase = &TodoUsecaseMock{}
 //			GetFunc: func(ctx context.Context, req *model.GetTodoRequest) (*model.TodoResponse, error) {
 //				panic("mock out the Get method")
 //			},
-//			ListFunc: func(ctx context.Context, req *model.ListTodoRequest) ([]model.TodoResponse, int64, error) {
+//			ListFunc: func(ctx context.Context, req *model.ListTodoRequest) (model.TodoResponseList, int64, error) {
 //				panic("mock out the List method")
 //			},
 //			UpdateFunc: func(ctx context.Context, req *model.UpdateTodoRequest) (*model.TodoResponse, error) {
@@ -58,7 +58,7 @@ type TodoUsecaseMock struct {
 	GetFunc func(ctx context.Context, req *model.GetTodoRequest) (*model.TodoResponse, error)
 
 	// ListFunc mocks the List method.
-	ListFunc func(ctx context.Context, req *model.ListTodoRequest) ([]model.TodoResponse, int64, error)
+	ListFunc func(ctx context.Context, req *model.ListTodoRequest) (model.TodoResponseList, int64, error)
 
 	// UpdateFunc mocks the Update method.
 	UpdateFunc func(ctx context.Context, req *model.UpdateTodoRequest) (*model.TodoResponse, error)
@@ -261,7 +261,7 @@ func (mock *TodoUsecaseMock) GetCalls() []struct {
 }
 
 // List calls ListFunc.
-func (mock *TodoUsecaseMock) List(ctx context.Context, req *model.ListTodoRequest) ([]model.TodoResponse, int64, error) {
+func (mock *TodoUsecaseMock) List(ctx context.Context, req *model.ListTodoRequest) (model.TodoResponseList, int64, error) {
 	if mock.ListFunc == nil {
 		panic("TodoUsecaseMock.ListFunc: method is nil but TodoUsecase.List was just called")
 	}

@@ -10,17 +10,20 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 type UserController struct {
-	Usecase user.UserUsecase
+	Config  *viper.Viper
 	Log     *logrus.Logger
+	Usecase user.UserUsecase
 }
 
-func NewUserController(useCase user.UserUsecase, logger *logrus.Logger) *UserController {
+func NewUserController(cfg *viper.Viper, log *logrus.Logger, useCase user.UserUsecase) *UserController {
 	return &UserController{
+		Config:  cfg,
+		Log:     log,
 		Usecase: useCase,
-		Log:     logger,
 	}
 }
 

@@ -17,30 +17,33 @@ func (u *UserUsecaseImpl) Update(ctx context.Context, req *model.UpdateUserReque
 	}
 
 	user := new(entity.User)
-	if err := u.UserRepository.FindById(ctx, u.DB.WithContext(ctx), user, req.ID); err != nil {
+	if err := u.UserRepository.FindByID(ctx, u.DB.WithContext(ctx), user, req.ID); err != nil {
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Update", err)
 	}
 
-	if req.Name != "" {
-		user.Name = req.Name
-	}
-
+	var password string
 	if req.Password != "" {
-		password, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 		if err != nil {
 			return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Update", err)
 		}
-		user.Password = string(password)
+		password = string(hashedPassword)
 	}
+
+	converter.ModelUpdateUserRequestToEntityUser(req, user, password)
 
 	if err := u.UserRepository.Update(ctx, u.DB.WithContext(ctx), user); err != nil {
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Update", err)
 	}
 
-	event := converter.UserToEvent(user)
+	event := new(model.UserEvent)
+	converter.UserToEvent(user, event)
 	if err := u.UserProducer.Send(ctx, event); err != nil {
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Update", err)
 	}
 
-	return converter.UserToResponse(user), nil
+	res := new(model.UserResponse)
+	converter.UserToResponse(user, res)
+
+	return res, nil
 }

@@ -21,11 +21,11 @@ func NewAddressRepositoryMwLogger(next AddressRepository) *AddressRepositoryMwLo
 	}
 }
 
-func (r *AddressRepositoryMwLogger) FindAllByContactId(ctx context.Context, db *gorm.DB, contactId string) ([]entity.Address, error) {
-	addresses, err := r.Next.FindAllByContactId(ctx, db, contactId)
+func (r *AddressRepositoryMwLogger) FindAllByContactID(ctx context.Context, db *gorm.DB, contactID string) (entity.AddressList, error) {
+	addresses, err := r.Next.FindAllByContactID(ctx, db, contactID)
 
 	fields := logrus.Fields{
-		"contactId": contactId,
+		"contactID": contactID,
 		"addresses": addresses,
 	}
 	logging.Log(ctx, fields, err)
@@ -33,13 +33,13 @@ func (r *AddressRepositoryMwLogger) FindAllByContactId(ctx context.Context, db *
 	return addresses, err
 }
 
-func (r *AddressRepositoryMwLogger) FindByIdAndContactId(ctx context.Context, db *gorm.DB, address *entity.Address, id string, contactId string) error {
-	err := r.Next.FindByIdAndContactId(ctx, db, address, id, contactId)
+func (r *AddressRepositoryMwLogger) FindByIDAndContactID(ctx context.Context, db *gorm.DB, address *entity.Address, id string, contactID string) error {
+	err := r.Next.FindByIDAndContactID(ctx, db, address, id, contactID)
 
 	fields := logrus.Fields{
 		"address":   address,
 		"id":        id,
-		"contactId": contactId,
+		"contactID": contactID,
 	}
 	logging.Log(ctx, fields, err)
 

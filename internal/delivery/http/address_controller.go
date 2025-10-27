@@ -10,17 +10,20 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 type AddressController struct {
-	Usecase address.AddressUsecase
+	Config  *viper.Viper
 	Log     *logrus.Logger
+	Usecase address.AddressUsecase
 }
 
-func NewAddressController(useCase address.AddressUsecase, log *logrus.Logger) *AddressController {
+func NewAddressController(cfg *viper.Viper, log *logrus.Logger, useCase address.AddressUsecase) *AddressController {
 	return &AddressController{
-		Usecase: useCase,
+		Config:  cfg,
 		Log:     log,
+		Usecase: useCase,
 	}
 }
 
@@ -43,8 +46,8 @@ func (c *AddressController) Create(ctx *fiber.Ctx) error {
 		return errkit.AddFuncName("http.(*AddressController).Create", err)
 	}
 
-	req.UserId = auth.ID
-	req.ContactId = ctx.Params("contactId")
+	req.UserID = auth.ID
+	req.ContactID = ctx.Params("contactId")
 
 	res, err := c.Usecase.Create(ctx.UserContext(), req)
 	if err != nil {
@@ -61,15 +64,15 @@ func (c *AddressController) Create(ctx *fiber.Ctx) error {
 //	@Tags			addresses
 //	@Param			contactId	path	string	true	"Contact ID"
 //	@Security		SimpleApiKeyAuth
-//	@Success		200	{object}	response.WebResponse[[]model.AddressResponse]
+//	@Success		200	{object}	response.WebResponse[model.AddressResponseList]
 //	@Router			/api/contacts/{contactId}/addresses [get]
 func (c *AddressController) List(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
-	contactId := ctx.Params("contactId")
+	contactID := ctx.Params("contactId")
 
 	req := &model.ListAddressRequest{
-		UserId:    auth.ID,
-		ContactId: contactId,
+		UserID:    auth.ID,
+		ContactID: contactID,
 	}
 
 	res, err := c.Usecase.List(ctx.UserContext(), req)
@@ -92,13 +95,13 @@ func (c *AddressController) List(ctx *fiber.Ctx) error {
 //	@Router			/api/contacts/{contactId}/addresses/{addressId} [get]
 func (c *AddressController) Get(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
-	contactId := ctx.Params("contactId")
-	addressId := ctx.Params("addressId")
+	contactID := ctx.Params("contactId")
+	addressID := ctx.Params("addressId")
 
 	req := &model.GetAddressRequest{
-		UserId:    auth.ID,
-		ContactId: contactId,
-		ID:        addressId,
+		UserID:    auth.ID,
+		ContactID: contactID,
+		ID:        addressID,
 	}
 
 	res, err := c.Usecase.Get(ctx.UserContext(), req)
@@ -129,8 +132,8 @@ func (c *AddressController) Update(ctx *fiber.Ctx) error {
 		return errkit.AddFuncName("http.(*AddressController).Update", err)
 	}
 
-	req.UserId = auth.ID
-	req.ContactId = ctx.Params("contactId")
+	req.UserID = auth.ID
+	req.ContactID = ctx.Params("contactId")
 	req.ID = ctx.Params("addressId")
 
 	res, err := c.Usecase.Update(ctx.UserContext(), req)
@@ -153,13 +156,13 @@ func (c *AddressController) Update(ctx *fiber.Ctx) error {
 //	@Router			/api/contacts/{contactId}/addresses/{addressId} [delete]
 func (c *AddressController) Delete(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
-	contactId := ctx.Params("contactId")
-	addressId := ctx.Params("addressId")
+	contactID := ctx.Params("contactId")
+	addressID := ctx.Params("addressId")
 
 	req := &model.DeleteAddressRequest{
-		UserId:    auth.ID,
-		ContactId: contactId,
-		ID:        addressId,
+		UserID:    auth.ID,
+		ContactID: contactID,
+		ID:        addressID,
 	}
 
 	if err := c.Usecase.Delete(ctx.UserContext(), req); err != nil {

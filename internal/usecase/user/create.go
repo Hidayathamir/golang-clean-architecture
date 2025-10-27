@@ -18,7 +18,7 @@ func (u *UserUsecaseImpl) Create(ctx context.Context, req *model.RegisterUserReq
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Create", err)
 	}
 
-	total, err := u.UserRepository.CountById(ctx, u.DB.WithContext(ctx), req.ID)
+	total, err := u.UserRepository.CountByID(ctx, u.DB.WithContext(ctx), req.ID)
 	if err != nil {
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Create", err)
 	}
@@ -34,20 +34,21 @@ func (u *UserUsecaseImpl) Create(ctx context.Context, req *model.RegisterUserReq
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Create", err)
 	}
 
-	user := &entity.User{
-		ID:       req.ID,
-		Password: string(password),
-		Name:     req.Name,
-	}
+	user := new(entity.User)
+	converter.ModelRegisterUserRequestToEntityUser(req, user, string(password))
 
 	if err := u.UserRepository.Create(ctx, u.DB.WithContext(ctx), user); err != nil {
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Create", err)
 	}
 
-	event := converter.UserToEvent(user)
+	event := new(model.UserEvent)
+	converter.UserToEvent(user, event)
 	if err = u.UserProducer.Send(ctx, event); err != nil {
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Create", err)
 	}
 
-	return converter.UserToResponse(user), nil
+	res := new(model.UserResponse)
+	converter.UserToResponse(user, res)
+
+	return res, nil
 }

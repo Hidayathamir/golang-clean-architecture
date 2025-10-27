@@ -26,8 +26,8 @@ func main() {
 	app := config.NewFiber(viperConfig)
 	producer := config.NewKafkaProducer(viperConfig, log)
 
-	usecases := config.SetupUsecases(db, app, log, validate, viperConfig, producer)
-	controllers := config.SetupControllers(usecases, log)
+	usecases := config.SetupUsecases(viperConfig, log, db, app, validate, producer)
+	controllers := config.SetupControllers(viperConfig, log, usecases)
 	middlewares := config.SetupMiddlewares(usecases)
 
 	route.Setup(app, controllers, middlewares)

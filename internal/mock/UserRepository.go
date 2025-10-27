@@ -21,14 +21,14 @@ var _ repository.UserRepository = &UserRepositoryMock{}
 //
 //		// make and configure a mocked repository.UserRepository
 //		mockedUserRepository := &UserRepositoryMock{
-//			CountByIdFunc: func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
-//				panic("mock out the CountById method")
+//			CountByIDFunc: func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
+//				panic("mock out the CountByID method")
 //			},
 //			CreateFunc: func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User) error {
 //				panic("mock out the Create method")
 //			},
-//			FindByIdFunc: func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
-//				panic("mock out the FindById method")
+//			FindByIDFunc: func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+//				panic("mock out the FindByID method")
 //			},
 //			FindByTokenFunc: func(ctx context.Context, db *gorm.DB, user *entity.User, token string) error {
 //				panic("mock out the FindByToken method")
@@ -43,14 +43,14 @@ var _ repository.UserRepository = &UserRepositoryMock{}
 //
 //	}
 type UserRepositoryMock struct {
-	// CountByIdFunc mocks the CountById method.
-	CountByIdFunc func(ctx context.Context, db *gorm.DB, id string) (int64, error)
+	// CountByIDFunc mocks the CountByID method.
+	CountByIDFunc func(ctx context.Context, db *gorm.DB, id string) (int64, error)
 
 	// CreateFunc mocks the Create method.
 	CreateFunc func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User) error
 
-	// FindByIdFunc mocks the FindById method.
-	FindByIdFunc func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error
+	// FindByIDFunc mocks the FindByID method.
+	FindByIDFunc func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error
 
 	// FindByTokenFunc mocks the FindByToken method.
 	FindByTokenFunc func(ctx context.Context, db *gorm.DB, user *entity.User, token string) error
@@ -60,8 +60,8 @@ type UserRepositoryMock struct {
 
 	// calls tracks calls to the methods.
 	calls struct {
-		// CountById holds details about calls to the CountById method.
-		CountById []struct {
+		// CountByID holds details about calls to the CountByID method.
+		CountByID []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Db is the db argument value.
@@ -78,8 +78,8 @@ type UserRepositoryMock struct {
 			// EntityMoqParam is the entityMoqParam argument value.
 			EntityMoqParam *entity.User
 		}
-		// FindById holds details about calls to the FindById method.
-		FindById []struct {
+		// FindByID holds details about calls to the FindByID method.
+		FindByID []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Db is the db argument value.
@@ -110,17 +110,17 @@ type UserRepositoryMock struct {
 			EntityMoqParam *entity.User
 		}
 	}
-	lockCountById   sync.RWMutex
+	lockCountByID   sync.RWMutex
 	lockCreate      sync.RWMutex
-	lockFindById    sync.RWMutex
+	lockFindByID    sync.RWMutex
 	lockFindByToken sync.RWMutex
 	lockUpdate      sync.RWMutex
 }
 
-// CountById calls CountByIdFunc.
-func (mock *UserRepositoryMock) CountById(ctx context.Context, db *gorm.DB, id string) (int64, error) {
-	if mock.CountByIdFunc == nil {
-		panic("UserRepositoryMock.CountByIdFunc: method is nil but UserRepository.CountById was just called")
+// CountByID calls CountByIDFunc.
+func (mock *UserRepositoryMock) CountByID(ctx context.Context, db *gorm.DB, id string) (int64, error) {
+	if mock.CountByIDFunc == nil {
+		panic("UserRepositoryMock.CountByIDFunc: method is nil but UserRepository.CountByID was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
@@ -131,17 +131,17 @@ func (mock *UserRepositoryMock) CountById(ctx context.Context, db *gorm.DB, id s
 		Db:  db,
 		ID:  id,
 	}
-	mock.lockCountById.Lock()
-	mock.calls.CountById = append(mock.calls.CountById, callInfo)
-	mock.lockCountById.Unlock()
-	return mock.CountByIdFunc(ctx, db, id)
+	mock.lockCountByID.Lock()
+	mock.calls.CountByID = append(mock.calls.CountByID, callInfo)
+	mock.lockCountByID.Unlock()
+	return mock.CountByIDFunc(ctx, db, id)
 }
 
-// CountByIdCalls gets all the calls that were made to CountById.
+// CountByIDCalls gets all the calls that were made to CountByID.
 // Check the length with:
 //
-//	len(mockedUserRepository.CountByIdCalls())
-func (mock *UserRepositoryMock) CountByIdCalls() []struct {
+//	len(mockedUserRepository.CountByIDCalls())
+func (mock *UserRepositoryMock) CountByIDCalls() []struct {
 	Ctx context.Context
 	Db  *gorm.DB
 	ID  string
@@ -151,9 +151,9 @@ func (mock *UserRepositoryMock) CountByIdCalls() []struct {
 		Db  *gorm.DB
 		ID  string
 	}
-	mock.lockCountById.RLock()
-	calls = mock.calls.CountById
-	mock.lockCountById.RUnlock()
+	mock.lockCountByID.RLock()
+	calls = mock.calls.CountByID
+	mock.lockCountByID.RUnlock()
 	return calls
 }
 
@@ -197,10 +197,10 @@ func (mock *UserRepositoryMock) CreateCalls() []struct {
 	return calls
 }
 
-// FindById calls FindByIdFunc.
-func (mock *UserRepositoryMock) FindById(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
-	if mock.FindByIdFunc == nil {
-		panic("UserRepositoryMock.FindByIdFunc: method is nil but UserRepository.FindById was just called")
+// FindByID calls FindByIDFunc.
+func (mock *UserRepositoryMock) FindByID(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	if mock.FindByIDFunc == nil {
+		panic("UserRepositoryMock.FindByIDFunc: method is nil but UserRepository.FindByID was just called")
 	}
 	callInfo := struct {
 		Ctx            context.Context
@@ -213,17 +213,17 @@ func (mock *UserRepositoryMock) FindById(ctx context.Context, db *gorm.DB, entit
 		EntityMoqParam: entityMoqParam,
 		ID:             id,
 	}
-	mock.lockFindById.Lock()
-	mock.calls.FindById = append(mock.calls.FindById, callInfo)
-	mock.lockFindById.Unlock()
-	return mock.FindByIdFunc(ctx, db, entityMoqParam, id)
+	mock.lockFindByID.Lock()
+	mock.calls.FindByID = append(mock.calls.FindByID, callInfo)
+	mock.lockFindByID.Unlock()
+	return mock.FindByIDFunc(ctx, db, entityMoqParam, id)
 }
 
-// FindByIdCalls gets all the calls that were made to FindById.
+// FindByIDCalls gets all the calls that were made to FindByID.
 // Check the length with:
 //
-//	len(mockedUserRepository.FindByIdCalls())
-func (mock *UserRepositoryMock) FindByIdCalls() []struct {
+//	len(mockedUserRepository.FindByIDCalls())
+func (mock *UserRepositoryMock) FindByIDCalls() []struct {
 	Ctx            context.Context
 	Db             *gorm.DB
 	EntityMoqParam *entity.User
@@ -235,9 +235,9 @@ func (mock *UserRepositoryMock) FindByIdCalls() []struct {
 		EntityMoqParam *entity.User
 		ID             string
 	}
-	mock.lockFindById.RLock()
-	calls = mock.calls.FindById
-	mock.lockFindById.RUnlock()
+	mock.lockFindByID.RLock()
+	calls = mock.calls.FindByID
+	mock.lockFindByID.RUnlock()
 	return calls
 }
 

@@ -26,11 +26,11 @@ func TestAddressUsecaseImpl_Get_Success(t *testing.T) {
 
 	req := &model.GetAddressRequest{}
 
-	ContactRepository.FindByIdAndUserIdFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userId string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
 		return nil
 	}
 
-	AddressRepository.FindByIdAndContactIdFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactId string) error {
+	AddressRepository.FindByIDAndContactIDFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactID string) error {
 		return nil
 	}
 
@@ -46,7 +46,7 @@ func TestAddressUsecaseImpl_Get_Success(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestAddressUsecaseImpl_Get_Fail_FindByIdAndUserId(t *testing.T) {
+func TestAddressUsecaseImpl_Get_Fail_FindByIDAndUserID(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	AddressRepository := &mock.AddressRepositoryMock{}
 	ContactRepository := &mock.ContactRepositoryMock{}
@@ -60,11 +60,11 @@ func TestAddressUsecaseImpl_Get_Fail_FindByIdAndUserId(t *testing.T) {
 
 	req := &model.GetAddressRequest{}
 
-	ContactRepository.FindByIdAndUserIdFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userId string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
 		return assert.AnError
 	}
 
-	AddressRepository.FindByIdAndContactIdFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactId string) error {
+	AddressRepository.FindByIDAndContactIDFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactID string) error {
 		return nil
 	}
 
@@ -81,7 +81,7 @@ func TestAddressUsecaseImpl_Get_Fail_FindByIdAndUserId(t *testing.T) {
 	assert.ErrorIs(t, err, assert.AnError)
 }
 
-func TestAddressUsecaseImpl_Get_Fail_FindByIdAndContactId(t *testing.T) {
+func TestAddressUsecaseImpl_Get_Fail_FindByIDAndContactID(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	AddressRepository := &mock.AddressRepositoryMock{}
 	ContactRepository := &mock.ContactRepositoryMock{}
@@ -95,11 +95,11 @@ func TestAddressUsecaseImpl_Get_Fail_FindByIdAndContactId(t *testing.T) {
 
 	req := &model.GetAddressRequest{}
 
-	ContactRepository.FindByIdAndUserIdFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userId string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
 		return nil
 	}
 
-	AddressRepository.FindByIdAndContactIdFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactId string) error {
+	AddressRepository.FindByIDAndContactIDFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactID string) error {
 		return assert.AnError
 	}
 

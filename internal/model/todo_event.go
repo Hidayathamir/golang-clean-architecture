@@ -8,6 +8,6 @@ type TodoCompletedEvent struct {
 	CompletedAt *int64 `json:"completed_at"`
 }
 
-func (t *TodoCompletedEvent) GetId() string {
+func (t *TodoCompletedEvent) GetID() string {
 	return t.ID
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/google/uuid"
 )
 
 func (u *AddressUsecaseImpl) Create(ctx context.Context, req *model.CreateAddressRequest) (*model.AddressResponse, error) {
@@ -17,28 +16,25 @@ func (u *AddressUsecaseImpl) Create(ctx context.Context, req *model.CreateAddres
 	}
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(ctx, u.DB.WithContext(ctx), contact, req.ContactId, req.UserId); err != nil {
+	if err := u.ContactRepository.FindByIDAndUserID(ctx, u.DB.WithContext(ctx), contact, req.ContactID, req.UserID); err != nil {
 		return nil, errkit.AddFuncName("address.(*AddressUsecaseImpl).Create", err)
 	}
 
-	address := &entity.Address{
-		ID:         uuid.NewString(),
-		ContactId:  contact.ID,
-		Street:     req.Street,
-		City:       req.City,
-		Province:   req.Province,
-		PostalCode: req.PostalCode,
-		Country:    req.Country,
-	}
+	address := new(entity.Address)
+	converter.ModelCreateAddressRequestToEntityAddress(req, address, contact.ID)
 
 	if err := u.AddressRepository.Create(ctx, u.DB.WithContext(ctx), address); err != nil {
 		return nil, errkit.AddFuncName("address.(*AddressUsecaseImpl).Create", err)
 	}
 
-	event := converter.AddressToEvent(address)
+	event := new(model.AddressEvent)
+	converter.EntityAddressToModelAddressEvent(address, event)
 	if err := u.AddressProducer.Send(ctx, event); err != nil {
 		return nil, errkit.AddFuncName("address.(*AddressUsecaseImpl).Create", err)
 	}
 
-	return converter.AddressToResponse(address), nil
+	res := new(model.AddressResponse)
+	converter.EntityAddressToModelAddressResponse(address, res)
+
+	return res, nil
 }

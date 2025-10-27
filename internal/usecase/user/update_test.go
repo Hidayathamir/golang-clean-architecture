@@ -9,6 +9,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/go-playground/validator/v10"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -19,6 +20,7 @@ func TestUserUsecaseImpl_Update_Success(t *testing.T) {
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
 		DB:             gormDB,
+		Config:         viper.New(),
 		Validate:       validator.New(),
 		UserRepository: UserRepository,
 		UserProducer:   UserProducer,
@@ -32,7 +34,7 @@ func TestUserUsecaseImpl_Update_Success(t *testing.T) {
 		Name:     "name1",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		return nil
 	}
 
@@ -62,6 +64,7 @@ func TestUserUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
 		DB:             gormDB,
+		Config:         viper.New(),
 		Validate:       validator.New(),
 		UserRepository: UserRepository,
 		UserProducer:   UserProducer,
@@ -73,7 +76,7 @@ func TestUserUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 		ID: "",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		return nil
 	}
 
@@ -99,12 +102,13 @@ func TestUserUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 	assert.ErrorAs(t, err, &verrs)
 }
 
-func TestUserUsecaseImpl_Update_Fail_FindById(t *testing.T) {
+func TestUserUsecaseImpl_Update_Fail_FindByID(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
 		DB:             gormDB,
+		Config:         viper.New(),
 		Validate:       validator.New(),
 		UserRepository: UserRepository,
 		UserProducer:   UserProducer,
@@ -116,7 +120,7 @@ func TestUserUsecaseImpl_Update_Fail_FindById(t *testing.T) {
 		ID: "id1",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		return assert.AnError
 	}
 
@@ -147,6 +151,7 @@ func TestUserUsecaseImpl_Update_Fail_Update(t *testing.T) {
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
 		DB:             gormDB,
+		Config:         viper.New(),
 		Validate:       validator.New(),
 		UserRepository: UserRepository,
 		UserProducer:   UserProducer,
@@ -158,7 +163,7 @@ func TestUserUsecaseImpl_Update_Fail_Update(t *testing.T) {
 		ID: "id1",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		return nil
 	}
 
@@ -189,6 +194,7 @@ func TestUserUsecaseImpl_Update_Fail_Send(t *testing.T) {
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
 		DB:             gormDB,
+		Config:         viper.New(),
 		Validate:       validator.New(),
 		UserRepository: UserRepository,
 		UserProducer:   UserProducer,
@@ -200,7 +206,7 @@ func TestUserUsecaseImpl_Update_Fail_Send(t *testing.T) {
 		ID: "id1",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		return nil
 	}
 

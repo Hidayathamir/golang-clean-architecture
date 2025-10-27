@@ -20,5 +20,8 @@ func (u *TodoUsecaseImpl) Get(ctx context.Context, req *model.GetTodoRequest) (*
 		return nil, errkit.AddFuncName("todo.(*TodoUsecaseImpl).Get", err)
 	}
 
-	return converter.TodoToResponse(todo), nil
+	res := new(model.TodoResponse)
+	converter.EntityTodoToModelTodoResponse(todo, res)
+
+	return res, nil
 }

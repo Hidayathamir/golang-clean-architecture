@@ -7,6 +7,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
@@ -17,18 +18,20 @@ type TodoRepository interface {
 	Update(ctx context.Context, db *gorm.DB, todo *entity.Todo) error
 	Delete(ctx context.Context, db *gorm.DB, todo *entity.Todo) error
 	FindByIDAndUserID(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID string) error
-	List(ctx context.Context, db *gorm.DB, req *model.ListTodoRequest) ([]entity.Todo, int64, error)
+	List(ctx context.Context, db *gorm.DB, req *model.ListTodoRequest) (entity.TodoList, int64, error)
 }
 
 var _ TodoRepository = &TodoRepositoryImpl{}
 
 type TodoRepositoryImpl struct {
-	Log *logrus.Logger
+	Config *viper.Viper
+	Log    *logrus.Logger
 }
 
-func NewTodoRepository(log *logrus.Logger) *TodoRepositoryImpl {
+func NewTodoRepository(cfg *viper.Viper, log *logrus.Logger) *TodoRepositoryImpl {
 	return &TodoRepositoryImpl{
-		Log: log,
+		Config: cfg,
+		Log:    log,
 	}
 }
 
@@ -63,8 +66,8 @@ func (r *TodoRepositoryImpl) FindByIDAndUserID(ctx context.Context, db *gorm.DB,
 	return nil
 }
 
-func (r *TodoRepositoryImpl) List(ctx context.Context, db *gorm.DB, req *model.ListTodoRequest) ([]entity.Todo, int64, error) {
-	var todos []entity.Todo
+func (r *TodoRepositoryImpl) List(ctx context.Context, db *gorm.DB, req *model.ListTodoRequest) (entity.TodoList, int64, error) {
+	var todos entity.TodoList
 	if err := db.Scopes(r.filterTodos(req)).
 		Offset((req.Page - 1) * req.Size).
 		Limit(req.Size).

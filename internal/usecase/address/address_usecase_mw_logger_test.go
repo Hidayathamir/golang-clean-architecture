@@ -64,8 +64,8 @@ func TestAddressUsecaseMwLogger_List(t *testing.T) {
 	u := &address.AddressUsecaseMwLogger{
 		Next: Next,
 	}
-	Next.ListFunc = func(ctx context.Context, req *model.ListAddressRequest) ([]model.AddressResponse, error) {
-		return []model.AddressResponse{{}}, nil
+	Next.ListFunc = func(ctx context.Context, req *model.ListAddressRequest) (model.AddressResponseList, error) {
+		return model.AddressResponseList{{}}, nil
 	}
 	res, err := u.List(context.Background(), &model.ListAddressRequest{})
 	assert.NotEmpty(t, res)

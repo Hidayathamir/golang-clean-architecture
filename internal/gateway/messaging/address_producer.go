@@ -8,6 +8,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 //go:generate moq -out=../../mock/AddressProducer.go -pkg=mock . AddressProducer
@@ -19,16 +20,18 @@ type AddressProducer interface {
 var _ AddressProducer = &AddressProducerImpl{}
 
 type AddressProducerImpl struct {
+	Config   *viper.Viper
+	Log      *logrus.Logger
 	Producer sarama.SyncProducer
 	Topic    string
-	Log      *logrus.Logger
 }
 
-func NewAddressProducer(producer sarama.SyncProducer, log *logrus.Logger) *AddressProducerImpl {
+func NewAddressProducer(cfg *viper.Viper, log *logrus.Logger, producer sarama.SyncProducer) *AddressProducerImpl {
 	return &AddressProducerImpl{
+		Config:   cfg,
+		Log:      log,
 		Producer: producer,
 		Topic:    "addresses",
-		Log:      log,
 	}
 }
 
@@ -45,7 +48,7 @@ func (p *AddressProducerImpl) Send(ctx context.Context, event *model.AddressEven
 
 	message := &sarama.ProducerMessage{
 		Topic: p.Topic,
-		Key:   sarama.StringEncoder(event.GetId()),
+		Key:   sarama.StringEncoder(event.GetID()),
 		Value: sarama.ByteEncoder(value),
 	}
 

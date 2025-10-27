@@ -9,6 +9,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
 	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
@@ -19,14 +20,15 @@ type ContactUsecase interface {
 	Update(ctx context.Context, req *model.UpdateContactRequest) (*model.ContactResponse, error)
 	Get(ctx context.Context, req *model.GetContactRequest) (*model.ContactResponse, error)
 	Delete(ctx context.Context, req *model.DeleteContactRequest) error
-	Search(ctx context.Context, req *model.SearchContactRequest) ([]model.ContactResponse, int64, error)
+	Search(ctx context.Context, req *model.SearchContactRequest) (model.ContactResponseList, int64, error)
 }
 
 var _ ContactUsecase = &ContactUsecaseImpl{}
 
 type ContactUsecaseImpl struct {
-	DB       *gorm.DB
+	Config   *viper.Viper
 	Log      *logrus.Logger
+	DB       *gorm.DB
 	Validate *validator.Validate
 
 	// repository
@@ -40,7 +42,7 @@ type ContactUsecaseImpl struct {
 }
 
 func NewContactUsecase(
-	db *gorm.DB, logger *logrus.Logger, validate *validator.Validate,
+	cfg *viper.Viper, log *logrus.Logger, db *gorm.DB, validate *validator.Validate,
 
 	// repository
 	contactRepository repository.ContactRepository,
@@ -52,8 +54,9 @@ func NewContactUsecase(
 	SlackClient rest.SlackClient,
 ) *ContactUsecaseImpl {
 	return &ContactUsecaseImpl{
+		Config:   cfg,
+		Log:      log,
 		DB:       db,
-		Log:      logger,
 		Validate: validate,
 
 		// repository

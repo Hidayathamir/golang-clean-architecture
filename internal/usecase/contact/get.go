@@ -16,9 +16,12 @@ func (u *ContactUsecaseImpl) Get(ctx context.Context, req *model.GetContactReque
 	}
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(ctx, u.DB.WithContext(ctx), contact, req.ID, req.UserId); err != nil {
+	if err := u.ContactRepository.FindByIDAndUserID(ctx, u.DB.WithContext(ctx), contact, req.ID, req.UserID); err != nil {
 		return nil, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Get", err)
 	}
 
-	return converter.ContactToResponse(contact), nil
+	res := new(model.ContactResponse)
+	converter.EntityContactToModelContactResponse(contact, res)
+
+	return res, nil
 }

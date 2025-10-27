@@ -8,6 +8,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
 	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
@@ -16,7 +17,7 @@ import (
 type TodoUsecase interface {
 	Create(ctx context.Context, req *model.CreateTodoRequest) (*model.TodoResponse, error)
 	Get(ctx context.Context, req *model.GetTodoRequest) (*model.TodoResponse, error)
-	List(ctx context.Context, req *model.ListTodoRequest) ([]model.TodoResponse, int64, error)
+	List(ctx context.Context, req *model.ListTodoRequest) (model.TodoResponseList, int64, error)
 	Update(ctx context.Context, req *model.UpdateTodoRequest) (*model.TodoResponse, error)
 	Delete(ctx context.Context, req *model.DeleteTodoRequest) error
 	Complete(ctx context.Context, req *model.CompleteTodoRequest) (*model.TodoResponse, error)
@@ -25,26 +26,37 @@ type TodoUsecase interface {
 var _ TodoUsecase = &TodoUsecaseImpl{}
 
 type TodoUsecaseImpl struct {
-	DB       *gorm.DB
+	Config   *viper.Viper
 	Log      *logrus.Logger
+	DB       *gorm.DB
 	Validate *validator.Validate
 
+	// repository
 	TodoRepository repository.TodoRepository
-	TodoProducer   messaging.TodoProducer
+
+	// producer
+	TodoProducer messaging.TodoProducer
 }
 
 func NewTodoUsecase(
-	db *gorm.DB,
-	log *logrus.Logger,
-	validate *validator.Validate,
+	cfg *viper.Viper, log *logrus.Logger, db *gorm.DB, validate *validator.Validate,
+
+	// repository
 	todoRepository repository.TodoRepository,
+
+	// producer
 	todoProducer messaging.TodoProducer,
 ) *TodoUsecaseImpl {
 	return &TodoUsecaseImpl{
-		DB:             db,
-		Log:            log,
-		Validate:       validate,
+		Config:   cfg,
+		Log:      log,
+		DB:       db,
+		Validate: validate,
+
+		// repository
 		TodoRepository: todoRepository,
-		TodoProducer:   todoProducer,
+
+		// producer
+		TodoProducer: todoProducer,
 	}
 }

@@ -16,14 +16,11 @@ func (u *ContactUsecaseImpl) Update(ctx context.Context, req *model.UpdateContac
 	}
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(ctx, u.DB.WithContext(ctx), contact, req.ID, req.UserId); err != nil {
+	if err := u.ContactRepository.FindByIDAndUserID(ctx, u.DB.WithContext(ctx), contact, req.ID, req.UserID); err != nil {
 		return nil, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Update", err)
 	}
 
-	contact.FirstName = req.FirstName
-	contact.LastName = req.LastName
-	contact.Email = req.Email
-	contact.Phone = req.Phone
+	converter.ModelUpdateContactRequestToEntityContact(req, contact)
 
 	if err := u.ContactRepository.Update(ctx, u.DB.WithContext(ctx), contact); err != nil {
 		return nil, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Update", err)
@@ -33,10 +30,14 @@ func (u *ContactUsecaseImpl) Update(ctx context.Context, req *model.UpdateContac
 		return nil, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Update", err)
 	}
 
-	event := converter.ContactToEvent(contact)
+	event := new(model.ContactEvent)
+	converter.EntityContactToModelContactEvent(contact, event)
 	if err := u.ContactProducer.Send(ctx, event); err != nil {
 		return nil, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Update", err)
 	}
 
-	return converter.ContactToResponse(contact), nil
+	res := new(model.ContactResponse)
+	converter.EntityContactToModelContactResponse(contact, res)
+
+	return res, nil
 }

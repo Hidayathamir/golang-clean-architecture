@@ -16,17 +16,15 @@ func (u *TodoUsecaseImpl) Create(ctx context.Context, req *model.CreateTodoReque
 		return nil, errkit.AddFuncName("todo.(*TodoUsecaseImpl).Create", err)
 	}
 
-	todo := &entity.Todo{
-		ID:          uuid.New().String(),
-		UserID:      req.UserID,
-		Title:       req.Title,
-		Description: req.Description,
-		IsCompleted: false,
-	}
+	todo := new(entity.Todo)
+	converter.ModelCreateTodoRequestToEntityTodo(req, todo, uuid.New().String())
 
 	if err := u.TodoRepository.Create(ctx, u.DB.WithContext(ctx), todo); err != nil {
 		return nil, errkit.AddFuncName("todo.(*TodoUsecaseImpl).Create", err)
 	}
 
-	return converter.TodoToResponse(todo), nil
+	res := new(model.TodoResponse)
+	converter.EntityTodoToModelTodoResponse(todo, res)
+
+	return res, nil
 }

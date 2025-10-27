@@ -55,7 +55,7 @@ func (u *ContactUsecaseMwLogger) Get(ctx context.Context, req *model.GetContactR
 	return res, err
 }
 
-func (u *ContactUsecaseMwLogger) Search(ctx context.Context, req *model.SearchContactRequest) ([]model.ContactResponse, int64, error) {
+func (u *ContactUsecaseMwLogger) Search(ctx context.Context, req *model.SearchContactRequest) (model.ContactResponseList, int64, error) {
 	res, total, err := u.Next.Search(ctx, req)
 
 	fields := logrus.Fields{

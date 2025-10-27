@@ -301,7 +301,7 @@ func TestListTodos(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(response.WebResponse[[]model.TodoResponse])
+	responseBody := new(response.WebResponse[model.TodoResponseList])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
@@ -330,7 +330,7 @@ func TestListTodosWithPagination(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(response.WebResponse[[]model.TodoResponse])
+	responseBody := new(response.WebResponse[model.TodoResponseList])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
@@ -374,7 +374,7 @@ func TestListTodosWithFilters(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(response.WebResponse[[]model.TodoResponse])
+	responseBody := new(response.WebResponse[model.TodoResponseList])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 

@@ -1,6 +1,10 @@
 package rest
 
-import "context"
+import (
+	"context"
+
+	"github.com/spf13/viper"
+)
 
 //go:generate moq -out=../../mock/SlackClient.go -pkg=mock . SlackClient
 
@@ -12,10 +16,13 @@ type SlackClient interface {
 var _ SlackClient = &SlackClientImpl{}
 
 type SlackClientImpl struct {
+	Config *viper.Viper
 }
 
-func NewSlackClient() *SlackClientImpl {
-	return &SlackClientImpl{}
+func NewSlackClient(cfg *viper.Viper) *SlackClientImpl {
+	return &SlackClientImpl{
+		Config: cfg,
+	}
 }
 
 func (c *SlackClientImpl) GetChannelList(ctx context.Context) ([]string, error) {

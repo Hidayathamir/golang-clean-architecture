@@ -15,7 +15,7 @@ func (u *ContactUsecaseImpl) Delete(ctx context.Context, req *model.DeleteContac
 	}
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(ctx, u.DB.WithContext(ctx), contact, req.ID, req.UserId); err != nil {
+	if err := u.ContactRepository.FindByIDAndUserID(ctx, u.DB.WithContext(ctx), contact, req.ID, req.UserID); err != nil {
 		return errkit.AddFuncName("contact.(*ContactUsecaseImpl).Delete", err)
 	}
 

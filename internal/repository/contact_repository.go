@@ -7,14 +7,15 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
 //go:generate moq -out=../mock/ContactRepository.go -pkg=mock . ContactRepository
 
 type ContactRepository interface {
-	FindByIdAndUserId(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userId string) error
-	Search(ctx context.Context, db *gorm.DB, req *model.SearchContactRequest) ([]entity.Contact, int64, error)
+	FindByIDAndUserID(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID string) error
+	Search(ctx context.Context, db *gorm.DB, req *model.SearchContactRequest) (entity.ContactList, int64, error)
 	Create(ctx context.Context, db *gorm.DB, entity *entity.Contact) error
 	Update(ctx context.Context, db *gorm.DB, entity *entity.Contact) error
 	Delete(ctx context.Context, db *gorm.DB, entity *entity.Contact) error
@@ -23,26 +24,28 @@ type ContactRepository interface {
 var _ ContactRepository = &ContactRepositoryImpl{}
 
 type ContactRepositoryImpl struct {
-	Log *logrus.Logger
+	Config *viper.Viper
+	Log    *logrus.Logger
 }
 
-func NewContactRepository(log *logrus.Logger) *ContactRepositoryImpl {
+func NewContactRepository(cfg *viper.Viper, log *logrus.Logger) *ContactRepositoryImpl {
 	return &ContactRepositoryImpl{
-		Log: log,
+		Config: cfg,
+		Log:    log,
 	}
 }
 
-func (r *ContactRepositoryImpl) FindByIdAndUserId(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userId string) error {
-	err := db.Where("id = ? AND user_id = ?", id, userId).Take(contact).Error
+func (r *ContactRepositoryImpl) FindByIDAndUserID(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID string) error {
+	err := db.Where("id = ? AND user_id = ?", id, userID).Take(contact).Error
 	if err != nil {
 		err = errkit.NotFound(err)
-		return errkit.AddFuncName("repository.(*ContactRepositoryImpl).FindByIdAndUserId", err)
+		return errkit.AddFuncName("repository.(*ContactRepositoryImpl).FindByIDAndUserID", err)
 	}
 	return nil
 }
 
-func (r *ContactRepositoryImpl) Search(ctx context.Context, db *gorm.DB, req *model.SearchContactRequest) ([]entity.Contact, int64, error) {
-	var contacts []entity.Contact
+func (r *ContactRepositoryImpl) Search(ctx context.Context, db *gorm.DB, req *model.SearchContactRequest) (entity.ContactList, int64, error) {
+	var contacts entity.ContactList
 	if err := db.Scopes(r.filterContact(req)).Offset((req.Page - 1) * req.Size).Limit(req.Size).Find(&contacts).Error; err != nil {
 		return nil, 0, errkit.AddFuncName("repository.(*ContactRepositoryImpl).Search", err)
 	}
@@ -57,7 +60,7 @@ func (r *ContactRepositoryImpl) Search(ctx context.Context, db *gorm.DB, req *mo
 
 func (r *ContactRepositoryImpl) filterContact(req *model.SearchContactRequest) func(tx *gorm.DB) *gorm.DB {
 	return func(tx *gorm.DB) *gorm.DB {
-		tx = tx.Where("user_id = ?", req.UserId)
+		tx = tx.Where("user_id = ?", req.UserID)
 
 		if name := req.Name; name != "" {
 			name = "%" + name + "%"

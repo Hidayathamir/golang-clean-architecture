@@ -30,12 +30,15 @@ func (u *TodoUsecaseImpl) Complete(ctx context.Context, req *model.CompleteTodoR
 			return nil, errkit.AddFuncName("todo.(*TodoUsecaseImpl).Complete", err)
 		}
 
-		if event := converter.TodoToCompletedEvent(todo); event != nil {
-			if err := u.TodoProducer.Send(ctx, event); err != nil {
-				return nil, errkit.AddFuncName("todo.(*TodoUsecaseImpl).Complete", err)
-			}
+		event := new(model.TodoCompletedEvent)
+		converter.EntityTodoToModelTodoCompletedEvent(todo, event)
+		if err := u.TodoProducer.Send(ctx, event); err != nil {
+			return nil, errkit.AddFuncName("todo.(*TodoUsecaseImpl).Complete", err)
 		}
 	}
 
-	return converter.TodoToResponse(todo), nil
+	res := new(model.TodoResponse)
+	converter.EntityTodoToModelTodoResponse(todo, res)
+
+	return res, nil
 }

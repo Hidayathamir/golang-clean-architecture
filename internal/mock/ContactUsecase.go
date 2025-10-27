@@ -29,7 +29,7 @@ var _ contact.ContactUsecase = &ContactUsecaseMock{}
 //			GetFunc: func(ctx context.Context, req *model.GetContactRequest) (*model.ContactResponse, error) {
 //				panic("mock out the Get method")
 //			},
-//			SearchFunc: func(ctx context.Context, req *model.SearchContactRequest) ([]model.ContactResponse, int64, error) {
+//			SearchFunc: func(ctx context.Context, req *model.SearchContactRequest) (model.ContactResponseList, int64, error) {
 //				panic("mock out the Search method")
 //			},
 //			UpdateFunc: func(ctx context.Context, req *model.UpdateContactRequest) (*model.ContactResponse, error) {
@@ -52,7 +52,7 @@ type ContactUsecaseMock struct {
 	GetFunc func(ctx context.Context, req *model.GetContactRequest) (*model.ContactResponse, error)
 
 	// SearchFunc mocks the Search method.
-	SearchFunc func(ctx context.Context, req *model.SearchContactRequest) ([]model.ContactResponse, int64, error)
+	SearchFunc func(ctx context.Context, req *model.SearchContactRequest) (model.ContactResponseList, int64, error)
 
 	// UpdateFunc mocks the Update method.
 	UpdateFunc func(ctx context.Context, req *model.UpdateContactRequest) (*model.ContactResponse, error)
@@ -211,7 +211,7 @@ func (mock *ContactUsecaseMock) GetCalls() []struct {
 }
 
 // Search calls SearchFunc.
-func (mock *ContactUsecaseMock) Search(ctx context.Context, req *model.SearchContactRequest) ([]model.ContactResponse, int64, error) {
+func (mock *ContactUsecaseMock) Search(ctx context.Context, req *model.SearchContactRequest) (model.ContactResponseList, int64, error) {
 	if mock.SearchFunc == nil {
 		panic("ContactUsecaseMock.SearchFunc: method is nil but ContactUsecase.Search was just called")
 	}

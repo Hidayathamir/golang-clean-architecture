@@ -22,20 +22,20 @@ func NewContactRepositoryMwLogger(next ContactRepository) *ContactRepositoryMwLo
 	}
 }
 
-func (r *ContactRepositoryMwLogger) FindByIdAndUserId(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userId string) error {
-	err := r.Next.FindByIdAndUserId(ctx, db, contact, id, userId)
+func (r *ContactRepositoryMwLogger) FindByIDAndUserID(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID string) error {
+	err := r.Next.FindByIDAndUserID(ctx, db, contact, id, userID)
 
 	fields := logrus.Fields{
 		"contact": contact,
 		"id":      id,
-		"userId":  userId,
+		"userID":  userID,
 	}
 	logging.Log(ctx, fields, err)
 
 	return err
 }
 
-func (r *ContactRepositoryMwLogger) Search(ctx context.Context, db *gorm.DB, req *model.SearchContactRequest) ([]entity.Contact, int64, error) {
+func (r *ContactRepositoryMwLogger) Search(ctx context.Context, db *gorm.DB, req *model.SearchContactRequest) (entity.ContactList, int64, error) {
 	contacts, total, err := r.Next.Search(ctx, db, req)
 
 	fields := logrus.Fields{

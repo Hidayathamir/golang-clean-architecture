@@ -10,6 +10,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/contact"
 	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,6 +19,7 @@ func TestNewContactUsecase(t *testing.T) {
 	var DB = gormDB
 	var Log = logrus.New()
 	var Validate = validator.New()
+	var Config = viper.New()
 
 	var ContactRepository repository.ContactRepository = &mock.ContactRepositoryMock{}
 
@@ -26,7 +28,7 @@ func TestNewContactUsecase(t *testing.T) {
 	var SlackClient rest.SlackClient = &mock.SlackClientMock{}
 
 	u := contact.NewContactUsecase(
-		DB, Log, Validate,
+		Config, Log, DB, Validate,
 
 		ContactRepository,
 

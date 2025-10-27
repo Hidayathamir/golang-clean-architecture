@@ -5,32 +5,60 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 )
 
-func TodoToResponse(todo *entity.Todo) *model.TodoResponse {
-	return &model.TodoResponse{
-		ID:          todo.ID,
-		Title:       todo.Title,
-		Description: todo.Description,
-		IsCompleted: todo.IsCompleted,
-		CompletedAt: todo.CompletedAt,
-		CreatedAt:   todo.CreatedAt,
-		UpdatedAt:   todo.UpdatedAt,
+func ModelCreateTodoRequestToEntityTodo(req *model.CreateTodoRequest, todo *entity.Todo, todoID string) {
+	if req == nil || todo == nil {
+		return
+	}
+
+	todo.ID = todoID
+	todo.UserID = req.UserID
+	todo.Title = req.Title
+	todo.Description = req.Description
+	todo.IsCompleted = false
+	todo.CompletedAt = nil
+}
+
+func ModelUpdateTodoRequestToEntityTodo(req *model.UpdateTodoRequest, todo *entity.Todo) {
+	if req == nil || todo == nil {
+		return
+	}
+
+	todo.Title = req.Title
+	todo.Description = req.Description
+}
+
+func EntityTodoToModelTodoResponse(todo *entity.Todo, res *model.TodoResponse) {
+	if todo == nil || res == nil {
+		return
+	}
+
+	res.ID = todo.ID
+	res.Title = todo.Title
+	res.Description = todo.Description
+	res.IsCompleted = todo.IsCompleted
+	res.CompletedAt = todo.CompletedAt
+	res.CreatedAt = todo.CreatedAt
+	res.UpdatedAt = todo.UpdatedAt
+}
+
+func EntityTodoListToModelTodoResponseList(todos entity.TodoList, res model.TodoResponseList) {
+	if res == nil {
+		return
+	}
+
+	for i := range todos {
+		EntityTodoToModelTodoResponse(&todos[i], &res[i])
 	}
 }
 
-func TodosToResponses(todos []entity.Todo) []model.TodoResponse {
-	responses := make([]model.TodoResponse, 0, len(todos))
-	for _, todo := range todos {
-		responses = append(responses, *TodoToResponse(&todo))
+func EntityTodoToModelTodoCompletedEvent(todo *entity.Todo, event *model.TodoCompletedEvent) {
+	if todo == nil || event == nil {
+		return
 	}
-	return responses
-}
 
-func TodoToCompletedEvent(todo *entity.Todo) *model.TodoCompletedEvent {
-	return &model.TodoCompletedEvent{
-		ID:          todo.ID,
-		UserID:      todo.UserID,
-		Title:       todo.Title,
-		Description: todo.Description,
-		CompletedAt: todo.CompletedAt,
-	}
+	event.ID = todo.ID
+	event.UserID = todo.UserID
+	event.Title = todo.Title
+	event.Description = todo.Description
+	event.CompletedAt = todo.CompletedAt
 }
