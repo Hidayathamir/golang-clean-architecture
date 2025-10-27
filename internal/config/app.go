@@ -10,6 +10,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/contact"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/todo"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
+	user2usecase "github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user2"
 	"github.com/IBM/sarama"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -20,6 +21,7 @@ import (
 
 type Usecases struct {
 	UserUsecase    user.UserUsecase
+	User2Usecase   user2usecase.User2Usecase
 	ContactUsecase contact.ContactUsecase
 	AddressUsecase address.AddressUsecase
 	TodoUsecase    todo.TodoUsecase
@@ -37,6 +39,10 @@ func SetupUsecases(
 	var userRepository repository.UserRepository
 	userRepository = repository.NewUserRepository(viperConfig, log)
 	userRepository = repository.NewUserRepositoryMwLogger(userRepository)
+
+	var user2Repository repository.User2Repository
+	user2Repository = repository.NewUser2Repository(viperConfig, log)
+	user2Repository = repository.NewUser2RepositoryMwLogger(user2Repository)
 
 	var contactRepository repository.ContactRepository
 	contactRepository = repository.NewContactRepository(viperConfig, log)
@@ -85,6 +91,8 @@ func SetupUsecases(
 	userUsecase = user.NewUserUsecase(viperConfig, log, db, validate, userRepository, userProducer, s3Client, slackClient)
 	userUsecase = user.NewUserUsecaseMwLogger(userUsecase)
 
+	var user2Usecase user2usecase.User2Usecase = user2usecase.NewUser2Usecase(viperConfig, log, db, validate, user2Repository)
+
 	var contactUsecase contact.ContactUsecase
 	contactUsecase = contact.NewContactUsecase(viperConfig, log, db, validate, contactRepository, contactProducer, slackClient)
 	contactUsecase = contact.NewContactUsecaseMwLogger(contactUsecase)
@@ -99,6 +107,7 @@ func SetupUsecases(
 
 	return &Usecases{
 		UserUsecase:    userUsecase,
+		User2Usecase:   user2Usecase,
 		ContactUsecase: contactUsecase,
 		AddressUsecase: addressUsecase,
 		TodoUsecase:    todoUsecase,
@@ -107,6 +116,7 @@ func SetupUsecases(
 
 type Controllers struct {
 	UserController    *http.UserController
+	User2Controller   *http.User2Controller
 	ContactController *http.ContactController
 	AddressController *http.AddressController
 	TodoController    *http.TodoController
@@ -114,12 +124,14 @@ type Controllers struct {
 
 func SetupControllers(viperConfig *viper.Viper, log *logrus.Logger, usecases *Usecases) *Controllers {
 	userController := http.NewUserController(viperConfig, log, usecases.UserUsecase)
+	user2Controller := http.NewUser2Controller(viperConfig, log, usecases.User2Usecase)
 	contactController := http.NewContactController(viperConfig, log, usecases.ContactUsecase)
 	addressController := http.NewAddressController(viperConfig, log, usecases.AddressUsecase)
 	todoController := http.NewTodoController(viperConfig, log, usecases.TodoUsecase)
 
 	return &Controllers{
 		UserController:    userController,
+		User2Controller:   user2Controller,
 		ContactController: contactController,
 		AddressController: addressController,
 		TodoController:    todoController,
@@ -127,16 +139,19 @@ func SetupControllers(viperConfig *viper.Viper, log *logrus.Logger, usecases *Us
 }
 
 type Middlewares struct {
-	AuthMiddleware    fiber.Handler
-	TraceIDMiddleware fiber.Handler
+	AuthMiddleware      fiber.Handler
+	User2AuthMiddleware fiber.Handler
+	TraceIDMiddleware   fiber.Handler
 }
 
 func SetupMiddlewares(usecases *Usecases) *Middlewares {
 	authMiddleware := middleware.NewAuth(usecases.UserUsecase)
+	user2AuthMiddleware := middleware.NewUser2Auth(usecases.User2Usecase)
 	traceIDMiddleware := middleware.NewTraceID()
 
 	return &Middlewares{
-		AuthMiddleware:    authMiddleware,
-		TraceIDMiddleware: traceIDMiddleware,
+		AuthMiddleware:      authMiddleware,
+		User2AuthMiddleware: user2AuthMiddleware,
+		TraceIDMiddleware:   traceIDMiddleware,
 	}
 }

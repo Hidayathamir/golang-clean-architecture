@@ -22,4 +22,7 @@ const (
 	KafkaGroupId          = "kafka.group.id"
 	KafkaAutoOffsetReset  = "kafka.auto.offset.reset"
 	KafkaProducerEnabled  = "kafka.producer.enabled"
+
+	AuthJWTSecret     = "auth.jwt.secret"
+	AuthJWTTTLSeconds = "auth.jwt.ttl_seconds"
 )

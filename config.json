@@ -9,6 +9,12 @@
   "log": {
     "level": 6
   },
+  "auth": {
+    "jwt": {
+      "secret": "change-me",
+      "ttl_seconds": 3600
+    }
+  },
   "database": {
     "migrations": "db/migrations",
     "username": "postgres",

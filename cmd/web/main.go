@@ -17,6 +17,10 @@ import (
 //	@in							header
 //	@name						Authorization
 //	@description				Simple token authorization
+//	@securityDefinitions.apikey	BearerAuth
+//	@in							header
+//	@name						Authorization
+//	@description				JWT bearer authorization
 
 func main() {
 	viperConfig := config.NewViper()

@@ -12,6 +12,8 @@ func Setup(app *fiber.App, controllers *config.Controllers, middlewares *config.
 	setupSwaggerRoute(app)
 	setupGuestRoute(app, controllers, middlewares)
 	setupAuthRoute(app, controllers, middlewares)
+	setupUser2GuestRoute(app, controllers, middlewares)
+	setupUser2AuthRoute(app, controllers, middlewares)
 }
 
 func setupHomeRoute(app *fiber.App) {
@@ -28,6 +30,12 @@ func setupGuestRoute(app *fiber.App, controllers *config.Controllers, middleware
 	router := app.Group("", middlewares.TraceIDMiddleware)
 	router.Post("/api/users", controllers.UserController.Register)
 	router.Post("/api/users/_login", controllers.UserController.Login)
+}
+
+func setupUser2GuestRoute(app *fiber.App, controllers *config.Controllers, middlewares *config.Middlewares) {
+	router := app.Group("", middlewares.TraceIDMiddleware)
+	router.Post("/api/user2", controllers.User2Controller.Register)
+	router.Post("/api/user2/_login", controllers.User2Controller.Login)
 }
 
 func setupAuthRoute(app *fiber.App, controllers *config.Controllers, middlewares *config.Middlewares) {
@@ -54,4 +62,9 @@ func setupAuthRoute(app *fiber.App, controllers *config.Controllers, middlewares
 	router.Put("/api/todos/:todoId", controllers.TodoController.Update)
 	router.Delete("/api/todos/:todoId", controllers.TodoController.Delete)
 	router.Patch("/api/todos/:todoId/_complete", controllers.TodoController.Complete)
+}
+
+func setupUser2AuthRoute(app *fiber.App, controllers *config.Controllers, middlewares *config.Middlewares) {
+	router := app.Group("", middlewares.TraceIDMiddleware, middlewares.User2AuthMiddleware)
+	router.Get("/api/user2/_current", controllers.User2Controller.Current)
 }

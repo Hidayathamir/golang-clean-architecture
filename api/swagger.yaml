@@ -107,6 +107,32 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
     type: object
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_User2Response
+  : properties:
+      data:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.User2Response'
+      error_detail:
+        items:
+          type: string
+        type: array
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
+    type: object
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_User2TokenResponse
+  : properties:
+      data:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.User2TokenResponse'
+      error_detail:
+        items:
+          type: string
+        type: array
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
+    type: object
   ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse
   : properties:
       data:
@@ -206,6 +232,18 @@ definitions:
     required:
     - title
     type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.LoginUser2Request:
+    properties:
+      email:
+        maxLength: 255
+        type: string
+      password:
+        maxLength: 100
+        type: string
+    required:
+    - email
+    - password
+    type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.LoginUserRequest:
     properties:
       id:
@@ -216,6 +254,23 @@ definitions:
         type: string
     required:
     - id
+    - password
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.RegisterUser2Request:
+    properties:
+      display_name:
+        maxLength: 100
+        type: string
+      email:
+        maxLength: 255
+        type: string
+      password:
+        maxLength: 100
+        minLength: 8
+        type: string
+    required:
+    - display_name
+    - email
     - password
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.RegisterUserRequest:
@@ -305,6 +360,26 @@ definitions:
       password:
         maxLength: 100
         type: string
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.User2Response:
+    properties:
+      created_at:
+        type: integer
+      display_name:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      updated_at:
+        type: integer
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.User2TokenResponse:
+    properties:
+      access_token:
+        type: string
+      expires_at:
+        type: integer
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.UserResponse:
     properties:
@@ -689,6 +764,55 @@ paths:
       summary: Complete todo
       tags:
       - todos
+  /api/user2:
+    post:
+      description: Create a new user2 account and return its profile
+      parameters:
+      - description: Register User2 Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.RegisterUser2Request'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_User2Response'
+      summary: Register user2 account
+      tags:
+      - user2
+  /api/user2/_current:
+    get:
+      description: Return the profile associated with the provided JWT access token
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_User2Response'
+      security:
+      - BearerAuth: []
+      summary: Get current user2 profile
+      tags:
+      - user2
+  /api/user2/_login:
+    post:
+      description: Authenticate a user2 account and return an access token
+      parameters:
+      - description: Login User2 Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.LoginUser2Request'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_User2TokenResponse'
+      summary: JWT login for user2
+      tags:
+      - user2
   /api/users:
     delete:
       description: Logout the current authenticated user
@@ -770,6 +894,11 @@ paths:
       tags:
       - users
 securityDefinitions:
+  BearerAuth:
+    description: JWT bearer authorization
+    in: header
+    name: Authorization
+    type: apiKey
   SimpleApiKeyAuth:
     description: Simple token authorization
     in: header

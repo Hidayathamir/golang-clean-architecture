@@ -598,6 +598,84 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/user2": {
+            "post": {
+                "description": "Create a new user2 account and return its profile",
+                "tags": [
+                    "user2"
+                ],
+                "summary": "Register user2 account",
+                "parameters": [
+                    {
+                        "description": "Register User2 Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.RegisterUser2Request"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_User2Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user2/_current": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Return the profile associated with the provided JWT access token",
+                "tags": [
+                    "user2"
+                ],
+                "summary": "Get current user2 profile",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_User2Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user2/_login": {
+            "post": {
+                "description": "Authenticate a user2 account and return an access token",
+                "tags": [
+                    "user2"
+                ],
+                "summary": "JWT login for user2",
+                "parameters": [
+                    {
+                        "description": "Login User2 Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.LoginUser2Request"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_User2TokenResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/users": {
             "post": {
                 "description": "Register a new user account",
@@ -895,6 +973,46 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_User2Response": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.User2Response"
+                },
+                "error_detail": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "error_message": {
+                    "type": "string"
+                },
+                "paging": {
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata"
+                }
+            }
+        },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_User2TokenResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.User2TokenResponse"
+                },
+                "error_detail": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "error_message": {
+                    "type": "string"
+                },
+                "paging": {
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata"
+                }
+            }
+        },
         "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse": {
             "type": "object",
             "properties": {
@@ -1041,6 +1159,23 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.LoginUser2Request": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 100
+                }
+            }
+        },
         "github_com_Hidayathamir_golang-clean-architecture_internal_model.LoginUserRequest": {
             "type": "object",
             "required": [
@@ -1055,6 +1190,29 @@ const docTemplate = `{
                 "password": {
                     "type": "string",
                     "maxLength": 100
+                }
+            }
+        },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.RegisterUser2Request": {
+            "type": "object",
+            "required": [
+                "display_name",
+                "email",
+                "password"
+            ],
+            "properties": {
+                "display_name": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "email": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 8
                 }
             }
         },
@@ -1184,6 +1342,37 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.User2Response": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "integer"
+                },
+                "display_name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.User2TokenResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "expires_at": {
+                    "type": "integer"
+                }
+            }
+        },
         "github_com_Hidayathamir_golang-clean-architecture_internal_model.UserResponse": {
             "type": "object",
             "properties": {
@@ -1206,6 +1395,12 @@ const docTemplate = `{
         }
     },
     "securityDefinitions": {
+        "BearerAuth": {
+            "description": "JWT bearer authorization",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        },
         "SimpleApiKeyAuth": {
             "description": "Simple token authorization",
             "type": "apiKey",
