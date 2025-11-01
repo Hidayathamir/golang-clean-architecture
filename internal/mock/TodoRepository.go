@@ -31,7 +31,7 @@ var _ repository.TodoRepository = &TodoRepositoryMock{}
 //			FindByIDAndUserIDFunc: func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID string) error {
 //				panic("mock out the FindByIDAndUserID method")
 //			},
-//			ListFunc: func(ctx context.Context, db *gorm.DB, req *model.ListTodoRequest) ([]entity.Todo, int64, error) {
+//			ListFunc: func(ctx context.Context, db *gorm.DB, req *model.ListTodoRequest) (entity.TodoList, int64, error) {
 //				panic("mock out the List method")
 //			},
 //			UpdateFunc: func(ctx context.Context, db *gorm.DB, todo *entity.Todo) error {
@@ -54,7 +54,7 @@ type TodoRepositoryMock struct {
 	FindByIDAndUserIDFunc func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID string) error
 
 	// ListFunc mocks the List method.
-	ListFunc func(ctx context.Context, db *gorm.DB, req *model.ListTodoRequest) ([]entity.Todo, int64, error)
+	ListFunc func(ctx context.Context, db *gorm.DB, req *model.ListTodoRequest) (entity.TodoList, int64, error)
 
 	// UpdateFunc mocks the Update method.
 	UpdateFunc func(ctx context.Context, db *gorm.DB, todo *entity.Todo) error
@@ -247,7 +247,7 @@ func (mock *TodoRepositoryMock) FindByIDAndUserIDCalls() []struct {
 }
 
 // List calls ListFunc.
-func (mock *TodoRepositoryMock) List(ctx context.Context, db *gorm.DB, req *model.ListTodoRequest) ([]entity.Todo, int64, error) {
+func (mock *TodoRepositoryMock) List(ctx context.Context, db *gorm.DB, req *model.ListTodoRequest) (entity.TodoList, int64, error) {
 	if mock.ListFunc == nil {
 		panic("TodoRepositoryMock.ListFunc: method is nil but TodoRepository.List was just called")
 	}

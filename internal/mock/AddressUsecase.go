@@ -29,7 +29,7 @@ var _ address.AddressUsecase = &AddressUsecaseMock{}
 //			GetFunc: func(ctx context.Context, req *model.GetAddressRequest) (*model.AddressResponse, error) {
 //				panic("mock out the Get method")
 //			},
-//			ListFunc: func(ctx context.Context, req *model.ListAddressRequest) ([]model.AddressResponse, error) {
+//			ListFunc: func(ctx context.Context, req *model.ListAddressRequest) (model.AddressResponseList, error) {
 //				panic("mock out the List method")
 //			},
 //			UpdateFunc: func(ctx context.Context, req *model.UpdateAddressRequest) (*model.AddressResponse, error) {
@@ -52,7 +52,7 @@ type AddressUsecaseMock struct {
 	GetFunc func(ctx context.Context, req *model.GetAddressRequest) (*model.AddressResponse, error)
 
 	// ListFunc mocks the List method.
-	ListFunc func(ctx context.Context, req *model.ListAddressRequest) ([]model.AddressResponse, error)
+	ListFunc func(ctx context.Context, req *model.ListAddressRequest) (model.AddressResponseList, error)
 
 	// UpdateFunc mocks the Update method.
 	UpdateFunc func(ctx context.Context, req *model.UpdateAddressRequest) (*model.AddressResponse, error)
@@ -211,7 +211,7 @@ func (mock *AddressUsecaseMock) GetCalls() []struct {
 }
 
 // List calls ListFunc.
-func (mock *AddressUsecaseMock) List(ctx context.Context, req *model.ListAddressRequest) ([]model.AddressResponse, error) {
+func (mock *AddressUsecaseMock) List(ctx context.Context, req *model.ListAddressRequest) (model.AddressResponseList, error) {
 	if mock.ListFunc == nil {
 		panic("AddressUsecaseMock.ListFunc: method is nil but AddressUsecase.List was just called")
 	}
