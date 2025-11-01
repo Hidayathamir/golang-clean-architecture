@@ -127,16 +127,19 @@ func SetupControllers(viperConfig *viper.Viper, log *logrus.Logger, usecases *Us
 }
 
 type Middlewares struct {
-	AuthMiddleware    fiber.Handler
-	TraceIDMiddleware fiber.Handler
+	AuthMiddleware      fiber.Handler
+	TraceIDMiddleware   fiber.Handler
+	OtelFiberMiddleware fiber.Handler
 }
 
 func SetupMiddlewares(usecases *Usecases) *Middlewares {
 	authMiddleware := middleware.NewAuth(usecases.UserUsecase)
 	traceIDMiddleware := middleware.NewTraceID()
+	otelFiberMiddleware := middleware.NewOtelFiberMiddleware()
 
 	return &Middlewares{
-		AuthMiddleware:    authMiddleware,
-		TraceIDMiddleware: traceIDMiddleware,
+		AuthMiddleware:      authMiddleware,
+		TraceIDMiddleware:   traceIDMiddleware,
+		OtelFiberMiddleware: otelFiberMiddleware,
 	}
 }

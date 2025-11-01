@@ -8,50 +8,70 @@ import (
 )
 
 func Setup(app *fiber.App, controllers *config.Controllers, middlewares *config.Middlewares) {
-	setupHomeRoute(app)
-	setupSwaggerRoute(app)
-	setupGuestRoute(app, controllers, middlewares)
-	setupAuthRoute(app, controllers, middlewares)
+	root := app.Group("")
+
+	setupHomeRoute(root)
+	setupSwaggerRoute(root)
+
+	api := root.Group("/api", middlewares.OtelFiberMiddleware, middlewares.TraceIDMiddleware)
+
+	setupGuestRoute(api, controllers)
+
+	authenticated := api.Group("", middlewares.AuthMiddleware)
+	setupAuthRoute(authenticated, controllers)
 }
 
-func setupHomeRoute(app *fiber.App) {
-	app.Get("/", func(ctx *fiber.Ctx) error {
+func setupHomeRoute(router fiber.Router) {
+	router.Get("/", func(ctx *fiber.Ctx) error {
 		return ctx.SendString("hi")
 	})
 }
 
-func setupSwaggerRoute(app *fiber.App) {
-	app.Get("/swagger/*", swagger.HandlerDefault)
+func setupSwaggerRoute(router fiber.Router) {
+	router.Get("/swagger/*", swagger.HandlerDefault)
 }
 
-func setupGuestRoute(app *fiber.App, controllers *config.Controllers, middlewares *config.Middlewares) {
-	router := app.Group("", middlewares.TraceIDMiddleware)
-	router.Post("/api/users", controllers.UserController.Register)
-	router.Post("/api/users/_login", controllers.UserController.Login)
+func setupGuestRoute(router fiber.Router, controllers *config.Controllers) {
+	users := router.Group("/users")
+	{
+		users.Post("", controllers.UserController.Register)
+		users.Post("/_login", controllers.UserController.Login)
+	}
 }
 
-func setupAuthRoute(app *fiber.App, controllers *config.Controllers, middlewares *config.Middlewares) {
-	router := app.Group("", middlewares.TraceIDMiddleware, middlewares.AuthMiddleware)
-	router.Delete("/api/users", controllers.UserController.Logout)
-	router.Patch("/api/users/_current", controllers.UserController.Update)
-	router.Get("/api/users/_current", controllers.UserController.Current)
+func setupAuthRoute(router fiber.Router, controllers *config.Controllers) {
+	users := router.Group("/users")
+	{
+		users.Delete("", controllers.UserController.Logout)
+		users.Patch("/_current", controllers.UserController.Update)
+		users.Get("/_current", controllers.UserController.Current)
+	}
 
-	router.Get("/api/contacts", controllers.ContactController.List)
-	router.Post("/api/contacts", controllers.ContactController.Create)
-	router.Put("/api/contacts/:contactId", controllers.ContactController.Update)
-	router.Get("/api/contacts/:contactId", controllers.ContactController.Get)
-	router.Delete("/api/contacts/:contactId", controllers.ContactController.Delete)
+	contacts := router.Group("/contacts")
+	{
+		contacts.Get("", controllers.ContactController.List)
+		contacts.Post("", controllers.ContactController.Create)
+		contacts.Put("/:contactId", controllers.ContactController.Update)
+		contacts.Get("/:contactId", controllers.ContactController.Get)
+		contacts.Delete("/:contactId", controllers.ContactController.Delete)
+	}
 
-	router.Get("/api/contacts/:contactId/addresses", controllers.AddressController.List)
-	router.Post("/api/contacts/:contactId/addresses", controllers.AddressController.Create)
-	router.Put("/api/contacts/:contactId/addresses/:addressId", controllers.AddressController.Update)
-	router.Get("/api/contacts/:contactId/addresses/:addressId", controllers.AddressController.Get)
-	router.Delete("/api/contacts/:contactId/addresses/:addressId", controllers.AddressController.Delete)
+	addresses := contacts.Group("/:contactId/addresses")
+	{
+		addresses.Get("", controllers.AddressController.List)
+		addresses.Post("", controllers.AddressController.Create)
+		addresses.Put("/:addressId", controllers.AddressController.Update)
+		addresses.Get("/:addressId", controllers.AddressController.Get)
+		addresses.Delete("/:addressId", controllers.AddressController.Delete)
+	}
 
-	router.Post("/api/todos", controllers.TodoController.Create)
-	router.Get("/api/todos", controllers.TodoController.List)
-	router.Get("/api/todos/:todoId", controllers.TodoController.Get)
-	router.Put("/api/todos/:todoId", controllers.TodoController.Update)
-	router.Delete("/api/todos/:todoId", controllers.TodoController.Delete)
-	router.Patch("/api/todos/:todoId/_complete", controllers.TodoController.Complete)
+	todos := router.Group("/todos")
+	{
+		todos.Post("", controllers.TodoController.Create)
+		todos.Get("", controllers.TodoController.List)
+		todos.Get("/:todoId", controllers.TodoController.Get)
+		todos.Put("/:todoId", controllers.TodoController.Update)
+		todos.Delete("/:todoId", controllers.TodoController.Delete)
+		todos.Patch("/:todoId/_complete", controllers.TodoController.Complete)
+	}
 }

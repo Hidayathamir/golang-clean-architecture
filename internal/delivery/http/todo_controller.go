@@ -10,6 +10,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	todousecase "github.com/Hidayathamir/golang-clean-architecture/internal/usecase/todo"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -39,6 +40,9 @@ func NewTodoController(cfg *viper.Viper, log *logrus.Logger, usecase todousecase
 //	@Success		200		{object}	response.WebResponse[model.TodoResponse]
 //	@Router			/api/todos [post]
 func (c *TodoController) Create(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	auth := middleware.GetUser(ctx)
 
 	req := new(model.CreateTodoRequest)
@@ -70,6 +74,9 @@ func (c *TodoController) Create(ctx *fiber.Ctx) error {
 //	@Success		200				{object}	response.WebResponse[model.TodoResponseList]
 //	@Router			/api/todos [get]
 func (c *TodoController) List(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	auth := middleware.GetUser(ctx)
 
 	var isCompleted *bool
@@ -115,6 +122,9 @@ func (c *TodoController) List(ctx *fiber.Ctx) error {
 //	@Success		200		{object}	response.WebResponse[model.TodoResponse]
 //	@Router			/api/todos/{todoId} [get]
 func (c *TodoController) Get(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	auth := middleware.GetUser(ctx)
 
 	req := &model.GetTodoRequest{
@@ -141,6 +151,9 @@ func (c *TodoController) Get(ctx *fiber.Ctx) error {
 //	@Success		200		{object}	response.WebResponse[model.TodoResponse]
 //	@Router			/api/todos/{todoId} [put]
 func (c *TodoController) Update(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	auth := middleware.GetUser(ctx)
 
 	req := new(model.UpdateTodoRequest)
@@ -170,6 +183,9 @@ func (c *TodoController) Update(ctx *fiber.Ctx) error {
 //	@Success		200		{object}	response.WebResponse[bool]
 //	@Router			/api/todos/{todoId} [delete]
 func (c *TodoController) Delete(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	auth := middleware.GetUser(ctx)
 
 	req := &model.DeleteTodoRequest{
@@ -194,6 +210,9 @@ func (c *TodoController) Delete(ctx *fiber.Ctx) error {
 //	@Success		200		{object}	response.WebResponse[model.TodoResponse]
 //	@Router			/api/todos/{todoId}/_complete [patch]
 func (c *TodoController) Complete(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	auth := middleware.GetUser(ctx)
 
 	req := &model.CompleteTodoRequest{

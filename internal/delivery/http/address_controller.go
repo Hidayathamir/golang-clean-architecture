@@ -8,6 +8,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/address"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -38,6 +39,9 @@ func NewAddressController(cfg *viper.Viper, log *logrus.Logger, useCase address.
 //	@Success		200	{object}	response.WebResponse[model.AddressResponse]
 //	@Router			/api/contacts/{contactId}/addresses [post]
 func (c *AddressController) Create(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	auth := middleware.GetUser(ctx)
 
 	req := new(model.CreateAddressRequest)
@@ -67,6 +71,9 @@ func (c *AddressController) Create(ctx *fiber.Ctx) error {
 //	@Success		200	{object}	response.WebResponse[model.AddressResponseList]
 //	@Router			/api/contacts/{contactId}/addresses [get]
 func (c *AddressController) List(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	auth := middleware.GetUser(ctx)
 	contactID := ctx.Params("contactId")
 
@@ -94,6 +101,9 @@ func (c *AddressController) List(ctx *fiber.Ctx) error {
 //	@Success		200	{object}	response.WebResponse[model.AddressResponse]
 //	@Router			/api/contacts/{contactId}/addresses/{addressId} [get]
 func (c *AddressController) Get(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	auth := middleware.GetUser(ctx)
 	contactID := ctx.Params("contactId")
 	addressID := ctx.Params("addressId")
@@ -124,6 +134,9 @@ func (c *AddressController) Get(ctx *fiber.Ctx) error {
 //	@Success		200	{object}	response.WebResponse[model.AddressResponse]
 //	@Router			/api/contacts/{contactId}/addresses/{addressId} [put]
 func (c *AddressController) Update(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	auth := middleware.GetUser(ctx)
 
 	req := new(model.UpdateAddressRequest)
@@ -155,6 +168,9 @@ func (c *AddressController) Update(ctx *fiber.Ctx) error {
 //	@Success		200	{object}	response.WebResponse[bool]
 //	@Router			/api/contacts/{contactId}/addresses/{addressId} [delete]
 func (c *AddressController) Delete(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	auth := middleware.GetUser(ctx)
 	contactID := ctx.Params("contactId")
 	addressID := ctx.Params("addressId")

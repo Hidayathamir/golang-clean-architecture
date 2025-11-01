@@ -8,6 +8,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -36,6 +37,9 @@ func NewUserController(cfg *viper.Viper, log *logrus.Logger, useCase user.UserUs
 //	@Success		200		{object}	response.WebResponse[model.UserResponse]
 //	@Router			/api/users [post]
 func (c *UserController) Register(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	req := new(model.RegisterUserRequest)
 	err := ctx.BodyParser(req)
 	if err != nil {
@@ -60,6 +64,9 @@ func (c *UserController) Register(ctx *fiber.Ctx) error {
 //	@Success		200		{object}	response.WebResponse[model.UserResponse]
 //	@Router			/api/users/_login [post]
 func (c *UserController) Login(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	req := new(model.LoginUserRequest)
 	err := ctx.BodyParser(req)
 	if err != nil {
@@ -84,6 +91,9 @@ func (c *UserController) Login(ctx *fiber.Ctx) error {
 //	@Success		200	{object}	response.WebResponse[model.UserResponse]
 //	@Router			/api/users/_current [get]
 func (c *UserController) Current(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	auth := middleware.GetUser(ctx)
 
 	req := &model.GetUserRequest{
@@ -107,6 +117,9 @@ func (c *UserController) Current(ctx *fiber.Ctx) error {
 //	@Success		200	{object}	response.WebResponse[bool]
 //	@Router			/api/users [delete]
 func (c *UserController) Logout(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	auth := middleware.GetUser(ctx)
 
 	req := &model.LogoutUserRequest{
@@ -131,6 +144,9 @@ func (c *UserController) Logout(ctx *fiber.Ctx) error {
 //	@Success		200		{object}	response.WebResponse[model.UserResponse]
 //	@Router			/api/users/_current [patch]
 func (c *UserController) Update(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	auth := middleware.GetUser(ctx)
 
 	req := new(model.UpdateUserRequest)

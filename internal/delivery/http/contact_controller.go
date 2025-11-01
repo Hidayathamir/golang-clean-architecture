@@ -9,6 +9,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/contact"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -38,6 +39,9 @@ func NewContactController(cfg *viper.Viper, log *logrus.Logger, useCase contact.
 //	@Success		200	{object}	response.WebResponse[model.ContactResponse]
 //	@Router			/api/contacts [post]
 func (c *ContactController) Create(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	auth := middleware.GetUser(ctx)
 
 	req := new(model.CreateContactRequest)
@@ -69,6 +73,9 @@ func (c *ContactController) Create(ctx *fiber.Ctx) error {
 //	@Success		200	{object}	response.WebResponse[model.ContactResponseList]
 //	@Router			/api/contacts [get]
 func (c *ContactController) List(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	auth := middleware.GetUser(ctx)
 
 	req := &model.SearchContactRequest{
@@ -105,6 +112,9 @@ func (c *ContactController) List(ctx *fiber.Ctx) error {
 //	@Success		200	{object}	response.WebResponse[model.ContactResponse]
 //	@Router			/api/contacts/{contactId} [get]
 func (c *ContactController) Get(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	auth := middleware.GetUser(ctx)
 
 	req := &model.GetContactRequest{
@@ -131,6 +141,9 @@ func (c *ContactController) Get(ctx *fiber.Ctx) error {
 //	@Success		200	{object}	response.WebResponse[model.ContactResponse]
 //	@Router			/api/contacts/{contactId} [put]
 func (c *ContactController) Update(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	auth := middleware.GetUser(ctx)
 
 	req := new(model.UpdateContactRequest)
@@ -160,6 +173,9 @@ func (c *ContactController) Update(ctx *fiber.Ctx) error {
 //	@Success		200	{object}	response.WebResponse[bool]
 //	@Router			/api/contacts/{contactId} [delete]
 func (c *ContactController) Delete(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
 	auth := middleware.GetUser(ctx)
 	contactID := ctx.Params("contactId")
 
