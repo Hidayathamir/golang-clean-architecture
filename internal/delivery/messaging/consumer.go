@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/IBM/sarama"
+	"github.com/dnwe/otelsarama"
 	"github.com/sirupsen/logrus"
 )
 
@@ -44,10 +45,10 @@ func (h *ConsumerGroupHandler) ConsumeClaim(session sarama.ConsumerGroupSession,
 }
 
 func ConsumeTopic(ctx context.Context, consumerGroup sarama.ConsumerGroup, topic string, log *logrus.Logger, handler ConsumerHandler) {
-	consumerHandler := &ConsumerGroupHandler{
+	consumerHandler := otelsarama.WrapConsumerGroupHandler(&ConsumerGroupHandler{
 		Handler: handler,
 		Log:     log,
-	}
+	})
 
 	go func() {
 		for {

@@ -53,18 +53,22 @@ func SetupUsecases(
 	// setup producer
 	var userProducer messaging.UserProducer
 	userProducer = messaging.NewUserProducer(viperConfig, log, producer)
+	userProducer = messaging.NewUserProducerMwTelemetry(userProducer)
 	userProducer = messaging.NewUserProducerMwLogger(userProducer)
 
 	var contactProducer messaging.ContactProducer
 	contactProducer = messaging.NewContactProducer(viperConfig, log, producer)
+	contactProducer = messaging.NewContactProducerMwTelemetry(contactProducer)
 	contactProducer = messaging.NewContactProducerMwLogger(contactProducer)
 
 	var addressProducer messaging.AddressProducer
 	addressProducer = messaging.NewAddressProducer(viperConfig, log, producer)
+	addressProducer = messaging.NewAddressProducerMwTelemetry(addressProducer)
 	addressProducer = messaging.NewAddressProducerMwLogger(addressProducer)
 
 	var todoProducer messaging.TodoProducer
 	todoProducer = messaging.NewTodoProducer(viperConfig, log, producer)
+	todoProducer = messaging.NewTodoProducerMwTelemetry(todoProducer)
 	todoProducer = messaging.NewTodoProducerMwLogger(todoProducer)
 
 	// setup client

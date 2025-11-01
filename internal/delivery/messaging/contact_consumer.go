@@ -6,6 +6,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/contact"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
 )
@@ -23,6 +24,9 @@ func NewContactConsumer(usecase contact.ContactUsecase, log *logrus.Logger) *Con
 }
 
 func (c ContactConsumer) Consume(message *sarama.ConsumerMessage) error {
+	_, span := telemetry.StartConsumer(message)
+	defer span.End()
+
 	ContactEvent := new(model.ContactEvent)
 	if err := json.Unmarshal(message.Value, ContactEvent); err != nil {
 		c.Log.WithError(err).Error("error unmarshalling Contact event")

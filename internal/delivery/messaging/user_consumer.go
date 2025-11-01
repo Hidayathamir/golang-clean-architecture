@@ -6,6 +6,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
 )
@@ -23,6 +24,9 @@ func NewUserConsumer(usecase user.UserUsecase, log *logrus.Logger) *UserConsumer
 }
 
 func (c UserConsumer) Consume(message *sarama.ConsumerMessage) error {
+	_, span := telemetry.StartConsumer(message)
+	defer span.End()
+
 	UserEvent := new(model.UserEvent)
 	if err := json.Unmarshal(message.Value, UserEvent); err != nil {
 		c.Log.WithError(err).Error("error unmarshalling User event")

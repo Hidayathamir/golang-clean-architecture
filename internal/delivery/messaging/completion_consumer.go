@@ -5,6 +5,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
 )
@@ -20,6 +21,9 @@ func NewTodoCompletionConsumer(log *logrus.Logger) *TodoCompletionConsumer {
 }
 
 func (c *TodoCompletionConsumer) Consume(message *sarama.ConsumerMessage) error {
+	_, span := telemetry.StartConsumer(message)
+	defer span.End()
+
 	event := new(model.TodoCompletedEvent)
 	if err := json.Unmarshal(message.Value, event); err != nil {
 		c.Log.WithError(err).Error("error unmarshalling todo completion event")

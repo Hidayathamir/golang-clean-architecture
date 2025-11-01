@@ -6,6 +6,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -51,6 +52,8 @@ func (p *UserProducerImpl) Send(ctx context.Context, event *model.UserEvent) err
 		Key:   sarama.StringEncoder(event.GetID()),
 		Value: sarama.ByteEncoder(value),
 	}
+
+	telemetry.InjectCtxToProducerMessage(ctx, message)
 
 	partition, offset, err := p.Producer.SendMessage(message)
 	if err != nil {

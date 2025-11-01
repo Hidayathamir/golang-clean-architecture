@@ -1,13 +1,13 @@
 package messaging
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	todousecase "github.com/Hidayathamir/golang-clean-architecture/internal/usecase/todo"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
 )
@@ -30,6 +30,9 @@ type completeTodoCommand struct {
 }
 
 func (c *TodoCommandConsumer) Consume(message *sarama.ConsumerMessage) error {
+	ctx, span := telemetry.StartConsumer(message)
+	defer span.End()
+
 	cmd := new(completeTodoCommand)
 	if err := json.Unmarshal(message.Value, cmd); err != nil {
 		c.Log.WithError(err).Error("error unmarshalling todo command")
@@ -47,7 +50,7 @@ func (c *TodoCommandConsumer) Consume(message *sarama.ConsumerMessage) error {
 		ID:     cmd.TodoID,
 	}
 
-	if _, err := c.Usecase.Complete(context.Background(), req); err != nil {
+	if _, err := c.Usecase.Complete(ctx, req); err != nil {
 		return errkit.AddFuncName("messaging.(*TodoCommandConsumer).Consume", err)
 	}
 
