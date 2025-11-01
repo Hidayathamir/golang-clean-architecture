@@ -9,6 +9,11 @@
   "log": {
     "level": 6
   },
+  "telemetry": {
+    "otlp": {
+      "endpoint": "localhost:4317"
+    }
+  },
   "database": {
     "migrations": "db/migrations",
     "username": "postgres",

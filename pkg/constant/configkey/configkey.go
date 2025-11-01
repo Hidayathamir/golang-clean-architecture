@@ -22,4 +22,6 @@ const (
 	KafkaGroupId          = "kafka.group.id"
 	KafkaAutoOffsetReset  = "kafka.auto.offset.reset"
 	KafkaProducerEnabled  = "kafka.producer.enabled"
+
+	TelemetryOTLPEndpoint = "telemetry.otlp.endpoint"
 )

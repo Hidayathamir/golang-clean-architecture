@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/messaging"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -22,6 +24,10 @@ func main() {
 	producer := config.NewKafkaProducer(viperConfig, log)
 
 	usecases := config.SetupUsecases(viperConfig, log, db, app, validate, producer)
+
+	stop, err := telemetry.Init(viperConfig)
+	panicIfErr(err)
+	defer stop()
 
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -75,4 +81,10 @@ func RunTodoCompletionConsumer(ctx context.Context, log *logrus.Logger, viperCon
 	todoCompletionGroup := config.NewKafkaConsumerGroup(viperConfig, log)
 	completionHandler := messaging.NewTodoCompletionConsumer(log)
 	messaging.ConsumeTopic(ctx, todoCompletionGroup, "todos", log, completionHandler.Consume)
+}
+
+func panicIfErr(err error) {
+	if err != nil {
+		log.Panic(err)
+	}
 }
