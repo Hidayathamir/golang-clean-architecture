@@ -28,11 +28,10 @@ docker-compose:
 #################################### 
 
 run-clean:
-	$(MAKE) errkitcli
-	$(MAKE) generate
-	$(MAKE) swag
-	$(MAKE) format
-	$(MAKE) run
+	make clean && make run
+
+clean:
+	make errkitcli && make generate && make swag && make format
 
 format:
 	golangci-lint run ./... --fix
