@@ -10,51 +10,6 @@ definitions:
       total_page:
         type: integer
     type: object
-  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-array_github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponse
-  : properties:
-      data:
-        items:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.AddressResponse'
-        type: array
-      error_detail:
-        items:
-          type: string
-        type: array
-      error_message:
-        type: string
-      paging:
-        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
-    type: object
-  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-array_github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponse
-  : properties:
-      data:
-        items:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.ContactResponse'
-        type: array
-      error_detail:
-        items:
-          type: string
-        type: array
-      error_message:
-        type: string
-      paging:
-        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
-    type: object
-  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-array_github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse
-  : properties:
-      data:
-        items:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.TodoResponse'
-        type: array
-      error_detail:
-        items:
-          type: string
-        type: array
-      error_message:
-        type: string
-      paging:
-        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
-    type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-bool:
     properties:
       data:
@@ -81,6 +36,21 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
     type: object
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponseList
+  : properties:
+      data:
+        items:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.AddressResponse'
+        type: array
+      error_detail:
+        items:
+          type: string
+        type: array
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
+    type: object
   ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponse
   : properties:
       data:
@@ -94,10 +64,40 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
     type: object
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponseList
+  : properties:
+      data:
+        items:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.ContactResponse'
+        type: array
+      error_detail:
+        items:
+          type: string
+        type: array
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
+    type: object
   ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse
   : properties:
       data:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.TodoResponse'
+      error_detail:
+        items:
+          type: string
+        type: array
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
+    type: object
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponseList
+  : properties:
+      data:
+        items:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.TodoResponse'
+        type: array
       error_detail:
         items:
           type: string
@@ -353,7 +353,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-array_github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponse'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponseList'
       security:
       - SimpleApiKeyAuth: []
       summary: List contacts
@@ -452,7 +452,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-array_github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponse'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponseList'
       security:
       - SimpleApiKeyAuth: []
       summary: List addresses
@@ -584,7 +584,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-array_github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponseList'
       security:
       - SimpleApiKeyAuth: []
       summary: List todos

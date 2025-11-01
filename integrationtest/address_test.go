@@ -107,7 +107,7 @@ func TestListAddresses(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(response.WebResponse[[]model.AddressResponse])
+	responseBody := new(response.WebResponse[model.AddressResponseList])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
@@ -133,7 +133,7 @@ func TestListAddressesFailed(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(response.WebResponse[[]model.AddressResponse])
+	responseBody := new(response.WebResponse[model.AddressResponseList])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
