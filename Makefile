@@ -67,6 +67,11 @@ check-tools:
 	else \
 		echo "❌ swag not found. Install: https://github.com/swaggo/swag"; \
 	fi
+	@if command -v moq >/dev/null 2>&1; then \
+		echo "✔ moq installed"; \
+	else \
+		echo "❌ moq not found. Install: https://github.com/matryer/moq"; \
+	fi
 	@if command -v golangci-lint >/dev/null 2>&1; then \
 		echo "✔ golangci-lint installed"; \
 	else \
