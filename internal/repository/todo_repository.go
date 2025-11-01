@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
@@ -36,28 +37,33 @@ func NewTodoRepository(cfg *viper.Viper, log *logrus.Logger) *TodoRepositoryImpl
 }
 
 func (r *TodoRepositoryImpl) Create(ctx context.Context, db *gorm.DB, todo *entity.Todo) error {
-	if err := db.Create(todo).Error; err != nil {
+	if err := db.WithContext(ctx).Create(todo).Error; err != nil {
 		return errkit.AddFuncName("repository.(*TodoRepositoryImpl).Create", err)
 	}
 	return nil
 }
 
 func (r *TodoRepositoryImpl) Update(ctx context.Context, db *gorm.DB, todo *entity.Todo) error {
-	if err := db.Save(todo).Error; err != nil {
+	if err := db.WithContext(ctx).Save(todo).Error; err != nil {
 		return errkit.AddFuncName("repository.(*TodoRepositoryImpl).Update", err)
 	}
 	return nil
 }
 
 func (r *TodoRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, todo *entity.Todo) error {
-	if err := db.Delete(todo).Error; err != nil {
+	if err := db.WithContext(ctx).Delete(todo).Error; err != nil {
 		return errkit.AddFuncName("repository.(*TodoRepositoryImpl).Delete", err)
 	}
 	return nil
 }
 
 func (r *TodoRepositoryImpl) FindByIDAndUserID(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID string) error {
-	err := db.Where("id = ? AND user_id = ?", id, userID).Take(todo).Error
+	err := db.WithContext(ctx).
+		Where(map[string]any{
+			entity.TodoColumnID:     id,
+			entity.TodoColumnUserID: userID,
+		}).
+		Take(todo).Error
 	if err != nil {
 		err = errkit.NotFound(err)
 		return errkit.AddFuncName("repository.(*TodoRepositoryImpl).FindByIDAndUserID", err)
@@ -68,10 +74,10 @@ func (r *TodoRepositoryImpl) FindByIDAndUserID(ctx context.Context, db *gorm.DB,
 
 func (r *TodoRepositoryImpl) List(ctx context.Context, db *gorm.DB, req *model.ListTodoRequest) (entity.TodoList, int64, error) {
 	var todos entity.TodoList
-	if err := db.Scopes(r.filterTodos(req)).
+	if err := db.WithContext(ctx).Scopes(r.filterTodos(req)).
 		Offset((req.Page - 1) * req.Size).
 		Limit(req.Size).
-		Order("created_at DESC").
+		Order(fmt.Sprintf("%s DESC", entity.TodoColumnCreatedAt)).
 		Find(&todos).Error; err != nil {
 		return nil, 0, errkit.AddFuncName("repository.(*TodoRepositoryImpl).List", err)
 	}
@@ -86,15 +92,15 @@ func (r *TodoRepositoryImpl) List(ctx context.Context, db *gorm.DB, req *model.L
 
 func (r *TodoRepositoryImpl) filterTodos(req *model.ListTodoRequest) func(tx *gorm.DB) *gorm.DB {
 	return func(tx *gorm.DB) *gorm.DB {
-		tx = tx.Where("user_id = ?", req.UserID)
+		tx = tx.Where(map[string]any{entity.TodoColumnUserID: req.UserID})
 
 		if req.Title != "" {
 			title := "%" + req.Title + "%"
-			tx = tx.Where("title ILIKE ?", title)
+			tx = tx.Where(fmt.Sprintf("%s ILIKE ?", entity.TodoColumnTitle), title)
 		}
 
 		if req.IsCompleted != nil {
-			tx = tx.Where("is_completed = ?", *req.IsCompleted)
+			tx = tx.Where(fmt.Sprintf("%s = ?", entity.TodoColumnIsCompleted), *req.IsCompleted)
 		}
 
 		return tx

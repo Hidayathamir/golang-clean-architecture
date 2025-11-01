@@ -36,18 +36,22 @@ func SetupUsecases(
 	// setup repositories
 	var userRepository repository.UserRepository
 	userRepository = repository.NewUserRepository(viperConfig, log)
+	userRepository = repository.NewUserRepositoryMwTelemetry(userRepository)
 	userRepository = repository.NewUserRepositoryMwLogger(userRepository)
 
 	var contactRepository repository.ContactRepository
 	contactRepository = repository.NewContactRepository(viperConfig, log)
+	contactRepository = repository.NewContactRepositoryMwTelemetry(contactRepository)
 	contactRepository = repository.NewContactRepositoryMwLogger(contactRepository)
 
 	var addressRepository repository.AddressRepository
 	addressRepository = repository.NewAddressRepository(viperConfig, log)
+	addressRepository = repository.NewAddressRepositoryMwTelemetry(addressRepository)
 	addressRepository = repository.NewAddressRepositoryMwLogger(addressRepository)
 
 	var todoRepository repository.TodoRepository
 	todoRepository = repository.NewTodoRepository(viperConfig, log)
+	todoRepository = repository.NewTodoRepositoryMwTelemetry(todoRepository)
 	todoRepository = repository.NewTodoRepositoryMwLogger(todoRepository)
 
 	// setup producer
@@ -74,31 +78,38 @@ func SetupUsecases(
 	// setup client
 	var paymentClient rest.PaymentClient
 	paymentClient = rest.NewPaymentClient(viperConfig)
+	paymentClient = rest.NewPaymentClientMwTelemetry(paymentClient)
 	paymentClient = rest.NewPaymentClientMwLogger(paymentClient)
 
 	var s3Client rest.S3Client
 	s3Client = rest.NewS3Client(viperConfig)
+	s3Client = rest.NewS3ClientMwTelemetry(s3Client)
 	s3Client = rest.NewS3ClientMwLogger(s3Client)
 
 	var slackClient rest.SlackClient
 	slackClient = rest.NewSlackClient(viperConfig)
+	slackClient = rest.NewSlackClientMwTelemetry(slackClient)
 	slackClient = rest.NewSlackClientMwLogger(slackClient)
 
 	// setup use cases
 	var userUsecase user.UserUsecase
 	userUsecase = user.NewUserUsecase(viperConfig, log, db, validate, userRepository, userProducer, s3Client, slackClient)
+	userUsecase = user.NewUserUsecaseMwTelemetry(userUsecase)
 	userUsecase = user.NewUserUsecaseMwLogger(userUsecase)
 
 	var contactUsecase contact.ContactUsecase
 	contactUsecase = contact.NewContactUsecase(viperConfig, log, db, validate, contactRepository, contactProducer, slackClient)
+	contactUsecase = contact.NewContactUsecaseMwTelemetry(contactUsecase)
 	contactUsecase = contact.NewContactUsecaseMwLogger(contactUsecase)
 
 	var addressUsecase address.AddressUsecase
 	addressUsecase = address.NewAddressUsecase(viperConfig, log, db, validate, contactRepository, addressRepository, addressProducer, paymentClient)
+	addressUsecase = address.NewAddressUsecaseMwTelemetry(addressUsecase)
 	addressUsecase = address.NewAddressUsecaseMwLogger(addressUsecase)
 
 	var todoUsecase todo.TodoUsecase
 	todoUsecase = todo.NewTodoUsecase(viperConfig, log, db, validate, todoRepository, todoProducer)
+	todoUsecase = todo.NewTodoUsecaseMwTelemetry(todoUsecase)
 	todoUsecase = todo.NewTodoUsecaseMwLogger(todoUsecase)
 
 	return &Usecases{
