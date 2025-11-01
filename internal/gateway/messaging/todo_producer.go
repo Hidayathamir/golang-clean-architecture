@@ -8,6 +8,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 //go:generate moq -out=../../mock/TodoProducer.go -pkg=mock . TodoProducer
@@ -19,16 +20,18 @@ type TodoProducer interface {
 var _ TodoProducer = &TodoProducerImpl{}
 
 type TodoProducerImpl struct {
+	Config   *viper.Viper
+	Log      *logrus.Logger
 	Producer sarama.SyncProducer
 	Topic    string
-	Log      *logrus.Logger
 }
 
-func NewTodoProducer(producer sarama.SyncProducer, log *logrus.Logger) *TodoProducerImpl {
+func NewTodoProducer(cfg *viper.Viper, log *logrus.Logger, producer sarama.SyncProducer) *TodoProducerImpl {
 	return &TodoProducerImpl{
+		Config:   cfg,
+		Log:      log,
 		Producer: producer,
 		Topic:    "todos",
-		Log:      log,
 	}
 }
 
@@ -45,7 +48,7 @@ func (p *TodoProducerImpl) Send(ctx context.Context, event *model.TodoCompletedE
 
 	message := &sarama.ProducerMessage{
 		Topic: p.Topic,
-		Key:   sarama.StringEncoder(event.GetId()),
+		Key:   sarama.StringEncoder(event.GetID()),
 		Value: sarama.ByteEncoder(value),
 	}
 

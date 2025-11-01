@@ -33,8 +33,8 @@ func (r *UserRepositoryMwLogger) FindByToken(ctx context.Context, db *gorm.DB, u
 	return err
 }
 
-func (r *UserRepositoryMwLogger) CountById(ctx context.Context, db *gorm.DB, id string) (int64, error) {
-	total, err := r.Next.CountById(ctx, db, id)
+func (r *UserRepositoryMwLogger) CountByID(ctx context.Context, db *gorm.DB, id string) (int64, error) {
+	total, err := r.Next.CountByID(ctx, db, id)
 
 	fields := logrus.Fields{
 		"id":    id,
@@ -56,8 +56,8 @@ func (r *UserRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, entity
 	return err
 }
 
-func (r *UserRepositoryMwLogger) FindById(ctx context.Context, db *gorm.DB, entity *entity.User, id string) error {
-	err := r.Next.FindById(ctx, db, entity, id)
+func (r *UserRepositoryMwLogger) FindByID(ctx context.Context, db *gorm.DB, entity *entity.User, id string) error {
+	err := r.Next.FindByID(ctx, db, entity, id)
 
 	fields := logrus.Fields{
 		"id":     id,

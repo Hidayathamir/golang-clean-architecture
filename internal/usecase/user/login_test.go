@@ -35,7 +35,7 @@ func TestUserUsecaseImpl_Login_Success(t *testing.T) {
 		Password: "password1",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		pw, err := bcrypt.GenerateFromPassword([]byte("password1"), bcrypt.DefaultCost)
 		require.NoError(t, err)
 		entityMoqParam.Password = string(pw)
@@ -87,7 +87,7 @@ func TestUserUsecaseImpl_Login_Fail_ValidateStruct(t *testing.T) {
 		Password: "password1",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		pw, err := bcrypt.GenerateFromPassword([]byte("password1"), bcrypt.DefaultCost)
 		require.NoError(t, err)
 		entityMoqParam.Password = string(pw)
@@ -120,7 +120,7 @@ func TestUserUsecaseImpl_Login_Fail_ValidateStruct(t *testing.T) {
 	assert.ErrorAs(t, err, &verrs)
 }
 
-func TestUserUsecaseImpl_Login_Fail_FindById(t *testing.T) {
+func TestUserUsecaseImpl_Login_Fail_FindByID(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
@@ -140,7 +140,7 @@ func TestUserUsecaseImpl_Login_Fail_FindById(t *testing.T) {
 		Password: "password1",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		return assert.AnError
 	}
 
@@ -189,7 +189,7 @@ func TestUserUsecaseImpl_Login_Fail_CompareHashAndPassword(t *testing.T) {
 		Password: "password1",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		pw, err := bcrypt.GenerateFromPassword([]byte("password2"), bcrypt.DefaultCost)
 		require.NoError(t, err)
 		entityMoqParam.Password = string(pw)
@@ -240,7 +240,7 @@ func TestUserUsecaseImpl_Login_Fail_Update(t *testing.T) {
 		Password: "password1",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		pw, err := bcrypt.GenerateFromPassword([]byte("password1"), bcrypt.DefaultCost)
 		require.NoError(t, err)
 		entityMoqParam.Password = string(pw)
@@ -292,7 +292,7 @@ func TestUserUsecaseImpl_Login_Fail_IsConnected(t *testing.T) {
 		Password: "password1",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		pw, err := bcrypt.GenerateFromPassword([]byte("password1"), bcrypt.DefaultCost)
 		require.NoError(t, err)
 		entityMoqParam.Password = string(pw)
@@ -344,7 +344,7 @@ func TestUserUsecaseImpl_Login_Fail_Send(t *testing.T) {
 		Password: "password1",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		pw, err := bcrypt.GenerateFromPassword([]byte("password1"), bcrypt.DefaultCost)
 		require.NoError(t, err)
 		entityMoqParam.Password = string(pw)

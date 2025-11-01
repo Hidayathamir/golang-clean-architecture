@@ -32,7 +32,7 @@ func TestUserUsecaseImpl_Logout_Success(t *testing.T) {
 		ID: "id1",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		return nil
 	}
 
@@ -79,7 +79,7 @@ func TestUserUsecaseImpl_Logout_Fail_ValidateStruct(t *testing.T) {
 		ID: "",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		return nil
 	}
 
@@ -109,7 +109,7 @@ func TestUserUsecaseImpl_Logout_Fail_ValidateStruct(t *testing.T) {
 	assert.ErrorAs(t, err, &verrs)
 }
 
-func TestUserUsecaseImpl_Logout_Fail_FindById(t *testing.T) {
+func TestUserUsecaseImpl_Logout_Fail_FindByID(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
@@ -128,7 +128,7 @@ func TestUserUsecaseImpl_Logout_Fail_FindById(t *testing.T) {
 		ID: "id1",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		return assert.AnError
 	}
 
@@ -176,7 +176,7 @@ func TestUserUsecaseImpl_Logout_Fail_Update(t *testing.T) {
 		ID: "id1",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		return nil
 	}
 
@@ -224,7 +224,7 @@ func TestUserUsecaseImpl_Logout_Fail_DeleteObject(t *testing.T) {
 		ID: "id1",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		return nil
 	}
 
@@ -272,7 +272,7 @@ func TestUserUsecaseImpl_Logout_Fail_Send(t *testing.T) {
 		ID: "id1",
 	}
 
-	UserRepository.FindByIdFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		return nil
 	}
 

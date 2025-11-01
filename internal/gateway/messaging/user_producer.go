@@ -8,6 +8,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 //go:generate moq -out=../../mock/UserProducer.go -pkg=mock . UserProducer
@@ -19,16 +20,18 @@ type UserProducer interface {
 var _ UserProducer = &UserProducerImpl{}
 
 type UserProducerImpl struct {
+	Config   *viper.Viper
+	Log      *logrus.Logger
 	Producer sarama.SyncProducer
 	Topic    string
-	Log      *logrus.Logger
 }
 
-func NewUserProducer(producer sarama.SyncProducer, log *logrus.Logger) *UserProducerImpl {
+func NewUserProducer(cfg *viper.Viper, log *logrus.Logger, producer sarama.SyncProducer) *UserProducerImpl {
 	return &UserProducerImpl{
+		Config:   cfg,
+		Log:      log,
 		Producer: producer,
 		Topic:    "users",
-		Log:      log,
 	}
 }
 
@@ -45,7 +48,7 @@ func (p *UserProducerImpl) Send(ctx context.Context, event *model.UserEvent) err
 
 	message := &sarama.ProducerMessage{
 		Topic: p.Topic,
-		Key:   sarama.StringEncoder(event.GetId()),
+		Key:   sarama.StringEncoder(event.GetID()),
 		Value: sarama.ByteEncoder(value),
 	}
 

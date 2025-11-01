@@ -32,7 +32,7 @@ func (u *TodoUsecaseMwLogger) Get(ctx context.Context, req *model.GetTodoRequest
 	return res, err
 }
 
-func (u *TodoUsecaseMwLogger) List(ctx context.Context, req *model.ListTodoRequest) ([]model.TodoResponse, int64, error) {
+func (u *TodoUsecaseMwLogger) List(ctx context.Context, req *model.ListTodoRequest) (model.TodoResponseList, int64, error) {
 	res, total, err := u.Next.List(ctx, req)
 	logging.Log(ctx, logrus.Fields{"req": req, "res": res, "total": total}, err)
 	return res, total, err

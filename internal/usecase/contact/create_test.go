@@ -27,7 +27,7 @@ func TestContactUsecaseImpl_Create_Success(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.CreateContactRequest{
-		UserId:    "userid1",
+		UserID:    "userid1",
 		FirstName: "firstname1",
 		Email:     "hidayat@gmail.com",
 	}
@@ -72,7 +72,7 @@ func TestContactUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.CreateContactRequest{
-		UserId:    "",
+		UserID:    "",
 		FirstName: "firstname1",
 		Email:     "hidayat@gmail.com",
 	}
@@ -113,7 +113,7 @@ func TestContactUsecaseImpl_Create_Fail_Create(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.CreateContactRequest{
-		UserId:    "userid1",
+		UserID:    "userid1",
 		FirstName: "firstname1",
 		Email:     "hidayat@gmail.com",
 	}
@@ -153,7 +153,7 @@ func TestContactUsecaseImpl_Create_Fail_Send(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.CreateContactRequest{
-		UserId:    "userid1",
+		UserID:    "userid1",
 		FirstName: "firstname1",
 		Email:     "hidayat@gmail.com",
 	}

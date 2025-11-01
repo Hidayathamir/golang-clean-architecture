@@ -16,29 +16,29 @@ func (u *AddressUsecaseImpl) Update(ctx context.Context, req *model.UpdateAddres
 	}
 
 	contact := new(entity.Contact)
-	if err := u.ContactRepository.FindByIdAndUserId(ctx, u.DB.WithContext(ctx), contact, req.ContactId, req.UserId); err != nil {
+	if err := u.ContactRepository.FindByIDAndUserID(ctx, u.DB.WithContext(ctx), contact, req.ContactID, req.UserID); err != nil {
 		return nil, errkit.AddFuncName("address.(*AddressUsecaseImpl).Update", err)
 	}
 
 	address := new(entity.Address)
-	if err := u.AddressRepository.FindByIdAndContactId(ctx, u.DB.WithContext(ctx), address, req.ID, contact.ID); err != nil {
+	if err := u.AddressRepository.FindByIDAndContactID(ctx, u.DB.WithContext(ctx), address, req.ID, contact.ID); err != nil {
 		return nil, errkit.AddFuncName("address.(*AddressUsecaseImpl).Update", err)
 	}
 
-	address.Street = req.Street
-	address.City = req.City
-	address.Province = req.Province
-	address.PostalCode = req.PostalCode
-	address.Country = req.Country
+	converter.ModelUpdateAddressRequestToEntityAddress(req, address)
 
 	if err := u.AddressRepository.Update(ctx, u.DB.WithContext(ctx), address); err != nil {
 		return nil, errkit.AddFuncName("address.(*AddressUsecaseImpl).Update", err)
 	}
 
-	event := converter.AddressToEvent(address)
+	event := new(model.AddressEvent)
+	converter.EntityAddressToModelAddressEvent(address, event)
 	if err := u.AddressProducer.Send(ctx, event); err != nil {
 		return nil, errkit.AddFuncName("address.(*AddressUsecaseImpl).Update", err)
 	}
 
-	return converter.AddressToResponse(address), nil
+	res := new(model.AddressResponse)
+	converter.EntityAddressToModelAddressResponse(address, res)
+
+	return res, nil
 }

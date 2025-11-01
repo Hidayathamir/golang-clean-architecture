@@ -9,6 +9,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
 	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
@@ -19,14 +20,15 @@ type AddressUsecase interface {
 	Update(ctx context.Context, req *model.UpdateAddressRequest) (*model.AddressResponse, error)
 	Get(ctx context.Context, req *model.GetAddressRequest) (*model.AddressResponse, error)
 	Delete(ctx context.Context, req *model.DeleteAddressRequest) error
-	List(ctx context.Context, req *model.ListAddressRequest) ([]model.AddressResponse, error)
+	List(ctx context.Context, req *model.ListAddressRequest) (model.AddressResponseList, error)
 }
 
 var _ AddressUsecase = &AddressUsecaseImpl{}
 
 type AddressUsecaseImpl struct {
-	DB       *gorm.DB
+	Config   *viper.Viper
 	Log      *logrus.Logger
+	DB       *gorm.DB
 	Validate *validator.Validate
 
 	// repository
@@ -41,7 +43,7 @@ type AddressUsecaseImpl struct {
 }
 
 func NewAddressUsecase(
-	db *gorm.DB, logger *logrus.Logger, validate *validator.Validate,
+	cfg *viper.Viper, log *logrus.Logger, db *gorm.DB, validate *validator.Validate,
 
 	// repository
 	contactRepository repository.ContactRepository,
@@ -54,8 +56,9 @@ func NewAddressUsecase(
 	paymentClient rest.PaymentClient,
 ) *AddressUsecaseImpl {
 	return &AddressUsecaseImpl{
+		Config:   cfg,
+		Log:      log,
 		DB:       db,
-		Log:      logger,
 		Validate: validate,
 
 		// repository

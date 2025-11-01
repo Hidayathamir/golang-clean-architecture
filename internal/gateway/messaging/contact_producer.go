@@ -8,6 +8,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 //go:generate moq -out=../../mock/ContactProducer.go -pkg=mock . ContactProducer
@@ -19,16 +20,18 @@ type ContactProducer interface {
 var _ ContactProducer = &ContactProducerImpl{}
 
 type ContactProducerImpl struct {
+	Config   *viper.Viper
+	Log      *logrus.Logger
 	Producer sarama.SyncProducer
 	Topic    string
-	Log      *logrus.Logger
 }
 
-func NewContactProducer(producer sarama.SyncProducer, log *logrus.Logger) *ContactProducerImpl {
+func NewContactProducer(cfg *viper.Viper, log *logrus.Logger, producer sarama.SyncProducer) *ContactProducerImpl {
 	return &ContactProducerImpl{
+		Config:   cfg,
+		Log:      log,
 		Producer: producer,
 		Topic:    "contacts",
-		Log:      log,
 	}
 }
 
@@ -45,7 +48,7 @@ func (p *ContactProducerImpl) Send(ctx context.Context, event *model.ContactEven
 
 	message := &sarama.ProducerMessage{
 		Topic: p.Topic,
-		Key:   sarama.StringEncoder(event.GetId()),
+		Key:   sarama.StringEncoder(event.GetID()),
 		Value: sarama.ByteEncoder(value),
 	}
 

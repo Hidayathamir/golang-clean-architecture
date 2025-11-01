@@ -26,75 +26,75 @@ type Usecases struct {
 }
 
 func SetupUsecases(
+	viperConfig *viper.Viper,
+	log *logrus.Logger,
 	db *gorm.DB,
 	app *fiber.App,
-	log *logrus.Logger,
 	validate *validator.Validate,
-	viperConfig *viper.Viper,
 	producer sarama.SyncProducer,
 ) *Usecases {
 	// setup repositories
 	var userRepository repository.UserRepository
-	userRepository = repository.NewUserRepository(log)
+	userRepository = repository.NewUserRepository(viperConfig, log)
 	userRepository = repository.NewUserRepositoryMwLogger(userRepository)
 
 	var contactRepository repository.ContactRepository
-	contactRepository = repository.NewContactRepository(log)
+	contactRepository = repository.NewContactRepository(viperConfig, log)
 	contactRepository = repository.NewContactRepositoryMwLogger(contactRepository)
 
 	var addressRepository repository.AddressRepository
-	addressRepository = repository.NewAddressRepository(log)
+	addressRepository = repository.NewAddressRepository(viperConfig, log)
 	addressRepository = repository.NewAddressRepositoryMwLogger(addressRepository)
 
 	var todoRepository repository.TodoRepository
-	todoRepository = repository.NewTodoRepository(log)
+	todoRepository = repository.NewTodoRepository(viperConfig, log)
 	todoRepository = repository.NewTodoRepositoryMwLogger(todoRepository)
 
 	// setup producer
 	var userProducer messaging.UserProducer
-	userProducer = messaging.NewUserProducer(producer, log)
+	userProducer = messaging.NewUserProducer(viperConfig, log, producer)
 	userProducer = messaging.NewUserProducerMwLogger(userProducer)
 
 	var contactProducer messaging.ContactProducer
-	contactProducer = messaging.NewContactProducer(producer, log)
+	contactProducer = messaging.NewContactProducer(viperConfig, log, producer)
 	contactProducer = messaging.NewContactProducerMwLogger(contactProducer)
 
 	var addressProducer messaging.AddressProducer
-	addressProducer = messaging.NewAddressProducer(producer, log)
+	addressProducer = messaging.NewAddressProducer(viperConfig, log, producer)
 	addressProducer = messaging.NewAddressProducerMwLogger(addressProducer)
 
 	var todoProducer messaging.TodoProducer
-	todoProducer = messaging.NewTodoProducer(producer, log)
+	todoProducer = messaging.NewTodoProducer(viperConfig, log, producer)
 	todoProducer = messaging.NewTodoProducerMwLogger(todoProducer)
 
 	// setup client
 	var paymentClient rest.PaymentClient
-	paymentClient = rest.NewPaymentClient()
+	paymentClient = rest.NewPaymentClient(viperConfig)
 	paymentClient = rest.NewPaymentClientMwLogger(paymentClient)
 
 	var s3Client rest.S3Client
-	s3Client = rest.NewS3Client()
+	s3Client = rest.NewS3Client(viperConfig)
 	s3Client = rest.NewS3ClientMwLogger(s3Client)
 
 	var slackClient rest.SlackClient
-	slackClient = rest.NewSlackClient()
+	slackClient = rest.NewSlackClient(viperConfig)
 	slackClient = rest.NewSlackClientMwLogger(slackClient)
 
 	// setup use cases
 	var userUsecase user.UserUsecase
-	userUsecase = user.NewUserUsecase(db, log, validate, userRepository, userProducer, s3Client, slackClient)
+	userUsecase = user.NewUserUsecase(viperConfig, log, db, validate, userRepository, userProducer, s3Client, slackClient)
 	userUsecase = user.NewUserUsecaseMwLogger(userUsecase)
 
 	var contactUsecase contact.ContactUsecase
-	contactUsecase = contact.NewContactUsecase(db, log, validate, contactRepository, contactProducer, slackClient)
+	contactUsecase = contact.NewContactUsecase(viperConfig, log, db, validate, contactRepository, contactProducer, slackClient)
 	contactUsecase = contact.NewContactUsecaseMwLogger(contactUsecase)
 
 	var addressUsecase address.AddressUsecase
-	addressUsecase = address.NewAddressUsecase(db, log, validate, contactRepository, addressRepository, addressProducer, paymentClient)
+	addressUsecase = address.NewAddressUsecase(viperConfig, log, db, validate, contactRepository, addressRepository, addressProducer, paymentClient)
 	addressUsecase = address.NewAddressUsecaseMwLogger(addressUsecase)
 
 	var todoUsecase todo.TodoUsecase
-	todoUsecase = todo.NewTodoUsecase(db, log, validate, todoRepository, todoProducer)
+	todoUsecase = todo.NewTodoUsecase(viperConfig, log, db, validate, todoRepository, todoProducer)
 	todoUsecase = todo.NewTodoUsecaseMwLogger(todoUsecase)
 
 	return &Usecases{
@@ -112,11 +112,11 @@ type Controllers struct {
 	TodoController    *http.TodoController
 }
 
-func SetupControllers(usecases *Usecases, log *logrus.Logger) *Controllers {
-	userController := http.NewUserController(usecases.UserUsecase, log)
-	contactController := http.NewContactController(usecases.ContactUsecase, log)
-	addressController := http.NewAddressController(usecases.AddressUsecase, log)
-	todoController := http.NewTodoController(usecases.TodoUsecase, log)
+func SetupControllers(viperConfig *viper.Viper, log *logrus.Logger, usecases *Usecases) *Controllers {
+	userController := http.NewUserController(viperConfig, log, usecases.UserUsecase)
+	contactController := http.NewContactController(viperConfig, log, usecases.ContactUsecase)
+	addressController := http.NewAddressController(viperConfig, log, usecases.AddressUsecase)
+	todoController := http.NewTodoController(viperConfig, log, usecases.TodoUsecase)
 
 	return &Controllers{
 		UserController:    userController,

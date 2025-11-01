@@ -16,7 +16,7 @@ func (u *UserUsecaseImpl) Logout(ctx context.Context, req *model.LogoutUserReque
 	}
 
 	user := new(entity.User)
-	if err := u.UserRepository.FindById(ctx, u.DB.WithContext(ctx), user, req.ID); err != nil {
+	if err := u.UserRepository.FindByID(ctx, u.DB.WithContext(ctx), user, req.ID); err != nil {
 		return false, errkit.AddFuncName("user.(*UserUsecaseImpl).Logout", err)
 	}
 
@@ -30,7 +30,8 @@ func (u *UserUsecaseImpl) Logout(ctx context.Context, req *model.LogoutUserReque
 		return false, errkit.AddFuncName("user.(*UserUsecaseImpl).Logout", err)
 	}
 
-	event := converter.UserToEvent(user)
+	event := new(model.UserEvent)
+	converter.UserToEvent(user, event)
 	if err := u.UserProducer.Send(ctx, event); err != nil {
 		return false, errkit.AddFuncName("user.(*UserUsecaseImpl).Logout", err)
 	}

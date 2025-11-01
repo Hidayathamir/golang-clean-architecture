@@ -11,6 +11,6 @@ type ContactEvent struct {
 	UpdatedAt int64  `json:"updated_at"`
 }
 
-func (c *ContactEvent) GetId() string {
+func (c *ContactEvent) GetID() string {
 	return c.ID
 }

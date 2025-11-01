@@ -6,6 +6,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
@@ -15,19 +16,21 @@ type UserRepository interface {
 	FindByToken(ctx context.Context, db *gorm.DB, user *entity.User, token string) error
 	Create(ctx context.Context, db *gorm.DB, entity *entity.User) error
 	Update(ctx context.Context, db *gorm.DB, entity *entity.User) error
-	CountById(ctx context.Context, db *gorm.DB, id string) (int64, error)
-	FindById(ctx context.Context, db *gorm.DB, entity *entity.User, id string) error
+	CountByID(ctx context.Context, db *gorm.DB, id string) (int64, error)
+	FindByID(ctx context.Context, db *gorm.DB, entity *entity.User, id string) error
 }
 
 var _ UserRepository = &UserRepositoryImpl{}
 
 type UserRepositoryImpl struct {
-	Log *logrus.Logger
+	Config *viper.Viper
+	Log    *logrus.Logger
 }
 
-func NewUserRepository(log *logrus.Logger) *UserRepositoryImpl {
+func NewUserRepository(cfg *viper.Viper, log *logrus.Logger) *UserRepositoryImpl {
 	return &UserRepositoryImpl{
-		Log: log,
+		Config: cfg,
+		Log:    log,
 	}
 }
 
@@ -64,20 +67,20 @@ func (r *UserRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, entity *en
 	return nil
 }
 
-func (r *UserRepositoryImpl) CountById(ctx context.Context, db *gorm.DB, id string) (int64, error) {
+func (r *UserRepositoryImpl) CountByID(ctx context.Context, db *gorm.DB, id string) (int64, error) {
 	var total int64
 	err := db.Model(new(entity.User)).Where("id = ?", id).Count(&total).Error
 	if err != nil {
-		return 0, errkit.AddFuncName("repository.(*UserRepositoryImpl).CountById", err)
+		return 0, errkit.AddFuncName("repository.(*UserRepositoryImpl).CountByID", err)
 	}
 	return total, nil
 }
 
-func (r *UserRepositoryImpl) FindById(ctx context.Context, db *gorm.DB, entity *entity.User, id string) error {
+func (r *UserRepositoryImpl) FindByID(ctx context.Context, db *gorm.DB, entity *entity.User, id string) error {
 	err := db.Where("id = ?", id).Take(entity).Error
 	if err != nil {
 		err = errkit.NotFound(err)
-		return errkit.AddFuncName("repository.(*UserRepositoryImpl).FindById", err)
+		return errkit.AddFuncName("repository.(*UserRepositoryImpl).FindByID", err)
 	}
 	return nil
 }

@@ -68,7 +68,7 @@ func (r *TodoRepositoryMwLogger) FindByIDAndUserID(ctx context.Context, db *gorm
 	return err
 }
 
-func (r *TodoRepositoryMwLogger) List(ctx context.Context, db *gorm.DB, req *model.ListTodoRequest) ([]entity.Todo, int64, error) {
+func (r *TodoRepositoryMwLogger) List(ctx context.Context, db *gorm.DB, req *model.ListTodoRequest) (entity.TodoList, int64, error) {
 	todos, total, err := r.Next.List(ctx, db, req)
 
 	fields := logrus.Fields{

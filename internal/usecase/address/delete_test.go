@@ -31,11 +31,11 @@ func TestAddressUsecaseImpl_Delete_Success(t *testing.T) {
 
 	req := &model.DeleteAddressRequest{}
 
-	ContactRepository.FindByIdAndUserIdFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userId string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
 		return nil
 	}
 
-	AddressRepository.FindByIdAndContactIdFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactId string) error {
+	AddressRepository.FindByIDAndContactIDFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactID string) error {
 		return nil
 	}
 
@@ -56,7 +56,7 @@ func TestAddressUsecaseImpl_Delete_Success(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestAddressUsecaseImpl_Delete_Fail_FindByIdAndUserId(t *testing.T) {
+func TestAddressUsecaseImpl_Delete_Fail_FindByIDAndUserID(t *testing.T) {
 	gormDB, sqlMockDB := newFakeDB(t)
 	AddressRepository := &mock.AddressRepositoryMock{}
 	ContactRepository := &mock.ContactRepositoryMock{}
@@ -75,11 +75,11 @@ func TestAddressUsecaseImpl_Delete_Fail_FindByIdAndUserId(t *testing.T) {
 
 	req := &model.DeleteAddressRequest{}
 
-	ContactRepository.FindByIdAndUserIdFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userId string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
 		return assert.AnError
 	}
 
-	AddressRepository.FindByIdAndContactIdFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactId string) error {
+	AddressRepository.FindByIDAndContactIDFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactID string) error {
 		return nil
 	}
 
@@ -101,7 +101,7 @@ func TestAddressUsecaseImpl_Delete_Fail_FindByIdAndUserId(t *testing.T) {
 	assert.ErrorIs(t, err, assert.AnError)
 }
 
-func TestAddressUsecaseImpl_Delete_Fail_FindByIdAndContactId(t *testing.T) {
+func TestAddressUsecaseImpl_Delete_Fail_FindByIDAndContactID(t *testing.T) {
 	gormDB, sqlMockDB := newFakeDB(t)
 	AddressRepository := &mock.AddressRepositoryMock{}
 	ContactRepository := &mock.ContactRepositoryMock{}
@@ -120,11 +120,11 @@ func TestAddressUsecaseImpl_Delete_Fail_FindByIdAndContactId(t *testing.T) {
 
 	req := &model.DeleteAddressRequest{}
 
-	ContactRepository.FindByIdAndUserIdFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userId string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
 		return nil
 	}
 
-	AddressRepository.FindByIdAndContactIdFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactId string) error {
+	AddressRepository.FindByIDAndContactIDFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactID string) error {
 		return assert.AnError
 	}
 
@@ -165,11 +165,11 @@ func TestAddressUsecaseImpl_Delete_Fail_Refund(t *testing.T) {
 
 	req := &model.DeleteAddressRequest{}
 
-	ContactRepository.FindByIdAndUserIdFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userId string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
 		return nil
 	}
 
-	AddressRepository.FindByIdAndContactIdFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactId string) error {
+	AddressRepository.FindByIDAndContactIDFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactID string) error {
 		return nil
 	}
 
@@ -210,11 +210,11 @@ func TestAddressUsecaseImpl_Delete_Fail_Delete(t *testing.T) {
 
 	req := &model.DeleteAddressRequest{}
 
-	ContactRepository.FindByIdAndUserIdFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userId string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
 		return nil
 	}
 
-	AddressRepository.FindByIdAndContactIdFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactId string) error {
+	AddressRepository.FindByIDAndContactIDFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactID string) error {
 		return nil
 	}
 

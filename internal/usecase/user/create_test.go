@@ -32,7 +32,7 @@ func TestUserUsecaseImpl_Create_Success(t *testing.T) {
 		Name:     "name1",
 	}
 
-	UserRepository.CountByIdFunc = func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
+	UserRepository.CountByIDFunc = func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
 		return 0, nil
 	}
 
@@ -81,7 +81,7 @@ func TestUserUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 		Name:     "name1",
 	}
 
-	UserRepository.CountByIdFunc = func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
+	UserRepository.CountByIDFunc = func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
 		return 0, nil
 	}
 
@@ -107,7 +107,7 @@ func TestUserUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 	assert.ErrorAs(t, err, &verrs)
 }
 
-func TestUserUsecaseImpl_Create_Fail_CountById(t *testing.T) {
+func TestUserUsecaseImpl_Create_Fail_CountByID(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
@@ -126,7 +126,7 @@ func TestUserUsecaseImpl_Create_Fail_CountById(t *testing.T) {
 		Name:     "name1",
 	}
 
-	UserRepository.CountByIdFunc = func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
+	UserRepository.CountByIDFunc = func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
 		return 0, assert.AnError
 	}
 
@@ -170,7 +170,7 @@ func TestUserUsecaseImpl_Create_Fail_UserAlreadyExists(t *testing.T) {
 		Name:     "name1",
 	}
 
-	UserRepository.CountByIdFunc = func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
+	UserRepository.CountByIDFunc = func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
 		return 1, nil
 	}
 
@@ -214,7 +214,7 @@ func TestUserUsecaseImpl_Create_Fail_Create(t *testing.T) {
 		Name:     "name1",
 	}
 
-	UserRepository.CountByIdFunc = func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
+	UserRepository.CountByIDFunc = func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
 		return 0, nil
 	}
 
@@ -258,7 +258,7 @@ func TestUserUsecaseImpl_Create_Fail_Send(t *testing.T) {
 		Name:     "name1",
 	}
 
-	UserRepository.CountByIdFunc = func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
+	UserRepository.CountByIDFunc = func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
 		return 0, nil
 	}
 

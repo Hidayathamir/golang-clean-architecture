@@ -55,7 +55,7 @@ func (u *AddressUsecaseMwLogger) Get(ctx context.Context, req *model.GetAddressR
 	return res, err
 }
 
-func (u *AddressUsecaseMwLogger) List(ctx context.Context, req *model.ListAddressRequest) ([]model.AddressResponse, error) {
+func (u *AddressUsecaseMwLogger) List(ctx context.Context, req *model.ListAddressRequest) (model.AddressResponseList, error) {
 	res, err := u.Next.List(ctx, req)
 
 	fields := logrus.Fields{

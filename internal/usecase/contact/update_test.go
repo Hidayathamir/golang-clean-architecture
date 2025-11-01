@@ -30,13 +30,13 @@ func TestContactUsecaseImpl_Update_Success(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.UpdateContactRequest{
-		UserId:    "userid1",
+		UserID:    "userid1",
 		ID:        uuid.NewString(),
 		FirstName: "firstname1",
 		Email:     "hidayat@gmail.com",
 	}
 
-	ContactRepository.FindByIdAndUserIdFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userId string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
 		return nil
 	}
 
@@ -89,13 +89,13 @@ func TestContactUsecaseImpl_Update_ValidateStruct(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.UpdateContactRequest{
-		UserId:    "",
+		UserID:    "",
 		ID:        uuid.NewString(),
 		FirstName: "firstname1",
 		Email:     "hidayat@gmail.com",
 	}
 
-	ContactRepository.FindByIdAndUserIdFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userId string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
 		return nil
 	}
 
@@ -125,7 +125,7 @@ func TestContactUsecaseImpl_Update_ValidateStruct(t *testing.T) {
 	assert.ErrorAs(t, err, &verrs)
 }
 
-func TestContactUsecaseImpl_Update_Fail_FindByIdAndUserId(t *testing.T) {
+func TestContactUsecaseImpl_Update_Fail_FindByIDAndUserID(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	ContactRepository := &mock.ContactRepositoryMock{}
 	ContactProducer := &mock.ContactProducerMock{}
@@ -141,13 +141,13 @@ func TestContactUsecaseImpl_Update_Fail_FindByIdAndUserId(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.UpdateContactRequest{
-		UserId:    "userid1",
+		UserID:    "userid1",
 		ID:        uuid.NewString(),
 		FirstName: "firstname1",
 		Email:     "hidayat@gmail.com",
 	}
 
-	ContactRepository.FindByIdAndUserIdFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userId string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
 		return assert.AnError
 	}
 
@@ -192,13 +192,13 @@ func TestContactUsecaseImpl_Update_Fail_Update(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.UpdateContactRequest{
-		UserId:    "userid1",
+		UserID:    "userid1",
 		ID:        uuid.NewString(),
 		FirstName: "firstname1",
 		Email:     "hidayat@gmail.com",
 	}
 
-	ContactRepository.FindByIdAndUserIdFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userId string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
 		return nil
 	}
 
@@ -243,13 +243,13 @@ func TestContactUsecaseImpl_Update_Fail_IsConnected(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.UpdateContactRequest{
-		UserId:    "userid1",
+		UserID:    "userid1",
 		ID:        uuid.NewString(),
 		FirstName: "firstname1",
 		Email:     "hidayat@gmail.com",
 	}
 
-	ContactRepository.FindByIdAndUserIdFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userId string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
 		return nil
 	}
 
@@ -294,13 +294,13 @@ func TestContactUsecaseImpl_Update_Fail_Send(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.UpdateContactRequest{
-		UserId:    "userid1",
+		UserID:    "userid1",
 		ID:        uuid.NewString(),
 		FirstName: "firstname1",
 		Email:     "hidayat@gmail.com",
 	}
 
-	ContactRepository.FindByIdAndUserIdFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userId string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
 		return nil
 	}
 

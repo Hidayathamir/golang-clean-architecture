@@ -1,6 +1,10 @@
 package rest
 
-import "context"
+import (
+	"context"
+
+	"github.com/spf13/viper"
+)
 
 //go:generate moq -out=../../mock/PaymentClient.go -pkg=mock . PaymentClient
 
@@ -12,10 +16,13 @@ type PaymentClient interface {
 var _ PaymentClient = &PaymentClientImpl{}
 
 type PaymentClientImpl struct {
+	Config *viper.Viper
 }
 
-func NewPaymentClient() *PaymentClientImpl {
-	return &PaymentClientImpl{}
+func NewPaymentClient(cfg *viper.Viper) *PaymentClientImpl {
+	return &PaymentClientImpl{
+		Config: cfg,
+	}
 }
 
 func (c *PaymentClientImpl) Refund(ctx context.Context, transactionID string) (bool, error) {

@@ -18,7 +18,7 @@ func (u *UserUsecaseImpl) Login(ctx context.Context, req *model.LoginUserRequest
 	}
 
 	user := new(entity.User)
-	if err := u.UserRepository.FindById(ctx, u.DB.WithContext(ctx), user, req.ID); err != nil {
+	if err := u.UserRepository.FindByID(ctx, u.DB.WithContext(ctx), user, req.ID); err != nil {
 		err = errkit.Unauthorized(err)
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Login", err)
 	}
@@ -37,10 +37,14 @@ func (u *UserUsecaseImpl) Login(ctx context.Context, req *model.LoginUserRequest
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Login", err)
 	}
 
-	event := converter.UserToEvent(user)
+	event := new(model.UserEvent)
+	converter.UserToEvent(user, event)
 	if err := u.UserProducer.Send(ctx, event); err != nil {
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Login", err)
 	}
 
-	return converter.UserToTokenResponse(user), nil
+	res := new(model.UserResponse)
+	converter.UserToTokenResponse(user, res)
+
+	return res, nil
 }

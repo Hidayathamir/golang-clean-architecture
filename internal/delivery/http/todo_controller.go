@@ -12,17 +12,20 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 type TodoController struct {
-	Usecase todousecase.TodoUsecase
+	Config  *viper.Viper
 	Log     *logrus.Logger
+	Usecase todousecase.TodoUsecase
 }
 
-func NewTodoController(usecase todousecase.TodoUsecase, log *logrus.Logger) *TodoController {
+func NewTodoController(cfg *viper.Viper, log *logrus.Logger, usecase todousecase.TodoUsecase) *TodoController {
 	return &TodoController{
-		Usecase: usecase,
+		Config:  cfg,
 		Log:     log,
+		Usecase: usecase,
 	}
 }
 
@@ -64,7 +67,7 @@ func (c *TodoController) Create(ctx *fiber.Ctx) error {
 //	@Param			is_completed	query		bool	false	"Filter by completion state"
 //	@Param			page			query		int		false	"Page number"	default(1)
 //	@Param			size			query		int		false	"Page size"		default(10)
-//	@Success		200				{object}	response.WebResponse[[]model.TodoResponse]
+//	@Success		200				{object}	response.WebResponse[model.TodoResponseList]
 //	@Router			/api/todos [get]
 func (c *TodoController) List(ctx *fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)

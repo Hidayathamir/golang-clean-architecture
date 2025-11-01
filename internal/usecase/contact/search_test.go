@@ -25,13 +25,13 @@ func TestContactUsecaseImpl_Search_Success(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.SearchContactRequest{
-		UserId: "userid1",
+		UserID: "userid1",
 		Page:   1,
 		Size:   1,
 	}
 
-	ContactRepository.SearchFunc = func(ctx context.Context, db *gorm.DB, req *model.SearchContactRequest) ([]entity.Contact, int64, error) {
-		return []entity.Contact{{}}, 12, nil
+	ContactRepository.SearchFunc = func(ctx context.Context, db *gorm.DB, req *model.SearchContactRequest) (entity.ContactList, int64, error) {
+		return entity.ContactList{{}}, 12, nil
 	}
 
 	// ------------------------------------------------------- //
@@ -40,7 +40,7 @@ func TestContactUsecaseImpl_Search_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected = []model.ContactResponse{{}}
+	var expected = model.ContactResponseList{{}}
 
 	assert.Equal(t, expected, res)
 	assert.Equal(t, int64(12), total)
@@ -59,13 +59,13 @@ func TestContactUsecaseImpl_Search_Fail_ValidateStruct(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.SearchContactRequest{
-		UserId: "",
+		UserID: "",
 		Page:   1,
 		Size:   1,
 	}
 
-	ContactRepository.SearchFunc = func(ctx context.Context, db *gorm.DB, req *model.SearchContactRequest) ([]entity.Contact, int64, error) {
-		return []entity.Contact{{}}, 12, nil
+	ContactRepository.SearchFunc = func(ctx context.Context, db *gorm.DB, req *model.SearchContactRequest) (entity.ContactList, int64, error) {
+		return entity.ContactList{{}}, 12, nil
 	}
 
 	// ------------------------------------------------------- //
@@ -74,7 +74,7 @@ func TestContactUsecaseImpl_Search_Fail_ValidateStruct(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected []model.ContactResponse
+	var expected model.ContactResponseList
 
 	assert.Equal(t, expected, res)
 	assert.Equal(t, int64(0), total)
@@ -95,12 +95,12 @@ func TestContactUsecaseImpl_Search_Fail_Search(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.SearchContactRequest{
-		UserId: "userid1",
+		UserID: "userid1",
 		Page:   1,
 		Size:   1,
 	}
 
-	ContactRepository.SearchFunc = func(ctx context.Context, db *gorm.DB, req *model.SearchContactRequest) ([]entity.Contact, int64, error) {
+	ContactRepository.SearchFunc = func(ctx context.Context, db *gorm.DB, req *model.SearchContactRequest) (entity.ContactList, int64, error) {
 		return nil, 0, assert.AnError
 	}
 
@@ -110,7 +110,7 @@ func TestContactUsecaseImpl_Search_Fail_Search(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected []model.ContactResponse
+	var expected model.ContactResponseList
 
 	assert.Equal(t, expected, res)
 	assert.Equal(t, int64(0), total)

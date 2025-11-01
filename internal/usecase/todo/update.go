@@ -20,12 +20,14 @@ func (u *TodoUsecaseImpl) Update(ctx context.Context, req *model.UpdateTodoReque
 		return nil, errkit.AddFuncName("todo.(*TodoUsecaseImpl).Update", err)
 	}
 
-	todo.Title = req.Title
-	todo.Description = req.Description
+	converter.ModelUpdateTodoRequestToEntityTodo(req, todo)
 
 	if err := u.TodoRepository.Update(ctx, u.DB.WithContext(ctx), todo); err != nil {
 		return nil, errkit.AddFuncName("todo.(*TodoUsecaseImpl).Update", err)
 	}
 
-	return converter.TodoToResponse(todo), nil
+	res := new(model.TodoResponse)
+	converter.EntityTodoToModelTodoResponse(todo, res)
+
+	return res, nil
 }

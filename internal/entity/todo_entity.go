@@ -1,6 +1,5 @@
 package entity
 
-// Todo represents a task owned by a user.
 type Todo struct {
 	ID          string `gorm:"column:id;primaryKey"`
 	UserID      string `gorm:"column:user_id"`
@@ -17,3 +16,5 @@ type Todo struct {
 func (t *Todo) TableName() string {
 	return "todos"
 }
+
+type TodoList []Todo

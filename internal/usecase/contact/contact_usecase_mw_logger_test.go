@@ -64,8 +64,8 @@ func TestContactUsecaseMwLogger_Search(t *testing.T) {
 	u := &contact.ContactUsecaseMwLogger{
 		Next: Next,
 	}
-	Next.SearchFunc = func(ctx context.Context, req *model.SearchContactRequest) ([]model.ContactResponse, int64, error) {
-		return []model.ContactResponse{{}}, 6, nil
+	Next.SearchFunc = func(ctx context.Context, req *model.SearchContactRequest) (model.ContactResponseList, int64, error) {
+		return model.ContactResponseList{{}}, 6, nil
 	}
 	res, total, err := u.Search(context.Background(), &model.SearchContactRequest{})
 	assert.NotEmpty(t, res)
