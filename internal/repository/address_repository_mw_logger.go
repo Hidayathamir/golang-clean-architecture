@@ -5,6 +5,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logging"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -22,7 +23,11 @@ func NewAddressRepositoryMwLogger(next AddressRepository) *AddressRepositoryMwLo
 }
 
 func (r *AddressRepositoryMwLogger) FindAllByContactID(ctx context.Context, db *gorm.DB, contactID string) (entity.AddressList, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	addresses, err := r.Next.FindAllByContactID(ctx, db, contactID)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"contactID": contactID,
@@ -34,7 +39,11 @@ func (r *AddressRepositoryMwLogger) FindAllByContactID(ctx context.Context, db *
 }
 
 func (r *AddressRepositoryMwLogger) FindByIDAndContactID(ctx context.Context, db *gorm.DB, address *entity.Address, id string, contactID string) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	err := r.Next.FindByIDAndContactID(ctx, db, address, id, contactID)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"address":   address,
@@ -47,7 +56,11 @@ func (r *AddressRepositoryMwLogger) FindByIDAndContactID(ctx context.Context, db
 }
 
 func (r *AddressRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, entity *entity.Address) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	err := r.Next.Create(ctx, db, entity)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"entity": entity,
@@ -58,7 +71,11 @@ func (r *AddressRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, ent
 }
 
 func (r *AddressRepositoryMwLogger) Delete(ctx context.Context, db *gorm.DB, entity *entity.Address) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	err := r.Next.Delete(ctx, db, entity)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"entity": entity,
@@ -69,7 +86,11 @@ func (r *AddressRepositoryMwLogger) Delete(ctx context.Context, db *gorm.DB, ent
 }
 
 func (r *AddressRepositoryMwLogger) Update(ctx context.Context, db *gorm.DB, entity *entity.Address) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	err := r.Next.Update(ctx, db, entity)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"entity": entity,

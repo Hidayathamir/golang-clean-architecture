@@ -5,6 +5,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logging"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/sirupsen/logrus"
 )
 
@@ -21,7 +22,11 @@ func NewContactUsecaseMwLogger(next ContactUsecase) *ContactUsecaseMwLogger {
 }
 
 func (u *ContactUsecaseMwLogger) Create(ctx context.Context, req *model.CreateContactRequest) (*model.ContactResponse, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	res, err := u.Next.Create(ctx, req)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -33,7 +38,11 @@ func (u *ContactUsecaseMwLogger) Create(ctx context.Context, req *model.CreateCo
 }
 
 func (u *ContactUsecaseMwLogger) Delete(ctx context.Context, req *model.DeleteContactRequest) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	err := u.Next.Delete(ctx, req)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -44,7 +53,11 @@ func (u *ContactUsecaseMwLogger) Delete(ctx context.Context, req *model.DeleteCo
 }
 
 func (u *ContactUsecaseMwLogger) Get(ctx context.Context, req *model.GetContactRequest) (*model.ContactResponse, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	res, err := u.Next.Get(ctx, req)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -56,7 +69,11 @@ func (u *ContactUsecaseMwLogger) Get(ctx context.Context, req *model.GetContactR
 }
 
 func (u *ContactUsecaseMwLogger) Search(ctx context.Context, req *model.SearchContactRequest) (model.ContactResponseList, int64, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	res, total, err := u.Next.Search(ctx, req)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -68,7 +85,11 @@ func (u *ContactUsecaseMwLogger) Search(ctx context.Context, req *model.SearchCo
 }
 
 func (u *ContactUsecaseMwLogger) Update(ctx context.Context, req *model.UpdateContactRequest) (*model.ContactResponse, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	res, err := u.Next.Update(ctx, req)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"req": req,

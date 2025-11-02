@@ -5,6 +5,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logging"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/sirupsen/logrus"
 )
 
@@ -21,7 +22,11 @@ func NewUserUsecaseMwLogger(next UserUsecase) *UserUsecaseMwLogger {
 }
 
 func (u *UserUsecaseMwLogger) Create(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	res, err := u.Next.Create(ctx, req)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -33,7 +38,11 @@ func (u *UserUsecaseMwLogger) Create(ctx context.Context, req *model.RegisterUse
 }
 
 func (u *UserUsecaseMwLogger) Current(ctx context.Context, req *model.GetUserRequest) (*model.UserResponse, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	res, err := u.Next.Current(ctx, req)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -45,7 +54,11 @@ func (u *UserUsecaseMwLogger) Current(ctx context.Context, req *model.GetUserReq
 }
 
 func (u *UserUsecaseMwLogger) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	res, err := u.Next.Login(ctx, req)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -57,7 +70,11 @@ func (u *UserUsecaseMwLogger) Login(ctx context.Context, req *model.LoginUserReq
 }
 
 func (u *UserUsecaseMwLogger) Logout(ctx context.Context, req *model.LogoutUserRequest) (bool, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	res, err := u.Next.Logout(ctx, req)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -69,7 +86,11 @@ func (u *UserUsecaseMwLogger) Logout(ctx context.Context, req *model.LogoutUserR
 }
 
 func (u *UserUsecaseMwLogger) Update(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	res, err := u.Next.Update(ctx, req)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"req": req,
@@ -81,7 +102,11 @@ func (u *UserUsecaseMwLogger) Update(ctx context.Context, req *model.UpdateUserR
 }
 
 func (u *UserUsecaseMwLogger) Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	res, err := u.Next.Verify(ctx, req)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"req": req,

@@ -6,6 +6,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logging"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -23,7 +24,11 @@ func NewTodoRepositoryMwLogger(next TodoRepository) *TodoRepositoryMwLogger {
 }
 
 func (r *TodoRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, todo *entity.Todo) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	err := r.Next.Create(ctx, db, todo)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"todo": todo,
@@ -34,7 +39,11 @@ func (r *TodoRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, todo *
 }
 
 func (r *TodoRepositoryMwLogger) Update(ctx context.Context, db *gorm.DB, todo *entity.Todo) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	err := r.Next.Update(ctx, db, todo)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"todo": todo,
@@ -45,7 +54,11 @@ func (r *TodoRepositoryMwLogger) Update(ctx context.Context, db *gorm.DB, todo *
 }
 
 func (r *TodoRepositoryMwLogger) Delete(ctx context.Context, db *gorm.DB, todo *entity.Todo) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	err := r.Next.Delete(ctx, db, todo)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"todo": todo,
@@ -56,7 +69,11 @@ func (r *TodoRepositoryMwLogger) Delete(ctx context.Context, db *gorm.DB, todo *
 }
 
 func (r *TodoRepositoryMwLogger) FindByIDAndUserID(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID string) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	err := r.Next.FindByIDAndUserID(ctx, db, todo, id, userID)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"id":      id,
@@ -69,7 +86,11 @@ func (r *TodoRepositoryMwLogger) FindByIDAndUserID(ctx context.Context, db *gorm
 }
 
 func (r *TodoRepositoryMwLogger) List(ctx context.Context, db *gorm.DB, req *model.ListTodoRequest) (entity.TodoList, int64, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	todos, total, err := r.Next.List(ctx, db, req)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"req":   req,
