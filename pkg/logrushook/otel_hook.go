@@ -33,5 +33,7 @@ func (h *OtelHook) Fire(entry *logrus.Entry) error {
 		entry.Data["span_id"] = spanID
 	}
 
+	telemetry.EmitLogEntry(entry)
+
 	return nil
 }
