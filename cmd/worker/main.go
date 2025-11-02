@@ -25,9 +25,13 @@ func main() {
 
 	usecases := config.SetupUsecases(viperConfig, log, db, app, validate, producer)
 
-	stop, err := telemetry.Init(viperConfig)
+	stopTraceProvider, err := telemetry.InitTraceProvider(viperConfig)
 	panicIfErr(err)
-	defer stop()
+	defer stopTraceProvider()
+
+	stopLogProvider, err := telemetry.InitLogProvider(viperConfig)
+	panicIfErr(err)
+	defer stopLogProvider()
 
 	ctx, cancel := context.WithCancel(context.Background())
 

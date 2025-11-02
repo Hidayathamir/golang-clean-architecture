@@ -39,9 +39,13 @@ func main() {
 	controllers := config.SetupControllers(viperConfig, log, usecases)
 	middlewares := config.SetupMiddlewares(usecases)
 
-	stop, err := telemetry.Init(viperConfig)
+	stopTraceProvider, err := telemetry.InitTraceProvider(viperConfig)
 	panicIfErr(err)
-	defer stop()
+	defer stopTraceProvider()
+
+	stopLogProvider, err := telemetry.InitLogProvider(viperConfig)
+	panicIfErr(err)
+	defer stopLogProvider()
 
 	route.Setup(app, controllers, middlewares)
 
