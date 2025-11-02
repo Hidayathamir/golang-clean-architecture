@@ -14,7 +14,7 @@ func NewLogger(viperConfig *viper.Viper) *logrus.Logger {
 	log.SetLevel(logrus.Level(viperConfig.GetInt32(configkey.LogLevel)))
 	log.SetFormatter(&logrus.JSONFormatter{})
 
-	log.AddHook(logrushook.NewTraceID())
+	log.AddHook(logrushook.NewOtelHook())
 
 	logging.SetLogger(log)
 	return log

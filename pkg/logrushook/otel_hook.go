@@ -5,26 +5,33 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var _ logrus.Hook = &TraceID{}
+var _ logrus.Hook = &OtelHook{}
 
-type TraceID struct{}
+type OtelHook struct{}
 
-func NewTraceID() *TraceID {
-	return &TraceID{}
+func NewOtelHook() *OtelHook {
+	return &OtelHook{}
 }
 
-func (h *TraceID) Levels() []logrus.Level {
+func (h *OtelHook) Levels() []logrus.Level {
 	return logrus.AllLevels
 }
 
-func (h *TraceID) Fire(entry *logrus.Entry) error {
+func (h *OtelHook) Fire(entry *logrus.Entry) error {
 	ctx := entry.Context
 	if ctx == nil {
 		return nil
 	}
+
 	traceID := telemetry.GetTraceID(ctx)
 	if traceID != "" {
 		entry.Data["trace_id"] = traceID
 	}
+
+	spanID := telemetry.GetSpanID(ctx)
+	if spanID != "" {
+		entry.Data["span_id"] = spanID
+	}
+
 	return nil
 }
