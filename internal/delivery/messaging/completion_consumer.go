@@ -21,16 +21,16 @@ func NewTodoCompletionConsumer(log *logrus.Logger) *TodoCompletionConsumer {
 }
 
 func (c *TodoCompletionConsumer) Consume(message *sarama.ConsumerMessage) error {
-	_, span := telemetry.StartConsumer(message)
+	ctx, span := telemetry.StartConsumer(message)
 	defer span.End()
 
 	event := new(model.TodoCompletedEvent)
 	if err := json.Unmarshal(message.Value, event); err != nil {
-		c.Log.WithError(err).Error("error unmarshalling todo completion event")
+		c.Log.WithContext(ctx).WithError(err).Error("error unmarshalling todo completion event")
 		return errkit.AddFuncName("messaging.(*TodoCompletionConsumer).Consume", err)
 	}
 
-	c.Log.WithFields(logrus.Fields{
+	c.Log.WithContext(ctx).WithFields(logrus.Fields{
 		"event":     event,
 		"partition": message.Partition,
 		"offset":    message.Offset,

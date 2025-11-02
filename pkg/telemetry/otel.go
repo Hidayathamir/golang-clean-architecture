@@ -119,3 +119,17 @@ func RecordError(span trace.Span, err error) {
 	span.RecordError(err)
 	span.SetStatus(codes.Error, err.Error())
 }
+
+func GetTraceID(ctx context.Context) string {
+	span := trace.SpanFromContext(ctx)
+	if span == nil {
+		return ""
+	}
+
+	sc := span.SpanContext()
+	if !sc.IsValid() || !sc.TraceID().IsValid() {
+		return ""
+	}
+
+	return sc.TraceID().String()
+}

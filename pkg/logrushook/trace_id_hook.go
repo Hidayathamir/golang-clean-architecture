@@ -1,7 +1,7 @@
 package logrushook
 
 import (
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/traceidctx"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/sirupsen/logrus"
 )
 
@@ -22,7 +22,7 @@ func (h *TraceID) Fire(entry *logrus.Entry) error {
 	if ctx == nil {
 		return nil
 	}
-	traceID := traceidctx.Get(ctx)
+	traceID := telemetry.GetTraceID(ctx)
 	if traceID != "" {
 		entry.Data["trace_id"] = traceID
 	}

@@ -24,17 +24,17 @@ func NewContactConsumer(usecase contact.ContactUsecase, log *logrus.Logger) *Con
 }
 
 func (c ContactConsumer) Consume(message *sarama.ConsumerMessage) error {
-	_, span := telemetry.StartConsumer(message)
+	ctx, span := telemetry.StartConsumer(message)
 	defer span.End()
 
 	ContactEvent := new(model.ContactEvent)
 	if err := json.Unmarshal(message.Value, ContactEvent); err != nil {
-		c.Log.WithError(err).Error("error unmarshalling Contact event")
+		c.Log.WithContext(ctx).WithError(err).Error("error unmarshalling Contact event")
 		return errkit.AddFuncName("messaging.ContactConsumer.Consume", err)
 	}
 
 	// TODO process event
-	c.Log.WithFields(logrus.Fields{
+	c.Log.WithContext(ctx).WithFields(logrus.Fields{
 		"event":     ContactEvent,
 		"partition": message.Partition,
 	}).Info("Received topic contacts")

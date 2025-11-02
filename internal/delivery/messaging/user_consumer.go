@@ -24,17 +24,17 @@ func NewUserConsumer(usecase user.UserUsecase, log *logrus.Logger) *UserConsumer
 }
 
 func (c UserConsumer) Consume(message *sarama.ConsumerMessage) error {
-	_, span := telemetry.StartConsumer(message)
+	ctx, span := telemetry.StartConsumer(message)
 	defer span.End()
 
 	UserEvent := new(model.UserEvent)
 	if err := json.Unmarshal(message.Value, UserEvent); err != nil {
-		c.Log.WithError(err).Error("error unmarshalling User event")
+		c.Log.WithContext(ctx).WithError(err).Error("error unmarshalling User event")
 		return errkit.AddFuncName("messaging.UserConsumer.Consume", err)
 	}
 
 	// TODO process event
-	c.Log.WithFields(logrus.Fields{
+	c.Log.WithContext(ctx).WithFields(logrus.Fields{
 		"event":     UserEvent,
 		"partition": message.Partition,
 	}).Info("Received topic users")
