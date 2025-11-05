@@ -3,108 +3,132 @@ package user_test
 import (
 	"context"
 	"testing"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/spf13/viper"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 )
 
-func TestUserUsecaseImpl_Verify_Success(t *testing.T) {
+func newVerifyUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepositoryMock) {
+	t.Helper()
+
 	gormDB, _ := newFakeDB(t)
-	UserRepository := &mock.UserRepositoryMock{}
+	repo := &mock.UserRepositoryMock{}
+
+	cfg := viper.New()
+	cfg.Set(configkey.AuthJWTSecret, "test-secret")
+	cfg.Set(configkey.AuthJWTIssuer, "test-issuer")
+	cfg.Set(configkey.AuthJWTExpireSeconds, 60)
+
 	u := &user.UserUsecaseImpl{
+		Config:         cfg,
 		DB:             gormDB,
 		Validate:       validator.New(),
-		UserRepository: UserRepository,
+		UserRepository: repo,
 	}
 
-	// ------------------------------------------------------- //
+	return u, repo
+}
+
+func newSignedToken(t *testing.T, cfg *viper.Viper, userID string) string {
+	t.Helper()
+
+	now := time.Now()
+	claims := jwt.RegisteredClaims{
+		Subject:   userID,
+		Issuer:    cfg.GetString(configkey.AuthJWTIssuer),
+		IssuedAt:  jwt.NewNumericDate(now),
+		ExpiresAt: jwt.NewNumericDate(now.Add(time.Minute)),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString([]byte(cfg.GetString(configkey.AuthJWTSecret)))
+	require.NoError(t, err)
+	return tokenString
+}
+
+func TestUserUsecaseImpl_Verify_Success(t *testing.T) {
+	u, repo := newVerifyUsecase(t)
+
+	tokenString := newSignedToken(t, u.Config, "id1")
 
 	req := &model.VerifyUserRequest{
-		Token: "token1",
+		Token: tokenString,
 	}
 
-	UserRepository.FindByTokenFunc = func(ctx context.Context, db *gorm.DB, user *entity.User, token string) error {
+	repo.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+		entityMoqParam.ID = id
 		return nil
 	}
 
-	// ------------------------------------------------------- //
-
 	res, err := u.Verify(context.Background(), req)
 
-	// ------------------------------------------------------- //
-
-	var expected = &model.Auth{}
-
-	assert.Equal(t, expected, res)
-	assert.Nil(t, err)
+	require.NoError(t, err)
+	assert.Equal(t, &model.Auth{ID: "id1"}, res)
 }
 
 func TestUserUsecaseImpl_Verify_ValidateStruct(t *testing.T) {
-	gormDB, _ := newFakeDB(t)
-	UserRepository := &mock.UserRepositoryMock{}
-	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Validate:       validator.New(),
-		UserRepository: UserRepository,
-	}
-
-	// ------------------------------------------------------- //
+	u, repo := newVerifyUsecase(t)
 
 	req := &model.VerifyUserRequest{
 		Token: "",
 	}
 
-	UserRepository.FindByTokenFunc = func(ctx context.Context, db *gorm.DB, user *entity.User, token string) error {
+	repo.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
 		return nil
 	}
 
-	// ------------------------------------------------------- //
-
 	res, err := u.Verify(context.Background(), req)
 
-	// ------------------------------------------------------- //
-
-	var expected *model.Auth
-
-	assert.Equal(t, expected, res)
+	assert.Nil(t, res)
 	assert.NotNil(t, err)
 	var verrs validator.ValidationErrors
 	assert.ErrorAs(t, err, &verrs)
 }
 
-func TestUserUsecaseImpl_Verify_FindByToken(t *testing.T) {
-	gormDB, _ := newFakeDB(t)
-	UserRepository := &mock.UserRepositoryMock{}
-	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Validate:       validator.New(),
-		UserRepository: UserRepository,
-	}
-
-	// ------------------------------------------------------- //
+func TestUserUsecaseImpl_Verify_ParseAccessToken(t *testing.T) {
+	u, repo := newVerifyUsecase(t)
 
 	req := &model.VerifyUserRequest{
-		Token: "token1",
+		Token: "invalid-token",
 	}
 
-	UserRepository.FindByTokenFunc = func(ctx context.Context, db *gorm.DB, user *entity.User, token string) error {
-		return assert.AnError
+	repo.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+		return nil
 	}
-
-	// ------------------------------------------------------- //
 
 	res, err := u.Verify(context.Background(), req)
 
-	// ------------------------------------------------------- //
+	assert.Nil(t, res)
+	assert.NotNil(t, err)
+}
 
-	var expected *model.Auth
+func TestUserUsecaseImpl_Verify_FindByID(t *testing.T) {
+	u, repo := newVerifyUsecase(t)
 
-	assert.Equal(t, expected, res)
+	tokenString := newSignedToken(t, u.Config, "id1")
+
+	req := &model.VerifyUserRequest{
+		Token: tokenString,
+	}
+
+	repo.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+		return assert.AnError
+	}
+
+	res, err := u.Verify(context.Background(), req)
+
+	assert.Nil(t, res)
 	assert.NotNil(t, err)
 	assert.ErrorIs(t, err, assert.AnError)
 }

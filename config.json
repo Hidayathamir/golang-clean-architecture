@@ -9,6 +9,13 @@
   "log": {
     "level": 6
   },
+  "auth": {
+    "jwt": {
+      "secret": "change-me",
+      "issuer": "github.com/Hidayathamir/golang-clean-architecture",
+      "expire_seconds": 3600
+    }
+  },
   "telemetry": {
     "otlp": {
       "endpoint": "localhost:4317"

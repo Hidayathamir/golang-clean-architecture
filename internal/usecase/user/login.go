@@ -7,7 +7,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -28,11 +27,6 @@ func (u *UserUsecaseImpl) Login(ctx context.Context, req *model.LoginUserRequest
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Login", err)
 	}
 
-	user.Token = uuid.New().String()
-	if err := u.UserRepository.Update(ctx, u.DB.WithContext(ctx), user); err != nil {
-		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Login", err)
-	}
-
 	if _, err := u.SlackClient.IsConnected(ctx); err != nil {
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Login", err)
 	}
@@ -42,6 +36,13 @@ func (u *UserUsecaseImpl) Login(ctx context.Context, req *model.LoginUserRequest
 	if err := u.UserProducer.Send(ctx, event); err != nil {
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Login", err)
 	}
+
+	token, err := u.signAccessToken(ctx, user.ID)
+	if err != nil {
+		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Login", err)
+	}
+
+	user.Token = token
 
 	res := new(model.UserResponse)
 	converter.UserToTokenResponse(user, res)

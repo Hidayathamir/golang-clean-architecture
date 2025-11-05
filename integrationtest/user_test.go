@@ -8,9 +8,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/golang-jwt/jwt/v5"
+
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -78,7 +81,7 @@ func TestRegisterError(t *testing.T) {
 
 func TestRegisterDuplicate(t *testing.T) {
 	ClearAll()
-	TestRegister(t) // register success
+	registerDefaultUser(t)
 
 	requestBody := model.RegisterUserRequest{
 		ID:       "khannedy",
@@ -108,7 +111,8 @@ func TestRegisterDuplicate(t *testing.T) {
 }
 
 func TestLogin(t *testing.T) {
-	TestRegister(t) // register success
+	ClearAll()
+	registerDefaultUser(t)
 
 	requestBody := model.LoginUserRequest{
 		ID:       "khannedy",
@@ -133,17 +137,22 @@ func TestLogin(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.NotNil(t, responseBody.Data.Token)
+	assert.NotEmpty(t, responseBody.Data.Token)
 
-	user := new(entity.User)
-	err = db.Where("id = ?", requestBody.ID).First(user).Error
+	claims := &jwt.RegisteredClaims{}
+	token, err := jwt.ParseWithClaims(responseBody.Data.Token, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(viperConfig.GetString(configkey.AuthJWTSecret)), nil
+	})
 	assert.Nil(t, err)
-	assert.Equal(t, user.Token, responseBody.Data.Token)
+	assert.True(t, token.Valid)
+	assert.Equal(t, requestBody.ID, claims.Subject)
+	assert.Equal(t, viperConfig.GetString(configkey.AuthJWTIssuer), claims.Issuer)
+	assert.NotNil(t, claims.ExpiresAt)
 }
 
 func TestLoginWrongUsername(t *testing.T) {
 	ClearAll()
-	TestRegister(t) // register success
+	registerDefaultUser(t)
 
 	requestBody := model.LoginUserRequest{
 		ID:       "wrong",
@@ -173,7 +182,7 @@ func TestLoginWrongUsername(t *testing.T) {
 
 func TestLoginWrongPassword(t *testing.T) {
 	ClearAll()
-	TestRegister(t) // register success
+	registerDefaultUser(t)
 
 	requestBody := model.LoginUserRequest{
 		ID:       "khannedy",
@@ -203,16 +212,12 @@ func TestLoginWrongPassword(t *testing.T) {
 
 func TestLogout(t *testing.T) {
 	ClearAll()
-	TestLogin(t) // login success
-
-	user := new(entity.User)
-	err := db.Where("id = ?", "khannedy").First(user).Error
-	assert.Nil(t, err)
+	token := registerAndLoginDefaultUser(t)
 
 	req := httptest.NewRequest(http.MethodDelete, "/api/users", nil)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -230,7 +235,8 @@ func TestLogout(t *testing.T) {
 
 func TestLogoutWrongAuthorization(t *testing.T) {
 	ClearAll()
-	TestLogin(t) // login success
+
+	registerDefaultUser(t)
 
 	req := httptest.NewRequest(http.MethodDelete, "/api/users", nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -253,7 +259,7 @@ func TestLogoutWrongAuthorization(t *testing.T) {
 
 func TestGetCurrentUser(t *testing.T) {
 	ClearAll()
-	TestLogin(t) // login success
+	token := registerAndLoginDefaultUser(t)
 
 	user := new(entity.User)
 	err := db.Where("id = ?", "khannedy").First(user).Error
@@ -262,7 +268,7 @@ func TestGetCurrentUser(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/api/users/_current", nil)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -283,7 +289,8 @@ func TestGetCurrentUser(t *testing.T) {
 
 func TestGetCurrentUserFailed(t *testing.T) {
 	ClearAll()
-	TestLogin(t) // login success
+
+	registerDefaultUser(t)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/users/_current", nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -306,7 +313,7 @@ func TestGetCurrentUserFailed(t *testing.T) {
 
 func TestUpdateUserName(t *testing.T) {
 	ClearAll()
-	TestLogin(t) // login success
+	token := registerAndLoginDefaultUser(t)
 
 	user := new(entity.User)
 	err := db.Where("id = ?", "khannedy").First(user).Error
@@ -322,7 +329,7 @@ func TestUpdateUserName(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPatch, "/api/users/_current", strings.NewReader(string(bodyJson)))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -343,7 +350,7 @@ func TestUpdateUserName(t *testing.T) {
 
 func TestUpdateUserPassword(t *testing.T) {
 	ClearAll()
-	TestLogin(t) // login success
+	token := registerAndLoginDefaultUser(t)
 
 	user := new(entity.User)
 	err := db.Where("id = ?", "khannedy").First(user).Error
@@ -359,7 +366,7 @@ func TestUpdateUserPassword(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPatch, "/api/users/_current", strings.NewReader(string(bodyJson)))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -386,7 +393,7 @@ func TestUpdateUserPassword(t *testing.T) {
 
 func TestUpdateFailed(t *testing.T) {
 	ClearAll()
-	TestLogin(t) // login success
+	registerDefaultUser(t)
 
 	requestBody := model.UpdateUserRequest{
 		Password: "rahasialagi",

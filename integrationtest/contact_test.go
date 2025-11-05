@@ -9,18 +9,14 @@ import (
 	"testing"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateContact(t *testing.T) {
-	TestLogin(t)
-
-	user := new(entity.User)
-	err := db.Where("id = ?", "khannedy").First(user).Error
-	assert.Nil(t, err)
+	ClearAll()
+	token, _ := loginAndGetDefaultUser(t)
 
 	requestBody := model.CreateContactRequest{
 		FirstName: "Eko Kurniawan",
@@ -28,54 +24,30 @@ func TestCreateContact(t *testing.T) {
 		Email:     "eko@example.com",
 		Phone:     "088888888888",
 	}
-	bodyJson, err := json.Marshal(requestBody)
-	assert.Nil(t, err)
 
-	req := httptest.NewRequest(http.MethodPost, "/api/contacts", strings.NewReader(string(bodyJson)))
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	resData := createContactViaAPI(t, token, requestBody)
 
-	res, err := app.Test(req)
-	assert.Nil(t, err)
-
-	bytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
-
-	responseBody := new(response.WebResponse[model.ContactResponse])
-	err = json.Unmarshal(bytes, responseBody)
-	assert.Nil(t, err)
-
-	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.Equal(t, requestBody.FirstName, responseBody.Data.FirstName)
-	assert.Equal(t, requestBody.LastName, responseBody.Data.LastName)
-	assert.Equal(t, requestBody.Email, responseBody.Data.Email)
-	assert.Equal(t, requestBody.Phone, responseBody.Data.Phone)
-	assert.NotNil(t, responseBody.Data.ID)
-	assert.NotNil(t, responseBody.Data.CreatedAt)
-	assert.NotNil(t, responseBody.Data.UpdatedAt)
+	assert.Equal(t, requestBody.FirstName, resData.FirstName)
+	assert.Equal(t, requestBody.LastName, resData.LastName)
+	assert.Equal(t, requestBody.Email, resData.Email)
+	assert.Equal(t, requestBody.Phone, resData.Phone)
+	assert.NotEmpty(t, resData.ID)
+	assert.NotZero(t, resData.CreatedAt)
+	assert.NotZero(t, resData.UpdatedAt)
 }
 
 func TestCreateContactFailed(t *testing.T) {
-	TestLogin(t)
+	ClearAll()
+	token, _ := loginAndGetDefaultUser(t)
 
-	user := new(entity.User)
-	err := db.Where("id = ?", "khannedy").First(user).Error
+	requestBody := model.CreateContactRequest{}
+	bodyJSON, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	requestBody := model.CreateContactRequest{
-		FirstName: "",
-		LastName:  "",
-		Email:     "",
-		Phone:     "",
-	}
-	bodyJson, err := json.Marshal(requestBody)
-	assert.Nil(t, err)
-
-	req := httptest.NewRequest(http.MethodPost, "/api/contacts", strings.NewReader(string(bodyJson)))
+	req := httptest.NewRequest(http.MethodPost, "/api/contacts", strings.NewReader(string(bodyJSON)))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -92,19 +64,20 @@ func TestCreateContactFailed(t *testing.T) {
 }
 
 func TestGetConnect(t *testing.T) {
-	TestCreateContact(t)
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
 
-	user := new(entity.User)
-	err := db.Where("id = ?", "khannedy").First(user).Error
-	assert.Nil(t, err)
-
-	contact := new(entity.Contact)
-	err = db.Where("user_id = ?", user.ID).First(contact).Error
-	assert.Nil(t, err)
+	createContactViaAPI(t, token, model.CreateContactRequest{
+		FirstName: "Eko Kurniawan",
+		LastName:  "Khannedy",
+		Email:     "eko@example.com",
+		Phone:     "088888888888",
+	})
+	contact := GetFirstContact(t, user)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/contacts/"+contact.ID, nil)
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -127,15 +100,20 @@ func TestGetConnect(t *testing.T) {
 }
 
 func TestGetContactFailed(t *testing.T) {
-	TestCreateContact(t)
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
 
-	user := new(entity.User)
-	err := db.Where("id = ?", "khannedy").First(user).Error
-	assert.Nil(t, err)
+	createContactViaAPI(t, token, model.CreateContactRequest{
+		FirstName: "Eko Kurniawan",
+		LastName:  "Khannedy",
+		Email:     "eko@example.com",
+		Phone:     "088888888888",
+	})
+	_ = GetFirstContact(t, user)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/contacts/"+uuid.NewString(), nil)
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -151,15 +129,16 @@ func TestGetContactFailed(t *testing.T) {
 }
 
 func TestUpdateContact(t *testing.T) {
-	TestCreateContact(t)
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
 
-	user := new(entity.User)
-	err := db.Where("id = ?", "khannedy").First(user).Error
-	assert.Nil(t, err)
-
-	contact := new(entity.Contact)
-	err = db.Where("user_id = ?", user.ID).First(contact).Error
-	assert.Nil(t, err)
+	createContactViaAPI(t, token, model.CreateContactRequest{
+		FirstName: "Eko Kurniawan",
+		LastName:  "Khannedy",
+		Email:     "eko@example.com",
+		Phone:     "088888888888",
+	})
+	contact := GetFirstContact(t, user)
 
 	requestBody := model.UpdateContactRequest{
 		FirstName: "Eko",
@@ -167,13 +146,13 @@ func TestUpdateContact(t *testing.T) {
 		Email:     "budiman@example.com",
 		Phone:     "089898989",
 	}
-	bodyJson, err := json.Marshal(requestBody)
+	bodyJSON, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req := httptest.NewRequest(http.MethodPut, "/api/contacts/"+contact.ID, strings.NewReader(string(bodyJson)))
+	req := httptest.NewRequest(http.MethodPut, "/api/contacts/"+contact.ID, strings.NewReader(string(bodyJSON)))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -190,35 +169,31 @@ func TestUpdateContact(t *testing.T) {
 	assert.Equal(t, requestBody.LastName, responseBody.Data.LastName)
 	assert.Equal(t, requestBody.Email, responseBody.Data.Email)
 	assert.Equal(t, requestBody.Phone, responseBody.Data.Phone)
-	assert.NotNil(t, responseBody.Data.ID)
-	assert.NotNil(t, responseBody.Data.CreatedAt)
-	assert.NotNil(t, responseBody.Data.UpdatedAt)
+	assert.NotEmpty(t, responseBody.Data.ID)
+	assert.NotZero(t, responseBody.Data.CreatedAt)
+	assert.NotZero(t, responseBody.Data.UpdatedAt)
 }
 
 func TestUpdateContactFailed(t *testing.T) {
-	TestCreateContact(t)
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
 
-	user := new(entity.User)
-	err := db.Where("id = ?", "khannedy").First(user).Error
+	createContactViaAPI(t, token, model.CreateContactRequest{
+		FirstName: "Eko Kurniawan",
+		LastName:  "Khannedy",
+		Email:     "eko@example.com",
+		Phone:     "088888888888",
+	})
+	contact := GetFirstContact(t, user)
+
+	requestBody := model.UpdateContactRequest{}
+	bodyJSON, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	contact := new(entity.Contact)
-	err = db.Where("user_id = ?", user.ID).First(contact).Error
-	assert.Nil(t, err)
-
-	requestBody := model.UpdateContactRequest{
-		FirstName: "",
-		LastName:  "",
-		Email:     "",
-		Phone:     "",
-	}
-	bodyJson, err := json.Marshal(requestBody)
-	assert.Nil(t, err)
-
-	req := httptest.NewRequest(http.MethodPut, "/api/contacts/"+contact.ID, strings.NewReader(string(bodyJson)))
+	req := httptest.NewRequest(http.MethodPut, "/api/contacts/"+contact.ID, strings.NewReader(string(bodyJSON)))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -234,19 +209,20 @@ func TestUpdateContactFailed(t *testing.T) {
 }
 
 func TestDeleteContact(t *testing.T) {
-	TestCreateContact(t)
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
 
-	user := new(entity.User)
-	err := db.Where("id = ?", "khannedy").First(user).Error
-	assert.Nil(t, err)
-
-	contact := new(entity.Contact)
-	err = db.Where("user_id = ?", user.ID).First(contact).Error
-	assert.Nil(t, err)
+	createContactViaAPI(t, token, model.CreateContactRequest{
+		FirstName: "Eko Kurniawan",
+		LastName:  "Khannedy",
+		Email:     "eko@example.com",
+		Phone:     "088888888888",
+	})
+	contact := GetFirstContact(t, user)
 
 	req := httptest.NewRequest(http.MethodDelete, "/api/contacts/"+contact.ID, nil)
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -259,19 +235,24 @@ func TestDeleteContact(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.Equal(t, true, responseBody.Data)
+	assert.True(t, responseBody.Data)
 }
 
 func TestDeleteContactFailed(t *testing.T) {
-	TestCreateContact(t)
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
 
-	user := new(entity.User)
-	err := db.Where("id = ?", "khannedy").First(user).Error
-	assert.Nil(t, err)
+	createContactViaAPI(t, token, model.CreateContactRequest{
+		FirstName: "Eko Kurniawan",
+		LastName:  "Khannedy",
+		Email:     "eko@example.com",
+		Phone:     "088888888888",
+	})
+	_ = GetFirstContact(t, user)
 
 	req := httptest.NewRequest(http.MethodDelete, "/api/contacts/"+uuid.NewString(), nil)
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -287,17 +268,14 @@ func TestDeleteContactFailed(t *testing.T) {
 }
 
 func TestSearchContact(t *testing.T) {
-	TestLogin(t)
-
-	user := new(entity.User)
-	err := db.Where("id = ?", "khannedy").First(user).Error
-	assert.Nil(t, err)
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
 
 	CreateContacts(user, 20)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/contacts", nil)
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -318,17 +296,14 @@ func TestSearchContact(t *testing.T) {
 }
 
 func TestSearchContactWithPagination(t *testing.T) {
-	TestLogin(t)
-
-	user := new(entity.User)
-	err := db.Where("id = ?", "khannedy").First(user).Error
-	assert.Nil(t, err)
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
 
 	CreateContacts(user, 20)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/contacts?page=2&size=5", nil)
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -349,17 +324,14 @@ func TestSearchContactWithPagination(t *testing.T) {
 }
 
 func TestSearchContactWithFilter(t *testing.T) {
-	TestLogin(t)
-
-	user := new(entity.User)
-	err := db.Where("id = ?", "khannedy").First(user).Error
-	assert.Nil(t, err)
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
 
 	CreateContacts(user, 20)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/contacts?name=contact&phone=08000000&email=example.com", nil)
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)

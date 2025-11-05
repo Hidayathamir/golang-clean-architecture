@@ -1,6 +1,6 @@
-@token = 04fc7675-4451-42cc-9ae1-c337a7b5e764
-@contactId = 85ddf7a1-829c-46d7-a0b0-de3762ff0fb6
-@addressId = 1ad438ce-f542-44ce-975b-561ac604bdd3
+@token =
+@contactId =
+@addressId =
 
 
 ### Register new user
@@ -21,22 +21,28 @@ Content-Type: application/json
   "id": "joko",
   "password": "joko"
 }
+> {%
+    const body = response.body;
+    if (body && body.data && body.data.token) {
+      client.global.set("token", body.data.token);
+    }
+%}
 
 ### Get user profile
 GET http://localhost:3000/api/users/_current
 Accept: application/json
-Authorization: {{token}}
+Authorization: Bearer {{token}}
 
 ### Logout user
 DELETE http://localhost:3000/api/users
 Accept: application/json
-Authorization: {{token}}
+Authorization: Bearer {{token}}
 
 ### Update user
 PATCH http://localhost:3000/api/users/_current
 Content-Type: application/json
 Accept: application/json
-Authorization: {{token}}
+Authorization: Bearer {{token}}
 
 {
   "name": "Joko Morro"
@@ -46,7 +52,7 @@ Authorization: {{token}}
 POST http://localhost:3000/api/contacts
 Content-Type: application/json
 Accept: application/json
-Authorization: {{token}}
+Authorization: Bearer {{token}}
 
 {
   "first_name": "Joko",
@@ -54,24 +60,30 @@ Authorization: {{token}}
   "phone": "08123456789",
   "email": "joko@example.com"
 }
+> {%
+    const body = response.body;
+    if (body && body.data && body.data.id) {
+      client.global.set("contactId", body.data.id);
+    }
+%}
 
 ### Get detail contact
 GET http://localhost:3000/api/contacts/{{contactId}}
 Content-Type: application/json
 Accept: application/json
-Authorization: {{token}}
+Authorization: Bearer {{token}}
 
 ### Search contacts
 GET http://localhost:3000/api/contacts?size=10&page=1&name=jo&phone=0812&email=joko
 Content-Type: application/json
 Accept: application/json
-Authorization: {{token}}
+Authorization: Bearer {{token}}
 
 ### update contact
 PUT http://localhost:3000/api/contacts/{{contactId}}
 Content-Type: application/json
 Accept: application/json
-Authorization: {{token}}
+Authorization: Bearer {{token}}
 
 {
   "first_name": "Budi",
@@ -83,19 +95,19 @@ Authorization: {{token}}
 ### delete contact
 DELETE http://localhost:3000/api/contacts/{{contactId}}
 Accept: application/json
-Authorization: {{token}}
+Authorization: Bearer {{token}}
 
 ### get all addresses
 GET http://localhost:3000/api/contacts/{{contactId}}/addresses
 Accept: application/json
-Authorization: {{token}}
+Authorization: Bearer {{token}}
 
 
 ### create new addresses
 POST http://localhost:3000/api/contacts/{{contactId}}/addresses
 Content-Type: application/json
 Accept: application/json
-Authorization: {{token}}
+Authorization: Bearer {{token}}
 
 {
   "street": "Jl. Jalan",
@@ -104,17 +116,23 @@ Authorization: {{token}}
   "country": "Indonesia",
   "postal_code": "12345"
 }
+> {%
+    const body = response.body;
+    if (body && body.data && body.data.id) {
+      client.global.set("addressId", body.data.id);
+    }
+%}
 
 ### get address detail
 GET http://localhost:3000/api/contacts/{{contactId}}/addresses/{{addressId}}
 Accept: application/json
-Authorization: {{token}}
+Authorization: Bearer {{token}}
 
 ### update address
 PUT http://localhost:3000/api/contacts/{{contactId}}/addresses/{{addressId}}
 Content-Type: application/json
 Accept: application/json
-Authorization: {{token}}
+Authorization: Bearer {{token}}
 
 {
   "street": "Jl. Sudah Jadi",
@@ -127,4 +145,4 @@ Authorization: {{token}}
 ### delete address
 DELETE http://localhost:3000/api/contacts/{{contactId}}/addresses/{{addressId}}
 Accept: application/json
-Authorization: {{token}}
+Authorization: Bearer {{token}}

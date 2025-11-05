@@ -1,14 +1,195 @@
 package integrationtest
 
 import (
+	"encoding/json"
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"strconv"
+	"strings"
 	"testing"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
+
+const (
+	defaultUserID       = "khannedy"
+	defaultUserPassword = "rahasia"
+	defaultUserName     = "Eko Khannedy"
+)
+
+func registerDefaultUser(t *testing.T) {
+	t.Helper()
+
+	requestBody := model.RegisterUserRequest{
+		ID:       defaultUserID,
+		Password: defaultUserPassword,
+		Name:     defaultUserName,
+	}
+
+	bodyJSON, err := json.Marshal(requestBody)
+	assert.Nil(t, err)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/users", strings.NewReader(string(bodyJSON)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	defer func() { _ = res.Body.Close() }()
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.UserResponse])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+	assert.Equal(t, requestBody.ID, responseBody.Data.ID)
+}
+
+func loginDefaultUser(t *testing.T) string {
+	t.Helper()
+
+	requestBody := model.LoginUserRequest{
+		ID:       defaultUserID,
+		Password: defaultUserPassword,
+	}
+
+	bodyJSON, err := json.Marshal(requestBody)
+	assert.Nil(t, err)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/users/_login", strings.NewReader(string(bodyJSON)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	defer func() { _ = res.Body.Close() }()
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.UserResponse])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+	assert.NotEmpty(t, responseBody.Data.Token)
+
+	return responseBody.Data.Token
+}
+
+func registerAndLoginDefaultUser(t *testing.T) string {
+	t.Helper()
+
+	registerDefaultUser(t)
+	return loginDefaultUser(t)
+}
+
+func bearerToken(token string) string {
+	return "Bearer " + token
+}
+
+func loginAndGetDefaultUser(t *testing.T) (string, *entity.User) {
+	t.Helper()
+
+	token := registerAndLoginDefaultUser(t)
+	user := GetFirstUser(t)
+	return token, user
+}
+
+func createTodoViaAPI(t *testing.T, token string, requestBody model.CreateTodoRequest) model.TodoResponse {
+	t.Helper()
+
+	bodyJSON, err := json.Marshal(requestBody)
+	assert.Nil(t, err)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/todos", strings.NewReader(string(bodyJSON)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", bearerToken(token))
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	defer func() { _ = res.Body.Close() }()
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.TodoResponse])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+
+	return responseBody.Data
+}
+
+func createContactViaAPI(t *testing.T, token string, requestBody model.CreateContactRequest) model.ContactResponse {
+	t.Helper()
+
+	bodyJSON, err := json.Marshal(requestBody)
+	assert.Nil(t, err)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/contacts", strings.NewReader(string(bodyJSON)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", bearerToken(token))
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	defer func() { _ = res.Body.Close() }()
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.ContactResponse])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+
+	return responseBody.Data
+}
+
+func createAddressViaAPI(t *testing.T, token string, contactID string, requestBody model.CreateAddressRequest) model.AddressResponse {
+	t.Helper()
+
+	bodyJSON, err := json.Marshal(requestBody)
+	assert.Nil(t, err)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/contacts/"+contactID+"/addresses", strings.NewReader(string(bodyJSON)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", bearerToken(token))
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	defer func() { _ = res.Body.Close() }()
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.AddressResponse])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+
+	return responseBody.Data
+}
 
 func ClearAll() {
 	ClearAddresses()

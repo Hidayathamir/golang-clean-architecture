@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
@@ -11,14 +12,27 @@ import (
 
 func NewAuth(userUserCase user.UserUsecase) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		headerAuth := ctx.Get("Authorization")
+		headerAuth := strings.TrimSpace(ctx.Get("Authorization"))
 		if headerAuth == "" {
 			err := fmt.Errorf("header auth not found")
 			err = errkit.Unauthorized(err)
 			return errkit.AddFuncName("middleware.NewAuth", err)
 		}
 
-		req := &model.VerifyUserRequest{Token: headerAuth}
+		var token string
+		parts := strings.Fields(headerAuth)
+		switch {
+		case len(parts) == 1:
+			token = parts[0]
+		case len(parts) == 2 && strings.EqualFold(parts[0], "Bearer"):
+			token = parts[1]
+		default:
+			err := fmt.Errorf("authorization header format invalid")
+			err = errkit.Unauthorized(err)
+			return errkit.AddFuncName("middleware.NewAuth", err)
+		}
+
+		req := &model.VerifyUserRequest{Token: token}
 		auth, err := userUserCase.Verify(ctx.UserContext(), req)
 		if err != nil {
 			err = errkit.Unauthorized(err)

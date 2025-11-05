@@ -24,4 +24,8 @@ const (
 	KafkaProducerEnabled  = "kafka.producer.enabled"
 
 	TelemetryOTLPEndpoint = "telemetry.otlp.endpoint"
+
+	AuthJWTSecret        = "auth.jwt.secret"
+	AuthJWTIssuer        = "auth.jwt.issuer"
+	AuthJWTExpireSeconds = "auth.jwt.expire_seconds"
 )

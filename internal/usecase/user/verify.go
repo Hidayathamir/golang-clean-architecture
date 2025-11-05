@@ -15,8 +15,13 @@ func (u *UserUsecaseImpl) Verify(ctx context.Context, req *model.VerifyUserReque
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Verify", err)
 	}
 
+	userID, err := u.parseAccessToken(ctx, req.Token)
+	if err != nil {
+		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Verify", err)
+	}
+
 	user := new(entity.User)
-	if err := u.UserRepository.FindByToken(ctx, u.DB.WithContext(ctx), user, req.Token); err != nil {
+	if err := u.UserRepository.FindByID(ctx, u.DB.WithContext(ctx), user, userID); err != nil {
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Verify", err)
 	}
 

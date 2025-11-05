@@ -18,58 +18,40 @@ import (
 )
 
 func TestCreateTodo(t *testing.T) {
-	TestLogin(t)
-
-	user := GetFirstUser(t)
+	ClearAll()
+	token, _ := loginAndGetDefaultUser(t)
 
 	requestBody := model.CreateTodoRequest{
 		Title:       "Buy groceries",
 		Description: "Milk, bread, eggs",
 	}
-	bodyJson, err := json.Marshal(requestBody)
-	assert.Nil(t, err)
 
-	req := httptest.NewRequest(http.MethodPost, "/api/todos", strings.NewReader(string(bodyJson)))
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	resData := createTodoViaAPI(t, token, requestBody)
 
-	res, err := app.Test(req)
-	assert.Nil(t, err)
-
-	bytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
-
-	responseBody := new(response.WebResponse[model.TodoResponse])
-	err = json.Unmarshal(bytes, responseBody)
-	assert.Nil(t, err)
-
-	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.Equal(t, requestBody.Title, responseBody.Data.Title)
-	assert.Equal(t, requestBody.Description, responseBody.Data.Description)
-	assert.False(t, responseBody.Data.IsCompleted)
-	assert.Nil(t, responseBody.Data.CompletedAt)
-	assert.NotEmpty(t, responseBody.Data.ID)
-	assert.NotZero(t, responseBody.Data.CreatedAt)
-	assert.NotZero(t, responseBody.Data.UpdatedAt)
+	assert.Equal(t, requestBody.Title, resData.Title)
+	assert.Equal(t, requestBody.Description, resData.Description)
+	assert.False(t, resData.IsCompleted)
+	assert.Nil(t, resData.CompletedAt)
+	assert.NotEmpty(t, resData.ID)
+	assert.NotZero(t, resData.CreatedAt)
+	assert.NotZero(t, resData.UpdatedAt)
 }
 
 func TestCreateTodoFailed(t *testing.T) {
-	TestLogin(t)
-
-	user := GetFirstUser(t)
+	ClearAll()
+	token, _ := loginAndGetDefaultUser(t)
 
 	requestBody := model.CreateTodoRequest{
 		Title:       "",
 		Description: "",
 	}
-	bodyJson, err := json.Marshal(requestBody)
+	bodyJSON, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req := httptest.NewRequest(http.MethodPost, "/api/todos", strings.NewReader(string(bodyJson)))
+	req := httptest.NewRequest(http.MethodPost, "/api/todos", strings.NewReader(string(bodyJSON)))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -86,14 +68,18 @@ func TestCreateTodoFailed(t *testing.T) {
 }
 
 func TestGetTodo(t *testing.T) {
-	TestCreateTodo(t)
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
 
-	user := GetFirstUser(t)
+	createTodoViaAPI(t, token, model.CreateTodoRequest{
+		Title:       "Buy groceries",
+		Description: "Milk, bread, eggs",
+	})
 	todo := GetFirstTodo(t, user)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/todos/"+todo.ID, nil)
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -116,13 +102,17 @@ func TestGetTodo(t *testing.T) {
 }
 
 func TestGetTodoFailed(t *testing.T) {
-	TestCreateTodo(t)
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
 
-	user := GetFirstUser(t)
+	createTodoViaAPI(t, token, model.CreateTodoRequest{
+		Title:       "Buy groceries",
+		Description: "Milk, bread, eggs",
+	})
 
 	req := httptest.NewRequest(http.MethodGet, "/api/todos/"+uuid.NewString(), nil)
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -136,25 +126,32 @@ func TestGetTodoFailed(t *testing.T) {
 
 	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 	assert.NotNil(t, responseBody.ErrorMessage)
+
+	// ensure original todo still exists
+	assert.NotNil(t, GetFirstTodo(t, user))
 }
 
 func TestUpdateTodo(t *testing.T) {
-	TestCreateTodo(t)
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
 
-	user := GetFirstUser(t)
+	createTodoViaAPI(t, token, model.CreateTodoRequest{
+		Title:       "Buy groceries",
+		Description: "Milk, bread, eggs",
+	})
 	todo := GetFirstTodo(t, user)
 
 	requestBody := model.UpdateTodoRequest{
 		Title:       "Buy more groceries",
 		Description: "Add vegetables to the list",
 	}
-	bodyJson, err := json.Marshal(requestBody)
+	bodyJSON, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req := httptest.NewRequest(http.MethodPut, "/api/todos/"+todo.ID, strings.NewReader(string(bodyJson)))
+	req := httptest.NewRequest(http.MethodPut, "/api/todos/"+todo.ID, strings.NewReader(string(bodyJSON)))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -175,22 +172,26 @@ func TestUpdateTodo(t *testing.T) {
 }
 
 func TestUpdateTodoFailed(t *testing.T) {
-	TestCreateTodo(t)
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
 
-	user := GetFirstUser(t)
+	createTodoViaAPI(t, token, model.CreateTodoRequest{
+		Title:       "Buy groceries",
+		Description: "Milk, bread, eggs",
+	})
 	todo := GetFirstTodo(t, user)
 
 	requestBody := model.UpdateTodoRequest{
 		Title:       "",
 		Description: "",
 	}
-	bodyJson, err := json.Marshal(requestBody)
+	bodyJSON, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req := httptest.NewRequest(http.MethodPut, "/api/todos/"+todo.ID, strings.NewReader(string(bodyJson)))
+	req := httptest.NewRequest(http.MethodPut, "/api/todos/"+todo.ID, strings.NewReader(string(bodyJSON)))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -207,14 +208,18 @@ func TestUpdateTodoFailed(t *testing.T) {
 }
 
 func TestDeleteTodo(t *testing.T) {
-	TestCreateTodo(t)
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
 
-	user := GetFirstUser(t)
+	createTodoViaAPI(t, token, model.CreateTodoRequest{
+		Title:       "Buy groceries",
+		Description: "Milk, bread, eggs",
+	})
 	todo := GetFirstTodo(t, user)
 
 	req := httptest.NewRequest(http.MethodDelete, "/api/todos/"+todo.ID, nil)
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -231,13 +236,17 @@ func TestDeleteTodo(t *testing.T) {
 }
 
 func TestDeleteTodoFailed(t *testing.T) {
-	TestCreateTodo(t)
+	ClearAll()
+	token, _ := loginAndGetDefaultUser(t)
 
-	user := GetFirstUser(t)
+	createTodoViaAPI(t, token, model.CreateTodoRequest{
+		Title:       "Buy groceries",
+		Description: "Milk, bread, eggs",
+	})
 
 	req := httptest.NewRequest(http.MethodDelete, "/api/todos/"+uuid.NewString(), nil)
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -254,14 +263,18 @@ func TestDeleteTodoFailed(t *testing.T) {
 }
 
 func TestCompleteTodo(t *testing.T) {
-	TestCreateTodo(t)
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
 
-	user := GetFirstUser(t)
+	createTodoViaAPI(t, token, model.CreateTodoRequest{
+		Title:       "Buy groceries",
+		Description: "Milk, bread, eggs",
+	})
 	todo := GetFirstTodo(t, user)
 
 	req := httptest.NewRequest(http.MethodPatch, "/api/todos/"+todo.ID+"/_complete", nil)
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -285,15 +298,14 @@ func TestCompleteTodo(t *testing.T) {
 }
 
 func TestListTodos(t *testing.T) {
-	TestLogin(t)
-
-	user := GetFirstUser(t)
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
 
 	CreateTodos(t, user, 15)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/todos", nil)
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -314,15 +326,14 @@ func TestListTodos(t *testing.T) {
 }
 
 func TestListTodosWithPagination(t *testing.T) {
-	TestLogin(t)
-
-	user := GetFirstUser(t)
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
 
 	CreateTodos(t, user, 25)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/todos?page=2&size=10", nil)
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
@@ -343,9 +354,8 @@ func TestListTodosWithPagination(t *testing.T) {
 }
 
 func TestListTodosWithFilters(t *testing.T) {
-	TestLogin(t)
-
-	user := GetFirstUser(t)
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
 
 	CreateTodos(t, user, 5)
 
@@ -366,7 +376,7 @@ func TestListTodosWithFilters(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodGet, "/api/todos?title=Todo&is_completed=true", nil)
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", user.Token)
+	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
 	assert.Nil(t, err)
