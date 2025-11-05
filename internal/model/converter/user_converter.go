@@ -40,14 +40,6 @@ func UserToResponse(user *entity.User, res *model.UserResponse) {
 	res.UpdatedAt = user.UpdatedAt
 }
 
-func UserToTokenResponse(user *entity.User, res *model.UserResponse) {
-	if user == nil || res == nil {
-		return
-	}
-
-	res.Token = user.Token
-}
-
 func UserToEvent(user *entity.User, event *model.UserEvent) {
 	if user == nil || event == nil {
 		return

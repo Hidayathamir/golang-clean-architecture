@@ -20,12 +20,6 @@ func (u *UserUsecaseImpl) Logout(ctx context.Context, req *model.LogoutUserReque
 		return false, errkit.AddFuncName("user.(*UserUsecaseImpl).Logout", err)
 	}
 
-	user.Token = ""
-
-	if err := u.UserRepository.Update(ctx, u.DB.WithContext(ctx), user); err != nil {
-		return false, errkit.AddFuncName("user.(*UserUsecaseImpl).Logout", err)
-	}
-
 	if _, err := u.S3Client.DeleteObject(ctx, "user-bucket", user.ID); err != nil {
 		return false, errkit.AddFuncName("user.(*UserUsecaseImpl).Logout", err)
 	}

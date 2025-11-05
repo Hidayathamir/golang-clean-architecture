@@ -12,7 +12,6 @@ import (
 //go:generate moq -out=../mock/UserRepository.go -pkg=mock . UserRepository
 
 type UserRepository interface {
-	FindByToken(ctx context.Context, db *gorm.DB, user *entity.User, token string) error
 	Create(ctx context.Context, db *gorm.DB, entity *entity.User) error
 	Update(ctx context.Context, db *gorm.DB, entity *entity.User) error
 	CountByID(ctx context.Context, db *gorm.DB, id string) (int64, error)
@@ -29,15 +28,6 @@ func NewUserRepository(cfg *viper.Viper) *UserRepositoryImpl {
 	return &UserRepositoryImpl{
 		Config: cfg,
 	}
-}
-
-func (r *UserRepositoryImpl) FindByToken(ctx context.Context, db *gorm.DB, user *entity.User, token string) error {
-	err := db.Where("token = ?", token).First(user).Error
-	if err != nil {
-		err = errkit.NotFound(err)
-		return errkit.AddFuncName("repository.(*UserRepositoryImpl).FindByToken", err)
-	}
-	return nil
 }
 
 func (r *UserRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity *entity.User) error {

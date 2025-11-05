@@ -22,22 +22,6 @@ func NewUserRepositoryMwLogger(next UserRepository) *UserRepositoryMwLogger {
 	}
 }
 
-func (r *UserRepositoryMwLogger) FindByToken(ctx context.Context, db *gorm.DB, user *entity.User, token string) error {
-	ctx, span := telemetry.Start(ctx)
-	defer span.End()
-
-	err := r.Next.FindByToken(ctx, db, user, token)
-	telemetry.RecordError(span, err)
-
-	fields := logrus.Fields{
-		"user":  user,
-		"token": token,
-	}
-	l.LogMw(ctx, fields, err)
-
-	return err
-}
-
 func (r *UserRepositoryMwLogger) CountByID(ctx context.Context, db *gorm.DB, id string) (int64, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()

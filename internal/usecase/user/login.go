@@ -42,10 +42,8 @@ func (u *UserUsecaseImpl) Login(ctx context.Context, req *model.LoginUserRequest
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Login", err)
 	}
 
-	user.Token = token
-
 	res := new(model.UserResponse)
-	converter.UserToTokenResponse(user, res)
+	res.Token = token
 
 	return res, nil
 }
