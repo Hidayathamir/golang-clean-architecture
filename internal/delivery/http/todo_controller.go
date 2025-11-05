@@ -12,20 +12,17 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/gofiber/fiber/v2"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 type TodoController struct {
 	Config  *viper.Viper
-	Log     *logrus.Logger
 	Usecase todousecase.TodoUsecase
 }
 
-func NewTodoController(cfg *viper.Viper, log *logrus.Logger, usecase todousecase.TodoUsecase) *TodoController {
+func NewTodoController(cfg *viper.Viper, usecase todousecase.TodoUsecase) *TodoController {
 	return &TodoController{
 		Config:  cfg,
-		Log:     log,
 		Usecase: usecase,
 	}
 }

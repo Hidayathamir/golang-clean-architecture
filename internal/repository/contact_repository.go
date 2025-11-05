@@ -6,7 +6,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
@@ -25,13 +24,11 @@ var _ ContactRepository = &ContactRepositoryImpl{}
 
 type ContactRepositoryImpl struct {
 	Config *viper.Viper
-	Log    *logrus.Logger
 }
 
-func NewContactRepository(cfg *viper.Viper, log *logrus.Logger) *ContactRepositoryImpl {
+func NewContactRepository(cfg *viper.Viper) *ContactRepositoryImpl {
 	return &ContactRepositoryImpl{
 		Config: cfg,
-		Log:    log,
 	}
 }
 

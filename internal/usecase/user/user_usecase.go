@@ -8,7 +8,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
 	"github.com/go-playground/validator/v10"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
@@ -28,7 +27,6 @@ var _ UserUsecase = &UserUsecaseImpl{}
 
 type UserUsecaseImpl struct {
 	Config   *viper.Viper
-	Log      *logrus.Logger
 	DB       *gorm.DB
 	Validate *validator.Validate
 
@@ -45,7 +43,6 @@ type UserUsecaseImpl struct {
 
 func NewUserUsecase(
 	cfg *viper.Viper,
-	log *logrus.Logger,
 	db *gorm.DB,
 	validate *validator.Validate,
 
@@ -61,7 +58,6 @@ func NewUserUsecase(
 ) *UserUsecaseImpl {
 	return &UserUsecaseImpl{
 		Config:   cfg,
-		Log:      log,
 		DB:       db,
 		Validate: validate,
 

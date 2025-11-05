@@ -7,7 +7,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
 	"github.com/go-playground/validator/v10"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
@@ -27,7 +26,6 @@ var _ TodoUsecase = &TodoUsecaseImpl{}
 
 type TodoUsecaseImpl struct {
 	Config   *viper.Viper
-	Log      *logrus.Logger
 	DB       *gorm.DB
 	Validate *validator.Validate
 
@@ -39,7 +37,7 @@ type TodoUsecaseImpl struct {
 }
 
 func NewTodoUsecase(
-	cfg *viper.Viper, log *logrus.Logger, db *gorm.DB, validate *validator.Validate,
+	cfg *viper.Viper, db *gorm.DB, validate *validator.Validate,
 
 	// repository
 	todoRepository repository.TodoRepository,
@@ -49,7 +47,6 @@ func NewTodoUsecase(
 ) *TodoUsecaseImpl {
 	return &TodoUsecaseImpl{
 		Config:   cfg,
-		Log:      log,
 		DB:       db,
 		Validate: validate,
 

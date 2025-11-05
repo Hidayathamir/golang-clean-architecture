@@ -3,16 +3,15 @@ package messaging
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
 	"github.com/IBM/sarama"
 	"github.com/dnwe/otelsarama"
-	"github.com/sirupsen/logrus"
 )
 
 type ConsumerHandler func(message *sarama.ConsumerMessage) error
 
 type ConsumerGroupHandler struct {
 	Handler ConsumerHandler
-	Log     *logrus.Logger
 }
 
 func (h *ConsumerGroupHandler) Setup(sarama.ConsumerGroupSession) error {
@@ -33,7 +32,7 @@ func (h *ConsumerGroupHandler) ConsumeClaim(session sarama.ConsumerGroupSession,
 
 			err := h.Handler(message)
 			if err != nil {
-				h.Log.WithError(err).Error("Failed to process message")
+				l.Logger.WithError(err).Error("Failed to process message")
 			} else {
 				session.MarkMessage(message, "")
 			}
@@ -44,20 +43,19 @@ func (h *ConsumerGroupHandler) ConsumeClaim(session sarama.ConsumerGroupSession,
 	}
 }
 
-func ConsumeTopic(ctx context.Context, consumerGroup sarama.ConsumerGroup, topic string, log *logrus.Logger, handler ConsumerHandler) {
+func ConsumeTopic(ctx context.Context, consumerGroup sarama.ConsumerGroup, topic string, handler ConsumerHandler) {
 	consumerHandler := otelsarama.WrapConsumerGroupHandler(&ConsumerGroupHandler{
 		Handler: handler,
-		Log:     log,
 	})
 
 	go func() {
 		for {
 			if err := consumerGroup.Consume(ctx, []string{topic}, consumerHandler); err != nil {
-				log.WithError(err).Error("Error from consumer")
+				l.Logger.WithError(err).Error("Error from consumer")
 			}
 
 			if ctx.Err() != nil {
-				log.Info("Context cancelled, stopping consumer")
+				l.Logger.Info("Context cancelled, stopping consumer")
 				return
 			}
 		}
@@ -65,13 +63,13 @@ func ConsumeTopic(ctx context.Context, consumerGroup sarama.ConsumerGroup, topic
 
 	go func() {
 		for err := range consumerGroup.Errors() {
-			log.WithError(err).Error("Consumer group error")
+			l.Logger.WithError(err).Error("Consumer group error")
 		}
 	}()
 
 	<-ctx.Done()
-	log.Infof("Closing consumer group for topic: %s", topic)
+	l.Logger.Infof("Closing consumer group for topic: %s", topic)
 	if err := consumerGroup.Close(); err != nil {
-		log.WithError(err).Error("Error closing consumer group")
+		l.Logger.WithError(err).Error("Error closing consumer group")
 	}
 }

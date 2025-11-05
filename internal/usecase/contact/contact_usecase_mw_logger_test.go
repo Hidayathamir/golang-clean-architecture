@@ -7,7 +7,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/contact"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/logging"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
@@ -18,7 +18,7 @@ func TestNewContactUsecaseMwLogger(t *testing.T) {
 }
 
 func TestContactUsecaseMwLogger_Create(t *testing.T) {
-	logging.SetLogger(logrus.New())
+	l.SetLogger(logrus.New())
 	Next := &mock.ContactUsecaseMock{}
 	u := &contact.ContactUsecaseMwLogger{
 		Next: Next,
@@ -32,7 +32,7 @@ func TestContactUsecaseMwLogger_Create(t *testing.T) {
 }
 
 func TestContactUsecaseMwLogger_Delete(t *testing.T) {
-	logging.SetLogger(logrus.New())
+	l.SetLogger(logrus.New())
 	Next := &mock.ContactUsecaseMock{}
 	u := &contact.ContactUsecaseMwLogger{
 		Next: Next,
@@ -45,7 +45,7 @@ func TestContactUsecaseMwLogger_Delete(t *testing.T) {
 }
 
 func TestContactUsecaseMwLogger_Get(t *testing.T) {
-	logging.SetLogger(logrus.New())
+	l.SetLogger(logrus.New())
 	Next := &mock.ContactUsecaseMock{}
 	u := &contact.ContactUsecaseMwLogger{
 		Next: Next,
@@ -59,7 +59,7 @@ func TestContactUsecaseMwLogger_Get(t *testing.T) {
 }
 
 func TestContactUsecaseMwLogger_Search(t *testing.T) {
-	logging.SetLogger(logrus.New())
+	l.SetLogger(logrus.New())
 	Next := &mock.ContactUsecaseMock{}
 	u := &contact.ContactUsecaseMwLogger{
 		Next: Next,
@@ -74,7 +74,7 @@ func TestContactUsecaseMwLogger_Search(t *testing.T) {
 }
 
 func TestContactUsecaseMwLogger_Update(t *testing.T) {
-	logging.SetLogger(logrus.New())
+	l.SetLogger(logrus.New())
 	Next := &mock.ContactUsecaseMock{}
 	u := &contact.ContactUsecaseMwLogger{
 		Next: Next,

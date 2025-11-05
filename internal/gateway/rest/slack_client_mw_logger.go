@@ -3,7 +3,7 @@ package rest
 import (
 	"context"
 
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/logging"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
 	"github.com/sirupsen/logrus"
 )
 
@@ -25,7 +25,7 @@ func (c *SlackClientMwLogger) GetChannelList(ctx context.Context) ([]string, err
 	fields := logrus.Fields{
 		"channelList": channelList,
 	}
-	logging.Log(ctx, fields, err)
+	l.LogMw(ctx, fields, err)
 
 	return channelList, err
 }
@@ -36,7 +36,7 @@ func (c *SlackClientMwLogger) IsConnected(ctx context.Context) (bool, error) {
 	fields := logrus.Fields{
 		"isConnect": isConnect,
 	}
-	logging.Log(ctx, fields, err)
+	l.LogMw(ctx, fields, err)
 
 	return isConnect, err
 }

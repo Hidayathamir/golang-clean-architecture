@@ -7,7 +7,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
@@ -26,13 +25,11 @@ var _ TodoRepository = &TodoRepositoryImpl{}
 
 type TodoRepositoryImpl struct {
 	Config *viper.Viper
-	Log    *logrus.Logger
 }
 
-func NewTodoRepository(cfg *viper.Viper, log *logrus.Logger) *TodoRepositoryImpl {
+func NewTodoRepository(cfg *viper.Viper) *TodoRepositoryImpl {
 	return &TodoRepositoryImpl{
 		Config: cfg,
-		Log:    log,
 	}
 }
 

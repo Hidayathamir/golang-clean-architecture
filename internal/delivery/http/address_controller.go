@@ -10,20 +10,17 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/gofiber/fiber/v2"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 type AddressController struct {
 	Config  *viper.Viper
-	Log     *logrus.Logger
 	Usecase address.AddressUsecase
 }
 
-func NewAddressController(cfg *viper.Viper, log *logrus.Logger, useCase address.AddressUsecase) *AddressController {
+func NewAddressController(cfg *viper.Viper, useCase address.AddressUsecase) *AddressController {
 	return &AddressController{
 		Config:  cfg,
-		Log:     log,
 		Usecase: useCase,
 	}
 }

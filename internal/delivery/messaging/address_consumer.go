@@ -6,6 +6,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/address"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
@@ -13,13 +14,11 @@ import (
 
 type AddressConsumer struct {
 	Usecase address.AddressUsecase
-	Log     *logrus.Logger
 }
 
-func NewAddressConsumer(usecase address.AddressUsecase, log *logrus.Logger) *AddressConsumer {
+func NewAddressConsumer(usecase address.AddressUsecase) *AddressConsumer {
 	return &AddressConsumer{
 		Usecase: usecase,
-		Log:     log,
 	}
 }
 
@@ -29,12 +28,12 @@ func (c AddressConsumer) Consume(message *sarama.ConsumerMessage) error {
 
 	addressEvent := new(model.AddressEvent)
 	if err := json.Unmarshal(message.Value, addressEvent); err != nil {
-		c.Log.WithContext(ctx).WithError(err).Error("error unmarshalling address event")
+		l.Logger.WithContext(ctx).WithError(err).Error("error unmarshalling address event")
 		return errkit.AddFuncName("messaging.AddressConsumer.Consume", err)
 	}
 
 	// TODO process event
-	c.Log.WithContext(ctx).WithFields(logrus.Fields{
+	l.Logger.WithContext(ctx).WithFields(logrus.Fields{
 		"event":     addressEvent,
 		"partition": message.Partition,
 	}).Info("Received topic address")

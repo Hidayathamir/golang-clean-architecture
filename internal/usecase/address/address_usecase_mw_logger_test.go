@@ -7,7 +7,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/address"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/logging"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
@@ -18,7 +18,7 @@ func TestNewAddressUsecaseMwLogger(t *testing.T) {
 }
 
 func TestAddressUsecaseMwLogger_Create(t *testing.T) {
-	logging.SetLogger(logrus.New())
+	l.SetLogger(logrus.New())
 	Next := &mock.AddressUsecaseMock{}
 	u := &address.AddressUsecaseMwLogger{
 		Next: Next,
@@ -32,7 +32,7 @@ func TestAddressUsecaseMwLogger_Create(t *testing.T) {
 }
 
 func TestAddressUsecaseMwLogger_Delete(t *testing.T) {
-	logging.SetLogger(logrus.New())
+	l.SetLogger(logrus.New())
 	Next := &mock.AddressUsecaseMock{}
 	u := &address.AddressUsecaseMwLogger{
 		Next: Next,
@@ -45,7 +45,7 @@ func TestAddressUsecaseMwLogger_Delete(t *testing.T) {
 }
 
 func TestAddressUsecaseMwLogger_Get(t *testing.T) {
-	logging.SetLogger(logrus.New())
+	l.SetLogger(logrus.New())
 	Next := &mock.AddressUsecaseMock{}
 	u := &address.AddressUsecaseMwLogger{
 		Next: Next,
@@ -59,7 +59,7 @@ func TestAddressUsecaseMwLogger_Get(t *testing.T) {
 }
 
 func TestAddressUsecaseMwLogger_List(t *testing.T) {
-	logging.SetLogger(logrus.New())
+	l.SetLogger(logrus.New())
 	Next := &mock.AddressUsecaseMock{}
 	u := &address.AddressUsecaseMwLogger{
 		Next: Next,
@@ -73,7 +73,7 @@ func TestAddressUsecaseMwLogger_List(t *testing.T) {
 }
 
 func TestAddressUsecaseMwLogger_Update(t *testing.T) {
-	logging.SetLogger(logrus.New())
+	l.SetLogger(logrus.New())
 	Next := &mock.AddressUsecaseMock{}
 	u := &address.AddressUsecaseMwLogger{
 		Next: Next,

@@ -8,7 +8,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
 	"github.com/go-playground/validator/v10"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
@@ -27,7 +26,6 @@ var _ AddressUsecase = &AddressUsecaseImpl{}
 
 type AddressUsecaseImpl struct {
 	Config   *viper.Viper
-	Log      *logrus.Logger
 	DB       *gorm.DB
 	Validate *validator.Validate
 
@@ -43,7 +41,7 @@ type AddressUsecaseImpl struct {
 }
 
 func NewAddressUsecase(
-	cfg *viper.Viper, log *logrus.Logger, db *gorm.DB, validate *validator.Validate,
+	cfg *viper.Viper, db *gorm.DB, validate *validator.Validate,
 
 	// repository
 	contactRepository repository.ContactRepository,
@@ -57,7 +55,6 @@ func NewAddressUsecase(
 ) *AddressUsecaseImpl {
 	return &AddressUsecaseImpl{
 		Config:   cfg,
-		Log:      log,
 		DB:       db,
 		Validate: validate,
 

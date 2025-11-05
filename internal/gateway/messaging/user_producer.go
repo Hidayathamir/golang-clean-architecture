@@ -6,9 +6,9 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/IBM/sarama"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -22,15 +22,13 @@ var _ UserProducer = &UserProducerImpl{}
 
 type UserProducerImpl struct {
 	Config   *viper.Viper
-	Log      *logrus.Logger
 	Producer sarama.SyncProducer
 	Topic    string
 }
 
-func NewUserProducer(cfg *viper.Viper, log *logrus.Logger, producer sarama.SyncProducer) *UserProducerImpl {
+func NewUserProducer(cfg *viper.Viper, producer sarama.SyncProducer) *UserProducerImpl {
 	return &UserProducerImpl{
 		Config:   cfg,
-		Log:      log,
 		Producer: producer,
 		Topic:    "users",
 	}
@@ -38,7 +36,7 @@ func NewUserProducer(cfg *viper.Viper, log *logrus.Logger, producer sarama.SyncP
 
 func (p *UserProducerImpl) Send(ctx context.Context, event *model.UserEvent) error {
 	if p.Producer == nil {
-		p.Log.Warn("Kafka producer is disabled")
+		l.Logger.Warn("Kafka producer is disabled")
 		return nil
 	}
 
@@ -60,6 +58,6 @@ func (p *UserProducerImpl) Send(ctx context.Context, event *model.UserEvent) err
 		return errkit.AddFuncName("messaging.(*UserProducerImpl).Send", err)
 	}
 
-	p.Log.Debugf("Message sent to topic %s, partition %d, offset %d", p.Topic, partition, offset)
+	l.Logger.Debugf("Message sent to topic %s, partition %d, offset %d", p.Topic, partition, offset)
 	return nil
 }

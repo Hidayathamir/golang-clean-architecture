@@ -6,6 +6,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
@@ -13,13 +14,11 @@ import (
 
 type UserConsumer struct {
 	Usecase user.UserUsecase
-	Log     *logrus.Logger
 }
 
-func NewUserConsumer(usecase user.UserUsecase, log *logrus.Logger) *UserConsumer {
+func NewUserConsumer(usecase user.UserUsecase) *UserConsumer {
 	return &UserConsumer{
 		Usecase: usecase,
-		Log:     log,
 	}
 }
 
@@ -29,12 +28,12 @@ func (c UserConsumer) Consume(message *sarama.ConsumerMessage) error {
 
 	UserEvent := new(model.UserEvent)
 	if err := json.Unmarshal(message.Value, UserEvent); err != nil {
-		c.Log.WithContext(ctx).WithError(err).Error("error unmarshalling User event")
+		l.Logger.WithContext(ctx).WithError(err).Error("error unmarshalling User event")
 		return errkit.AddFuncName("messaging.UserConsumer.Consume", err)
 	}
 
 	// TODO process event
-	c.Log.WithContext(ctx).WithFields(logrus.Fields{
+	l.Logger.WithContext(ctx).WithFields(logrus.Fields{
 		"event":     UserEvent,
 		"partition": message.Partition,
 	}).Info("Received topic users")

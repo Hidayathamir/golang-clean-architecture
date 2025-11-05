@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/logging"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/sirupsen/logrus"
 )
@@ -32,7 +32,7 @@ func (u *ContactUsecaseMwLogger) Create(ctx context.Context, req *model.CreateCo
 		"req": req,
 		"res": res,
 	}
-	logging.Log(ctx, fields, err)
+	l.LogMw(ctx, fields, err)
 
 	return res, err
 }
@@ -47,7 +47,7 @@ func (u *ContactUsecaseMwLogger) Delete(ctx context.Context, req *model.DeleteCo
 	fields := logrus.Fields{
 		"req": req,
 	}
-	logging.Log(ctx, fields, err)
+	l.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -63,7 +63,7 @@ func (u *ContactUsecaseMwLogger) Get(ctx context.Context, req *model.GetContactR
 		"req": req,
 		"res": res,
 	}
-	logging.Log(ctx, fields, err)
+	l.LogMw(ctx, fields, err)
 
 	return res, err
 }
@@ -79,7 +79,7 @@ func (u *ContactUsecaseMwLogger) Search(ctx context.Context, req *model.SearchCo
 		"req": req,
 		"res": res,
 	}
-	logging.Log(ctx, fields, err)
+	l.LogMw(ctx, fields, err)
 
 	return res, total, err
 }
@@ -95,7 +95,7 @@ func (u *ContactUsecaseMwLogger) Update(ctx context.Context, req *model.UpdateCo
 		"req": req,
 		"res": res,
 	}
-	logging.Log(ctx, fields, err)
+	l.LogMw(ctx, fields, err)
 
 	return res, err
 }

@@ -9,7 +9,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/address"
 	"github.com/go-playground/validator/v10"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
@@ -17,7 +16,6 @@ import (
 func TestNewAddressUsecase(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	var DB = gormDB
-	var Log = logrus.New()
 	var Validate = validator.New()
 	var Config = viper.New()
 
@@ -29,7 +27,7 @@ func TestNewAddressUsecase(t *testing.T) {
 	var PaymentClient rest.PaymentClient = &mock.PaymentClientMock{}
 
 	u := address.NewAddressUsecase(
-		Config, Log, DB, Validate,
+		Config, DB, Validate,
 
 		ContactRepository,
 		AddressRepository,

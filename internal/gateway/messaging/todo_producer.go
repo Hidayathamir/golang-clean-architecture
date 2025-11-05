@@ -6,9 +6,9 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/IBM/sarama"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -22,15 +22,13 @@ var _ TodoProducer = &TodoProducerImpl{}
 
 type TodoProducerImpl struct {
 	Config   *viper.Viper
-	Log      *logrus.Logger
 	Producer sarama.SyncProducer
 	Topic    string
 }
 
-func NewTodoProducer(cfg *viper.Viper, log *logrus.Logger, producer sarama.SyncProducer) *TodoProducerImpl {
+func NewTodoProducer(cfg *viper.Viper, producer sarama.SyncProducer) *TodoProducerImpl {
 	return &TodoProducerImpl{
 		Config:   cfg,
-		Log:      log,
 		Producer: producer,
 		Topic:    "todos",
 	}
@@ -38,7 +36,7 @@ func NewTodoProducer(cfg *viper.Viper, log *logrus.Logger, producer sarama.SyncP
 
 func (p *TodoProducerImpl) Send(ctx context.Context, event *model.TodoCompletedEvent) error {
 	if p.Producer == nil {
-		p.Log.Warn("Kafka producer is disabled")
+		l.Logger.Warn("Kafka producer is disabled")
 		return nil
 	}
 
@@ -60,6 +58,6 @@ func (p *TodoProducerImpl) Send(ctx context.Context, event *model.TodoCompletedE
 		return errkit.AddFuncName("messaging.(*TodoProducerImpl).Send", err)
 	}
 
-	p.Log.Debugf("Message sent to topic %s, partition %d, offset %d", p.Topic, partition, offset)
+	l.Logger.Debugf("Message sent to topic %s, partition %d, offset %d", p.Topic, partition, offset)
 	return nil
 }

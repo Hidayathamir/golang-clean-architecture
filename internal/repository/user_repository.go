@@ -5,7 +5,6 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
@@ -24,13 +23,11 @@ var _ UserRepository = &UserRepositoryImpl{}
 
 type UserRepositoryImpl struct {
 	Config *viper.Viper
-	Log    *logrus.Logger
 }
 
-func NewUserRepository(cfg *viper.Viper, log *logrus.Logger) *UserRepositoryImpl {
+func NewUserRepository(cfg *viper.Viper) *UserRepositoryImpl {
 	return &UserRepositoryImpl{
 		Config: cfg,
-		Log:    log,
 	}
 }
 

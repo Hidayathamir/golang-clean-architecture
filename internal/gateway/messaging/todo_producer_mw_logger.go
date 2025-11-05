@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/logging"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/sirupsen/logrus"
 )
@@ -26,6 +26,6 @@ func (p *TodoProducerMwLogger) Send(ctx context.Context, event *model.TodoComple
 	defer span.End()
 	err := p.Next.Send(ctx, event)
 	telemetry.RecordError(span, err)
-	logging.Log(ctx, logrus.Fields{"event": event}, err)
+	l.LogMw(ctx, logrus.Fields{"event": event}, err)
 	return err
 }

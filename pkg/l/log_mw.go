@@ -1,4 +1,4 @@
-package logging
+package l
 
 import (
 	"context"
@@ -8,23 +8,19 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var logger *logrus.Logger
-
-func SetLogger(l *logrus.Logger) { logger = l }
-
-func Log(ctx context.Context, fields logrus.Fields, err error) {
-	level, errMsg := getLevelAndErrMsg(err)
+func LogMw(ctx context.Context, fields logrus.Fields, err error) {
+	level, errMsg := GetLevelAndErrMsg(err)
 
 	fileLine, funcName := caller.Info(caller.WithSkip(1))
 
-	logger.WithContext(ctx).WithFields(logrus.Fields{
-		"fields": limitJSON(fields),
+	Logger.WithContext(ctx).WithFields(logrus.Fields{
+		"fields": LimitJSON(fields),
 		"err":    errMsg,
 		"source": fileLine,
 	}).Log(level, funcName)
 }
 
-func getLevelAndErrMsg(err error) (logrus.Level, string) {
+func GetLevelAndErrMsg(err error) (logrus.Level, string) {
 	level := logrus.InfoLevel
 	errMsg := ""
 	if err != nil {
@@ -36,7 +32,7 @@ func getLevelAndErrMsg(err error) (logrus.Level, string) {
 
 var limitChar = 10000
 
-func limitJSON(v any) any {
+func LimitJSON(v any) any {
 	jsonByte, err := json.Marshal(v)
 	if err != nil {
 		return ""

@@ -5,7 +5,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/logging"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -33,7 +33,7 @@ func (r *TodoRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, todo *
 	fields := logrus.Fields{
 		"todo": todo,
 	}
-	logging.Log(ctx, fields, err)
+	l.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -48,7 +48,7 @@ func (r *TodoRepositoryMwLogger) Update(ctx context.Context, db *gorm.DB, todo *
 	fields := logrus.Fields{
 		"todo": todo,
 	}
-	logging.Log(ctx, fields, err)
+	l.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -63,7 +63,7 @@ func (r *TodoRepositoryMwLogger) Delete(ctx context.Context, db *gorm.DB, todo *
 	fields := logrus.Fields{
 		"todo": todo,
 	}
-	logging.Log(ctx, fields, err)
+	l.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -80,7 +80,7 @@ func (r *TodoRepositoryMwLogger) FindByIDAndUserID(ctx context.Context, db *gorm
 		"user_id": userID,
 		"todo":    todo,
 	}
-	logging.Log(ctx, fields, err)
+	l.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -97,7 +97,7 @@ func (r *TodoRepositoryMwLogger) List(ctx context.Context, db *gorm.DB, req *mod
 		"todos": todos,
 		"total": total,
 	}
-	logging.Log(ctx, fields, err)
+	l.LogMw(ctx, fields, err)
 
 	return todos, total, err
 }

@@ -11,20 +11,17 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/gofiber/fiber/v2"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 type ContactController struct {
 	Config  *viper.Viper
-	Log     *logrus.Logger
 	Usecase contact.ContactUsecase
 }
 
-func NewContactController(cfg *viper.Viper, log *logrus.Logger, useCase contact.ContactUsecase) *ContactController {
+func NewContactController(cfg *viper.Viper, useCase contact.ContactUsecase) *ContactController {
 	return &ContactController{
 		Config:  cfg,
-		Log:     log,
 		Usecase: useCase,
 	}
 }
