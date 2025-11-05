@@ -8,7 +8,19 @@ I recommend run with docker for testing.
 make docker-compose
 ```
 
-This will run docker compose that will run PostgreSQL, Kafka & signoz. Go to http://localhost:8080/ to see Kafka. Go to http://localhost:3301/ to see signoz.
+Wait until this container status is up.
+
+```shell
+$ docker ps --format "{{.Names}}\t{{.Status}}"
+signoz-otel-collector	Up 33 minutes
+signoz	Up 33 minutes (healthy)
+akhq	Up 34 minutes (healthy)
+signoz-clickhouse	Up 34 minutes (healthy)
+kafka-clean-arch	Up 34 minutes
+zookeeper-clean-arch	Up 34 minutes
+postgres-clean-arch	Up 34 minutes
+signoz-zookeeper-1	Up 34 minutes (healthy)
+```
 
 2. Keep docker container running. From another terminal, run migration and run application.
 

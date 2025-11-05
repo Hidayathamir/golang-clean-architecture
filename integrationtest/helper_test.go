@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,28 +20,28 @@ func ClearAll() {
 func ClearUsers() {
 	err := db.Where("id is not null").Delete(&entity.User{}).Error
 	if err != nil {
-		log.Panicf("Failed clear user data : %+v", err)
+		l.Logger.Panicf("Failed clear user data : %+v", err)
 	}
 }
 
 func ClearContact() {
 	err := db.Where("id is not null").Delete(&entity.Contact{}).Error
 	if err != nil {
-		log.Panicf("Failed clear contact data : %+v", err)
+		l.Logger.Panicf("Failed clear contact data : %+v", err)
 	}
 }
 
 func ClearAddresses() {
 	err := db.Where("id is not null").Delete(&entity.Address{}).Error
 	if err != nil {
-		log.Panicf("Failed clear address data : %+v", err)
+		l.Logger.Panicf("Failed clear address data : %+v", err)
 	}
 }
 
 func ClearTodos() {
 	err := db.Where("id is not null").Delete(&entity.Todo{}).Error
 	if err != nil {
-		log.Panicf("Failed clear todo data : %+v", err)
+		l.Logger.Panicf("Failed clear todo data : %+v", err)
 	}
 }
 
@@ -56,7 +57,7 @@ func CreateContacts(user *entity.User, total int) {
 		}
 		err := db.Create(contact).Error
 		if err != nil {
-			log.Panicf("Failed create contact data : %+v", err)
+			l.Logger.Panicf("Failed create contact data : %+v", err)
 		}
 	}
 }

@@ -2,12 +2,13 @@ package main
 
 import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 func main() {
 	viperConfig := config.NewViper()
-	log := config.NewLogger(viperConfig)
+	l.SetupLogger(viperConfig)
 
-	config.Migrate(viperConfig, log)
+	config.Migrate(viperConfig)
 }
