@@ -3,6 +3,7 @@ package rest
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
 )
@@ -20,7 +21,11 @@ func NewSlackClientMwLogger(next SlackClient) *SlackClientMwLogger {
 }
 
 func (c *SlackClientMwLogger) GetChannelList(ctx context.Context) ([]string, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	channelList, err := c.Next.GetChannelList(ctx)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"channelList": channelList,
@@ -31,7 +36,11 @@ func (c *SlackClientMwLogger) GetChannelList(ctx context.Context) ([]string, err
 }
 
 func (c *SlackClientMwLogger) IsConnected(ctx context.Context) (bool, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
 	isConnect, err := c.Next.IsConnected(ctx)
+	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"isConnect": isConnect,

@@ -27,7 +27,13 @@ func (u *TodoUsecaseMwLogger) Create(ctx context.Context, req *model.CreateTodoR
 
 	res, err := u.Next.Create(ctx, req)
 	telemetry.RecordError(span, err)
-	x.LogMw(ctx, logrus.Fields{"req": req, "res": res}, err)
+
+	fields := logrus.Fields{
+		"req": req,
+		"res": res,
+	}
+	x.LogMw(ctx, fields, err)
+
 	return res, err
 }
 
@@ -37,7 +43,13 @@ func (u *TodoUsecaseMwLogger) Get(ctx context.Context, req *model.GetTodoRequest
 
 	res, err := u.Next.Get(ctx, req)
 	telemetry.RecordError(span, err)
-	x.LogMw(ctx, logrus.Fields{"req": req, "res": res}, err)
+
+	fields := logrus.Fields{
+		"req": req,
+		"res": res,
+	}
+	x.LogMw(ctx, fields, err)
+
 	return res, err
 }
 
@@ -47,7 +59,14 @@ func (u *TodoUsecaseMwLogger) List(ctx context.Context, req *model.ListTodoReque
 
 	res, total, err := u.Next.List(ctx, req)
 	telemetry.RecordError(span, err)
-	x.LogMw(ctx, logrus.Fields{"req": req, "res": res, "total": total}, err)
+
+	fields := logrus.Fields{
+		"req":   req,
+		"res":   res,
+		"total": total,
+	}
+	x.LogMw(ctx, fields, err)
+
 	return res, total, err
 }
 
@@ -57,7 +76,13 @@ func (u *TodoUsecaseMwLogger) Update(ctx context.Context, req *model.UpdateTodoR
 
 	res, err := u.Next.Update(ctx, req)
 	telemetry.RecordError(span, err)
-	x.LogMw(ctx, logrus.Fields{"req": req, "res": res}, err)
+
+	fields := logrus.Fields{
+		"req": req,
+		"res": res,
+	}
+	x.LogMw(ctx, fields, err)
+
 	return res, err
 }
 
@@ -67,7 +92,12 @@ func (u *TodoUsecaseMwLogger) Delete(ctx context.Context, req *model.DeleteTodoR
 
 	err := u.Next.Delete(ctx, req)
 	telemetry.RecordError(span, err)
-	x.LogMw(ctx, logrus.Fields{"req": req}, err)
+
+	fields := logrus.Fields{
+		"req": req,
+	}
+	x.LogMw(ctx, fields, err)
+
 	return err
 }
 
@@ -77,6 +107,12 @@ func (u *TodoUsecaseMwLogger) Complete(ctx context.Context, req *model.CompleteT
 
 	res, err := u.Next.Complete(ctx, req)
 	telemetry.RecordError(span, err)
-	x.LogMw(ctx, logrus.Fields{"req": req, "res": res}, err)
+
+	fields := logrus.Fields{
+		"req": req,
+		"res": res,
+	}
+	x.LogMw(ctx, fields, err)
+
 	return res, err
 }
