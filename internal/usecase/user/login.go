@@ -28,7 +28,7 @@ func (u *UserUsecaseImpl) Login(ctx context.Context, req *model.LoginUserRequest
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Login", err)
 	}
 
-	if _, err := u.SlackClient.IsConnected(ctx); err != nil {
+	if _, err := u.SlackClient.IsConnected(ctx, model.SlackIsConnectedRequest{}); err != nil {
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Login", err)
 	}
 

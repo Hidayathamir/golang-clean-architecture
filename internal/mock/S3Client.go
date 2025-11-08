@@ -6,6 +6,7 @@ package mock
 import (
 	"context"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/rest"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"sync"
 )
 
@@ -19,10 +20,10 @@ var _ rest.S3Client = &S3ClientMock{}
 //
 //		// make and configure a mocked rest.S3Client
 //		mockedS3Client := &S3ClientMock{
-//			DeleteObjectFunc: func(ctx context.Context, bucket string, key string) (bool, error) {
+//			DeleteObjectFunc: func(ctx context.Context, req model.S3DeleteObjectRequest) (model.S3DeleteObjectResponse, error) {
 //				panic("mock out the DeleteObject method")
 //			},
-//			DownloadFunc: func(ctx context.Context, bucket string, key string) (string, error) {
+//			DownloadFunc: func(ctx context.Context, req model.S3DownloadRequest) (model.S3DownloadResponse, error) {
 //				panic("mock out the Download method")
 //			},
 //		}
@@ -33,10 +34,10 @@ var _ rest.S3Client = &S3ClientMock{}
 //	}
 type S3ClientMock struct {
 	// DeleteObjectFunc mocks the DeleteObject method.
-	DeleteObjectFunc func(ctx context.Context, bucket string, key string) (bool, error)
+	DeleteObjectFunc func(ctx context.Context, req model.S3DeleteObjectRequest) (model.S3DeleteObjectResponse, error)
 
 	// DownloadFunc mocks the Download method.
-	DownloadFunc func(ctx context.Context, bucket string, key string) (string, error)
+	DownloadFunc func(ctx context.Context, req model.S3DownloadRequest) (model.S3DownloadResponse, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -44,19 +45,15 @@ type S3ClientMock struct {
 		DeleteObject []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
-			// Bucket is the bucket argument value.
-			Bucket string
-			// Key is the key argument value.
-			Key string
+			// Req is the req argument value.
+			Req model.S3DeleteObjectRequest
 		}
 		// Download holds details about calls to the Download method.
 		Download []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
-			// Bucket is the bucket argument value.
-			Bucket string
-			// Key is the key argument value.
-			Key string
+			// Req is the req argument value.
+			Req model.S3DownloadRequest
 		}
 	}
 	lockDeleteObject sync.RWMutex
@@ -64,23 +61,21 @@ type S3ClientMock struct {
 }
 
 // DeleteObject calls DeleteObjectFunc.
-func (mock *S3ClientMock) DeleteObject(ctx context.Context, bucket string, key string) (bool, error) {
+func (mock *S3ClientMock) DeleteObject(ctx context.Context, req model.S3DeleteObjectRequest) (model.S3DeleteObjectResponse, error) {
 	if mock.DeleteObjectFunc == nil {
 		panic("S3ClientMock.DeleteObjectFunc: method is nil but S3Client.DeleteObject was just called")
 	}
 	callInfo := struct {
-		Ctx    context.Context
-		Bucket string
-		Key    string
+		Ctx context.Context
+		Req model.S3DeleteObjectRequest
 	}{
-		Ctx:    ctx,
-		Bucket: bucket,
-		Key:    key,
+		Ctx: ctx,
+		Req: req,
 	}
 	mock.lockDeleteObject.Lock()
 	mock.calls.DeleteObject = append(mock.calls.DeleteObject, callInfo)
 	mock.lockDeleteObject.Unlock()
-	return mock.DeleteObjectFunc(ctx, bucket, key)
+	return mock.DeleteObjectFunc(ctx, req)
 }
 
 // DeleteObjectCalls gets all the calls that were made to DeleteObject.
@@ -88,14 +83,12 @@ func (mock *S3ClientMock) DeleteObject(ctx context.Context, bucket string, key s
 //
 //	len(mockedS3Client.DeleteObjectCalls())
 func (mock *S3ClientMock) DeleteObjectCalls() []struct {
-	Ctx    context.Context
-	Bucket string
-	Key    string
+	Ctx context.Context
+	Req model.S3DeleteObjectRequest
 } {
 	var calls []struct {
-		Ctx    context.Context
-		Bucket string
-		Key    string
+		Ctx context.Context
+		Req model.S3DeleteObjectRequest
 	}
 	mock.lockDeleteObject.RLock()
 	calls = mock.calls.DeleteObject
@@ -104,23 +97,21 @@ func (mock *S3ClientMock) DeleteObjectCalls() []struct {
 }
 
 // Download calls DownloadFunc.
-func (mock *S3ClientMock) Download(ctx context.Context, bucket string, key string) (string, error) {
+func (mock *S3ClientMock) Download(ctx context.Context, req model.S3DownloadRequest) (model.S3DownloadResponse, error) {
 	if mock.DownloadFunc == nil {
 		panic("S3ClientMock.DownloadFunc: method is nil but S3Client.Download was just called")
 	}
 	callInfo := struct {
-		Ctx    context.Context
-		Bucket string
-		Key    string
+		Ctx context.Context
+		Req model.S3DownloadRequest
 	}{
-		Ctx:    ctx,
-		Bucket: bucket,
-		Key:    key,
+		Ctx: ctx,
+		Req: req,
 	}
 	mock.lockDownload.Lock()
 	mock.calls.Download = append(mock.calls.Download, callInfo)
 	mock.lockDownload.Unlock()
-	return mock.DownloadFunc(ctx, bucket, key)
+	return mock.DownloadFunc(ctx, req)
 }
 
 // DownloadCalls gets all the calls that were made to Download.
@@ -128,14 +119,12 @@ func (mock *S3ClientMock) Download(ctx context.Context, bucket string, key strin
 //
 //	len(mockedS3Client.DownloadCalls())
 func (mock *S3ClientMock) DownloadCalls() []struct {
-	Ctx    context.Context
-	Bucket string
-	Key    string
+	Ctx context.Context
+	Req model.S3DownloadRequest
 } {
 	var calls []struct {
-		Ctx    context.Context
-		Bucket string
-		Key    string
+		Ctx context.Context
+		Req model.S3DownloadRequest
 	}
 	mock.lockDownload.RLock()
 	calls = mock.calls.Download

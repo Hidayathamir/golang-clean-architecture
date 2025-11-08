@@ -34,11 +34,11 @@ func newLoginUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepositoryM
 	cfg.Set(configkey.AuthJWTExpireSeconds, 60)
 
 	u := &user.UserUsecaseImpl{
-		Config: cfg,
-		DB:     gormDB,
-		 UserRepository: repo,
-		UserProducer: producer,
-		SlackClient:  slack,
+		Config:         cfg,
+		DB:             gormDB,
+		UserRepository: repo,
+		UserProducer:   producer,
+		SlackClient:    slack,
 	}
 
 	return u, repo, producer, slack
@@ -60,8 +60,8 @@ func TestUserUsecaseImpl_Login_Success(t *testing.T) {
 		return nil
 	}
 
-	slack.IsConnectedFunc = func(ctx context.Context) (bool, error) {
-		return true, nil
+	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
+		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
 	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
@@ -101,8 +101,8 @@ func TestUserUsecaseImpl_Login_Fail_ValidateStruct(t *testing.T) {
 		return nil
 	}
 
-	slack.IsConnectedFunc = func(ctx context.Context) (bool, error) {
-		return true, nil
+	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
+		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
 	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
@@ -129,8 +129,8 @@ func TestUserUsecaseImpl_Login_Fail_FindByID(t *testing.T) {
 		return assert.AnError
 	}
 
-	slack.IsConnectedFunc = func(ctx context.Context) (bool, error) {
-		return true, nil
+	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
+		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
 	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
@@ -160,8 +160,8 @@ func TestUserUsecaseImpl_Login_Fail_CompareHashAndPassword(t *testing.T) {
 		return nil
 	}
 
-	slack.IsConnectedFunc = func(ctx context.Context) (bool, error) {
-		return true, nil
+	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
+		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
 	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
@@ -190,8 +190,8 @@ func TestUserUsecaseImpl_Login_Fail_IsConnected(t *testing.T) {
 		return nil
 	}
 
-	slack.IsConnectedFunc = func(ctx context.Context) (bool, error) {
-		return false, assert.AnError
+	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
+		return model.SlackIsConnectedResponse{Connected: false}, assert.AnError
 	}
 
 	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
@@ -221,8 +221,8 @@ func TestUserUsecaseImpl_Login_Fail_Send(t *testing.T) {
 		return nil
 	}
 
-	slack.IsConnectedFunc = func(ctx context.Context) (bool, error) {
-		return true, nil
+	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
+		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
 	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
@@ -247,11 +247,11 @@ func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 	cfg.Set(configkey.AuthJWTExpireSeconds, 60)
 
 	u := &user.UserUsecaseImpl{
-		Config: cfg,
-		DB:     gormDB,
-		 UserRepository: repo,
-		UserProducer: producer,
-		SlackClient:  slack,
+		Config:         cfg,
+		DB:             gormDB,
+		UserRepository: repo,
+		UserProducer:   producer,
+		SlackClient:    slack,
 	}
 
 	req := &model.LoginUserRequest{
@@ -267,8 +267,8 @@ func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 		return nil
 	}
 
-	slack.IsConnectedFunc = func(ctx context.Context) (bool, error) {
-		return true, nil
+	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
+		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
 	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {

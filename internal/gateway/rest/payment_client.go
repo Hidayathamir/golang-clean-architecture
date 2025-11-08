@@ -3,14 +3,15 @@ package rest
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/spf13/viper"
 )
 
 //go:generate moq -out=../../mock/PaymentClient.go -pkg=mock . PaymentClient
 
 type PaymentClient interface {
-	Refund(ctx context.Context, transactionID string) (bool, error)
-	GetStatus(ctx context.Context, transactionID string) (string, error)
+	Refund(ctx context.Context, req model.PaymentRefundRequest) (model.PaymentRefundResponse, error)
+	GetStatus(ctx context.Context, req model.PaymentGetStatusRequest) (model.PaymentGetStatusResponse, error)
 }
 
 var _ PaymentClient = &PaymentClientImpl{}
@@ -25,12 +26,16 @@ func NewPaymentClient(cfg *viper.Viper) *PaymentClientImpl {
 	}
 }
 
-func (c *PaymentClientImpl) Refund(ctx context.Context, transactionID string) (bool, error) {
+func (c *PaymentClientImpl) Refund(ctx context.Context, req model.PaymentRefundRequest) (model.PaymentRefundResponse, error) {
 	// TODO implement hit external rest api
-	return true, nil
+	return model.PaymentRefundResponse{
+		Success: true,
+	}, nil
 }
 
-func (c *PaymentClientImpl) GetStatus(ctx context.Context, transactionID string) (string, error) {
+func (c *PaymentClientImpl) GetStatus(ctx context.Context, req model.PaymentGetStatusRequest) (model.PaymentGetStatusResponse, error) {
 	// TODO implement hit external rest api
-	return "SUCCESS", nil
+	return model.PaymentGetStatusResponse{
+		Status: "SUCCESS",
+	}, nil
 }

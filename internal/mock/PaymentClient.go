@@ -6,6 +6,7 @@ package mock
 import (
 	"context"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/rest"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"sync"
 )
 
@@ -19,10 +20,10 @@ var _ rest.PaymentClient = &PaymentClientMock{}
 //
 //		// make and configure a mocked rest.PaymentClient
 //		mockedPaymentClient := &PaymentClientMock{
-//			GetStatusFunc: func(ctx context.Context, transactionID string) (string, error) {
+//			GetStatusFunc: func(ctx context.Context, req model.PaymentGetStatusRequest) (model.PaymentGetStatusResponse, error) {
 //				panic("mock out the GetStatus method")
 //			},
-//			RefundFunc: func(ctx context.Context, transactionID string) (bool, error) {
+//			RefundFunc: func(ctx context.Context, req model.PaymentRefundRequest) (model.PaymentRefundResponse, error) {
 //				panic("mock out the Refund method")
 //			},
 //		}
@@ -33,10 +34,10 @@ var _ rest.PaymentClient = &PaymentClientMock{}
 //	}
 type PaymentClientMock struct {
 	// GetStatusFunc mocks the GetStatus method.
-	GetStatusFunc func(ctx context.Context, transactionID string) (string, error)
+	GetStatusFunc func(ctx context.Context, req model.PaymentGetStatusRequest) (model.PaymentGetStatusResponse, error)
 
 	// RefundFunc mocks the Refund method.
-	RefundFunc func(ctx context.Context, transactionID string) (bool, error)
+	RefundFunc func(ctx context.Context, req model.PaymentRefundRequest) (model.PaymentRefundResponse, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -44,15 +45,15 @@ type PaymentClientMock struct {
 		GetStatus []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
-			// TransactionID is the transactionID argument value.
-			TransactionID string
+			// Req is the req argument value.
+			Req model.PaymentGetStatusRequest
 		}
 		// Refund holds details about calls to the Refund method.
 		Refund []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
-			// TransactionID is the transactionID argument value.
-			TransactionID string
+			// Req is the req argument value.
+			Req model.PaymentRefundRequest
 		}
 	}
 	lockGetStatus sync.RWMutex
@@ -60,21 +61,21 @@ type PaymentClientMock struct {
 }
 
 // GetStatus calls GetStatusFunc.
-func (mock *PaymentClientMock) GetStatus(ctx context.Context, transactionID string) (string, error) {
+func (mock *PaymentClientMock) GetStatus(ctx context.Context, req model.PaymentGetStatusRequest) (model.PaymentGetStatusResponse, error) {
 	if mock.GetStatusFunc == nil {
 		panic("PaymentClientMock.GetStatusFunc: method is nil but PaymentClient.GetStatus was just called")
 	}
 	callInfo := struct {
-		Ctx           context.Context
-		TransactionID string
+		Ctx context.Context
+		Req model.PaymentGetStatusRequest
 	}{
-		Ctx:           ctx,
-		TransactionID: transactionID,
+		Ctx: ctx,
+		Req: req,
 	}
 	mock.lockGetStatus.Lock()
 	mock.calls.GetStatus = append(mock.calls.GetStatus, callInfo)
 	mock.lockGetStatus.Unlock()
-	return mock.GetStatusFunc(ctx, transactionID)
+	return mock.GetStatusFunc(ctx, req)
 }
 
 // GetStatusCalls gets all the calls that were made to GetStatus.
@@ -82,12 +83,12 @@ func (mock *PaymentClientMock) GetStatus(ctx context.Context, transactionID stri
 //
 //	len(mockedPaymentClient.GetStatusCalls())
 func (mock *PaymentClientMock) GetStatusCalls() []struct {
-	Ctx           context.Context
-	TransactionID string
+	Ctx context.Context
+	Req model.PaymentGetStatusRequest
 } {
 	var calls []struct {
-		Ctx           context.Context
-		TransactionID string
+		Ctx context.Context
+		Req model.PaymentGetStatusRequest
 	}
 	mock.lockGetStatus.RLock()
 	calls = mock.calls.GetStatus
@@ -96,21 +97,21 @@ func (mock *PaymentClientMock) GetStatusCalls() []struct {
 }
 
 // Refund calls RefundFunc.
-func (mock *PaymentClientMock) Refund(ctx context.Context, transactionID string) (bool, error) {
+func (mock *PaymentClientMock) Refund(ctx context.Context, req model.PaymentRefundRequest) (model.PaymentRefundResponse, error) {
 	if mock.RefundFunc == nil {
 		panic("PaymentClientMock.RefundFunc: method is nil but PaymentClient.Refund was just called")
 	}
 	callInfo := struct {
-		Ctx           context.Context
-		TransactionID string
+		Ctx context.Context
+		Req model.PaymentRefundRequest
 	}{
-		Ctx:           ctx,
-		TransactionID: transactionID,
+		Ctx: ctx,
+		Req: req,
 	}
 	mock.lockRefund.Lock()
 	mock.calls.Refund = append(mock.calls.Refund, callInfo)
 	mock.lockRefund.Unlock()
-	return mock.RefundFunc(ctx, transactionID)
+	return mock.RefundFunc(ctx, req)
 }
 
 // RefundCalls gets all the calls that were made to Refund.
@@ -118,12 +119,12 @@ func (mock *PaymentClientMock) Refund(ctx context.Context, transactionID string)
 //
 //	len(mockedPaymentClient.RefundCalls())
 func (mock *PaymentClientMock) RefundCalls() []struct {
-	Ctx           context.Context
-	TransactionID string
+	Ctx context.Context
+	Req model.PaymentRefundRequest
 } {
 	var calls []struct {
-		Ctx           context.Context
-		TransactionID string
+		Ctx context.Context
+		Req model.PaymentRefundRequest
 	}
 	mock.lockRefund.RLock()
 	calls = mock.calls.Refund

@@ -3,14 +3,15 @@ package rest
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/spf13/viper"
 )
 
 //go:generate moq -out=../../mock/SlackClient.go -pkg=mock . SlackClient
 
 type SlackClient interface {
-	GetChannelList(ctx context.Context) ([]string, error)
-	IsConnected(ctx context.Context) (bool, error)
+	GetChannelList(ctx context.Context, req model.SlackGetChannelListRequest) (model.SlackGetChannelListResponse, error)
+	IsConnected(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error)
 }
 
 var _ SlackClient = &SlackClientImpl{}
@@ -25,12 +26,16 @@ func NewSlackClient(cfg *viper.Viper) *SlackClientImpl {
 	}
 }
 
-func (c *SlackClientImpl) GetChannelList(ctx context.Context) ([]string, error) {
+func (c *SlackClientImpl) GetChannelList(ctx context.Context, req model.SlackGetChannelListRequest) (model.SlackGetChannelListResponse, error) {
 	// TODO implement hit external rest api
-	return []string{"general", "random"}, nil
+	return model.SlackGetChannelListResponse{
+		Channels: []string{"general", "random"},
+	}, nil
 }
 
-func (c *SlackClientImpl) IsConnected(ctx context.Context) (bool, error) {
+func (c *SlackClientImpl) IsConnected(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
 	// TODO implement hit external rest api
-	return true, nil
+	return model.SlackIsConnectedResponse{
+		Connected: true,
+	}, nil
 }

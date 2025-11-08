@@ -3,6 +3,7 @@ package rest
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
@@ -20,34 +21,34 @@ func NewPaymentClientMwLogger(next PaymentClient) *PaymentClientMwLogger {
 	}
 }
 
-func (c *PaymentClientMwLogger) Refund(ctx context.Context, transactionID string) (bool, error) {
+func (c *PaymentClientMwLogger) Refund(ctx context.Context, req model.PaymentRefundRequest) (model.PaymentRefundResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	ok, err := c.Next.Refund(ctx, transactionID)
+	res, err := c.Next.Refund(ctx, req)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
-		"transactionID": transactionID,
-		"ok":            ok,
+		"transactionID": req.TransactionID,
+		"success":       res.Success,
 	}
 	x.LogMw(ctx, fields, err)
 
-	return ok, err
+	return res, err
 }
 
-func (c *PaymentClientMwLogger) GetStatus(ctx context.Context, transactionID string) (string, error) {
+func (c *PaymentClientMwLogger) GetStatus(ctx context.Context, req model.PaymentGetStatusRequest) (model.PaymentGetStatusResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	status, err := c.Next.GetStatus(ctx, transactionID)
+	res, err := c.Next.GetStatus(ctx, req)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
-		"transactionID": transactionID,
-		"status":        status,
+		"transactionID": req.TransactionID,
+		"status":        res.Status,
 	}
 	x.LogMw(ctx, fields, err)
 
-	return status, err
+	return res, err
 }

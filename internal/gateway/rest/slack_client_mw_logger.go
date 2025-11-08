@@ -3,6 +3,7 @@ package rest
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
@@ -20,32 +21,32 @@ func NewSlackClientMwLogger(next SlackClient) *SlackClientMwLogger {
 	}
 }
 
-func (c *SlackClientMwLogger) GetChannelList(ctx context.Context) ([]string, error) {
+func (c *SlackClientMwLogger) GetChannelList(ctx context.Context, req model.SlackGetChannelListRequest) (model.SlackGetChannelListResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	channelList, err := c.Next.GetChannelList(ctx)
+	res, err := c.Next.GetChannelList(ctx, req)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
-		"channelList": channelList,
+		"channels": res.Channels,
 	}
 	x.LogMw(ctx, fields, err)
 
-	return channelList, err
+	return res, err
 }
 
-func (c *SlackClientMwLogger) IsConnected(ctx context.Context) (bool, error) {
+func (c *SlackClientMwLogger) IsConnected(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	isConnect, err := c.Next.IsConnected(ctx)
+	res, err := c.Next.IsConnected(ctx, req)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
-		"isConnect": isConnect,
+		"isConnect": res.Connected,
 	}
 	x.LogMw(ctx, fields, err)
 
-	return isConnect, err
+	return res, err
 }

@@ -6,6 +6,7 @@ package mock
 import (
 	"context"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/rest"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"sync"
 )
 
@@ -19,10 +20,10 @@ var _ rest.SlackClient = &SlackClientMock{}
 //
 //		// make and configure a mocked rest.SlackClient
 //		mockedSlackClient := &SlackClientMock{
-//			GetChannelListFunc: func(ctx context.Context) ([]string, error) {
+//			GetChannelListFunc: func(ctx context.Context, req model.SlackGetChannelListRequest) (model.SlackGetChannelListResponse, error) {
 //				panic("mock out the GetChannelList method")
 //			},
-//			IsConnectedFunc: func(ctx context.Context) (bool, error) {
+//			IsConnectedFunc: func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
 //				panic("mock out the IsConnected method")
 //			},
 //		}
@@ -33,10 +34,10 @@ var _ rest.SlackClient = &SlackClientMock{}
 //	}
 type SlackClientMock struct {
 	// GetChannelListFunc mocks the GetChannelList method.
-	GetChannelListFunc func(ctx context.Context) ([]string, error)
+	GetChannelListFunc func(ctx context.Context, req model.SlackGetChannelListRequest) (model.SlackGetChannelListResponse, error)
 
 	// IsConnectedFunc mocks the IsConnected method.
-	IsConnectedFunc func(ctx context.Context) (bool, error)
+	IsConnectedFunc func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -44,11 +45,15 @@ type SlackClientMock struct {
 		GetChannelList []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
+			// Req is the req argument value.
+			Req model.SlackGetChannelListRequest
 		}
 		// IsConnected holds details about calls to the IsConnected method.
 		IsConnected []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
+			// Req is the req argument value.
+			Req model.SlackIsConnectedRequest
 		}
 	}
 	lockGetChannelList sync.RWMutex
@@ -56,19 +61,21 @@ type SlackClientMock struct {
 }
 
 // GetChannelList calls GetChannelListFunc.
-func (mock *SlackClientMock) GetChannelList(ctx context.Context) ([]string, error) {
+func (mock *SlackClientMock) GetChannelList(ctx context.Context, req model.SlackGetChannelListRequest) (model.SlackGetChannelListResponse, error) {
 	if mock.GetChannelListFunc == nil {
 		panic("SlackClientMock.GetChannelListFunc: method is nil but SlackClient.GetChannelList was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
+		Req model.SlackGetChannelListRequest
 	}{
 		Ctx: ctx,
+		Req: req,
 	}
 	mock.lockGetChannelList.Lock()
 	mock.calls.GetChannelList = append(mock.calls.GetChannelList, callInfo)
 	mock.lockGetChannelList.Unlock()
-	return mock.GetChannelListFunc(ctx)
+	return mock.GetChannelListFunc(ctx, req)
 }
 
 // GetChannelListCalls gets all the calls that were made to GetChannelList.
@@ -77,9 +84,11 @@ func (mock *SlackClientMock) GetChannelList(ctx context.Context) ([]string, erro
 //	len(mockedSlackClient.GetChannelListCalls())
 func (mock *SlackClientMock) GetChannelListCalls() []struct {
 	Ctx context.Context
+	Req model.SlackGetChannelListRequest
 } {
 	var calls []struct {
 		Ctx context.Context
+		Req model.SlackGetChannelListRequest
 	}
 	mock.lockGetChannelList.RLock()
 	calls = mock.calls.GetChannelList
@@ -88,19 +97,21 @@ func (mock *SlackClientMock) GetChannelListCalls() []struct {
 }
 
 // IsConnected calls IsConnectedFunc.
-func (mock *SlackClientMock) IsConnected(ctx context.Context) (bool, error) {
+func (mock *SlackClientMock) IsConnected(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
 	if mock.IsConnectedFunc == nil {
 		panic("SlackClientMock.IsConnectedFunc: method is nil but SlackClient.IsConnected was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
+		Req model.SlackIsConnectedRequest
 	}{
 		Ctx: ctx,
+		Req: req,
 	}
 	mock.lockIsConnected.Lock()
 	mock.calls.IsConnected = append(mock.calls.IsConnected, callInfo)
 	mock.lockIsConnected.Unlock()
-	return mock.IsConnectedFunc(ctx)
+	return mock.IsConnectedFunc(ctx, req)
 }
 
 // IsConnectedCalls gets all the calls that were made to IsConnected.
@@ -109,9 +120,11 @@ func (mock *SlackClientMock) IsConnected(ctx context.Context) (bool, error) {
 //	len(mockedSlackClient.IsConnectedCalls())
 func (mock *SlackClientMock) IsConnectedCalls() []struct {
 	Ctx context.Context
+	Req model.SlackIsConnectedRequest
 } {
 	var calls []struct {
 		Ctx context.Context
+		Req model.SlackIsConnectedRequest
 	}
 	mock.lockIsConnected.RLock()
 	calls = mock.calls.IsConnected

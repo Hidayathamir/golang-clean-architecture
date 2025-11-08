@@ -21,7 +21,9 @@ func (u *AddressUsecaseImpl) Delete(ctx context.Context, req *model.DeleteAddres
 	}
 
 	err := u.DB.Transaction(func(tx *gorm.DB) error {
-		if _, err := u.PaymentClient.Refund(ctx, address.ID); err != nil {
+		if _, err := u.PaymentClient.Refund(ctx, model.PaymentRefundRequest{
+			TransactionID: address.ID,
+		}); err != nil {
 			return errkit.AddFuncName("address.(*AddressUsecaseImpl).Delete", err)
 		}
 

@@ -20,10 +20,10 @@ func TestContactUsecaseImpl_Update_Success(t *testing.T) {
 	ContactProducer := &mock.ContactProducerMock{}
 	SlackClient := &mock.SlackClientMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB: gormDB,
-		 ContactRepository: ContactRepository,
-		ContactProducer: ContactProducer,
-		SlackClient:     SlackClient,
+		DB:                gormDB,
+		ContactRepository: ContactRepository,
+		ContactProducer:   ContactProducer,
+		SlackClient:       SlackClient,
 	}
 
 	// ------------------------------------------------------- //
@@ -43,8 +43,8 @@ func TestContactUsecaseImpl_Update_Success(t *testing.T) {
 		return nil
 	}
 
-	SlackClient.IsConnectedFunc = func(ctx context.Context) (bool, error) {
-		return true, nil
+	SlackClient.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
+		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
 	ContactProducer.SendFunc = func(ctx context.Context, event *model.ContactEvent) error {
@@ -78,10 +78,10 @@ func TestContactUsecaseImpl_Update_ValidateStruct(t *testing.T) {
 	ContactProducer := &mock.ContactProducerMock{}
 	SlackClient := &mock.SlackClientMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB: gormDB,
-		 ContactRepository: ContactRepository,
-		ContactProducer: ContactProducer,
-		SlackClient:     SlackClient,
+		DB:                gormDB,
+		ContactRepository: ContactRepository,
+		ContactProducer:   ContactProducer,
+		SlackClient:       SlackClient,
 	}
 
 	// ------------------------------------------------------- //
@@ -101,8 +101,8 @@ func TestContactUsecaseImpl_Update_ValidateStruct(t *testing.T) {
 		return nil
 	}
 
-	SlackClient.IsConnectedFunc = func(ctx context.Context) (bool, error) {
-		return true, nil
+	SlackClient.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
+		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
 	ContactProducer.SendFunc = func(ctx context.Context, event *model.ContactEvent) error {
@@ -129,10 +129,10 @@ func TestContactUsecaseImpl_Update_Fail_FindByIDAndUserID(t *testing.T) {
 	ContactProducer := &mock.ContactProducerMock{}
 	SlackClient := &mock.SlackClientMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB: gormDB,
-		 ContactRepository: ContactRepository,
-		ContactProducer: ContactProducer,
-		SlackClient:     SlackClient,
+		DB:                gormDB,
+		ContactRepository: ContactRepository,
+		ContactProducer:   ContactProducer,
+		SlackClient:       SlackClient,
 	}
 
 	// ------------------------------------------------------- //
@@ -152,8 +152,8 @@ func TestContactUsecaseImpl_Update_Fail_FindByIDAndUserID(t *testing.T) {
 		return nil
 	}
 
-	SlackClient.IsConnectedFunc = func(ctx context.Context) (bool, error) {
-		return true, nil
+	SlackClient.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
+		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
 	ContactProducer.SendFunc = func(ctx context.Context, event *model.ContactEvent) error {
@@ -179,10 +179,10 @@ func TestContactUsecaseImpl_Update_Fail_Update(t *testing.T) {
 	ContactProducer := &mock.ContactProducerMock{}
 	SlackClient := &mock.SlackClientMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB: gormDB,
-		 ContactRepository: ContactRepository,
-		ContactProducer: ContactProducer,
-		SlackClient:     SlackClient,
+		DB:                gormDB,
+		ContactRepository: ContactRepository,
+		ContactProducer:   ContactProducer,
+		SlackClient:       SlackClient,
 	}
 
 	// ------------------------------------------------------- //
@@ -202,8 +202,8 @@ func TestContactUsecaseImpl_Update_Fail_Update(t *testing.T) {
 		return assert.AnError
 	}
 
-	SlackClient.IsConnectedFunc = func(ctx context.Context) (bool, error) {
-		return true, nil
+	SlackClient.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
+		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
 	ContactProducer.SendFunc = func(ctx context.Context, event *model.ContactEvent) error {
@@ -229,10 +229,10 @@ func TestContactUsecaseImpl_Update_Fail_IsConnected(t *testing.T) {
 	ContactProducer := &mock.ContactProducerMock{}
 	SlackClient := &mock.SlackClientMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB: gormDB,
-		 ContactRepository: ContactRepository,
-		ContactProducer: ContactProducer,
-		SlackClient:     SlackClient,
+		DB:                gormDB,
+		ContactRepository: ContactRepository,
+		ContactProducer:   ContactProducer,
+		SlackClient:       SlackClient,
 	}
 
 	// ------------------------------------------------------- //
@@ -252,8 +252,8 @@ func TestContactUsecaseImpl_Update_Fail_IsConnected(t *testing.T) {
 		return nil
 	}
 
-	SlackClient.IsConnectedFunc = func(ctx context.Context) (bool, error) {
-		return false, assert.AnError
+	SlackClient.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
+		return model.SlackIsConnectedResponse{Connected: false}, assert.AnError
 	}
 
 	ContactProducer.SendFunc = func(ctx context.Context, event *model.ContactEvent) error {
@@ -279,10 +279,10 @@ func TestContactUsecaseImpl_Update_Fail_Send(t *testing.T) {
 	ContactProducer := &mock.ContactProducerMock{}
 	SlackClient := &mock.SlackClientMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB: gormDB,
-		 ContactRepository: ContactRepository,
-		ContactProducer: ContactProducer,
-		SlackClient:     SlackClient,
+		DB:                gormDB,
+		ContactRepository: ContactRepository,
+		ContactProducer:   ContactProducer,
+		SlackClient:       SlackClient,
 	}
 
 	// ------------------------------------------------------- //
@@ -302,8 +302,8 @@ func TestContactUsecaseImpl_Update_Fail_Send(t *testing.T) {
 		return nil
 	}
 
-	SlackClient.IsConnectedFunc = func(ctx context.Context) (bool, error) {
-		return true, nil
+	SlackClient.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
+		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
 	ContactProducer.SendFunc = func(ctx context.Context, event *model.ContactEvent) error {

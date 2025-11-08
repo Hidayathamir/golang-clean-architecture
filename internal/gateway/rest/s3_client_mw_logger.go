@@ -3,6 +3,7 @@ package rest
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
@@ -20,36 +21,36 @@ func NewS3ClientMwLogger(next S3Client) *S3ClientMwLogger {
 	}
 }
 
-func (c *S3ClientMwLogger) Download(ctx context.Context, bucket, key string) (string, error) {
+func (c *S3ClientMwLogger) Download(ctx context.Context, req model.S3DownloadRequest) (model.S3DownloadResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	path, err := c.Next.Download(ctx, bucket, key)
+	res, err := c.Next.Download(ctx, req)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
-		"bucket": bucket,
-		"key":    key,
-		"path":   path,
+		"bucket": req.Bucket,
+		"key":    req.Key,
+		"data":   res.Data,
 	}
 	x.LogMw(ctx, fields, err)
 
-	return path, err
+	return res, err
 }
 
-func (c *S3ClientMwLogger) DeleteObject(ctx context.Context, bucket, key string) (bool, error) {
+func (c *S3ClientMwLogger) DeleteObject(ctx context.Context, req model.S3DeleteObjectRequest) (model.S3DeleteObjectResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	ok, err := c.Next.DeleteObject(ctx, bucket, key)
+	res, err := c.Next.DeleteObject(ctx, req)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
-		"bucket": bucket,
-		"key":    key,
-		"ok":     ok,
+		"bucket":  req.Bucket,
+		"key":     req.Key,
+		"deleted": res.Deleted,
 	}
 	x.LogMw(ctx, fields, err)
 
-	return ok, err
+	return res, err
 }

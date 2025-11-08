@@ -39,8 +39,8 @@ func TestAddressUsecaseImpl_Delete_Success(t *testing.T) {
 		return nil
 	}
 
-	PaymentClient.RefundFunc = func(ctx context.Context, transactionID string) (bool, error) {
-		return true, nil
+	PaymentClient.RefundFunc = func(ctx context.Context, req model.PaymentRefundRequest) (model.PaymentRefundResponse, error) {
+		return model.PaymentRefundResponse{Success: true}, nil
 	}
 
 	AddressRepository.DeleteFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Address) error {
@@ -83,8 +83,8 @@ func TestAddressUsecaseImpl_Delete_Fail_FindByIDAndUserID(t *testing.T) {
 		return nil
 	}
 
-	PaymentClient.RefundFunc = func(ctx context.Context, transactionID string) (bool, error) {
-		return true, nil
+	PaymentClient.RefundFunc = func(ctx context.Context, req model.PaymentRefundRequest) (model.PaymentRefundResponse, error) {
+		return model.PaymentRefundResponse{Success: true}, nil
 	}
 
 	AddressRepository.DeleteFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Address) error {
@@ -128,8 +128,8 @@ func TestAddressUsecaseImpl_Delete_Fail_FindByIDAndContactID(t *testing.T) {
 		return assert.AnError
 	}
 
-	PaymentClient.RefundFunc = func(ctx context.Context, transactionID string) (bool, error) {
-		return true, nil
+	PaymentClient.RefundFunc = func(ctx context.Context, req model.PaymentRefundRequest) (model.PaymentRefundResponse, error) {
+		return model.PaymentRefundResponse{Success: true}, nil
 	}
 
 	AddressRepository.DeleteFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Address) error {
@@ -173,8 +173,8 @@ func TestAddressUsecaseImpl_Delete_Fail_Refund(t *testing.T) {
 		return nil
 	}
 
-	PaymentClient.RefundFunc = func(ctx context.Context, transactionID string) (bool, error) {
-		return false, assert.AnError
+	PaymentClient.RefundFunc = func(ctx context.Context, req model.PaymentRefundRequest) (model.PaymentRefundResponse, error) {
+		return model.PaymentRefundResponse{Success: false}, assert.AnError
 	}
 
 	AddressRepository.DeleteFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Address) error {
@@ -218,8 +218,8 @@ func TestAddressUsecaseImpl_Delete_Fail_Delete(t *testing.T) {
 		return nil
 	}
 
-	PaymentClient.RefundFunc = func(ctx context.Context, transactionID string) (bool, error) {
-		return true, nil
+	PaymentClient.RefundFunc = func(ctx context.Context, req model.PaymentRefundRequest) (model.PaymentRefundResponse, error) {
+		return model.PaymentRefundResponse{Success: true}, nil
 	}
 
 	AddressRepository.DeleteFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Address) error {

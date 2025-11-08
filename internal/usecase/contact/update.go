@@ -27,7 +27,7 @@ func (u *ContactUsecaseImpl) Update(ctx context.Context, req *model.UpdateContac
 		return nil, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Update", err)
 	}
 
-	if _, err := u.SlackClient.IsConnected(ctx); err != nil {
+	if _, err := u.SlackClient.IsConnected(ctx, model.SlackIsConnectedRequest{}); err != nil {
 		return nil, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Update", err)
 	}
 
