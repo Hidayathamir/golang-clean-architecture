@@ -31,10 +31,9 @@ func newVerifyUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepository
 	cfg.Set(configkey.AuthJWTExpireSeconds, 60)
 
 	u := &user.UserUsecaseImpl{
-		Config:         cfg,
-		DB:             gormDB,
-		Validate:       validator.New(),
-		UserRepository: repo,
+		Config: cfg,
+		DB:     gormDB,
+		 UserRepository: repo,
 	}
 
 	return u, repo

@@ -7,7 +7,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/rest"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
-	"github.com/go-playground/validator/v10"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
@@ -25,9 +24,8 @@ type AddressUsecase interface {
 var _ AddressUsecase = &AddressUsecaseImpl{}
 
 type AddressUsecaseImpl struct {
-	Config   *viper.Viper
-	DB       *gorm.DB
-	Validate *validator.Validate
+	Config *viper.Viper
+	DB     *gorm.DB
 
 	// repository
 	AddressRepository repository.AddressRepository
@@ -41,7 +39,7 @@ type AddressUsecaseImpl struct {
 }
 
 func NewAddressUsecase(
-	cfg *viper.Viper, db *gorm.DB, validate *validator.Validate,
+	cfg *viper.Viper, db *gorm.DB,
 
 	// repository
 	contactRepository repository.ContactRepository,
@@ -54,9 +52,8 @@ func NewAddressUsecase(
 	paymentClient rest.PaymentClient,
 ) *AddressUsecaseImpl {
 	return &AddressUsecaseImpl{
-		Config:   cfg,
-		DB:       db,
-		Validate: validate,
+		Config: cfg,
+		DB:     db,
 
 		// repository
 		ContactRepository: contactRepository,

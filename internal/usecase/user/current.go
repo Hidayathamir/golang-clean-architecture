@@ -7,10 +7,11 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
 func (u *UserUsecaseImpl) Current(ctx context.Context, req *model.GetUserRequest) (*model.UserResponse, error) {
-	if err := u.Validate.Struct(req); err != nil {
+	if err := x.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Current", err)
 	}

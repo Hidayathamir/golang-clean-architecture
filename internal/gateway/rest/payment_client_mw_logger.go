@@ -3,7 +3,7 @@ package rest
 import (
 	"context"
 
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
 )
 
@@ -26,7 +26,7 @@ func (c *PaymentClientMwLogger) Refund(ctx context.Context, transactionID string
 		"transactionID": transactionID,
 		"ok":            ok,
 	}
-	l.LogMw(ctx, fields, err)
+	x.LogMw(ctx, fields, err)
 
 	return ok, err
 }
@@ -38,7 +38,7 @@ func (c *PaymentClientMwLogger) GetStatus(ctx context.Context, transactionID str
 		"transactionID": transactionID,
 		"status":        status,
 	}
-	l.LogMw(ctx, fields, err)
+	x.LogMw(ctx, fields, err)
 
 	return status, err
 }

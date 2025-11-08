@@ -19,10 +19,9 @@ func TestContactUsecaseImpl_Delete_Success(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	ContactProducer := &mock.ContactProducerMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		ContactRepository: ContactRepository,
-		ContactProducer:   ContactProducer,
+		DB: gormDB,
+		 ContactRepository: ContactRepository,
+		ContactProducer: ContactProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -54,10 +53,9 @@ func TestContactUsecaseImpl_Delete_Fail_ValidateStruct(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	ContactProducer := &mock.ContactProducerMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		ContactRepository: ContactRepository,
-		ContactProducer:   ContactProducer,
+		DB: gormDB,
+		 ContactRepository: ContactRepository,
+		ContactProducer: ContactProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -91,10 +89,9 @@ func TestContactUsecaseImpl_Delete_Fail_FindByIDAndUserID(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	ContactProducer := &mock.ContactProducerMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		ContactRepository: ContactRepository,
-		ContactProducer:   ContactProducer,
+		DB: gormDB,
+		 ContactRepository: ContactRepository,
+		ContactProducer: ContactProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -127,10 +124,9 @@ func TestContactUsecaseImpl_Delete_Fail_Delete(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	ContactProducer := &mock.ContactProducerMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		ContactRepository: ContactRepository,
-		ContactProducer:   ContactProducer,
+		DB: gormDB,
+		 ContactRepository: ContactRepository,
+		ContactProducer: ContactProducer,
 	}
 
 	// ------------------------------------------------------- //

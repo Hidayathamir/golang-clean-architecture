@@ -20,11 +20,10 @@ func TestContactUsecaseImpl_Update_Success(t *testing.T) {
 	ContactProducer := &mock.ContactProducerMock{}
 	SlackClient := &mock.SlackClientMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		ContactRepository: ContactRepository,
-		ContactProducer:   ContactProducer,
-		SlackClient:       SlackClient,
+		DB: gormDB,
+		 ContactRepository: ContactRepository,
+		ContactProducer: ContactProducer,
+		SlackClient:     SlackClient,
 	}
 
 	// ------------------------------------------------------- //
@@ -79,11 +78,10 @@ func TestContactUsecaseImpl_Update_ValidateStruct(t *testing.T) {
 	ContactProducer := &mock.ContactProducerMock{}
 	SlackClient := &mock.SlackClientMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		ContactRepository: ContactRepository,
-		ContactProducer:   ContactProducer,
-		SlackClient:       SlackClient,
+		DB: gormDB,
+		 ContactRepository: ContactRepository,
+		ContactProducer: ContactProducer,
+		SlackClient:     SlackClient,
 	}
 
 	// ------------------------------------------------------- //
@@ -131,11 +129,10 @@ func TestContactUsecaseImpl_Update_Fail_FindByIDAndUserID(t *testing.T) {
 	ContactProducer := &mock.ContactProducerMock{}
 	SlackClient := &mock.SlackClientMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		ContactRepository: ContactRepository,
-		ContactProducer:   ContactProducer,
-		SlackClient:       SlackClient,
+		DB: gormDB,
+		 ContactRepository: ContactRepository,
+		ContactProducer: ContactProducer,
+		SlackClient:     SlackClient,
 	}
 
 	// ------------------------------------------------------- //
@@ -182,11 +179,10 @@ func TestContactUsecaseImpl_Update_Fail_Update(t *testing.T) {
 	ContactProducer := &mock.ContactProducerMock{}
 	SlackClient := &mock.SlackClientMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		ContactRepository: ContactRepository,
-		ContactProducer:   ContactProducer,
-		SlackClient:       SlackClient,
+		DB: gormDB,
+		 ContactRepository: ContactRepository,
+		ContactProducer: ContactProducer,
+		SlackClient:     SlackClient,
 	}
 
 	// ------------------------------------------------------- //
@@ -233,11 +229,10 @@ func TestContactUsecaseImpl_Update_Fail_IsConnected(t *testing.T) {
 	ContactProducer := &mock.ContactProducerMock{}
 	SlackClient := &mock.SlackClientMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		ContactRepository: ContactRepository,
-		ContactProducer:   ContactProducer,
-		SlackClient:       SlackClient,
+		DB: gormDB,
+		 ContactRepository: ContactRepository,
+		ContactProducer: ContactProducer,
+		SlackClient:     SlackClient,
 	}
 
 	// ------------------------------------------------------- //
@@ -284,11 +279,10 @@ func TestContactUsecaseImpl_Update_Fail_Send(t *testing.T) {
 	ContactProducer := &mock.ContactProducerMock{}
 	SlackClient := &mock.SlackClientMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		ContactRepository: ContactRepository,
-		ContactProducer:   ContactProducer,
-		SlackClient:       SlackClient,
+		DB: gormDB,
+		 ContactRepository: ContactRepository,
+		ContactProducer: ContactProducer,
+		SlackClient:     SlackClient,
 	}
 
 	// ------------------------------------------------------- //

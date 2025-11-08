@@ -14,8 +14,8 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/route"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
 // General API Info
@@ -30,13 +30,12 @@ import (
 
 func main() {
 	viperConfig := config.NewViper()
-	l.SetupLogger(viperConfig)
+	x.SetupAll(viperConfig)
 	db := config.NewDatabase(viperConfig)
-	validate := config.NewValidator(viperConfig)
 	app := config.NewFiber(viperConfig)
 	producer := config.NewKafkaProducer(viperConfig)
 
-	usecases := config.SetupUsecases(viperConfig, db, app, validate, producer)
+	usecases := config.SetupUsecases(viperConfig, db, app, producer)
 	controllers := config.SetupControllers(viperConfig, usecases)
 	middlewares := config.SetupMiddlewares(usecases)
 

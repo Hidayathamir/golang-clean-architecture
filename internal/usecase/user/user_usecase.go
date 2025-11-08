@@ -7,7 +7,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/rest"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
-	"github.com/go-playground/validator/v10"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
@@ -26,9 +25,8 @@ type UserUsecase interface {
 var _ UserUsecase = &UserUsecaseImpl{}
 
 type UserUsecaseImpl struct {
-	Config   *viper.Viper
-	DB       *gorm.DB
-	Validate *validator.Validate
+	Config *viper.Viper
+	DB     *gorm.DB
 
 	// repository
 	UserRepository repository.UserRepository
@@ -44,7 +42,6 @@ type UserUsecaseImpl struct {
 func NewUserUsecase(
 	cfg *viper.Viper,
 	db *gorm.DB,
-	validate *validator.Validate,
 
 	// repository
 	userRepository repository.UserRepository,
@@ -57,9 +54,8 @@ func NewUserUsecase(
 	slackClient rest.SlackClient,
 ) *UserUsecaseImpl {
 	return &UserUsecaseImpl{
-		Config:   cfg,
-		DB:       db,
-		Validate: validate,
+		Config: cfg,
+		DB:     db,
 
 		// repository
 		UserRepository: userRepository,

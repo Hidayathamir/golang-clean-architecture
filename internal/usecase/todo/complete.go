@@ -8,10 +8,11 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
 func (u *TodoUsecaseImpl) Complete(ctx context.Context, req *model.CompleteTodoRequest) (*model.TodoResponse, error) {
-	if err := u.Validate.Struct(req); err != nil {
+	if err := x.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName("todo.(*TodoUsecaseImpl).Complete", err)
 	}

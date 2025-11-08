@@ -19,11 +19,10 @@ func TestUserUsecaseImpl_Logout_Success(t *testing.T) {
 	UserProducer := &mock.UserProducerMock{}
 	S3Client := &mock.S3ClientMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Validate:       validator.New(),
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
-		S3Client:       S3Client,
+		DB: gormDB,
+		 UserRepository: UserRepository,
+		UserProducer: UserProducer,
+		S3Client:     S3Client,
 	}
 
 	// ------------------------------------------------------- //
@@ -62,11 +61,10 @@ func TestUserUsecaseImpl_Logout_Fail_ValidateStruct(t *testing.T) {
 	UserProducer := &mock.UserProducerMock{}
 	S3Client := &mock.S3ClientMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Validate:       validator.New(),
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
-		S3Client:       S3Client,
+		DB: gormDB,
+		 UserRepository: UserRepository,
+		UserProducer: UserProducer,
+		S3Client:     S3Client,
 	}
 
 	// ------------------------------------------------------- //
@@ -107,11 +105,10 @@ func TestUserUsecaseImpl_Logout_Fail_FindByID(t *testing.T) {
 	UserProducer := &mock.UserProducerMock{}
 	S3Client := &mock.S3ClientMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Validate:       validator.New(),
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
-		S3Client:       S3Client,
+		DB: gormDB,
+		 UserRepository: UserRepository,
+		UserProducer: UserProducer,
+		S3Client:     S3Client,
 	}
 
 	// ------------------------------------------------------- //
@@ -151,11 +148,10 @@ func TestUserUsecaseImpl_Logout_Fail_DeleteObject(t *testing.T) {
 	UserProducer := &mock.UserProducerMock{}
 	S3Client := &mock.S3ClientMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Validate:       validator.New(),
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
-		S3Client:       S3Client,
+		DB: gormDB,
+		 UserRepository: UserRepository,
+		UserProducer: UserProducer,
+		S3Client:     S3Client,
 	}
 
 	// ------------------------------------------------------- //
@@ -195,11 +191,10 @@ func TestUserUsecaseImpl_Logout_Fail_Send(t *testing.T) {
 	UserProducer := &mock.UserProducerMock{}
 	S3Client := &mock.S3ClientMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Validate:       validator.New(),
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
-		S3Client:       S3Client,
+		DB: gormDB,
+		 UserRepository: UserRepository,
+		UserProducer: UserProducer,
+		S3Client:     S3Client,
 	}
 
 	// ------------------------------------------------------- //

@@ -8,11 +8,12 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func (u *UserUsecaseImpl) Create(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error) {
-	err := u.Validate.Struct(req)
+	err := x.Validate.Struct(req)
 	if err != nil {
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Create", err)

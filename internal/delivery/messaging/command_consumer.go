@@ -7,8 +7,8 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	todousecase "github.com/Hidayathamir/golang-clean-architecture/internal/usecase/todo"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
 )
@@ -34,13 +34,13 @@ func (c *TodoCommandConsumer) Consume(message *sarama.ConsumerMessage) error {
 
 	cmd := new(completeTodoCommand)
 	if err := json.Unmarshal(message.Value, cmd); err != nil {
-		l.Logger.WithContext(ctx).WithError(err).Error("error unmarshalling todo command")
+		x.Logger.WithContext(ctx).WithError(err).Error("error unmarshalling todo command")
 		return errkit.AddFuncName("messaging.(*TodoCommandConsumer).Consume", err)
 	}
 
 	if cmd.UserID == "" || cmd.TodoID == "" {
 		err := errkit.BadRequest(fmt.Errorf("invalid todo command payload: %+v", cmd))
-		l.Logger.WithContext(ctx).WithError(err).Warn("todo command missing identifiers")
+		x.Logger.WithContext(ctx).WithError(err).Warn("todo command missing identifiers")
 		return errkit.AddFuncName("messaging.(*TodoCommandConsumer).Consume", err)
 	}
 
@@ -53,7 +53,7 @@ func (c *TodoCommandConsumer) Consume(message *sarama.ConsumerMessage) error {
 		return errkit.AddFuncName("messaging.(*TodoCommandConsumer).Consume", err)
 	}
 
-	l.Logger.WithContext(ctx).WithFields(logrus.Fields{
+	x.Logger.WithContext(ctx).WithFields(logrus.Fields{
 		"user_id": cmd.UserID,
 		"todo_id": cmd.TodoID,
 	}).Info("Processed todo completion command")

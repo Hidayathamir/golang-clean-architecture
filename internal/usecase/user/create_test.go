@@ -18,10 +18,9 @@ func TestUserUsecaseImpl_Create_Success(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Validate:       validator.New(),
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
+		DB: gormDB,
+		 UserRepository: UserRepository,
+		UserProducer: UserProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -67,10 +66,9 @@ func TestUserUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Validate:       validator.New(),
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
+		DB: gormDB,
+		 UserRepository: UserRepository,
+		UserProducer: UserProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -112,10 +110,9 @@ func TestUserUsecaseImpl_Create_Fail_CountByID(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Validate:       validator.New(),
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
+		DB: gormDB,
+		 UserRepository: UserRepository,
+		UserProducer: UserProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -156,10 +153,9 @@ func TestUserUsecaseImpl_Create_Fail_UserAlreadyExists(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Validate:       validator.New(),
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
+		DB: gormDB,
+		 UserRepository: UserRepository,
+		UserProducer: UserProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -200,10 +196,9 @@ func TestUserUsecaseImpl_Create_Fail_Create(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Validate:       validator.New(),
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
+		DB: gormDB,
+		 UserRepository: UserRepository,
+		UserProducer: UserProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -244,10 +239,9 @@ func TestUserUsecaseImpl_Create_Fail_Send(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Validate:       validator.New(),
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
+		DB: gormDB,
+		 UserRepository: UserRepository,
+		UserProducer: UserProducer,
 	}
 
 	// ------------------------------------------------------- //

@@ -9,8 +9,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/route"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
-	"github.com/go-playground/validator/v10"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/gofiber/fiber/v2"
 	"github.com/spf13/viper"
 	"github.com/testcontainers/testcontainers-go"
@@ -25,16 +24,13 @@ var db *gorm.DB
 
 var viperConfig *viper.Viper
 
-var validate *validator.Validate
-
 // TestMain is the entry point for all tests in this package.
 // It sets up global dependencies (logger, validator, Fiber app, DB, Kafka producer),
 // starts a PostgreSQL container, runs database migrations, bootstraps the application,
 // executes test, and finally terminates the container before exiting.
 func TestMain(m *testing.M) {
 	viperConfig = config.NewViper()
-	l.SetupLogger(viperConfig)
-	validate = config.NewValidator(viperConfig)
+	x.SetupAll(viperConfig)
 	app = config.NewFiber(viperConfig)
 	postgresContainer := newPostgresContainer(viperConfig)
 	viperConfig.Set(configkey.DatabaseMigrations, "../db/migrations")
@@ -43,7 +39,7 @@ func TestMain(m *testing.M) {
 	kafkaContainer := newKafkaContainer(viperConfig)
 	producer := config.NewKafkaProducer(viperConfig)
 
-	usecases := config.SetupUsecases(viperConfig, db, app, validate, producer)
+	usecases := config.SetupUsecases(viperConfig, db, app, producer)
 	controllers := config.SetupControllers(viperConfig, usecases)
 	middlewares := config.SetupMiddlewares(usecases)
 

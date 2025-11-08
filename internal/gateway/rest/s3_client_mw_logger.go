@@ -3,7 +3,7 @@ package rest
 import (
 	"context"
 
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
 )
 
@@ -27,7 +27,7 @@ func (c *S3ClientMwLogger) Download(ctx context.Context, bucket, key string) (st
 		"key":    key,
 		"ok":     ok,
 	}
-	l.LogMw(ctx, fields, err)
+	x.LogMw(ctx, fields, err)
 
 	return ok, err
 }
@@ -40,7 +40,7 @@ func (c *S3ClientMwLogger) DeleteObject(ctx context.Context, bucket, key string)
 		"key":    key,
 		"ok":     ok,
 	}
-	l.LogMw(ctx, fields, err)
+	x.LogMw(ctx, fields, err)
 
 	return ok, err
 }

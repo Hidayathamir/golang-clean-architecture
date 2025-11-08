@@ -17,9 +17,8 @@ func TestUserUsecaseImpl_Current_Success(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Validate:       validator.New(),
-		UserRepository: UserRepository,
+		DB: gormDB,
+		 UserRepository: UserRepository,
 	}
 
 	// ------------------------------------------------------- //
@@ -48,9 +47,8 @@ func TestUserUsecaseImpl_Current_Fail_ValidateStruct(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Validate:       validator.New(),
-		UserRepository: UserRepository,
+		DB: gormDB,
+		 UserRepository: UserRepository,
 	}
 
 	// ------------------------------------------------------- //
@@ -81,9 +79,8 @@ func TestUserUsecaseImpl_Current_Fail_FindByID(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Validate:       validator.New(),
-		UserRepository: UserRepository,
+		DB: gormDB,
+		 UserRepository: UserRepository,
 	}
 
 	// ------------------------------------------------------- //

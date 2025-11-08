@@ -6,10 +6,11 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
 func (u *ContactUsecaseImpl) Search(ctx context.Context, req *model.SearchContactRequest) (model.ContactResponseList, int64, error) {
-	if err := u.Validate.Struct(req); err != nil {
+	if err := x.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
 		return nil, 0, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Search", err)
 	}

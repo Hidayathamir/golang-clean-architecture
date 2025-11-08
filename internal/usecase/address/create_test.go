@@ -20,8 +20,7 @@ func TestAddressUsecaseImpl_Create_Success(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	AddressProducer := &mock.AddressProducerMock{}
 	u := &address.AddressUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
+		DB: gormDB,
 		AddressRepository: AddressRepository,
 		ContactRepository: ContactRepository,
 		AddressProducer:   AddressProducer,
@@ -67,8 +66,7 @@ func TestAddressUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	AddressProducer := &mock.AddressProducerMock{}
 	u := &address.AddressUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
+		DB: gormDB,
 		AddressRepository: AddressRepository,
 		ContactRepository: ContactRepository,
 		AddressProducer:   AddressProducer,
@@ -113,8 +111,7 @@ func TestAddressUsecaseImpl_Create_Fail_FindByIDAndUserID(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	AddressProducer := &mock.AddressProducerMock{}
 	u := &address.AddressUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
+		DB: gormDB,
 		AddressRepository: AddressRepository,
 		ContactRepository: ContactRepository,
 		AddressProducer:   AddressProducer,
@@ -158,8 +155,7 @@ func TestAddressUsecaseImpl_Create_Fail_Create(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	AddressProducer := &mock.AddressProducerMock{}
 	u := &address.AddressUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
+		DB: gormDB,
 		AddressRepository: AddressRepository,
 		ContactRepository: ContactRepository,
 		AddressProducer:   AddressProducer,
@@ -203,8 +199,7 @@ func TestAddressUsecaseImpl_Create_Fail_Send(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	AddressProducer := &mock.AddressProducerMock{}
 	u := &address.AddressUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
+		DB: gormDB,
 		AddressRepository: AddressRepository,
 		ContactRepository: ContactRepository,
 		AddressProducer:   AddressProducer,

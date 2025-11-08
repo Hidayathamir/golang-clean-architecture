@@ -21,9 +21,8 @@ func TestAddressUsecaseImpl_Update_Success(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	AddressProducer := &mock.AddressProducerMock{}
 	u := &address.AddressUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		AddressRepository: AddressRepository,
+		DB: gormDB,
+		 AddressRepository: AddressRepository,
 		ContactRepository: ContactRepository,
 		AddressProducer:   AddressProducer,
 	}
@@ -74,9 +73,8 @@ func TestAddressUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	AddressProducer := &mock.AddressProducerMock{}
 	u := &address.AddressUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		AddressRepository: AddressRepository,
+		DB: gormDB,
+		 AddressRepository: AddressRepository,
 		ContactRepository: ContactRepository,
 		AddressProducer:   AddressProducer,
 	}
@@ -127,9 +125,8 @@ func TestAddressUsecaseImpl_Update_Fail_FindByIDAndUserID(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	AddressProducer := &mock.AddressProducerMock{}
 	u := &address.AddressUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		AddressRepository: AddressRepository,
+		DB: gormDB,
+		 AddressRepository: AddressRepository,
 		ContactRepository: ContactRepository,
 		AddressProducer:   AddressProducer,
 	}
@@ -179,9 +176,8 @@ func TestAddressUsecaseImpl_Update_Fail_FindByIDAndContactID(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	AddressProducer := &mock.AddressProducerMock{}
 	u := &address.AddressUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		AddressRepository: AddressRepository,
+		DB: gormDB,
+		 AddressRepository: AddressRepository,
 		ContactRepository: ContactRepository,
 		AddressProducer:   AddressProducer,
 	}
@@ -231,9 +227,8 @@ func TestAddressUsecaseImpl_Update_Fail_Update(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	AddressProducer := &mock.AddressProducerMock{}
 	u := &address.AddressUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		AddressRepository: AddressRepository,
+		DB: gormDB,
+		 AddressRepository: AddressRepository,
 		ContactRepository: ContactRepository,
 		AddressProducer:   AddressProducer,
 	}
@@ -283,9 +278,8 @@ func TestAddressUsecaseImpl_Update_Fail_Send(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	AddressProducer := &mock.AddressProducerMock{}
 	u := &address.AddressUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		AddressRepository: AddressRepository,
+		DB: gormDB,
+		 AddressRepository: AddressRepository,
 		ContactRepository: ContactRepository,
 		AddressProducer:   AddressProducer,
 	}

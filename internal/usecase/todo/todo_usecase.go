@@ -6,7 +6,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
-	"github.com/go-playground/validator/v10"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
@@ -25,9 +24,8 @@ type TodoUsecase interface {
 var _ TodoUsecase = &TodoUsecaseImpl{}
 
 type TodoUsecaseImpl struct {
-	Config   *viper.Viper
-	DB       *gorm.DB
-	Validate *validator.Validate
+	Config *viper.Viper
+	DB     *gorm.DB
 
 	// repository
 	TodoRepository repository.TodoRepository
@@ -37,7 +35,7 @@ type TodoUsecaseImpl struct {
 }
 
 func NewTodoUsecase(
-	cfg *viper.Viper, db *gorm.DB, validate *validator.Validate,
+	cfg *viper.Viper, db *gorm.DB,
 
 	// repository
 	todoRepository repository.TodoRepository,
@@ -46,9 +44,8 @@ func NewTodoUsecase(
 	todoProducer messaging.TodoProducer,
 ) *TodoUsecaseImpl {
 	return &TodoUsecaseImpl{
-		Config:   cfg,
-		DB:       db,
-		Validate: validate,
+		Config: cfg,
+		DB:     db,
 
 		// repository
 		TodoRepository: todoRepository,

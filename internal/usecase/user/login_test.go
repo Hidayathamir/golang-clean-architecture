@@ -34,12 +34,11 @@ func newLoginUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepositoryM
 	cfg.Set(configkey.AuthJWTExpireSeconds, 60)
 
 	u := &user.UserUsecaseImpl{
-		Config:         cfg,
-		DB:             gormDB,
-		Validate:       validator.New(),
-		UserRepository: repo,
-		UserProducer:   producer,
-		SlackClient:    slack,
+		Config: cfg,
+		DB:     gormDB,
+		 UserRepository: repo,
+		UserProducer: producer,
+		SlackClient:  slack,
 	}
 
 	return u, repo, producer, slack
@@ -248,12 +247,11 @@ func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 	cfg.Set(configkey.AuthJWTExpireSeconds, 60)
 
 	u := &user.UserUsecaseImpl{
-		Config:         cfg,
-		DB:             gormDB,
-		Validate:       validator.New(),
-		UserRepository: repo,
-		UserProducer:   producer,
-		SlackClient:    slack,
+		Config: cfg,
+		DB:     gormDB,
+		 UserRepository: repo,
+		UserProducer: producer,
+		SlackClient:  slack,
 	}
 
 	req := &model.LoginUserRequest{

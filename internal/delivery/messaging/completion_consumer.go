@@ -5,8 +5,8 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
 )
@@ -23,11 +23,11 @@ func (c *TodoCompletionConsumer) Consume(message *sarama.ConsumerMessage) error 
 
 	event := new(model.TodoCompletedEvent)
 	if err := json.Unmarshal(message.Value, event); err != nil {
-		l.Logger.WithContext(ctx).WithError(err).Error("error unmarshalling todo completion event")
+		x.Logger.WithContext(ctx).WithError(err).Error("error unmarshalling todo completion event")
 		return errkit.AddFuncName("messaging.(*TodoCompletionConsumer).Consume", err)
 	}
 
-	l.Logger.WithContext(ctx).WithFields(logrus.Fields{
+	x.Logger.WithContext(ctx).WithFields(logrus.Fields{
 		"event":     event,
 		"partition": message.Partition,
 		"offset":    message.Offset,

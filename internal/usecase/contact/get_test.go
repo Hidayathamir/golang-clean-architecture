@@ -18,9 +18,8 @@ func TestContactUsecaseImpl_Get_Success(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	ContactRepository := &mock.ContactRepositoryMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		ContactRepository: ContactRepository,
+		DB: gormDB,
+		 ContactRepository: ContactRepository,
 	}
 
 	// ------------------------------------------------------- //
@@ -50,9 +49,8 @@ func TestContactUsecaseImpl_Get_Fail_ValidateStruct(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	ContactRepository := &mock.ContactRepositoryMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		ContactRepository: ContactRepository,
+		DB: gormDB,
+		 ContactRepository: ContactRepository,
 	}
 
 	// ------------------------------------------------------- //
@@ -84,9 +82,8 @@ func TestContactUsecaseImpl_Get_Fail_FindByIDAndUserID(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	ContactRepository := &mock.ContactRepositoryMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		ContactRepository: ContactRepository,
+		DB: gormDB,
+		 ContactRepository: ContactRepository,
 	}
 
 	// ------------------------------------------------------- //

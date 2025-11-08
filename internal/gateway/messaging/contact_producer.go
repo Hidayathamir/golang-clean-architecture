@@ -6,8 +6,8 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/IBM/sarama"
 	"github.com/spf13/viper"
 )
@@ -36,7 +36,7 @@ func NewContactProducer(cfg *viper.Viper, producer sarama.SyncProducer) *Contact
 
 func (p *ContactProducerImpl) Send(ctx context.Context, event *model.ContactEvent) error {
 	if p.Producer == nil {
-		l.Logger.Warn("Kafka producer is disabled")
+		x.Logger.Warn("Kafka producer is disabled")
 		return nil
 	}
 
@@ -58,6 +58,6 @@ func (p *ContactProducerImpl) Send(ctx context.Context, event *model.ContactEven
 		return errkit.AddFuncName("messaging.(*ContactProducerImpl).Send", err)
 	}
 
-	l.Logger.Debugf("Message sent to topic %s, partition %d, offset %d", p.Topic, partition, offset)
+	x.Logger.Debugf("Message sent to topic %s, partition %d, offset %d", p.Topic, partition, offset)
 	return nil
 }

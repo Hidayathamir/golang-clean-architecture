@@ -19,11 +19,10 @@ func TestUserUsecaseImpl_Update_Success(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Config:         viper.New(),
-		Validate:       validator.New(),
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
+		DB:     gormDB,
+		Config: viper.New(),
+		 UserRepository: UserRepository,
+		UserProducer: UserProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -63,11 +62,10 @@ func TestUserUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Config:         viper.New(),
-		Validate:       validator.New(),
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
+		DB:     gormDB,
+		Config: viper.New(),
+		 UserRepository: UserRepository,
+		UserProducer: UserProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -107,11 +105,10 @@ func TestUserUsecaseImpl_Update_Fail_FindByID(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Config:         viper.New(),
-		Validate:       validator.New(),
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
+		DB:     gormDB,
+		Config: viper.New(),
+		 UserRepository: UserRepository,
+		UserProducer: UserProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -150,11 +147,10 @@ func TestUserUsecaseImpl_Update_Fail_Update(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Config:         viper.New(),
-		Validate:       validator.New(),
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
+		DB:     gormDB,
+		Config: viper.New(),
+		 UserRepository: UserRepository,
+		UserProducer: UserProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -193,11 +189,10 @@ func TestUserUsecaseImpl_Update_Fail_Send(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Config:         viper.New(),
-		Validate:       validator.New(),
+		DB:     gormDB,
+		Config: viper.New(),
 		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
+		UserProducer: UserProducer,
 	}
 
 	// ------------------------------------------------------- //

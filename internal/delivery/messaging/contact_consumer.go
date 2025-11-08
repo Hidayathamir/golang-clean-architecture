@@ -6,8 +6,8 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/contact"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/IBM/sarama"
 	"github.com/sirupsen/logrus"
 )
@@ -28,12 +28,12 @@ func (c ContactConsumer) Consume(message *sarama.ConsumerMessage) error {
 
 	ContactEvent := new(model.ContactEvent)
 	if err := json.Unmarshal(message.Value, ContactEvent); err != nil {
-		l.Logger.WithContext(ctx).WithError(err).Error("error unmarshalling Contact event")
+		x.Logger.WithContext(ctx).WithError(err).Error("error unmarshalling Contact event")
 		return errkit.AddFuncName("messaging.ContactConsumer.Consume", err)
 	}
 
 	// TODO process event
-	l.Logger.WithContext(ctx).WithFields(logrus.Fields{
+	x.Logger.WithContext(ctx).WithFields(logrus.Fields{
 		"event":     ContactEvent,
 		"partition": message.Partition,
 	}).Info("Received topic contacts")

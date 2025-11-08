@@ -3,7 +3,7 @@ package messaging
 import (
 	"context"
 
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/IBM/sarama"
 	"github.com/dnwe/otelsarama"
 )
@@ -32,7 +32,7 @@ func (h *ConsumerGroupHandler) ConsumeClaim(session sarama.ConsumerGroupSession,
 
 			err := h.Handler(message)
 			if err != nil {
-				l.Logger.WithError(err).Error("Failed to process message")
+				x.Logger.WithError(err).Error("Failed to process message")
 			} else {
 				session.MarkMessage(message, "")
 			}
@@ -51,11 +51,11 @@ func ConsumeTopic(ctx context.Context, consumerGroup sarama.ConsumerGroup, topic
 	go func() {
 		for {
 			if err := consumerGroup.Consume(ctx, []string{topic}, consumerHandler); err != nil {
-				l.Logger.WithError(err).Error("Error from consumer")
+				x.Logger.WithError(err).Error("Error from consumer")
 			}
 
 			if ctx.Err() != nil {
-				l.Logger.Info("Context cancelled, stopping consumer")
+				x.Logger.Info("Context cancelled, stopping consumer")
 				return
 			}
 		}
@@ -63,13 +63,13 @@ func ConsumeTopic(ctx context.Context, consumerGroup sarama.ConsumerGroup, topic
 
 	go func() {
 		for err := range consumerGroup.Errors() {
-			l.Logger.WithError(err).Error("Consumer group error")
+			x.Logger.WithError(err).Error("Consumer group error")
 		}
 	}()
 
 	<-ctx.Done()
-	l.Logger.Infof("Closing consumer group for topic: %s", topic)
+	x.Logger.Infof("Closing consumer group for topic: %s", topic)
 	if err := consumerGroup.Close(); err != nil {
-		l.Logger.WithError(err).Error("Error closing consumer group")
+		x.Logger.WithError(err).Error("Error closing consumer group")
 	}
 }

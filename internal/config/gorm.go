@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
@@ -25,7 +25,7 @@ func NewDatabase(viperConfig *viper.Viper) *gorm.DB {
 
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable TimeZone=UTC", host, port, username, password, database)
 
-	gormLogger := logger.New(&logrusWriter{Logger: l.Logger}, logger.Config{
+	gormLogger := logger.New(&logrusWriter{Logger: x.Logger}, logger.Config{
 		SlowThreshold:             time.Second * 5,
 		Colorful:                  false,
 		IgnoreRecordNotFoundError: true,
@@ -42,25 +42,25 @@ func NewDatabase(viperConfig *viper.Viper) *gorm.DB {
 		if err == nil {
 			break
 		}
-		l.Logger.Warnf("database connection attempt %d/%d failed: %v", attempt, maxAttempts, err)
+		x.Logger.Warnf("database connection attempt %d/%d failed: %v", attempt, maxAttempts, err)
 		time.Sleep(1 * time.Second)
 	}
 	if err != nil {
-		l.Logger.Panicf("failed to connect database: %v", err)
+		x.Logger.Panicf("failed to connect database: %v", err)
 	}
 
 	connection, err := db.DB()
 	if err != nil {
-		l.Logger.Panicf("failed to connect database: %v", err)
+		x.Logger.Panicf("failed to connect database: %v", err)
 	}
 
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
 		if pingErr := connection.Ping(); pingErr == nil {
 			break
 		} else if attempt == maxAttempts {
-			l.Logger.Panicf("failed to connect database: %v", pingErr)
+			x.Logger.Panicf("failed to connect database: %v", pingErr)
 		} else {
-			l.Logger.Warnf("database ping attempt %d/%d failed: %v", attempt, maxAttempts, pingErr)
+			x.Logger.Warnf("database ping attempt %d/%d failed: %v", attempt, maxAttempts, pingErr)
 			time.Sleep(1 * time.Second)
 		}
 	}

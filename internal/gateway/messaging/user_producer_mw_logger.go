@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/l"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
 )
 
@@ -30,7 +30,7 @@ func (p *UserProducerMwLogger) Send(ctx context.Context, event *model.UserEvent)
 	fields := logrus.Fields{
 		"event": event,
 	}
-	l.LogMw(ctx, fields, err)
+	x.LogMw(ctx, fields, err)
 
 	return err
 }

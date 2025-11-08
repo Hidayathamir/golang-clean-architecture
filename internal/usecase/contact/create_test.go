@@ -18,10 +18,9 @@ func TestContactUsecaseImpl_Create_Success(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	ContactProducer := &mock.ContactProducerMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
+		DB: gormDB,
 		ContactRepository: ContactRepository,
-		ContactProducer:   ContactProducer,
+		ContactProducer: ContactProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -63,10 +62,9 @@ func TestContactUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	ContactProducer := &mock.ContactProducerMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		ContactRepository: ContactRepository,
-		ContactProducer:   ContactProducer,
+		DB: gormDB,
+		 ContactRepository: ContactRepository,
+		ContactProducer: ContactProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -104,10 +102,9 @@ func TestContactUsecaseImpl_Create_Fail_Create(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	ContactProducer := &mock.ContactProducerMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		ContactRepository: ContactRepository,
-		ContactProducer:   ContactProducer,
+		DB: gormDB,
+		 ContactRepository: ContactRepository,
+		ContactProducer: ContactProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -144,10 +141,9 @@ func TestContactUsecaseImpl_Create_Fail_Send(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	ContactProducer := &mock.ContactProducerMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB:                gormDB,
-		Validate:          validator.New(),
-		ContactRepository: ContactRepository,
-		ContactProducer:   ContactProducer,
+		DB: gormDB,
+		 ContactRepository: ContactRepository,
+		ContactProducer: ContactProducer,
 	}
 
 	// ------------------------------------------------------- //

@@ -11,7 +11,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/todo"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/IBM/sarama"
-	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
@@ -28,7 +27,6 @@ func SetupUsecases(
 	viperConfig *viper.Viper,
 	db *gorm.DB,
 	app *fiber.App,
-	validate *validator.Validate,
 	producer sarama.SyncProducer,
 ) *Usecases {
 	// setup repositories
@@ -80,19 +78,19 @@ func SetupUsecases(
 
 	// setup use cases
 	var userUsecase user.UserUsecase
-	userUsecase = user.NewUserUsecase(viperConfig, db, validate, userRepository, userProducer, s3Client, slackClient)
+	userUsecase = user.NewUserUsecase(viperConfig, db, userRepository, userProducer, s3Client, slackClient)
 	userUsecase = user.NewUserUsecaseMwLogger(userUsecase)
 
 	var contactUsecase contact.ContactUsecase
-	contactUsecase = contact.NewContactUsecase(viperConfig, db, validate, contactRepository, contactProducer, slackClient)
+	contactUsecase = contact.NewContactUsecase(viperConfig, db, contactRepository, contactProducer, slackClient)
 	contactUsecase = contact.NewContactUsecaseMwLogger(contactUsecase)
 
 	var addressUsecase address.AddressUsecase
-	addressUsecase = address.NewAddressUsecase(viperConfig, db, validate, contactRepository, addressRepository, addressProducer, paymentClient)
+	addressUsecase = address.NewAddressUsecase(viperConfig, db, contactRepository, addressRepository, addressProducer, paymentClient)
 	addressUsecase = address.NewAddressUsecaseMwLogger(addressUsecase)
 
 	var todoUsecase todo.TodoUsecase
-	todoUsecase = todo.NewTodoUsecase(viperConfig, db, validate, todoRepository, todoProducer)
+	todoUsecase = todo.NewTodoUsecase(viperConfig, db, todoRepository, todoProducer)
 	todoUsecase = todo.NewTodoUsecaseMwLogger(todoUsecase)
 
 	return &Usecases{
