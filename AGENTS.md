@@ -3,6 +3,26 @@
 ## Project Structure & Module Organization
 The entrypoints under `cmd/` drive the deployables: `web` serves HTTP traffic, `worker` handles asynchronous jobs, and `migrate` manages database schema tasks. Domain logic follows a clean architecture split within `internal/`, where `delivery` exposes adapters, `usecase` coordinates workflows, `entity` defines models, `repository` persists data, and `gateway` integrates upstream services. Shared helpers reside in `pkg/`, database migrations live in `db/migrations`, and end-to-end flows are captured in `integrationtest/`.
 
+### Folder Reference
+- `cmd/`: Go entrypoints for runnable binaries.
+  - `cmd/web`: HTTP server bootstrap, middlewares, and route wiring.
+  - `cmd/worker`: Background job consumers plus scheduler wiring.
+  - `cmd/migrate`: Database migration runner using files from `db/migrations`.
+- `internal/`: Core business layers split by Clean Architecture roles.
+  - `internal/delivery`: HTTP/worker handlers, request validation, presenter glue.
+  - `internal/usecase`: Application services orchestrating repositories and gateways.
+  - `internal/entity` & `internal/model`: Domain structs (entity) and transport-specific projections (model).
+  - `internal/repository`: Interfaces and implementations over persistence engines.
+  - `internal/gateway`: Outbound integrations such as third-party APIs or queues.
+  - `internal/config`: Runtime configuration loaders/parsers.
+  - `internal/mock`: Test doubles for usecases, repositories, and gateways.
+- `pkg/`: Reusable utilities (logging, error helpers, middleware primitives) that stay framework-agnostic.
+- `db/migrations`: SQL migration files consumed by `cmd/migrate`; structure mirrors goose/flyway style timestamps.
+- `api/`: Generated Swagger specs and client/server stubs—never hand-edit.
+- `integrationtest/`: Black-box flows that spin up real adapters via docker-compose.
+- `signoz/`: Observability sandbox configs (docker-compose fragments, dashboards).
+- Project-wide metadata lives at the repo root: `Makefile` (automation), `README.md`, `README_my_note.md`, and `run_app.md` (process docs), plus `.env` samples under `config/` when present.
+
 ## Build, Test, and Development Commands
 Run `make run` to start `cmd/web/main.go` and `make run-worker` for background processing. `make go-test` executes unit tests across `internal/...`, while `make go-integration-test` exercises scenarios in `integrationtest/...`. Use `make run-clean` for a full lint, generate, Swagger, and boot cycle, `make docker-compose` to reset local dependencies, and `make check-tools` to confirm required CLIs before onboarding.
 
