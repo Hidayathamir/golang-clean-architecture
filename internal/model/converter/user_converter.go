@@ -29,7 +29,7 @@ func ModelUpdateUserRequestToEntityUser(req *model.UpdateUserRequest, user *enti
 	}
 }
 
-func UserToResponse(user *entity.User, res *model.UserResponse) {
+func EntityUserToModelUserResponse(user *entity.User, res *model.UserResponse) {
 	if user == nil || res == nil {
 		return
 	}
@@ -40,7 +40,7 @@ func UserToResponse(user *entity.User, res *model.UserResponse) {
 	res.UpdatedAt = user.UpdatedAt
 }
 
-func UserToEvent(user *entity.User, event *model.UserEvent) {
+func EntityUserToModelUserEvent(user *entity.User, event *model.UserEvent) {
 	if user == nil || event == nil {
 		return
 	}
@@ -49,4 +49,12 @@ func UserToEvent(user *entity.User, event *model.UserEvent) {
 	event.Name = user.Name
 	event.CreatedAt = user.CreatedAt
 	event.UpdatedAt = user.UpdatedAt
+}
+
+func EntityUserToModelAuth(user *entity.User, auth *model.Auth) {
+	if user == nil || auth == nil {
+		return
+	}
+
+	auth.ID = user.ID
 }

@@ -38,13 +38,13 @@ func (u *UserUsecaseImpl) Update(ctx context.Context, req *model.UpdateUserReque
 	}
 
 	event := new(model.UserEvent)
-	converter.UserToEvent(user, event)
+	converter.EntityUserToModelUserEvent(user, event)
 	if err := u.UserProducer.Send(ctx, event); err != nil {
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Update", err)
 	}
 
 	res := new(model.UserResponse)
-	converter.UserToResponse(user, res)
+	converter.EntityUserToModelUserResponse(user, res)
 
 	return res, nil
 }

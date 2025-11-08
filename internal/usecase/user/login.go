@@ -33,7 +33,7 @@ func (u *UserUsecaseImpl) Login(ctx context.Context, req *model.LoginUserRequest
 	}
 
 	event := new(model.UserEvent)
-	converter.UserToEvent(user, event)
+	converter.EntityUserToModelUserEvent(user, event)
 	if err := u.UserProducer.Send(ctx, event); err != nil {
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Login", err)
 	}
@@ -44,6 +44,7 @@ func (u *UserUsecaseImpl) Login(ctx context.Context, req *model.LoginUserRequest
 	}
 
 	res := new(model.UserResponse)
+	converter.EntityUserToModelUserResponse(user, res)
 	res.Token = token
 
 	return res, nil

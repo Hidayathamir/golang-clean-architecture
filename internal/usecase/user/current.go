@@ -22,7 +22,7 @@ func (u *UserUsecaseImpl) Current(ctx context.Context, req *model.GetUserRequest
 	}
 
 	res := new(model.UserResponse)
-	converter.UserToResponse(user, res)
+	converter.EntityUserToModelUserResponse(user, res)
 
 	return res, nil
 }

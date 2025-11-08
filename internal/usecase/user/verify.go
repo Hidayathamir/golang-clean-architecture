@@ -5,6 +5,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/model/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
@@ -26,5 +27,8 @@ func (u *UserUsecaseImpl) Verify(ctx context.Context, req *model.VerifyUserReque
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Verify", err)
 	}
 
-	return &model.Auth{ID: user.ID}, nil
+	auth := new(model.Auth)
+	converter.EntityUserToModelAuth(user, auth)
+
+	return auth, nil
 }

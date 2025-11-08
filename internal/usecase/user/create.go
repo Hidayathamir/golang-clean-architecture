@@ -43,13 +43,13 @@ func (u *UserUsecaseImpl) Create(ctx context.Context, req *model.RegisterUserReq
 	}
 
 	event := new(model.UserEvent)
-	converter.UserToEvent(user, event)
+	converter.EntityUserToModelUserEvent(user, event)
 	if err = u.UserProducer.Send(ctx, event); err != nil {
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Create", err)
 	}
 
 	res := new(model.UserResponse)
-	converter.UserToResponse(user, res)
+	converter.EntityUserToModelUserResponse(user, res)
 
 	return res, nil
 }

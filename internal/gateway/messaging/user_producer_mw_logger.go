@@ -24,6 +24,7 @@ func NewUserProducerMwLogger(next UserProducer) *UserProducerMwLogger {
 func (p *UserProducerMwLogger) Send(ctx context.Context, event *model.UserEvent) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
+
 	err := p.Next.Send(ctx, event)
 	telemetry.RecordError(span, err)
 
