@@ -12,28 +12,21 @@ import (
 )
 
 func (u *UserUsecaseImpl) signAccessToken(ctx context.Context, userID string) (string, error) {
-	cfg := u.Config
-	if cfg == nil {
-		err := fmt.Errorf("config is not initialized")
-		err = errkit.InternalServerError(err)
-		return "", errkit.AddFuncName("user.(*UserUsecaseImpl).signAccessToken", err)
-	}
-
-	secret := cfg.GetString(configkey.AuthJWTSecret)
+	secret := u.Config.GetString(configkey.AuthJWTSecret)
 	if secret == "" {
 		err := fmt.Errorf("jwt secret is not configured")
 		err = errkit.InternalServerError(err)
 		return "", errkit.AddFuncName("user.(*UserUsecaseImpl).signAccessToken", err)
 	}
 
-	expireSeconds := cfg.GetInt(configkey.AuthJWTExpireSeconds)
+	expireSeconds := u.Config.GetInt(configkey.AuthJWTExpireSeconds)
 	if expireSeconds <= 0 {
 		err := fmt.Errorf("jwt expire seconds must be greater than zero")
 		err = errkit.InternalServerError(err)
 		return "", errkit.AddFuncName("user.(*UserUsecaseImpl).signAccessToken", err)
 	}
 
-	issuer := cfg.GetString(configkey.AuthJWTIssuer)
+	issuer := u.Config.GetString(configkey.AuthJWTIssuer)
 	now := time.Now()
 	claims := jwt.RegisteredClaims{
 		Subject:   userID,
@@ -53,20 +46,13 @@ func (u *UserUsecaseImpl) signAccessToken(ctx context.Context, userID string) (s
 }
 
 func (u *UserUsecaseImpl) parseAccessToken(ctx context.Context, tokenString string) (string, error) {
-	cfg := u.Config
-	if cfg == nil {
-		err := fmt.Errorf("config is not initialized")
-		err = errkit.InternalServerError(err)
-		return "", errkit.AddFuncName("user.(*UserUsecaseImpl).parseAccessToken", err)
-	}
-
 	if tokenString == "" {
 		err := fmt.Errorf("token is empty")
 		err = errkit.Unauthorized(err)
 		return "", errkit.AddFuncName("user.(*UserUsecaseImpl).parseAccessToken", err)
 	}
 
-	secret := cfg.GetString(configkey.AuthJWTSecret)
+	secret := u.Config.GetString(configkey.AuthJWTSecret)
 	if secret == "" {
 		err := fmt.Errorf("jwt secret is not configured")
 		err = errkit.InternalServerError(err)
@@ -74,7 +60,7 @@ func (u *UserUsecaseImpl) parseAccessToken(ctx context.Context, tokenString stri
 	}
 
 	claims := &jwt.RegisteredClaims{}
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (any, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 		}

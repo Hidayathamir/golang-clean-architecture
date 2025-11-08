@@ -26,7 +26,6 @@ type Usecases struct {
 func SetupUsecases(
 	viperConfig *viper.Viper,
 	db *gorm.DB,
-	app *fiber.App,
 	producer sarama.SyncProducer,
 ) *Usecases {
 	// setup repositories

@@ -19,10 +19,9 @@ func main() {
 	viperConfig := config.NewViper()
 	x.SetupAll(viperConfig)
 	db := config.NewDatabase(viperConfig)
-	app := config.NewFiber(viperConfig)
 	producer := config.NewKafkaProducer(viperConfig)
 
-	usecases := config.SetupUsecases(viperConfig, db, app, producer)
+	usecases := config.SetupUsecases(viperConfig, db, producer)
 
 	stopTraceProvider, err := telemetry.InitTraceProvider(viperConfig)
 	panicIfErr(err)
