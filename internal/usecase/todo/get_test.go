@@ -25,10 +25,10 @@ func TestTodoUsecaseImpl_Get_Success(t *testing.T) {
 
 	req := &model.GetTodoRequest{
 		ID:     uuid.NewString(),
-		UserID: "user1",
+		UserID: testUserID,
 	}
 
-	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id, userID string) error {
+	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
 		todo.ID = req.ID
 		todo.UserID = req.UserID
 		todo.Title = "Test Todo"
@@ -92,10 +92,10 @@ func TestTodoUsecaseImpl_Get_Fail_FindByIDAndUserID(t *testing.T) {
 
 	req := &model.GetTodoRequest{
 		ID:     uuid.NewString(),
-		UserID: "user1",
+		UserID: testUserID,
 	}
 
-	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id, userID string) error {
+	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
 		return assert.AnError
 	}
 

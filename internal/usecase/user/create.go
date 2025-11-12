@@ -19,7 +19,7 @@ func (u *UserUsecaseImpl) Create(ctx context.Context, req *model.RegisterUserReq
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Create", err)
 	}
 
-	total, err := u.UserRepository.CountByID(ctx, u.DB.WithContext(ctx), req.ID)
+	total, err := u.UserRepository.CountByUsername(ctx, u.DB.WithContext(ctx), req.Username)
 	if err != nil {
 		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Create", err)
 	}

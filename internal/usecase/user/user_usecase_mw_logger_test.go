@@ -24,7 +24,7 @@ func TestUserUsecaseMwLogger_Create(t *testing.T) {
 		Next: Next,
 	}
 	Next.CreateFunc = func(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error) {
-		return &model.UserResponse{ID: "id1"}, nil
+		return &model.UserResponse{ID: 1, Username: "user1"}, nil
 	}
 	res, err := u.Create(context.Background(), &model.RegisterUserRequest{})
 	assert.NotEmpty(t, res)
@@ -38,7 +38,7 @@ func TestUserUsecaseMwLogger_Current(t *testing.T) {
 		Next: Next,
 	}
 	Next.CurrentFunc = func(ctx context.Context, req *model.GetUserRequest) (*model.UserResponse, error) {
-		return &model.UserResponse{ID: "id1"}, nil
+		return &model.UserResponse{ID: 1, Username: "user1"}, nil
 	}
 	res, err := u.Current(context.Background(), &model.GetUserRequest{})
 	assert.NotEmpty(t, res)
@@ -52,7 +52,7 @@ func TestUserUsecaseMwLogger_Login(t *testing.T) {
 		Next: Next,
 	}
 	Next.LoginFunc = func(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error) {
-		return &model.UserResponse{ID: "id1"}, nil
+		return &model.UserResponse{ID: 1, Username: "user1"}, nil
 	}
 	res, err := u.Login(context.Background(), &model.LoginUserRequest{})
 	assert.NotEmpty(t, res)
@@ -80,7 +80,7 @@ func TestUserUsecaseMwLogger_Update(t *testing.T) {
 		Next: Next,
 	}
 	Next.UpdateFunc = func(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error) {
-		return &model.UserResponse{ID: "id1"}, nil
+		return &model.UserResponse{ID: 1, Username: "user1"}, nil
 	}
 	res, err := u.Update(context.Background(), &model.UpdateUserRequest{})
 	assert.NotEmpty(t, res)
@@ -94,7 +94,7 @@ func TestUserUsecaseMwLogger_Verify(t *testing.T) {
 		Next: Next,
 	}
 	Next.VerifyFunc = func(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error) {
-		return &model.Auth{ID: "id1"}, nil
+		return &model.Auth{ID: 1, Username: "user1"}, nil
 	}
 	res, err := u.Verify(context.Background(), &model.VerifyUserRequest{})
 	assert.NotEmpty(t, res)

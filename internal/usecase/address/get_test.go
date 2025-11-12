@@ -26,7 +26,7 @@ func TestAddressUsecaseImpl_Get_Success(t *testing.T) {
 
 	req := &model.GetAddressRequest{}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return nil
 	}
 
@@ -60,7 +60,7 @@ func TestAddressUsecaseImpl_Get_Fail_FindByIDAndUserID(t *testing.T) {
 
 	req := &model.GetAddressRequest{}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return assert.AnError
 	}
 
@@ -95,7 +95,7 @@ func TestAddressUsecaseImpl_Get_Fail_FindByIDAndContactID(t *testing.T) {
 
 	req := &model.GetAddressRequest{}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return nil
 	}
 

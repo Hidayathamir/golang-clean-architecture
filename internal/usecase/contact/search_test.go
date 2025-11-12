@@ -17,14 +17,14 @@ func TestContactUsecaseImpl_Search_Success(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	ContactRepository := &mock.ContactRepositoryMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB: gormDB,
-		 ContactRepository: ContactRepository,
+		DB:                gormDB,
+		ContactRepository: ContactRepository,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.SearchContactRequest{
-		UserID: "userid1",
+		UserID: testUserID,
 		Page:   1,
 		Size:   1,
 	}
@@ -50,14 +50,14 @@ func TestContactUsecaseImpl_Search_Fail_ValidateStruct(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	ContactRepository := &mock.ContactRepositoryMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB: gormDB,
-		 ContactRepository: ContactRepository,
+		DB:                gormDB,
+		ContactRepository: ContactRepository,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.SearchContactRequest{
-		UserID: "",
+		UserID: 0,
 		Page:   1,
 		Size:   1,
 	}
@@ -85,14 +85,14 @@ func TestContactUsecaseImpl_Search_Fail_Search(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	ContactRepository := &mock.ContactRepositoryMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB: gormDB,
-		 ContactRepository: ContactRepository,
+		DB:                gormDB,
+		ContactRepository: ContactRepository,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.SearchContactRequest{
-		UserID: "userid1",
+		UserID: testUserID,
 		Page:   1,
 		Size:   1,
 	}

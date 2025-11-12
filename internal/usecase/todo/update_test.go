@@ -26,12 +26,12 @@ func TestTodoUsecaseImpl_Update_Success(t *testing.T) {
 	const title = "Updated Title"
 	req := &model.UpdateTodoRequest{
 		ID:          uuid.NewString(),
-		UserID:      "user1",
+		UserID:      testUserID,
 		Title:       title,
 		Description: "Updated Description",
 	}
 
-	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id, userID string) error {
+	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
 		todo.ID = req.ID
 		todo.UserID = req.UserID
 		return nil
@@ -97,12 +97,12 @@ func TestTodoUsecaseImpl_Update_Fail_FindByIDAndUserID(t *testing.T) {
 
 	req := &model.UpdateTodoRequest{
 		ID:          uuid.NewString(),
-		UserID:      "user1",
+		UserID:      testUserID,
 		Title:       "Updated Title",
 		Description: "Updated Description",
 	}
 
-	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id, userID string) error {
+	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
 		return assert.AnError
 	}
 
@@ -130,12 +130,12 @@ func TestTodoUsecaseImpl_Update_Fail_Update(t *testing.T) {
 
 	req := &model.UpdateTodoRequest{
 		ID:          uuid.NewString(),
-		UserID:      "user1",
+		UserID:      testUserID,
 		Title:       "Updated Title",
 		Description: "Updated Description",
 	}
 
-	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id, userID string) error {
+	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
 		return nil
 	}
 

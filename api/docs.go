@@ -1044,15 +1044,15 @@ const docTemplate = `{
         "github_com_Hidayathamir_golang-clean-architecture_internal_model.LoginUserRequest": {
             "type": "object",
             "required": [
-                "id",
-                "password"
+                "password",
+                "username"
             ],
             "properties": {
-                "id": {
+                "password": {
                     "type": "string",
                     "maxLength": 100
                 },
-                "password": {
+                "username": {
                     "type": "string",
                     "maxLength": 100
                 }
@@ -1061,20 +1061,20 @@ const docTemplate = `{
         "github_com_Hidayathamir_golang-clean-architecture_internal_model.RegisterUserRequest": {
             "type": "object",
             "required": [
-                "id",
                 "name",
-                "password"
+                "password",
+                "username"
             ],
             "properties": {
-                "id": {
-                    "type": "string",
-                    "maxLength": 100
-                },
                 "name": {
                     "type": "string",
                     "maxLength": 100
                 },
                 "password": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "username": {
                     "type": "string",
                     "maxLength": 100
                 }
@@ -1191,7 +1191,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -1201,6 +1201,9 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "integer"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         }

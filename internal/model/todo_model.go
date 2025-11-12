@@ -11,35 +11,35 @@ type TodoResponse struct {
 }
 
 type CreateTodoRequest struct {
-	UserID      string `json:"-"           validate:"required"`
+	UserID      int64  `json:"-"           validate:"required"`
 	Title       string `json:"title"       validate:"required,max=200"`
 	Description string `json:"description" validate:"max=1000"`
 }
 
 type UpdateTodoRequest struct {
-	UserID      string `json:"-"           validate:"required"`
+	UserID      int64  `json:"-"           validate:"required"`
 	ID          string `json:"-"           validate:"required,max=100,uuid"`
 	Title       string `json:"title"       validate:"required,max=200"`
 	Description string `json:"description" validate:"max=1000"`
 }
 
 type GetTodoRequest struct {
-	UserID string `json:"-" validate:"required"`
+	UserID int64  `json:"-" validate:"required"`
 	ID     string `json:"-" validate:"required,max=100,uuid"`
 }
 
 type DeleteTodoRequest struct {
-	UserID string `json:"-" validate:"required"`
+	UserID int64  `json:"-" validate:"required"`
 	ID     string `json:"-" validate:"required,max=100,uuid"`
 }
 
 type CompleteTodoRequest struct {
-	UserID string `json:"-" validate:"required"`
+	UserID int64  `json:"-" validate:"required"`
 	ID     string `json:"-" validate:"required,max=100,uuid"`
 }
 
 type ListTodoRequest struct {
-	UserID      string `json:"-"            validate:"required"`
+	UserID      int64  `json:"-"            validate:"required"`
 	Title       string `json:"title"        validate:"max=200"`
 	IsCompleted *bool  `json:"is_completed"`
 	Page        int    `json:"page"         validate:"min=1"`

@@ -14,7 +14,7 @@ type ContactResponse struct {
 type ContactResponseList []ContactResponse
 
 type CreateContactRequest struct {
-	UserID    string `json:"-"          validate:"required"`
+	UserID    int64  `json:"-"          validate:"required"`
 	FirstName string `json:"first_name" validate:"required,max=100"`
 	LastName  string `json:"last_name"  validate:"max=100"`
 	Email     string `json:"email"      validate:"max=200,email"`
@@ -22,7 +22,7 @@ type CreateContactRequest struct {
 }
 
 type UpdateContactRequest struct {
-	UserID    string `json:"-"          validate:"required"`
+	UserID    int64  `json:"-"          validate:"required"`
 	ID        string `json:"-"          validate:"required,max=100,uuid"`
 	FirstName string `json:"first_name" validate:"required,max=100"`
 	LastName  string `json:"last_name"  validate:"max=100"`
@@ -31,7 +31,7 @@ type UpdateContactRequest struct {
 }
 
 type SearchContactRequest struct {
-	UserID string `json:"-"     validate:"required"`
+	UserID int64  `json:"-"     validate:"required"`
 	Name   string `json:"name"  validate:"max=100"`
 	Email  string `json:"email" validate:"max=200"`
 	Phone  string `json:"phone" validate:"max=20"`
@@ -40,11 +40,11 @@ type SearchContactRequest struct {
 }
 
 type GetContactRequest struct {
-	UserID string `json:"-" validate:"required"`
+	UserID int64  `json:"-" validate:"required"`
 	ID     string `json:"-" validate:"required,max=100,uuid"`
 }
 
 type DeleteContactRequest struct {
-	UserID string `json:"-" validate:"required"`
+	UserID int64  `json:"-" validate:"required"`
 	ID     string `json:"-" validate:"required,max=100,uuid"`
 }

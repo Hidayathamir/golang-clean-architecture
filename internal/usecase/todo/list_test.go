@@ -23,7 +23,7 @@ func TestTodoUsecaseImpl_List_Success(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.ListTodoRequest{
-		UserID: "user1",
+		UserID: testUserID,
 		Page:   1,
 		Size:   10,
 	}
@@ -129,7 +129,7 @@ func TestTodoUsecaseImpl_List_Fail_List(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.ListTodoRequest{
-		UserID: "user1",
+		UserID: testUserID,
 	}
 
 	TodoRepository.ListFunc = func(ctx context.Context, db *gorm.DB, req *model.ListTodoRequest) (entity.TodoList, int64, error) {

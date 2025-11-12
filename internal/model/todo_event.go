@@ -2,7 +2,7 @@ package model
 
 type TodoCompletedEvent struct {
 	ID          string `json:"id"`
-	UserID      string `json:"user_id"`
+	UserID      int64  `json:"user_id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	CompletedAt *int64 `json:"completed_at"`

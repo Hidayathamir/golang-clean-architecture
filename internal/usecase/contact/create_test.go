@@ -18,15 +18,15 @@ func TestContactUsecaseImpl_Create_Success(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	ContactProducer := &mock.ContactProducerMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB: gormDB,
+		DB:                gormDB,
 		ContactRepository: ContactRepository,
-		ContactProducer: ContactProducer,
+		ContactProducer:   ContactProducer,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.CreateContactRequest{
-		UserID:    "userid1",
+		UserID:    testUserID,
 		FirstName: "firstname1",
 		Email:     "hidayat@gmail.com",
 	}
@@ -62,15 +62,15 @@ func TestContactUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	ContactProducer := &mock.ContactProducerMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB: gormDB,
-		 ContactRepository: ContactRepository,
-		ContactProducer: ContactProducer,
+		DB:                gormDB,
+		ContactRepository: ContactRepository,
+		ContactProducer:   ContactProducer,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.CreateContactRequest{
-		UserID:    "",
+		UserID:    0,
 		FirstName: "firstname1",
 		Email:     "hidayat@gmail.com",
 	}
@@ -102,15 +102,15 @@ func TestContactUsecaseImpl_Create_Fail_Create(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	ContactProducer := &mock.ContactProducerMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB: gormDB,
-		 ContactRepository: ContactRepository,
-		ContactProducer: ContactProducer,
+		DB:                gormDB,
+		ContactRepository: ContactRepository,
+		ContactProducer:   ContactProducer,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.CreateContactRequest{
-		UserID:    "userid1",
+		UserID:    testUserID,
 		FirstName: "firstname1",
 		Email:     "hidayat@gmail.com",
 	}
@@ -141,15 +141,15 @@ func TestContactUsecaseImpl_Create_Fail_Send(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	ContactProducer := &mock.ContactProducerMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB: gormDB,
-		 ContactRepository: ContactRepository,
-		ContactProducer: ContactProducer,
+		DB:                gormDB,
+		ContactRepository: ContactRepository,
+		ContactProducer:   ContactProducer,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.CreateContactRequest{
-		UserID:    "userid1",
+		UserID:    testUserID,
 		FirstName: "firstname1",
 		Email:     "hidayat@gmail.com",
 	}

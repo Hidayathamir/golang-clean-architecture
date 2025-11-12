@@ -1,7 +1,7 @@
 create table if not exists todos
 (
     id           varchar(100) not null,
-    user_id      varchar(100) not null,
+    user_id      bigint       not null,
     title        varchar(200) not null,
     description  text         null,
     is_completed boolean      not null default false,

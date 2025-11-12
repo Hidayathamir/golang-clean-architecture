@@ -208,31 +208,31 @@ definitions:
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.LoginUserRequest:
     properties:
-      id:
-        maxLength: 100
-        type: string
       password:
         maxLength: 100
         type: string
+      username:
+        maxLength: 100
+        type: string
     required:
-    - id
     - password
+    - username
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.RegisterUserRequest:
     properties:
-      id:
-        maxLength: 100
-        type: string
       name:
         maxLength: 100
         type: string
       password:
         maxLength: 100
         type: string
+      username:
+        maxLength: 100
+        type: string
     required:
-    - id
     - name
     - password
+    - username
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.TodoResponse:
     properties:
@@ -311,13 +311,15 @@ definitions:
       created_at:
         type: integer
       id:
-        type: string
+        type: integer
       name:
         type: string
       token:
         type: string
       updated_at:
         type: integer
+      username:
+        type: string
     type: object
 info:
   contact: {}

@@ -31,7 +31,7 @@ func TestAddressUsecaseImpl_Delete_Success(t *testing.T) {
 
 	req := &model.DeleteAddressRequest{}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return nil
 	}
 
@@ -75,7 +75,7 @@ func TestAddressUsecaseImpl_Delete_Fail_FindByIDAndUserID(t *testing.T) {
 
 	req := &model.DeleteAddressRequest{}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return assert.AnError
 	}
 
@@ -120,7 +120,7 @@ func TestAddressUsecaseImpl_Delete_Fail_FindByIDAndContactID(t *testing.T) {
 
 	req := &model.DeleteAddressRequest{}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return nil
 	}
 
@@ -165,7 +165,7 @@ func TestAddressUsecaseImpl_Delete_Fail_Refund(t *testing.T) {
 
 	req := &model.DeleteAddressRequest{}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return nil
 	}
 
@@ -210,7 +210,7 @@ func TestAddressUsecaseImpl_Delete_Fail_Delete(t *testing.T) {
 
 	req := &model.DeleteAddressRequest{}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return nil
 	}
 

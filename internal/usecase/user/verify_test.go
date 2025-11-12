@@ -2,6 +2,7 @@ package user_test
 
 import (
 	"context"
+	"strconv"
 	"testing"
 	"time"
 
@@ -31,20 +32,20 @@ func newVerifyUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepository
 	cfg.Set(configkey.AuthJWTExpireSeconds, 60)
 
 	u := &user.UserUsecaseImpl{
-		Config: cfg,
-		DB:     gormDB,
-		 UserRepository: repo,
+		Config:         cfg,
+		DB:             gormDB,
+		UserRepository: repo,
 	}
 
 	return u, repo
 }
 
-func newSignedToken(t *testing.T, cfg *viper.Viper, userID string) string {
+func newSignedToken(t *testing.T, cfg *viper.Viper, userID int64) string {
 	t.Helper()
 
 	now := time.Now()
 	claims := jwt.RegisteredClaims{
-		Subject:   userID,
+		Subject:   strconv.FormatInt(userID, 10),
 		Issuer:    cfg.GetString(configkey.AuthJWTIssuer),
 		IssuedAt:  jwt.NewNumericDate(now),
 		ExpiresAt: jwt.NewNumericDate(now.Add(time.Minute)),
@@ -59,13 +60,13 @@ func newSignedToken(t *testing.T, cfg *viper.Viper, userID string) string {
 func TestUserUsecaseImpl_Verify_Success(t *testing.T) {
 	u, repo := newVerifyUsecase(t)
 
-	tokenString := newSignedToken(t, u.Config, "id1")
+	tokenString := newSignedToken(t, u.Config, 1)
 
 	req := &model.VerifyUserRequest{
 		Token: tokenString,
 	}
 
-	repo.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	repo.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id int64) error {
 		entityMoqParam.ID = id
 		return nil
 	}
@@ -73,7 +74,7 @@ func TestUserUsecaseImpl_Verify_Success(t *testing.T) {
 	res, err := u.Verify(context.Background(), req)
 
 	require.NoError(t, err)
-	assert.Equal(t, &model.Auth{ID: "id1"}, res)
+	assert.Equal(t, &model.Auth{ID: 1}, res)
 }
 
 func TestUserUsecaseImpl_Verify_ValidateStruct(t *testing.T) {
@@ -83,7 +84,7 @@ func TestUserUsecaseImpl_Verify_ValidateStruct(t *testing.T) {
 		Token: "",
 	}
 
-	repo.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	repo.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id int64) error {
 		return nil
 	}
 
@@ -102,7 +103,7 @@ func TestUserUsecaseImpl_Verify_ParseAccessToken(t *testing.T) {
 		Token: "invalid-token",
 	}
 
-	repo.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	repo.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id int64) error {
 		return nil
 	}
 
@@ -115,13 +116,13 @@ func TestUserUsecaseImpl_Verify_ParseAccessToken(t *testing.T) {
 func TestUserUsecaseImpl_Verify_FindByID(t *testing.T) {
 	u, repo := newVerifyUsecase(t)
 
-	tokenString := newSignedToken(t, u.Config, "id1")
+	tokenString := newSignedToken(t, u.Config, 1)
 
 	req := &model.VerifyUserRequest{
 		Token: tokenString,
 	}
 
-	repo.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	repo.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id int64) error {
 		return assert.AnError
 	}
 

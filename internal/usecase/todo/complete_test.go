@@ -29,7 +29,7 @@ func TestTodoUsecaseImpl_Complete_Success(t *testing.T) {
 	todoID := uuid.NewString()
 	req := &model.CompleteTodoRequest{
 		ID:     todoID,
-		UserID: "user1",
+		UserID: testUserID,
 	}
 
 	now := time.Now().UnixMilli()
@@ -44,7 +44,7 @@ func TestTodoUsecaseImpl_Complete_Success(t *testing.T) {
 	}
 
 	var updatedTodo *entity.Todo
-	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id, userID string) error {
+	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
 		*todo = *incompleteTodo
 		return nil
 	}
@@ -133,10 +133,10 @@ func TestTodoUsecaseImpl_Complete_Fail_FindByIDAndUserID(t *testing.T) {
 
 	req := &model.CompleteTodoRequest{
 		ID:     uuid.NewString(),
-		UserID: "user1",
+		UserID: testUserID,
 	}
 
-	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id, userID string) error {
+	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
 		return assert.AnError
 	}
 
@@ -165,7 +165,7 @@ func TestTodoUsecaseImpl_Complete_AlreadyCompleted(t *testing.T) {
 	todoID := uuid.NewString()
 	req := &model.CompleteTodoRequest{
 		ID:     todoID,
-		UserID: "user1",
+		UserID: testUserID,
 	}
 
 	completedAt := time.Now().UnixMilli()
@@ -178,7 +178,7 @@ func TestTodoUsecaseImpl_Complete_AlreadyCompleted(t *testing.T) {
 		CompletedAt: &completedAt,
 	}
 
-	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id, userID string) error {
+	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
 		*todo = *completedTodo
 		return nil
 	}
@@ -209,7 +209,7 @@ func TestTodoUsecaseImpl_Complete_Fail_Update(t *testing.T) {
 	todoID := uuid.NewString()
 	req := &model.CompleteTodoRequest{
 		ID:     todoID,
-		UserID: "user1",
+		UserID: testUserID,
 	}
 
 	incompleteTodo := &entity.Todo{
@@ -220,7 +220,7 @@ func TestTodoUsecaseImpl_Complete_Fail_Update(t *testing.T) {
 		IsCompleted: false,
 	}
 
-	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id, userID string) error {
+	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
 		*todo = *incompleteTodo
 		return nil
 	}
@@ -256,7 +256,7 @@ func TestTodoUsecaseImpl_Complete_Fail_Send(t *testing.T) {
 	todoID := uuid.NewString()
 	req := &model.CompleteTodoRequest{
 		ID:     todoID,
-		UserID: "user1",
+		UserID: testUserID,
 	}
 
 	incompleteTodo := &entity.Todo{
@@ -267,7 +267,7 @@ func TestTodoUsecaseImpl_Complete_Fail_Send(t *testing.T) {
 		IsCompleted: false,
 	}
 
-	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id, userID string) error {
+	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
 		*todo = *incompleteTodo
 		return nil
 	}

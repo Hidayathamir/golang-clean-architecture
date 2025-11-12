@@ -21,8 +21,8 @@ func TestAddressUsecaseImpl_Update_Success(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	AddressProducer := &mock.AddressProducerMock{}
 	u := &address.AddressUsecaseImpl{
-		DB: gormDB,
-		 AddressRepository: AddressRepository,
+		DB:                gormDB,
+		AddressRepository: AddressRepository,
 		ContactRepository: ContactRepository,
 		AddressProducer:   AddressProducer,
 	}
@@ -31,13 +31,13 @@ func TestAddressUsecaseImpl_Update_Success(t *testing.T) {
 
 	const street = "street1"
 	req := &model.UpdateAddressRequest{
-		UserID:    "userid1",
+		UserID:    testUserID,
 		ContactID: uuid.NewString(),
 		ID:        uuid.NewString(),
 		Street:    street,
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return nil
 	}
 
@@ -73,8 +73,8 @@ func TestAddressUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	AddressProducer := &mock.AddressProducerMock{}
 	u := &address.AddressUsecaseImpl{
-		DB: gormDB,
-		 AddressRepository: AddressRepository,
+		DB:                gormDB,
+		AddressRepository: AddressRepository,
 		ContactRepository: ContactRepository,
 		AddressProducer:   AddressProducer,
 	}
@@ -83,13 +83,13 @@ func TestAddressUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 
 	const street = "street1"
 	req := &model.UpdateAddressRequest{
-		UserID:    "",
+		UserID:    0,
 		ContactID: uuid.NewString(),
 		ID:        uuid.NewString(),
 		Street:    street,
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return nil
 	}
 
@@ -125,8 +125,8 @@ func TestAddressUsecaseImpl_Update_Fail_FindByIDAndUserID(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	AddressProducer := &mock.AddressProducerMock{}
 	u := &address.AddressUsecaseImpl{
-		DB: gormDB,
-		 AddressRepository: AddressRepository,
+		DB:                gormDB,
+		AddressRepository: AddressRepository,
 		ContactRepository: ContactRepository,
 		AddressProducer:   AddressProducer,
 	}
@@ -135,13 +135,13 @@ func TestAddressUsecaseImpl_Update_Fail_FindByIDAndUserID(t *testing.T) {
 
 	const street = "street1"
 	req := &model.UpdateAddressRequest{
-		UserID:    "userid1",
+		UserID:    testUserID,
 		ContactID: uuid.NewString(),
 		ID:        uuid.NewString(),
 		Street:    street,
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return assert.AnError
 	}
 
@@ -176,8 +176,8 @@ func TestAddressUsecaseImpl_Update_Fail_FindByIDAndContactID(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	AddressProducer := &mock.AddressProducerMock{}
 	u := &address.AddressUsecaseImpl{
-		DB: gormDB,
-		 AddressRepository: AddressRepository,
+		DB:                gormDB,
+		AddressRepository: AddressRepository,
 		ContactRepository: ContactRepository,
 		AddressProducer:   AddressProducer,
 	}
@@ -186,13 +186,13 @@ func TestAddressUsecaseImpl_Update_Fail_FindByIDAndContactID(t *testing.T) {
 
 	const street = "street1"
 	req := &model.UpdateAddressRequest{
-		UserID:    "userid1",
+		UserID:    testUserID,
 		ContactID: uuid.NewString(),
 		ID:        uuid.NewString(),
 		Street:    street,
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return nil
 	}
 
@@ -227,8 +227,8 @@ func TestAddressUsecaseImpl_Update_Fail_Update(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	AddressProducer := &mock.AddressProducerMock{}
 	u := &address.AddressUsecaseImpl{
-		DB: gormDB,
-		 AddressRepository: AddressRepository,
+		DB:                gormDB,
+		AddressRepository: AddressRepository,
 		ContactRepository: ContactRepository,
 		AddressProducer:   AddressProducer,
 	}
@@ -237,13 +237,13 @@ func TestAddressUsecaseImpl_Update_Fail_Update(t *testing.T) {
 
 	const street = "street1"
 	req := &model.UpdateAddressRequest{
-		UserID:    "userid1",
+		UserID:    testUserID,
 		ContactID: uuid.NewString(),
 		ID:        uuid.NewString(),
 		Street:    street,
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return nil
 	}
 
@@ -278,8 +278,8 @@ func TestAddressUsecaseImpl_Update_Fail_Send(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	AddressProducer := &mock.AddressProducerMock{}
 	u := &address.AddressUsecaseImpl{
-		DB: gormDB,
-		 AddressRepository: AddressRepository,
+		DB:                gormDB,
+		AddressRepository: AddressRepository,
 		ContactRepository: ContactRepository,
 		AddressProducer:   AddressProducer,
 	}
@@ -288,13 +288,13 @@ func TestAddressUsecaseImpl_Update_Fail_Send(t *testing.T) {
 
 	const street = "street1"
 	req := &model.UpdateAddressRequest{
-		UserID:    "userid1",
+		UserID:    testUserID,
 		ContactID: uuid.NewString(),
 		ID:        uuid.NewString(),
 		Street:    street,
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return nil
 	}
 

@@ -48,15 +48,16 @@ func TestUserUsecaseImpl_Login_Success(t *testing.T) {
 	u, repo, producer, slack := newLoginUsecase(t)
 
 	req := &model.LoginUserRequest{
-		ID:       "id1",
+		Username: "user1",
 		Password: "password1",
 	}
 
-	repo.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	repo.FindByUsernameFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, username string) error {
 		pw, err := bcrypt.GenerateFromPassword([]byte("password1"), bcrypt.DefaultCost)
 		require.NoError(t, err)
 		entityMoqParam.Password = string(pw)
-		entityMoqParam.ID = id
+		entityMoqParam.ID = 123
+		entityMoqParam.Username = username
 		return nil
 	}
 
@@ -79,7 +80,7 @@ func TestUserUsecaseImpl_Login_Success(t *testing.T) {
 	})
 	require.NoError(t, err)
 	assert.True(t, token.Valid)
-	assert.Equal(t, req.ID, claims.Subject)
+	assert.Equal(t, "123", claims.Subject)
 	assert.Equal(t, u.Config.GetString(configkey.AuthJWTIssuer), claims.Issuer)
 	require.NotNil(t, claims.ExpiresAt)
 	assert.WithinDuration(t, time.Now().Add(time.Minute), claims.ExpiresAt.Time, time.Minute)
@@ -89,15 +90,16 @@ func TestUserUsecaseImpl_Login_Fail_ValidateStruct(t *testing.T) {
 	u, repo, producer, slack := newLoginUsecase(t)
 
 	req := &model.LoginUserRequest{
-		ID:       "",
+		Username: "",
 		Password: "password1",
 	}
 
-	repo.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	repo.FindByUsernameFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, username string) error {
 		pw, err := bcrypt.GenerateFromPassword([]byte("password1"), bcrypt.DefaultCost)
 		require.NoError(t, err)
 		entityMoqParam.Password = string(pw)
-		entityMoqParam.ID = id
+		entityMoqParam.ID = 123
+		entityMoqParam.Username = username
 		return nil
 	}
 
@@ -117,15 +119,15 @@ func TestUserUsecaseImpl_Login_Fail_ValidateStruct(t *testing.T) {
 	assert.ErrorAs(t, err, &verrs)
 }
 
-func TestUserUsecaseImpl_Login_Fail_FindByID(t *testing.T) {
+func TestUserUsecaseImpl_Login_Fail_FindByUsername(t *testing.T) {
 	u, repo, producer, slack := newLoginUsecase(t)
 
 	req := &model.LoginUserRequest{
-		ID:       "id1",
+		Username: "user1",
 		Password: "password1",
 	}
 
-	repo.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	repo.FindByUsernameFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, username string) error {
 		return assert.AnError
 	}
 
@@ -148,15 +150,16 @@ func TestUserUsecaseImpl_Login_Fail_CompareHashAndPassword(t *testing.T) {
 	u, repo, producer, slack := newLoginUsecase(t)
 
 	req := &model.LoginUserRequest{
-		ID:       "id1",
+		Username: "user1",
 		Password: "password1",
 	}
 
-	repo.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	repo.FindByUsernameFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, username string) error {
 		pw, err := bcrypt.GenerateFromPassword([]byte("password2"), bcrypt.DefaultCost)
 		require.NoError(t, err)
 		entityMoqParam.Password = string(pw)
-		entityMoqParam.ID = id
+		entityMoqParam.ID = 123
+		entityMoqParam.Username = username
 		return nil
 	}
 
@@ -178,15 +181,16 @@ func TestUserUsecaseImpl_Login_Fail_IsConnected(t *testing.T) {
 	u, repo, producer, slack := newLoginUsecase(t)
 
 	req := &model.LoginUserRequest{
-		ID:       "id1",
+		Username: "user1",
 		Password: "password1",
 	}
 
-	repo.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	repo.FindByUsernameFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, username string) error {
 		pw, err := bcrypt.GenerateFromPassword([]byte("password1"), bcrypt.DefaultCost)
 		require.NoError(t, err)
 		entityMoqParam.Password = string(pw)
-		entityMoqParam.ID = id
+		entityMoqParam.ID = 123
+		entityMoqParam.Username = username
 		return nil
 	}
 
@@ -209,15 +213,16 @@ func TestUserUsecaseImpl_Login_Fail_Send(t *testing.T) {
 	u, repo, producer, slack := newLoginUsecase(t)
 
 	req := &model.LoginUserRequest{
-		ID:       "id1",
+		Username: "user1",
 		Password: "password1",
 	}
 
-	repo.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	repo.FindByUsernameFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, username string) error {
 		pw, err := bcrypt.GenerateFromPassword([]byte("password1"), bcrypt.DefaultCost)
 		require.NoError(t, err)
 		entityMoqParam.Password = string(pw)
-		entityMoqParam.ID = id
+		entityMoqParam.ID = 123
+		entityMoqParam.Username = username
 		return nil
 	}
 
@@ -255,15 +260,16 @@ func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 	}
 
 	req := &model.LoginUserRequest{
-		ID:       "id1",
+		Username: "user1",
 		Password: "password1",
 	}
 
-	repo.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	repo.FindByUsernameFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, username string) error {
 		pw, err := bcrypt.GenerateFromPassword([]byte("password1"), bcrypt.DefaultCost)
 		require.NoError(t, err)
 		entityMoqParam.Password = string(pw)
-		entityMoqParam.ID = id
+		entityMoqParam.ID = 123
+		entityMoqParam.Username = username
 		return nil
 	}
 

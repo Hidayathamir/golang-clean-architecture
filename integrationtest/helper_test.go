@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	defaultUserID       = "khannedy"
+	defaultUsername     = "khannedy"
 	defaultUserPassword = "rahasia"
 	defaultUserName     = "Eko Khannedy"
 )
@@ -27,7 +27,7 @@ func registerDefaultUser(t *testing.T) {
 	t.Helper()
 
 	requestBody := model.RegisterUserRequest{
-		ID:       defaultUserID,
+		Username: defaultUsername,
 		Password: defaultUserPassword,
 		Name:     defaultUserName,
 	}
@@ -52,14 +52,14 @@ func registerDefaultUser(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.Equal(t, requestBody.ID, responseBody.Data.ID)
+	assert.Equal(t, requestBody.Username, responseBody.Data.Username)
 }
 
 func loginDefaultUser(t *testing.T) string {
 	t.Helper()
 
 	requestBody := model.LoginUserRequest{
-		ID:       defaultUserID,
+		Username: defaultUsername,
 		Password: defaultUserPassword,
 	}
 

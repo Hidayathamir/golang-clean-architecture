@@ -28,7 +28,7 @@ var _ repository.ContactRepository = &ContactRepositoryMock{}
 //			DeleteFunc: func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Contact) error {
 //				panic("mock out the Delete method")
 //			},
-//			FindByIDAndUserIDFunc: func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID string) error {
+//			FindByIDAndUserIDFunc: func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 //				panic("mock out the FindByIDAndUserID method")
 //			},
 //			SearchFunc: func(ctx context.Context, db *gorm.DB, req *model.SearchContactRequest) (entity.ContactList, int64, error) {
@@ -51,7 +51,7 @@ type ContactRepositoryMock struct {
 	DeleteFunc func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Contact) error
 
 	// FindByIDAndUserIDFunc mocks the FindByIDAndUserID method.
-	FindByIDAndUserIDFunc func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID string) error
+	FindByIDAndUserIDFunc func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error
 
 	// SearchFunc mocks the Search method.
 	SearchFunc func(ctx context.Context, db *gorm.DB, req *model.SearchContactRequest) (entity.ContactList, int64, error)
@@ -90,7 +90,7 @@ type ContactRepositoryMock struct {
 			// ID is the id argument value.
 			ID string
 			// UserID is the userID argument value.
-			UserID string
+			UserID int64
 		}
 		// Search holds details about calls to the Search method.
 		Search []struct {
@@ -199,7 +199,7 @@ func (mock *ContactRepositoryMock) DeleteCalls() []struct {
 }
 
 // FindByIDAndUserID calls FindByIDAndUserIDFunc.
-func (mock *ContactRepositoryMock) FindByIDAndUserID(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID string) error {
+func (mock *ContactRepositoryMock) FindByIDAndUserID(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 	if mock.FindByIDAndUserIDFunc == nil {
 		panic("ContactRepositoryMock.FindByIDAndUserIDFunc: method is nil but ContactRepository.FindByIDAndUserID was just called")
 	}
@@ -208,7 +208,7 @@ func (mock *ContactRepositoryMock) FindByIDAndUserID(ctx context.Context, db *go
 		Db      *gorm.DB
 		Contact *entity.Contact
 		ID      string
-		UserID  string
+		UserID  int64
 	}{
 		Ctx:     ctx,
 		Db:      db,
@@ -231,14 +231,14 @@ func (mock *ContactRepositoryMock) FindByIDAndUserIDCalls() []struct {
 	Db      *gorm.DB
 	Contact *entity.Contact
 	ID      string
-	UserID  string
+	UserID  int64
 } {
 	var calls []struct {
 		Ctx     context.Context
 		Db      *gorm.DB
 		Contact *entity.Contact
 		ID      string
-		UserID  string
+		UserID  int64
 	}
 	mock.lockFindByIDAndUserID.RLock()
 	calls = mock.calls.FindByIDAndUserID

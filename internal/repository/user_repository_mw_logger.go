@@ -22,16 +22,16 @@ func NewUserRepositoryMwLogger(next UserRepository) *UserRepositoryMwLogger {
 	}
 }
 
-func (r *UserRepositoryMwLogger) CountByID(ctx context.Context, db *gorm.DB, id string) (int64, error) {
+func (r *UserRepositoryMwLogger) CountByUsername(ctx context.Context, db *gorm.DB, username string) (int64, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	total, err := r.Next.CountByID(ctx, db, id)
+	total, err := r.Next.CountByUsername(ctx, db, username)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
-		"id":    id,
-		"total": total,
+		"username": username,
+		"total":    total,
 	}
 	x.LogMw(ctx, fields, err)
 
@@ -53,7 +53,7 @@ func (r *UserRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, entity
 	return err
 }
 
-func (r *UserRepositoryMwLogger) FindByID(ctx context.Context, db *gorm.DB, entity *entity.User, id string) error {
+func (r *UserRepositoryMwLogger) FindByID(ctx context.Context, db *gorm.DB, entity *entity.User, id int64) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -63,6 +63,22 @@ func (r *UserRepositoryMwLogger) FindByID(ctx context.Context, db *gorm.DB, enti
 	fields := logrus.Fields{
 		"id":     id,
 		"entity": entity,
+	}
+	x.LogMw(ctx, fields, err)
+
+	return err
+}
+
+func (r *UserRepositoryMwLogger) FindByUsername(ctx context.Context, db *gorm.DB, entity *entity.User, username string) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := r.Next.FindByUsername(ctx, db, entity, username)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"username": username,
+		"entity":   entity,
 	}
 	x.LogMw(ctx, fields, err)
 

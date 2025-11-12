@@ -18,20 +18,20 @@ func TestUserUsecaseImpl_Create_Success(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB: gormDB,
-		 UserRepository: UserRepository,
-		UserProducer: UserProducer,
+		DB:             gormDB,
+		UserRepository: UserRepository,
+		UserProducer:   UserProducer,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.RegisterUserRequest{
-		ID:       "id1",
+		Username: "user1",
 		Password: "pw1",
 		Name:     "name1",
 	}
 
-	UserRepository.CountByIDFunc = func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
+	UserRepository.CountByUsernameFunc = func(ctx context.Context, db *gorm.DB, username string) (int64, error) {
 		return 0, nil
 	}
 
@@ -50,7 +50,8 @@ func TestUserUsecaseImpl_Create_Success(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	var expected = &model.UserResponse{
-		ID:        "id1",
+		ID:        0,
+		Username:  "user1",
 		Name:      "name1",
 		Token:     "",
 		CreatedAt: 0,
@@ -66,20 +67,20 @@ func TestUserUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB: gormDB,
-		 UserRepository: UserRepository,
-		UserProducer: UserProducer,
+		DB:             gormDB,
+		UserRepository: UserRepository,
+		UserProducer:   UserProducer,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.RegisterUserRequest{
-		ID:       "",
+		Username: "",
 		Password: "pw1",
 		Name:     "name1",
 	}
 
-	UserRepository.CountByIDFunc = func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
+	UserRepository.CountByUsernameFunc = func(ctx context.Context, db *gorm.DB, username string) (int64, error) {
 		return 0, nil
 	}
 
@@ -105,25 +106,25 @@ func TestUserUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 	assert.ErrorAs(t, err, &verrs)
 }
 
-func TestUserUsecaseImpl_Create_Fail_CountByID(t *testing.T) {
+func TestUserUsecaseImpl_Create_Fail_CountByUsername(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB: gormDB,
-		 UserRepository: UserRepository,
-		UserProducer: UserProducer,
+		DB:             gormDB,
+		UserRepository: UserRepository,
+		UserProducer:   UserProducer,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.RegisterUserRequest{
-		ID:       "id1",
+		Username: "user1",
 		Password: "pw1",
 		Name:     "name1",
 	}
 
-	UserRepository.CountByIDFunc = func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
+	UserRepository.CountByUsernameFunc = func(ctx context.Context, db *gorm.DB, username string) (int64, error) {
 		return 0, assert.AnError
 	}
 
@@ -153,20 +154,20 @@ func TestUserUsecaseImpl_Create_Fail_UserAlreadyExists(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB: gormDB,
-		 UserRepository: UserRepository,
-		UserProducer: UserProducer,
+		DB:             gormDB,
+		UserRepository: UserRepository,
+		UserProducer:   UserProducer,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.RegisterUserRequest{
-		ID:       "id1",
+		Username: "user1",
 		Password: "pw1",
 		Name:     "name1",
 	}
 
-	UserRepository.CountByIDFunc = func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
+	UserRepository.CountByUsernameFunc = func(ctx context.Context, db *gorm.DB, username string) (int64, error) {
 		return 1, nil
 	}
 
@@ -196,20 +197,20 @@ func TestUserUsecaseImpl_Create_Fail_Create(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB: gormDB,
-		 UserRepository: UserRepository,
-		UserProducer: UserProducer,
+		DB:             gormDB,
+		UserRepository: UserRepository,
+		UserProducer:   UserProducer,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.RegisterUserRequest{
-		ID:       "id1",
+		Username: "user1",
 		Password: "pw1",
 		Name:     "name1",
 	}
 
-	UserRepository.CountByIDFunc = func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
+	UserRepository.CountByUsernameFunc = func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
 		return 0, nil
 	}
 
@@ -239,20 +240,20 @@ func TestUserUsecaseImpl_Create_Fail_Send(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB: gormDB,
-		 UserRepository: UserRepository,
-		UserProducer: UserProducer,
+		DB:             gormDB,
+		UserRepository: UserRepository,
+		UserProducer:   UserProducer,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.RegisterUserRequest{
-		ID:       "id1",
+		Username: "user1",
 		Password: "pw1",
 		Name:     "name1",
 	}
 
-	UserRepository.CountByIDFunc = func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
+	UserRepository.CountByUsernameFunc = func(ctx context.Context, db *gorm.DB, username string) (int64, error) {
 		return 0, nil
 	}
 

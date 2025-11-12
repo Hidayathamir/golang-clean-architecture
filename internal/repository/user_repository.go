@@ -14,8 +14,9 @@ import (
 type UserRepository interface {
 	Create(ctx context.Context, db *gorm.DB, entity *entity.User) error
 	Update(ctx context.Context, db *gorm.DB, entity *entity.User) error
-	CountByID(ctx context.Context, db *gorm.DB, id string) (int64, error)
-	FindByID(ctx context.Context, db *gorm.DB, entity *entity.User, id string) error
+	CountByUsername(ctx context.Context, db *gorm.DB, username string) (int64, error)
+	FindByID(ctx context.Context, db *gorm.DB, entity *entity.User, id int64) error
+	FindByUsername(ctx context.Context, db *gorm.DB, entity *entity.User, username string) error
 }
 
 var _ UserRepository = &UserRepositoryImpl{}
@@ -54,20 +55,29 @@ func (r *UserRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, entity *en
 	return nil
 }
 
-func (r *UserRepositoryImpl) CountByID(ctx context.Context, db *gorm.DB, id string) (int64, error) {
+func (r *UserRepositoryImpl) CountByUsername(ctx context.Context, db *gorm.DB, username string) (int64, error) {
 	var total int64
-	err := db.Model(new(entity.User)).Where("id = ?", id).Count(&total).Error
+	err := db.Model(new(entity.User)).Where("username = ?", username).Count(&total).Error
 	if err != nil {
-		return 0, errkit.AddFuncName("repository.(*UserRepositoryImpl).CountByID", err)
+		return 0, errkit.AddFuncName("repository.(*UserRepositoryImpl).CountByUsername", err)
 	}
 	return total, nil
 }
 
-func (r *UserRepositoryImpl) FindByID(ctx context.Context, db *gorm.DB, entity *entity.User, id string) error {
+func (r *UserRepositoryImpl) FindByID(ctx context.Context, db *gorm.DB, entity *entity.User, id int64) error {
 	err := db.Where("id = ?", id).Take(entity).Error
 	if err != nil {
 		err = errkit.NotFound(err)
 		return errkit.AddFuncName("repository.(*UserRepositoryImpl).FindByID", err)
+	}
+	return nil
+}
+
+func (r *UserRepositoryImpl) FindByUsername(ctx context.Context, db *gorm.DB, entity *entity.User, username string) error {
+	err := db.Where("username = ?", username).Take(entity).Error
+	if err != nil {
+		err = errkit.NotFound(err)
+		return errkit.AddFuncName("repository.(*UserRepositoryImpl).FindByUsername", err)
 	}
 	return nil
 }

@@ -19,19 +19,19 @@ func TestContactUsecaseImpl_Delete_Success(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	ContactProducer := &mock.ContactProducerMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB: gormDB,
-		 ContactRepository: ContactRepository,
-		ContactProducer: ContactProducer,
+		DB:                gormDB,
+		ContactRepository: ContactRepository,
+		ContactProducer:   ContactProducer,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.DeleteContactRequest{
-		UserID: "userid1",
+		UserID: testUserID,
 		ID:     uuid.NewString(),
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return nil
 	}
 
@@ -53,19 +53,19 @@ func TestContactUsecaseImpl_Delete_Fail_ValidateStruct(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	ContactProducer := &mock.ContactProducerMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB: gormDB,
-		 ContactRepository: ContactRepository,
-		ContactProducer: ContactProducer,
+		DB:                gormDB,
+		ContactRepository: ContactRepository,
+		ContactProducer:   ContactProducer,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.DeleteContactRequest{
-		UserID: "",
+		UserID: 0,
 		ID:     uuid.NewString(),
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return nil
 	}
 
@@ -89,19 +89,19 @@ func TestContactUsecaseImpl_Delete_Fail_FindByIDAndUserID(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	ContactProducer := &mock.ContactProducerMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB: gormDB,
-		 ContactRepository: ContactRepository,
-		ContactProducer: ContactProducer,
+		DB:                gormDB,
+		ContactRepository: ContactRepository,
+		ContactProducer:   ContactProducer,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.DeleteContactRequest{
-		UserID: "userid1",
+		UserID: testUserID,
 		ID:     uuid.NewString(),
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return assert.AnError
 	}
 
@@ -124,19 +124,19 @@ func TestContactUsecaseImpl_Delete_Fail_Delete(t *testing.T) {
 	ContactRepository := &mock.ContactRepositoryMock{}
 	ContactProducer := &mock.ContactProducerMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB: gormDB,
-		 ContactRepository: ContactRepository,
-		ContactProducer: ContactProducer,
+		DB:                gormDB,
+		ContactRepository: ContactRepository,
+		ContactProducer:   ContactProducer,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.DeleteContactRequest{
-		UserID: "userid1",
+		UserID: testUserID,
 		ID:     uuid.NewString(),
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return nil
 	}
 

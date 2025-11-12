@@ -19,21 +19,21 @@ func TestUserUsecaseImpl_Update_Success(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:     gormDB,
-		Config: viper.New(),
-		 UserRepository: UserRepository,
-		UserProducer: UserProducer,
+		DB:             gormDB,
+		Config:         viper.New(),
+		UserRepository: UserRepository,
+		UserProducer:   UserProducer,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.UpdateUserRequest{
-		ID:       "id1",
+		ID:       1,
 		Password: "password1",
 		Name:     "name1",
 	}
 
-	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id int64) error {
 		return nil
 	}
 
@@ -62,19 +62,19 @@ func TestUserUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:     gormDB,
-		Config: viper.New(),
-		 UserRepository: UserRepository,
-		UserProducer: UserProducer,
+		DB:             gormDB,
+		Config:         viper.New(),
+		UserRepository: UserRepository,
+		UserProducer:   UserProducer,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.UpdateUserRequest{
-		ID: "",
+		ID: 0,
 	}
 
-	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id int64) error {
 		return nil
 	}
 
@@ -105,19 +105,19 @@ func TestUserUsecaseImpl_Update_Fail_FindByID(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:     gormDB,
-		Config: viper.New(),
-		 UserRepository: UserRepository,
-		UserProducer: UserProducer,
+		DB:             gormDB,
+		Config:         viper.New(),
+		UserRepository: UserRepository,
+		UserProducer:   UserProducer,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.UpdateUserRequest{
-		ID: "id1",
+		ID: 1,
 	}
 
-	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id int64) error {
 		return assert.AnError
 	}
 
@@ -147,19 +147,19 @@ func TestUserUsecaseImpl_Update_Fail_Update(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:     gormDB,
-		Config: viper.New(),
-		 UserRepository: UserRepository,
-		UserProducer: UserProducer,
+		DB:             gormDB,
+		Config:         viper.New(),
+		UserRepository: UserRepository,
+		UserProducer:   UserProducer,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.UpdateUserRequest{
-		ID: "id1",
+		ID: 1,
 	}
 
-	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id int64) error {
 		return nil
 	}
 
@@ -189,19 +189,19 @@ func TestUserUsecaseImpl_Update_Fail_Send(t *testing.T) {
 	UserRepository := &mock.UserRepositoryMock{}
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:     gormDB,
-		Config: viper.New(),
+		DB:             gormDB,
+		Config:         viper.New(),
 		UserRepository: UserRepository,
-		UserProducer: UserProducer,
+		UserProducer:   UserProducer,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.UpdateUserRequest{
-		ID: "id1",
+		ID: 1,
 	}
 
-	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id int64) error {
 		return nil
 	}
 

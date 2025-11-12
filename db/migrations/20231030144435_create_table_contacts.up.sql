@@ -5,7 +5,7 @@ create table if not exists contacts
     last_name  varchar(100) null,
     email      varchar(100) null,
     phone      varchar(100) null,
-    user_id    varchar(100) not null,
+    user_id    bigint       not null,
     created_at bigint       not null,
     updated_at bigint       not null,
     primary key (id),

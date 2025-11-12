@@ -14,12 +14,12 @@ type AddressResponse struct {
 type AddressResponseList []AddressResponse
 
 type ListAddressRequest struct {
-	UserID    string `json:"-" validate:"required"`
+	UserID    int64  `json:"-" validate:"required"`
 	ContactID string `json:"-" validate:"required,max=100,uuid"`
 }
 
 type CreateAddressRequest struct {
-	UserID     string `json:"-"           validate:"required"`
+	UserID     int64  `json:"-"           validate:"required"`
 	ContactID  string `json:"-"           validate:"required,max=100,uuid"`
 	Street     string `json:"street"      validate:"max=255"`
 	City       string `json:"city"        validate:"max=255"`
@@ -29,7 +29,7 @@ type CreateAddressRequest struct {
 }
 
 type UpdateAddressRequest struct {
-	UserID     string `json:"-"           validate:"required"`
+	UserID     int64  `json:"-"           validate:"required"`
 	ContactID  string `json:"-"           validate:"required,max=100,uuid"`
 	ID         string `json:"-"           validate:"required,max=100,uuid"`
 	Street     string `json:"street"      validate:"max=255"`
@@ -40,13 +40,13 @@ type UpdateAddressRequest struct {
 }
 
 type GetAddressRequest struct {
-	UserID    string `json:"-" validate:"required"`
+	UserID    int64  `json:"-" validate:"required"`
 	ContactID string `json:"-" validate:"required,max=100,uuid"`
 	ID        string `json:"-" validate:"required,max=100,uuid"`
 }
 
 type DeleteAddressRequest struct {
-	UserID    string `json:"-" validate:"required"`
+	UserID    int64  `json:"-" validate:"required"`
 	ContactID string `json:"-" validate:"required,max=100,uuid"`
 	ID        string `json:"-" validate:"required,max=100,uuid"`
 }

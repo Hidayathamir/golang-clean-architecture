@@ -10,6 +10,8 @@ import (
 	"gorm.io/gorm"
 )
 
+const testUserID int64 = 1
+
 func newFakeDB(t *testing.T) (gormDB *gorm.DB, sqlMockDB sqlmock.Sqlmock) {
 	t.Helper()
 

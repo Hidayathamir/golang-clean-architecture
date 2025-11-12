@@ -28,10 +28,10 @@ func TestTodoUsecaseImpl_Delete_Success(t *testing.T) {
 
 	req := &model.DeleteTodoRequest{
 		ID:     uuid.NewString(),
-		UserID: "user1",
+		UserID: testUserID,
 	}
 
-	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id, userID string) error {
+	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
 		return nil
 	}
 
@@ -83,10 +83,10 @@ func TestTodoUsecaseImpl_Delete_Fail_FindByIDAndUserID(t *testing.T) {
 
 	req := &model.DeleteTodoRequest{
 		ID:     uuid.NewString(),
-		UserID: "user1",
+		UserID: testUserID,
 	}
 
-	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id, userID string) error {
+	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
 		return assert.AnError
 	}
 
@@ -114,10 +114,10 @@ func TestTodoUsecaseImpl_Delete_Fail_Delete(t *testing.T) {
 
 	req := &model.DeleteTodoRequest{
 		ID:     uuid.NewString(),
-		UserID: "user1",
+		UserID: testUserID,
 	}
 
-	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id, userID string) error {
+	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
 		return nil
 	}
 

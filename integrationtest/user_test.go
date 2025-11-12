@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -21,7 +22,7 @@ import (
 func TestRegister(t *testing.T) {
 	ClearAll()
 	requestBody := model.RegisterUserRequest{
-		ID:       "khannedy",
+		Username: "khannedy",
 		Password: "rahasia",
 		Name:     "Eko Khannedy",
 	}
@@ -44,7 +45,8 @@ func TestRegister(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.Equal(t, requestBody.ID, responseBody.Data.ID)
+	assert.Equal(t, requestBody.Username, responseBody.Data.Username)
+	assert.True(t, responseBody.Data.ID > 0)
 	assert.Equal(t, requestBody.Name, responseBody.Data.Name)
 	assert.NotNil(t, responseBody.Data.CreatedAt)
 	assert.NotNil(t, responseBody.Data.UpdatedAt)
@@ -53,7 +55,7 @@ func TestRegister(t *testing.T) {
 func TestRegisterError(t *testing.T) {
 	ClearAll()
 	requestBody := model.RegisterUserRequest{
-		ID:       "",
+		Username: "",
 		Password: "",
 		Name:     "",
 	}
@@ -84,7 +86,7 @@ func TestRegisterDuplicate(t *testing.T) {
 	registerDefaultUser(t)
 
 	requestBody := model.RegisterUserRequest{
-		ID:       "khannedy",
+		Username: "khannedy",
 		Password: "rahasia",
 		Name:     "Eko Khannedy",
 	}
@@ -115,7 +117,7 @@ func TestLogin(t *testing.T) {
 	registerDefaultUser(t)
 
 	requestBody := model.LoginUserRequest{
-		ID:       "khannedy",
+		Username: "khannedy",
 		Password: "rahasia",
 	}
 
@@ -145,7 +147,10 @@ func TestLogin(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	assert.True(t, token.Valid)
-	assert.Equal(t, requestBody.ID, claims.Subject)
+	user := new(entity.User)
+	err = db.Where("username = ?", requestBody.Username).First(user).Error
+	assert.Nil(t, err)
+	assert.Equal(t, strconv.FormatInt(user.ID, 10), claims.Subject)
 	assert.Equal(t, viperConfig.GetString(configkey.AuthJWTIssuer), claims.Issuer)
 	assert.NotNil(t, claims.ExpiresAt)
 }
@@ -155,7 +160,7 @@ func TestLoginWrongUsername(t *testing.T) {
 	registerDefaultUser(t)
 
 	requestBody := model.LoginUserRequest{
-		ID:       "wrong",
+		Username: "wrong",
 		Password: "rahasia",
 	}
 
@@ -185,7 +190,7 @@ func TestLoginWrongPassword(t *testing.T) {
 	registerDefaultUser(t)
 
 	requestBody := model.LoginUserRequest{
-		ID:       "khannedy",
+		Username: "khannedy",
 		Password: "wrong",
 	}
 
@@ -262,7 +267,7 @@ func TestGetCurrentUser(t *testing.T) {
 	token := registerAndLoginDefaultUser(t)
 
 	user := new(entity.User)
-	err := db.Where("id = ?", "khannedy").First(user).Error
+	err := db.Where("username = ?", "khannedy").First(user).Error
 	assert.Nil(t, err)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/users/_current", nil)
@@ -316,7 +321,7 @@ func TestUpdateUserName(t *testing.T) {
 	token := registerAndLoginDefaultUser(t)
 
 	user := new(entity.User)
-	err := db.Where("id = ?", "khannedy").First(user).Error
+	err := db.Where("username = ?", "khannedy").First(user).Error
 	assert.Nil(t, err)
 
 	requestBody := model.UpdateUserRequest{
@@ -353,7 +358,7 @@ func TestUpdateUserPassword(t *testing.T) {
 	token := registerAndLoginDefaultUser(t)
 
 	user := new(entity.User)
-	err := db.Where("id = ?", "khannedy").First(user).Error
+	err := db.Where("username = ?", "khannedy").First(user).Error
 	assert.Nil(t, err)
 
 	requestBody := model.UpdateUserRequest{
@@ -384,7 +389,7 @@ func TestUpdateUserPassword(t *testing.T) {
 	assert.NotNil(t, responseBody.Data.UpdatedAt)
 
 	user = new(entity.User)
-	err = db.Where("id = ?", "khannedy").First(user).Error
+	err = db.Where("username = ?", "khannedy").First(user).Error
 	assert.Nil(t, err)
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(requestBody.Password))

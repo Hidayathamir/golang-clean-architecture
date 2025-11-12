@@ -18,18 +18,18 @@ func TestContactUsecaseImpl_Get_Success(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	ContactRepository := &mock.ContactRepositoryMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB: gormDB,
-		 ContactRepository: ContactRepository,
+		DB:                gormDB,
+		ContactRepository: ContactRepository,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.GetContactRequest{
-		UserID: "userid1",
+		UserID: testUserID,
 		ID:     uuid.NewString(),
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return nil
 	}
 
@@ -49,18 +49,18 @@ func TestContactUsecaseImpl_Get_Fail_ValidateStruct(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	ContactRepository := &mock.ContactRepositoryMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB: gormDB,
-		 ContactRepository: ContactRepository,
+		DB:                gormDB,
+		ContactRepository: ContactRepository,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.GetContactRequest{
-		UserID: "",
+		UserID: 0,
 		ID:     uuid.NewString(),
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return assert.AnError
 	}
 
@@ -82,18 +82,18 @@ func TestContactUsecaseImpl_Get_Fail_FindByIDAndUserID(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	ContactRepository := &mock.ContactRepositoryMock{}
 	u := &contact.ContactUsecaseImpl{
-		DB: gormDB,
-		 ContactRepository: ContactRepository,
+		DB:                gormDB,
+		ContactRepository: ContactRepository,
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &model.GetContactRequest{
-		UserID: "userid1",
+		UserID: testUserID,
 		ID:     uuid.NewString(),
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id, userID string) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
 		return assert.AnError
 	}
 

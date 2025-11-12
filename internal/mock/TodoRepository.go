@@ -28,7 +28,7 @@ var _ repository.TodoRepository = &TodoRepositoryMock{}
 //			DeleteFunc: func(ctx context.Context, db *gorm.DB, todo *entity.Todo) error {
 //				panic("mock out the Delete method")
 //			},
-//			FindByIDAndUserIDFunc: func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID string) error {
+//			FindByIDAndUserIDFunc: func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
 //				panic("mock out the FindByIDAndUserID method")
 //			},
 //			ListFunc: func(ctx context.Context, db *gorm.DB, req *model.ListTodoRequest) (entity.TodoList, int64, error) {
@@ -51,7 +51,7 @@ type TodoRepositoryMock struct {
 	DeleteFunc func(ctx context.Context, db *gorm.DB, todo *entity.Todo) error
 
 	// FindByIDAndUserIDFunc mocks the FindByIDAndUserID method.
-	FindByIDAndUserIDFunc func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID string) error
+	FindByIDAndUserIDFunc func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error
 
 	// ListFunc mocks the List method.
 	ListFunc func(ctx context.Context, db *gorm.DB, req *model.ListTodoRequest) (entity.TodoList, int64, error)
@@ -90,7 +90,7 @@ type TodoRepositoryMock struct {
 			// ID is the id argument value.
 			ID string
 			// UserID is the userID argument value.
-			UserID string
+			UserID int64
 		}
 		// List holds details about calls to the List method.
 		List []struct {
@@ -199,7 +199,7 @@ func (mock *TodoRepositoryMock) DeleteCalls() []struct {
 }
 
 // FindByIDAndUserID calls FindByIDAndUserIDFunc.
-func (mock *TodoRepositoryMock) FindByIDAndUserID(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID string) error {
+func (mock *TodoRepositoryMock) FindByIDAndUserID(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
 	if mock.FindByIDAndUserIDFunc == nil {
 		panic("TodoRepositoryMock.FindByIDAndUserIDFunc: method is nil but TodoRepository.FindByIDAndUserID was just called")
 	}
@@ -208,7 +208,7 @@ func (mock *TodoRepositoryMock) FindByIDAndUserID(ctx context.Context, db *gorm.
 		Db     *gorm.DB
 		Todo   *entity.Todo
 		ID     string
-		UserID string
+		UserID int64
 	}{
 		Ctx:    ctx,
 		Db:     db,
@@ -231,14 +231,14 @@ func (mock *TodoRepositoryMock) FindByIDAndUserIDCalls() []struct {
 	Db     *gorm.DB
 	Todo   *entity.Todo
 	ID     string
-	UserID string
+	UserID int64
 } {
 	var calls []struct {
 		Ctx    context.Context
 		Db     *gorm.DB
 		Todo   *entity.Todo
 		ID     string
-		UserID string
+		UserID int64
 	}
 	mock.lockFindByIDAndUserID.RLock()
 	calls = mock.calls.FindByIDAndUserID

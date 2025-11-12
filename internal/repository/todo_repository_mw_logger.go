@@ -68,7 +68,7 @@ func (r *TodoRepositoryMwLogger) Delete(ctx context.Context, db *gorm.DB, todo *
 	return err
 }
 
-func (r *TodoRepositoryMwLogger) FindByIDAndUserID(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID string) error {
+func (r *TodoRepositoryMwLogger) FindByIDAndUserID(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 

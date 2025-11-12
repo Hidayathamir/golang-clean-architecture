@@ -28,10 +28,10 @@ func TestUserUsecaseImpl_Logout_Success(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.LogoutUserRequest{
-		ID: "id1",
+		ID: 1,
 	}
 
-	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id int64) error {
 		return nil
 	}
 
@@ -70,10 +70,10 @@ func TestUserUsecaseImpl_Logout_Fail_ValidateStruct(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.LogoutUserRequest{
-		ID: "",
+		ID: 0,
 	}
 
-	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id int64) error {
 		return nil
 	}
 
@@ -114,10 +114,10 @@ func TestUserUsecaseImpl_Logout_Fail_FindByID(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.LogoutUserRequest{
-		ID: "id1",
+		ID: 1,
 	}
 
-	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id int64) error {
 		return assert.AnError
 	}
 
@@ -157,10 +157,10 @@ func TestUserUsecaseImpl_Logout_Fail_DeleteObject(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.LogoutUserRequest{
-		ID: "id1",
+		ID: 1,
 	}
 
-	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id int64) error {
 		return nil
 	}
 
@@ -200,10 +200,10 @@ func TestUserUsecaseImpl_Logout_Fail_Send(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.LogoutUserRequest{
-		ID: "id1",
+		ID: 1,
 	}
 
-	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id string) error {
+	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id int64) error {
 		return nil
 	}
 

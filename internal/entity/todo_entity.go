@@ -14,7 +14,7 @@ const (
 
 type Todo struct {
 	ID          string `gorm:"column:id;primaryKey"`
-	UserID      string `gorm:"column:user_id"`
+	UserID      int64  `gorm:"column:user_id"`
 	Title       string `gorm:"column:title"`
 	Description string `gorm:"column:description"`
 	IsCompleted bool   `gorm:"column:is_completed"`

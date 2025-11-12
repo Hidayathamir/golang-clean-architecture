@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
@@ -23,7 +24,7 @@ func (u *UserUsecaseImpl) Logout(ctx context.Context, req *model.LogoutUserReque
 
 	if _, err := u.S3Client.DeleteObject(ctx, model.S3DeleteObjectRequest{
 		Bucket: "user-bucket",
-		Key:    user.ID,
+		Key:    strconv.FormatInt(user.ID, 10),
 	}); err != nil {
 		return false, errkit.AddFuncName("user.(*UserUsecaseImpl).Logout", err)
 	}

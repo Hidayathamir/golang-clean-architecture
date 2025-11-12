@@ -25,7 +25,7 @@ func TestTodoUsecaseImpl_Create_Success(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.CreateTodoRequest{
-		UserID:      "user1",
+		UserID:      testUserID,
 		Title:       "Test Todo",
 		Description: "Test Description",
 	}
@@ -99,7 +99,7 @@ func TestTodoUsecaseImpl_Create_Fail_Create(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.CreateTodoRequest{
-		UserID:      "user1",
+		UserID:      testUserID,
 		Title:       "Test Todo",
 		Description: "Test Description",
 	}

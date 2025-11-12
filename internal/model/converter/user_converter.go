@@ -10,7 +10,7 @@ func ModelRegisterUserRequestToEntityUser(req *model.RegisterUserRequest, user *
 		return
 	}
 
-	user.ID = req.ID
+	user.Username = req.Username
 	user.Name = req.Name
 	user.Password = password
 }
@@ -35,6 +35,7 @@ func EntityUserToModelUserResponse(user *entity.User, res *model.UserResponse) {
 	}
 
 	res.ID = user.ID
+	res.Username = user.Username
 	res.Name = user.Name
 	res.CreatedAt = user.CreatedAt
 	res.UpdatedAt = user.UpdatedAt
@@ -46,6 +47,7 @@ func EntityUserToModelUserEvent(user *entity.User, event *model.UserEvent) {
 	}
 
 	event.ID = user.ID
+	event.Username = user.Username
 	event.Name = user.Name
 	event.CreatedAt = user.CreatedAt
 	event.UpdatedAt = user.UpdatedAt
@@ -57,4 +59,5 @@ func EntityUserToModelAuth(user *entity.User, auth *model.Auth) {
 	}
 
 	auth.ID = user.ID
+	auth.Username = user.Username
 }
