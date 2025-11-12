@@ -26,10 +26,16 @@ const (
 func registerDefaultUser(t *testing.T) {
 	t.Helper()
 
+	registerUser(t, defaultUsername, defaultUserPassword, defaultUserName)
+}
+
+func registerUser(t *testing.T, username, password, name string) {
+	t.Helper()
+
 	requestBody := model.RegisterUserRequest{
-		Username: defaultUsername,
-		Password: defaultUserPassword,
-		Name:     defaultUserName,
+		Username: username,
+		Password: password,
+		Name:     name,
 	}
 
 	bodyJSON, err := json.Marshal(requestBody)
@@ -58,9 +64,15 @@ func registerDefaultUser(t *testing.T) {
 func loginDefaultUser(t *testing.T) string {
 	t.Helper()
 
+	return loginUser(t, defaultUsername, defaultUserPassword)
+}
+
+func loginUser(t *testing.T, username, password string) string {
+	t.Helper()
+
 	requestBody := model.LoginUserRequest{
-		Username: defaultUsername,
-		Password: defaultUserPassword,
+		Username: username,
+		Password: password,
 	}
 
 	bodyJSON, err := json.Marshal(requestBody)
@@ -93,6 +105,13 @@ func registerAndLoginDefaultUser(t *testing.T) string {
 
 	registerDefaultUser(t)
 	return loginDefaultUser(t)
+}
+
+func registerAndLoginUser(t *testing.T, username, password, name string) string {
+	t.Helper()
+
+	registerUser(t, username, password, name)
+	return loginUser(t, username, password)
 }
 
 func bearerToken(token string) string {

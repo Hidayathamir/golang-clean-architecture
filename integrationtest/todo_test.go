@@ -131,6 +131,36 @@ func TestGetTodoFailed(t *testing.T) {
 	assert.NotNil(t, GetFirstTodo(t, user))
 }
 
+func TestGetTodoOtherUser(t *testing.T) {
+	ClearAll()
+	tokenUserA, userA := loginAndGetDefaultUser(t)
+
+	createTodoViaAPI(t, tokenUserA, model.CreateTodoRequest{
+		Title:       "Secret",
+		Description: "Owned by A",
+	})
+	todo := GetFirstTodo(t, userA)
+
+	otherToken := registerAndLoginUser(t, uuid.NewString(), "secret", "Other User")
+
+	req := httptest.NewRequest(http.MethodGet, "/api/todos/"+todo.ID, nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", bearerToken(otherToken))
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.TodoResponse])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusNotFound, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
+}
+
 func TestUpdateTodo(t *testing.T) {
 	ClearAll()
 	token, user := loginAndGetDefaultUser(t)
@@ -171,6 +201,41 @@ func TestUpdateTodo(t *testing.T) {
 	assert.NotZero(t, responseBody.Data.UpdatedAt)
 }
 
+func TestUpdateTodoUnauthorized(t *testing.T) {
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
+
+	createTodoViaAPI(t, token, model.CreateTodoRequest{
+		Title:       "Buy groceries",
+		Description: "Milk, bread, eggs",
+	})
+	todo := GetFirstTodo(t, user)
+
+	requestBody := model.UpdateTodoRequest{
+		Title:       "New Title",
+		Description: "New Desc",
+	}
+	bodyJSON, err := json.Marshal(requestBody)
+	assert.Nil(t, err)
+
+	req := httptest.NewRequest(http.MethodPut, "/api/todos/"+todo.ID, strings.NewReader(string(bodyJSON)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.TodoResponse])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
+}
+
 func TestUpdateTodoFailed(t *testing.T) {
 	ClearAll()
 	token, user := loginAndGetDefaultUser(t)
@@ -204,6 +269,44 @@ func TestUpdateTodoFailed(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
+}
+
+func TestUpdateTodoOtherUser(t *testing.T) {
+	ClearAll()
+	tokenUserA, userA := loginAndGetDefaultUser(t)
+
+	createTodoViaAPI(t, tokenUserA, model.CreateTodoRequest{
+		Title:       "Secret",
+		Description: "Owned by A",
+	})
+	todo := GetFirstTodo(t, userA)
+
+	otherToken := registerAndLoginUser(t, uuid.NewString(), "secret", "Other User")
+
+	requestBody := model.UpdateTodoRequest{
+		Title:       "Malicious",
+		Description: "Attempt overwrite",
+	}
+	bodyJSON, err := json.Marshal(requestBody)
+	assert.Nil(t, err)
+
+	req := httptest.NewRequest(http.MethodPut, "/api/todos/"+todo.ID, strings.NewReader(string(bodyJSON)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", bearerToken(otherToken))
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.TodoResponse])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 	assert.NotNil(t, responseBody.ErrorMessage)
 }
 
@@ -259,6 +362,33 @@ func TestDeleteTodoFailed(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, http.StatusNotFound, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
+}
+
+func TestDeleteTodoUnauthorized(t *testing.T) {
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
+
+	createTodoViaAPI(t, token, model.CreateTodoRequest{
+		Title:       "Buy groceries",
+		Description: "Milk, bread, eggs",
+	})
+	todo := GetFirstTodo(t, user)
+
+	req := httptest.NewRequest(http.MethodDelete, "/api/todos/"+todo.ID, nil)
+	req.Header.Set("Accept", "application/json")
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[bool])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
 	assert.NotNil(t, responseBody.ErrorMessage)
 }
 
@@ -323,6 +453,26 @@ func TestListTodos(t *testing.T) {
 	assert.Equal(t, int64(2), responseBody.Paging.TotalPage)
 	assert.Equal(t, 1, responseBody.Paging.Page)
 	assert.Equal(t, 10, responseBody.Paging.Size)
+}
+
+func TestListTodosUnauthorized(t *testing.T) {
+	ClearAll()
+
+	req := httptest.NewRequest(http.MethodGet, "/api/todos", nil)
+	req.Header.Set("Accept", "application/json")
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.TodoResponseList])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
 }
 
 func TestListTodosWithPagination(t *testing.T) {
@@ -399,4 +549,240 @@ func TestListTodosWithFilters(t *testing.T) {
 		assert.True(t, todo.IsCompleted)
 		assert.NotNil(t, todo.CompletedAt)
 	}
+}
+
+func TestListTodosInvalidBoolFilter(t *testing.T) {
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
+
+	CreateTodos(t, user, 2)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/todos?is_completed=maybe", nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", bearerToken(token))
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.TodoResponseList])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
+}
+
+func TestListTodosInvalidPagination(t *testing.T) {
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
+
+	CreateTodos(t, user, 2)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/todos?page=0&size=0", nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", bearerToken(token))
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.TodoResponseList])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
+}
+
+func TestCompleteTodoInvalidID(t *testing.T) {
+	ClearAll()
+	token, _ := loginAndGetDefaultUser(t)
+
+	req := httptest.NewRequest(http.MethodPatch, "/api/todos/not-a-uuid/_complete", nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", bearerToken(token))
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.TodoResponse])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
+}
+
+func TestListTodosTitleTooLong(t *testing.T) {
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
+
+	CreateTodos(t, user, 1)
+
+	longTitle := strings.Repeat("x", 201)
+	req := httptest.NewRequest(http.MethodGet, "/api/todos?title="+longTitle, nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", bearerToken(token))
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.TodoResponseList])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
+}
+
+func TestDeleteTodoOtherUser(t *testing.T) {
+	ClearAll()
+	tokenUserA, userA := loginAndGetDefaultUser(t)
+
+	createTodoViaAPI(t, tokenUserA, model.CreateTodoRequest{
+		Title:       "Owner Todo",
+		Description: "Owned by A",
+	})
+	todo := GetFirstTodo(t, userA)
+
+	otherToken := registerAndLoginUser(t, uuid.NewString(), "secret", "Other User")
+
+	req := httptest.NewRequest(http.MethodDelete, "/api/todos/"+todo.ID, nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", bearerToken(otherToken))
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[bool])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusNotFound, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
+}
+
+func TestCompleteTodoUnauthorized(t *testing.T) {
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
+
+	createTodoViaAPI(t, token, model.CreateTodoRequest{
+		Title:       "Buy groceries",
+		Description: "Milk, bread, eggs",
+	})
+	todo := GetFirstTodo(t, user)
+
+	req := httptest.NewRequest(http.MethodPatch, "/api/todos/"+todo.ID+"/_complete", nil)
+	req.Header.Set("Accept", "application/json")
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.TodoResponse])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
+}
+
+func TestCompleteTodoOtherUser(t *testing.T) {
+	ClearAll()
+	tokenUserA, userA := loginAndGetDefaultUser(t)
+
+	createTodoViaAPI(t, tokenUserA, model.CreateTodoRequest{
+		Title:       "Owner Todo",
+		Description: "Owned by A",
+	})
+	todo := GetFirstTodo(t, userA)
+
+	otherToken := registerAndLoginUser(t, uuid.NewString(), "secret", "Other User")
+
+	req := httptest.NewRequest(http.MethodPatch, "/api/todos/"+todo.ID+"/_complete", nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", bearerToken(otherToken))
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.TodoResponse])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusNotFound, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
+}
+func TestGetTodoInvalidIDFormat(t *testing.T) {
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
+
+	createTodoViaAPI(t, token, model.CreateTodoRequest{
+		Title:       "Buy groceries",
+		Description: "Milk, bread, eggs",
+	})
+	_ = GetFirstTodo(t, user)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/todos/not-a-uuid", nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", bearerToken(token))
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.TodoResponse])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
+}
+
+func TestDeleteTodoInvalidIDFormat(t *testing.T) {
+	ClearAll()
+	token, _ := loginAndGetDefaultUser(t)
+
+	createTodoViaAPI(t, token, model.CreateTodoRequest{
+		Title:       "Buy groceries",
+		Description: "Milk, bread, eggs",
+	})
+
+	req := httptest.NewRequest(http.MethodDelete, "/api/todos/not-a-uuid", nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", bearerToken(token))
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[bool])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
 }

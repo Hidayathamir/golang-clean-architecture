@@ -36,6 +36,56 @@ func TestCreateContact(t *testing.T) {
 	assert.NotZero(t, resData.UpdatedAt)
 }
 
+func TestCreateContactUnauthorized(t *testing.T) {
+	ClearAll()
+
+	requestBody := model.CreateContactRequest{
+		FirstName: "Eko Kurniawan",
+		LastName:  "Khannedy",
+		Email:     "eko@example.com",
+		Phone:     "088888888888",
+	}
+	bodyJSON, err := json.Marshal(requestBody)
+	assert.Nil(t, err)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/contacts", strings.NewReader(string(bodyJSON)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.ContactResponse])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
+}
+
+func TestListContactsUnauthorized(t *testing.T) {
+	ClearAll()
+
+	req := httptest.NewRequest(http.MethodGet, "/api/contacts", nil)
+	req.Header.Set("Accept", "application/json")
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.ContactResponseList])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
+}
+
 func TestCreateContactFailed(t *testing.T) {
 	ClearAll()
 	token, _ := loginAndGetDefaultUser(t)
@@ -60,6 +110,45 @@ func TestCreateContactFailed(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
+}
+
+func TestUpdateContactUnauthorized(t *testing.T) {
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
+
+	createContactViaAPI(t, token, model.CreateContactRequest{
+		FirstName: "Eko Kurniawan",
+		LastName:  "Khannedy",
+		Email:     "eko@example.com",
+		Phone:     "088888888888",
+	})
+	contact := GetFirstContact(t, user)
+
+	requestBody := model.UpdateContactRequest{
+		FirstName: "New",
+		LastName:  "Name",
+		Email:     "new@example.com",
+		Phone:     "0800",
+	}
+	bodyJSON, err := json.Marshal(requestBody)
+	assert.Nil(t, err)
+
+	req := httptest.NewRequest(http.MethodPut, "/api/contacts/"+contact.ID, strings.NewReader(string(bodyJSON)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.ContactResponse])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
 	assert.NotNil(t, responseBody.ErrorMessage)
 }
 
@@ -126,6 +215,84 @@ func TestGetContactFailed(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, http.StatusNotFound, res.StatusCode)
+}
+
+func TestGetContactOtherUser(t *testing.T) {
+	ClearAll()
+	tokenUserA, userA := loginAndGetDefaultUser(t)
+
+	createContactViaAPI(t, tokenUserA, model.CreateContactRequest{
+		FirstName: "Eko",
+		LastName:  "Khannedy",
+		Email:     "eko@example.com",
+		Phone:     "088888888888",
+	})
+	contact := GetFirstContact(t, userA)
+
+	otherUsername := uuid.NewString()
+	otherPassword := "secret"
+	otherToken := registerAndLoginUser(t, otherUsername, otherPassword, "Other User")
+
+	req := httptest.NewRequest(http.MethodGet, "/api/contacts/"+contact.ID, nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", bearerToken(otherToken))
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.ContactResponse])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusNotFound, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
+}
+
+func TestUpdateContactOtherUser(t *testing.T) {
+	ClearAll()
+	tokenUserA, userA := loginAndGetDefaultUser(t)
+
+	createContactViaAPI(t, tokenUserA, model.CreateContactRequest{
+		FirstName: "Eko",
+		LastName:  "Khannedy",
+		Email:     "eko@example.com",
+		Phone:     "088888888888",
+	})
+	contact := GetFirstContact(t, userA)
+
+	otherUsername := uuid.NewString()
+	otherPassword := "secret"
+	otherToken := registerAndLoginUser(t, otherUsername, otherPassword, "Other User")
+
+	requestBody := model.UpdateContactRequest{
+		FirstName: "Hack",
+		LastName:  "Attempt",
+		Email:     "hack@example.com",
+		Phone:     "0800",
+	}
+	bodyJSON, err := json.Marshal(requestBody)
+	assert.Nil(t, err)
+
+	req := httptest.NewRequest(http.MethodPut, "/api/contacts/"+contact.ID, strings.NewReader(string(bodyJSON)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", bearerToken(otherToken))
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.ContactResponse])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusNotFound, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
 }
 
 func TestUpdateContact(t *testing.T) {
@@ -267,6 +434,67 @@ func TestDeleteContactFailed(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 }
 
+func TestDeleteContactUnauthorized(t *testing.T) {
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
+
+	createContactViaAPI(t, token, model.CreateContactRequest{
+		FirstName: "Eko Kurniawan",
+		LastName:  "Khannedy",
+		Email:     "eko@example.com",
+		Phone:     "088888888888",
+	})
+	contact := GetFirstContact(t, user)
+
+	req := httptest.NewRequest(http.MethodDelete, "/api/contacts/"+contact.ID, nil)
+	req.Header.Set("Accept", "application/json")
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[bool])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
+}
+
+func TestDeleteContactOtherUser(t *testing.T) {
+	ClearAll()
+	tokenUserA, userA := loginAndGetDefaultUser(t)
+
+	createContactViaAPI(t, tokenUserA, model.CreateContactRequest{
+		FirstName: "Eko Kurniawan",
+		LastName:  "Khannedy",
+		Email:     "eko@example.com",
+		Phone:     "088888888888",
+	})
+	contact := GetFirstContact(t, userA)
+
+	otherToken := registerAndLoginUser(t, uuid.NewString(), "secret", "Other User")
+
+	req := httptest.NewRequest(http.MethodDelete, "/api/contacts/"+contact.ID, nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", bearerToken(otherToken))
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[bool])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusNotFound, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
+}
+
 func TestSearchContact(t *testing.T) {
 	ClearAll()
 	token, user := loginAndGetDefaultUser(t)
@@ -349,4 +577,53 @@ func TestSearchContactWithFilter(t *testing.T) {
 	assert.Equal(t, int64(2), responseBody.Paging.TotalPage)
 	assert.Equal(t, 1, responseBody.Paging.Page)
 	assert.Equal(t, 10, responseBody.Paging.Size)
+}
+
+func TestSearchContactInvalidPagination(t *testing.T) {
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
+
+	CreateContacts(user, 5)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/contacts?page=0&size=200", nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", bearerToken(token))
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.ContactResponseList])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
+}
+
+func TestSearchContactFilterTooLong(t *testing.T) {
+	ClearAll()
+	token, user := loginAndGetDefaultUser(t)
+
+	CreateContacts(user, 2)
+
+	longName := strings.Repeat("a", 101)
+	req := httptest.NewRequest(http.MethodGet, "/api/contacts?name="+longName, nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", bearerToken(token))
+
+	res, err := app.Test(req)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[model.ContactResponseList])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+
+	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+	assert.NotNil(t, responseBody.ErrorMessage)
 }
