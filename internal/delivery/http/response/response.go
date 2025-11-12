@@ -1,7 +1,6 @@
 package response
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
@@ -40,23 +39,11 @@ func Error(ctx *fiber.Ctx, err error) error {
 		return ctx.Status(http.StatusInternalServerError).SendString("something wrong")
 	}
 
-	httpErr := LoadErrAsHTTPError(err)
+	httpErr := errkit.GetHTTPError(err)
 
 	res := WebResponse[any]{}
 	res.ErrorMessage = httpErr.Message
 	res.ErrorDetail = errkit.Split(err)
 
 	return ctx.Status(httpErr.HTTPCode).JSON(res)
-}
-
-// LoadErrAsHTTPError load error as HTTPError. Default http.StatusInternalServerError.
-func LoadErrAsHTTPError(err error) *errkit.HTTPError {
-	httpErr := &errkit.HTTPError{
-		HTTPCode: http.StatusInternalServerError,
-		Message:  "internal server error",
-	}
-
-	errors.As(err, &httpErr)
-
-	return httpErr
 }

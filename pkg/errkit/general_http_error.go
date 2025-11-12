@@ -4,62 +4,22 @@ import (
 	"net/http"
 )
 
-func Custom(err error, status int, msg string) error {
-	return WrapE(
-		&HTTPError{
-			HTTPCode: status,
-			Message:  msg,
-		},
-		err,
-	)
-}
-
 func InternalServerError(err error) error {
-	return WrapE(
-		&HTTPError{
-			HTTPCode: http.StatusInternalServerError,
-			Message:  "internal server error",
-		},
-		err,
-	)
+	return SetHTTPError(err, http.StatusInternalServerError)
 }
 
 func BadRequest(err error) error {
-	return WrapE(
-		&HTTPError{
-			HTTPCode: http.StatusBadRequest,
-			Message:  "bad request",
-		},
-		err,
-	)
+	return SetHTTPError(err, http.StatusBadRequest)
 }
 
 func Conflict(err error) error {
-	return WrapE(
-		&HTTPError{
-			HTTPCode: http.StatusConflict,
-			Message:  "conflict",
-		},
-		err,
-	)
+	return SetHTTPError(err, http.StatusConflict)
 }
 
 func NotFound(err error) error {
-	return WrapE(
-		&HTTPError{
-			HTTPCode: http.StatusNotFound,
-			Message:  "not found",
-		},
-		err,
-	)
+	return SetHTTPError(err, http.StatusNotFound)
 }
 
 func Unauthorized(err error) error {
-	return WrapE(
-		&HTTPError{
-			HTTPCode: http.StatusUnauthorized,
-			Message:  "unauthorized",
-		},
-		err,
-	)
+	return SetHTTPError(err, http.StatusUnauthorized)
 }
