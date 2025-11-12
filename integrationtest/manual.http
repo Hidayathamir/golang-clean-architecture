@@ -1,148 +1,205 @@
-@token =
-@contactId =
-@addressId =
+@host = http://localhost:3000
+# Edit runId before rerunning the entire flow to avoid conflicts,
+# but keep the same value for every step in one run.
+@runId = 1731000000
+@userId = manual-user-{{runId}}
+@userName = Manual User {{runId}}
+@password = Passw0rd!
+@token = 
+@contactId = 
+@addressId = 
+@todoId = 
+
+### 01 - Service health
+GET {{host}}/
+Accept: text/plain
 
 
-### Register new user
-POST http://localhost:3000/api/users
+### 02 - Register fresh user (uses unique timestamp)
+POST {{host}}/api/users
 Content-Type: application/json
 
 {
-  "name": "Joko",
-  "id": "joko",
-  "password": "joko"
+  "name": "{{userName}}",
+  "username": "{{userId}}",
+  "password": "{{password}}"
 }
 
-### Login user
-POST http://localhost:3000/api/users/_login
+
+### 03 - Login user (copy token from response)
+POST {{host}}/api/users/_login
 Content-Type: application/json
 
 {
-  "id": "joko",
-  "password": "joko"
+  "username": "{{userId}}",
+  "password": "{{password}}"
 }
-> {%
-    const body = response.body;
-    if (body && body.data && body.data.token) {
-      client.global.set("token", body.data.token);
-    }
-%}
+# Copy the token from the response manually into the @token variable above before proceeding.
 
-### Get user profile
-GET http://localhost:3000/api/users/_current
+
+### 04 - Get current profile
+GET {{host}}/api/users/_current
 Accept: application/json
 Authorization: Bearer {{token}}
 
-### Logout user
-DELETE http://localhost:3000/api/users
-Accept: application/json
-Authorization: Bearer {{token}}
 
-### Update user
-PATCH http://localhost:3000/api/users/_current
+### 05 - Update current profile
+PATCH {{host}}/api/users/_current
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "Joko Morro"
+  "name": "{{userName}} (updated)"
 }
 
-### Create contact
-POST http://localhost:3000/api/contacts
+
+### 06 - Create contact and store id
+POST {{host}}/api/contacts
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-  "first_name": "Joko",
-  "last_name": "Morro",
-  "phone": "08123456789",
-  "email": "joko@example.com"
+  "first_name": "Manual",
+  "last_name": "Contact",
+  "phone": "0800{{runId}}",
+  "email": "manual+{{runId}}@example.com"
 }
-> {%
-    const body = response.body;
-    if (body && body.data && body.data.id) {
-      client.global.set("contactId", body.data.id);
-    }
-%}
+# Copy the contact ID from the response into @contactId before continuing.
 
-### Get detail contact
-GET http://localhost:3000/api/contacts/{{contactId}}
-Content-Type: application/json
+
+### 07 - List contacts (should include created contact)
+GET {{host}}/api/contacts?size=5&page=1&name=Manual&email=manual
 Accept: application/json
 Authorization: Bearer {{token}}
 
-### Search contacts
-GET http://localhost:3000/api/contacts?size=10&page=1&name=jo&phone=0812&email=joko
-Content-Type: application/json
+
+### 08 - Get contact detail
+GET {{host}}/api/contacts/{{contactId}}
 Accept: application/json
 Authorization: Bearer {{token}}
 
-### update contact
-PUT http://localhost:3000/api/contacts/{{contactId}}
+
+### 09 - Update contact info
+PUT {{host}}/api/contacts/{{contactId}}
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-  "first_name": "Budi",
-  "last_name": "Nugraha",
-  "phone": "088324324",
-  "email": "budi@example.com"
+  "first_name": "Manual",
+  "last_name": "Contact {{runId}}",
+  "phone": "0899{{runId}}",
+  "email": "manual.updated+{{runId}}@example.com"
 }
 
-### delete contact
-DELETE http://localhost:3000/api/contacts/{{contactId}}
-Accept: application/json
-Authorization: Bearer {{token}}
 
-### get all addresses
-GET http://localhost:3000/api/contacts/{{contactId}}/addresses
-Accept: application/json
-Authorization: Bearer {{token}}
-
-
-### create new addresses
-POST http://localhost:3000/api/contacts/{{contactId}}/addresses
+### 10 - Create address for contact
+POST {{host}}/api/contacts/{{contactId}}/addresses
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-  "street": "Jl. Jalan",
+  "street": "Jl. Manual Flow {{runId}}",
   "city": "Jakarta",
   "province": "DKI Jakarta",
   "country": "Indonesia",
   "postal_code": "12345"
 }
-> {%
-    const body = response.body;
-    if (body && body.data && body.data.id) {
-      client.global.set("addressId", body.data.id);
-    }
-%}
+# Copy the address ID from the response into @addressId before continuing.
 
-### get address detail
-GET http://localhost:3000/api/contacts/{{contactId}}/addresses/{{addressId}}
+
+### 11 - List addresses on contact
+GET {{host}}/api/contacts/{{contactId}}/addresses
 Accept: application/json
 Authorization: Bearer {{token}}
 
-### update address
-PUT http://localhost:3000/api/contacts/{{contactId}}/addresses/{{addressId}}
+
+### 12 - Get address detail
+GET {{host}}/api/contacts/{{contactId}}/addresses/{{addressId}}
+Accept: application/json
+Authorization: Bearer {{token}}
+
+
+### 13 - Update address
+PUT {{host}}/api/contacts/{{contactId}}/addresses/{{addressId}}
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-  "street": "Jl. Sudah Jadi",
-  "city": "Jakarta",
-  "province": "DKI Jakarta",
+  "street": "Jl. Manual Updated {{runId}}",
+  "city": "Bandung",
+  "province": "Jawa Barat",
   "country": "Indonesia",
-  "postal_code": "12345"
+  "postal_code": "54321"
 }
 
-### delete address
-DELETE http://localhost:3000/api/contacts/{{contactId}}/addresses/{{addressId}}
+
+### 14 - Delete address
+DELETE {{host}}/api/contacts/{{contactId}}/addresses/{{addressId}}
+Accept: application/json
+Authorization: Bearer {{token}}
+
+
+### 15 - Create todo for user
+POST {{host}}/api/todos
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Manual todo {{runId}}",
+  "description": "Covers todo lifecycle for manual HTTP"
+}
+# Copy the todo ID from the response into @todoId before continuing.
+
+
+### 16 - List todos
+GET {{host}}/api/todos?size=5&page=1&title=Manual
+Accept: application/json
+Authorization: Bearer {{token}}
+
+
+### 17 - Get todo detail
+GET {{host}}/api/todos/{{todoId}}
+Accept: application/json
+Authorization: Bearer {{token}}
+
+
+### 18 - Update todo
+PUT {{host}}/api/todos/{{todoId}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Manual todo updated {{runId}}",
+  "description": "Ensure update endpoint works as expected"
+}
+
+
+### 19 - Complete todo
+PATCH {{host}}/api/todos/{{todoId}}/_complete
+Accept: application/json
+Authorization: Bearer {{token}}
+
+
+### 20 - Delete todo
+DELETE {{host}}/api/todos/{{todoId}}
+Accept: application/json
+Authorization: Bearer {{token}}
+
+
+### 21 - Delete contact to keep workspace tidy
+DELETE {{host}}/api/contacts/{{contactId}}
+Accept: application/json
+Authorization: Bearer {{token}}
+
+
+### 22 - Logout user (token becomes invalid)
+DELETE {{host}}/api/users
 Accept: application/json
 Authorization: Bearer {{token}}
