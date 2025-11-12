@@ -38,23 +38,25 @@ This project is forked from [khannedy/golang-clean-architecture](https://github.
    - **Trace ID per request** — see [trace ID middleware](internal/delivery/http/middleware/trace_id_middleware.go).
    - **Trace-friendly logs** — sample:
      ```json
-     {
-       "err": "user.(*UserUsecaseImpl).Create:: [409] conflict:: user already exists",
-       "fields": {
-         "req": {
-           "id": "joko",
-           "password": "joko",
-           "name": "Joko"
-         },
-         "res": null
-       },
-       "funcName": "user.(*UserUsecaseMwLogger).Create",
-       "level": "error",
-       "msg": "log",
-       "source": "/home/hidayat/data-d/myrepo/golang-clean-architecture/internal/usecase/user/user_usecase_mw_logger.go:30",
-       "time": "2025-10-12T15:59:28+07:00",
-       "trace_id": "67275406-c9c4-4a28-be8a-40ff2aa87e86"
-     }
+      {
+          "err": "user.(*UserUsecaseImpl).Create:: [409] Conflict:: user already exists",
+          "fields": {
+              "req": {
+                  "username": "manual-user-1731000000",
+                  "password": "Passw0rd!",
+                  "name": "Manual User 1731000000"
+              },
+              "res": null
+          },
+          "file": "/home/hidayat/data-d/myrepo/golang-clean-architecture/pkg/x/log_mw.go:20",
+          "func": "github.com/Hidayathamir/golang-clean-architecture/pkg/x.LogMw",
+          "level": "error",
+          "msg": "user.(*UserUsecaseMwLogger).Create",
+          "source": "/home/hidayat/data-d/myrepo/golang-clean-architecture/internal/usecase/user/user_usecase_mw_logger.go:35",
+          "span_id": "9eac5661888eb4cd",
+          "time": "2025-11-12T22:43:10+07:00",
+          "trace_id": "b9de7b7454f39736ef4e5ca40c223541"
+      }
      ```
 
 4. **Testing**
