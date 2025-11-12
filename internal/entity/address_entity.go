@@ -1,7 +1,7 @@
 package entity
 
 type Address struct {
-	ID         string `gorm:"column:id;primaryKey"`
+	ID         string `gorm:"column:id;primaryKey"` // TODO: this is uuid, next use int
 	ContactID  string `gorm:"column:contact_id"`
 	Street     string `gorm:"column:street"`
 	City       string `gorm:"column:city"`

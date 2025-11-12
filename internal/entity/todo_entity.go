@@ -13,7 +13,7 @@ const (
 )
 
 type Todo struct {
-	ID          string `gorm:"column:id;primaryKey"`
+	ID          string `gorm:"column:id;primaryKey"` // TODO: this is uuid, next use int
 	UserID      int64  `gorm:"column:user_id"`
 	Title       string `gorm:"column:title"`
 	Description string `gorm:"column:description"`
