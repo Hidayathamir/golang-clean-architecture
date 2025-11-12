@@ -14,33 +14,33 @@ import (
 func (u *UserUsecaseImpl) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error) {
 	if err := x.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
-		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Login", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	user := new(entity.User)
 	if err := u.UserRepository.FindByUsername(ctx, u.DB.WithContext(ctx), user, req.Username); err != nil {
 		err = errkit.Unauthorized(err)
-		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Login", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		err = errkit.Unauthorized(err)
-		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Login", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	if _, err := u.SlackClient.IsConnected(ctx, model.SlackIsConnectedRequest{}); err != nil {
-		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Login", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	event := new(model.UserEvent)
 	converter.EntityUserToModelUserEvent(user, event)
 	if err := u.UserProducer.Send(ctx, event); err != nil {
-		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Login", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	token, err := u.signAccessToken(ctx, user.ID)
 	if err != nil {
-		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Login", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	res := new(model.UserResponse)

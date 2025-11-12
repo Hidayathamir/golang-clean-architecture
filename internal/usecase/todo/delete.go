@@ -12,16 +12,16 @@ import (
 func (u *TodoUsecaseImpl) Delete(ctx context.Context, req *model.DeleteTodoRequest) error {
 	if err := x.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
-		return errkit.AddFuncName("todo.(*TodoUsecaseImpl).Delete", err)
+		return errkit.AddFuncName(err)
 	}
 
 	todo := new(entity.Todo)
 	if err := u.TodoRepository.FindByIDAndUserID(ctx, u.DB.WithContext(ctx), todo, req.ID, req.UserID); err != nil {
-		return errkit.AddFuncName("todo.(*TodoUsecaseImpl).Delete", err)
+		return errkit.AddFuncName(err)
 	}
 
 	if err := u.TodoRepository.Delete(ctx, u.DB.WithContext(ctx), todo); err != nil {
-		return errkit.AddFuncName("todo.(*TodoUsecaseImpl).Delete", err)
+		return errkit.AddFuncName(err)
 	}
 
 	return nil

@@ -29,7 +29,7 @@ func (c ContactConsumer) Consume(message *sarama.ConsumerMessage) error {
 	ContactEvent := new(model.ContactEvent)
 	if err := json.Unmarshal(message.Value, ContactEvent); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error("error unmarshalling Contact event")
-		return errkit.AddFuncName("messaging.ContactConsumer.Consume", err)
+		return errkit.AddFuncName(err)
 	}
 
 	// TODO process event

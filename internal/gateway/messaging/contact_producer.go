@@ -42,7 +42,7 @@ func (p *ContactProducerImpl) Send(ctx context.Context, event *model.ContactEven
 
 	value, err := json.Marshal(event)
 	if err != nil {
-		return errkit.AddFuncName("messaging.(*ContactProducerImpl).Send", err)
+		return errkit.AddFuncName(err)
 	}
 
 	message := &sarama.ProducerMessage{
@@ -55,7 +55,7 @@ func (p *ContactProducerImpl) Send(ctx context.Context, event *model.ContactEven
 
 	partition, offset, err := p.Producer.SendMessage(message)
 	if err != nil {
-		return errkit.AddFuncName("messaging.(*ContactProducerImpl).Send", err)
+		return errkit.AddFuncName(err)
 	}
 
 	x.Logger.Debugf("Message sent to topic %s, partition %d, offset %d", p.Topic, partition, offset)

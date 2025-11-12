@@ -24,7 +24,7 @@ func (c *TodoCompletionConsumer) Consume(message *sarama.ConsumerMessage) error 
 	event := new(model.TodoCompletedEvent)
 	if err := json.Unmarshal(message.Value, event); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error("error unmarshalling todo completion event")
-		return errkit.AddFuncName("messaging.(*TodoCompletionConsumer).Consume", err)
+		return errkit.AddFuncName(err)
 	}
 
 	x.Logger.WithContext(ctx).WithFields(logrus.Fields{

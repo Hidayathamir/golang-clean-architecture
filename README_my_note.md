@@ -18,7 +18,7 @@ This project is forked from [khannedy/golang-clean-architecture](https://github.
 
 2. **Error Handling**
    - **Consistent error wrapping & mapping** — e.g. [`errkit.BadRequest(err)`](internal/usecase/address/create.go) handled by [`response.Error`](internal/config/fiber.go).
-   - **Auto function-name enrichment** — [`errkit.AddFuncName`](internal/usecase/address/create.go); names generated via `make errkitcli`.
+   - **Auto function-name enrichment** — [`errkit.AddFuncName`](internal/usecase/address/create.go).
    - **Example response:**
      ```json
      {

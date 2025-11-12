@@ -35,13 +35,13 @@ func (c *TodoCommandConsumer) Consume(message *sarama.ConsumerMessage) error {
 	cmd := new(completeTodoCommand)
 	if err := json.Unmarshal(message.Value, cmd); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error("error unmarshalling todo command")
-		return errkit.AddFuncName("messaging.(*TodoCommandConsumer).Consume", err)
+		return errkit.AddFuncName(err)
 	}
 
 	if cmd.UserID <= 0 || cmd.TodoID == "" {
 		err := errkit.BadRequest(fmt.Errorf("invalid todo command payload: %+v", cmd))
 		x.Logger.WithContext(ctx).WithError(err).Warn("todo command missing identifiers")
-		return errkit.AddFuncName("messaging.(*TodoCommandConsumer).Consume", err)
+		return errkit.AddFuncName(err)
 	}
 
 	req := &model.CompleteTodoRequest{
@@ -50,7 +50,7 @@ func (c *TodoCommandConsumer) Consume(message *sarama.ConsumerMessage) error {
 	}
 
 	if _, err := c.Usecase.Complete(ctx, req); err != nil {
-		return errkit.AddFuncName("messaging.(*TodoCommandConsumer).Consume", err)
+		return errkit.AddFuncName(err)
 	}
 
 	x.Logger.WithContext(ctx).WithFields(logrus.Fields{

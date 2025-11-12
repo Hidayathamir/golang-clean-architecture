@@ -21,7 +21,7 @@ var tracer trace.Tracer = otel.Tracer(instrumentationScope)
 func InitTraceProvider(viperConfig *viper.Viper) (Stop, error) {
 	exporter, err := newSpanExporter(viperConfig)
 	if err != nil {
-		return nil, errkit.AddFuncName("telemetry.InitTraceProvider", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	tp := sdktrace.NewTracerProvider(
@@ -43,10 +43,10 @@ func InitTraceProvider(viperConfig *viper.Viper) (Stop, error) {
 
 	stop := func() {
 		if err := tp.ForceFlush(context.Background()); err != nil {
-			fmt.Println(errkit.AddFuncName("telemetry.InitTraceProvider", err))
+			fmt.Println(errkit.AddFuncName(err))
 		}
 		if err := tp.Shutdown(context.Background()); err != nil {
-			fmt.Println(errkit.AddFuncName("telemetry.InitTraceProvider", err))
+			fmt.Println(errkit.AddFuncName(err))
 		}
 	}
 
@@ -57,7 +57,7 @@ func newSpanExporter(viperConfig *viper.Viper) (sdktrace.SpanExporter, error) {
 	endpoint := viperConfig.GetString(configkey.TelemetryOTLPEndpoint)
 	if endpoint == "" {
 		err := fmt.Errorf("missing OTLP endpoint configuration")
-		return nil, errkit.AddFuncName("telemetry.newSpanExporter", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	options := []otlptracegrpc.Option{
@@ -67,7 +67,7 @@ func newSpanExporter(viperConfig *viper.Viper) (sdktrace.SpanExporter, error) {
 
 	exporter, err := otlptracegrpc.New(context.Background(), options...)
 	if err != nil {
-		return nil, errkit.AddFuncName("telemetry.newSpanExporter", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	return exporter, nil

@@ -12,12 +12,12 @@ import (
 func (u *TodoUsecaseImpl) List(ctx context.Context, req *model.ListTodoRequest) (model.TodoResponseList, int64, error) {
 	if err := x.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
-		return nil, 0, errkit.AddFuncName("todo.(*TodoUsecaseImpl).List", err)
+		return nil, 0, errkit.AddFuncName(err)
 	}
 
 	todos, total, err := u.TodoRepository.List(ctx, u.DB.WithContext(ctx), req)
 	if err != nil {
-		return nil, 0, errkit.AddFuncName("todo.(*TodoUsecaseImpl).List", err)
+		return nil, 0, errkit.AddFuncName(err)
 	}
 
 	res := make(model.TodoResponseList, len(todos))

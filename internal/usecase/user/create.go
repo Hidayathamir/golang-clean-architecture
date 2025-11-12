@@ -16,36 +16,36 @@ func (u *UserUsecaseImpl) Create(ctx context.Context, req *model.RegisterUserReq
 	err := x.Validate.Struct(req)
 	if err != nil {
 		err = errkit.BadRequest(err)
-		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Create", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	total, err := u.UserRepository.CountByUsername(ctx, u.DB.WithContext(ctx), req.Username)
 	if err != nil {
-		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Create", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	if total > 0 {
 		err = errors.New("user already exists")
 		err = errkit.Conflict(err)
-		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Create", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	password, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Create", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	user := new(entity.User)
 	converter.ModelRegisterUserRequestToEntityUser(req, user, string(password))
 
 	if err := u.UserRepository.Create(ctx, u.DB.WithContext(ctx), user); err != nil {
-		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Create", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	event := new(model.UserEvent)
 	converter.EntityUserToModelUserEvent(user, event)
 	if err = u.UserProducer.Send(ctx, event); err != nil {
-		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Create", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	res := new(model.UserResponse)

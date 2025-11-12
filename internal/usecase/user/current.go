@@ -13,12 +13,12 @@ import (
 func (u *UserUsecaseImpl) Current(ctx context.Context, req *model.GetUserRequest) (*model.UserResponse, error) {
 	if err := x.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
-		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Current", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	user := new(entity.User)
 	if err := u.UserRepository.FindByID(ctx, u.DB.WithContext(ctx), user, req.ID); err != nil {
-		return nil, errkit.AddFuncName("user.(*UserUsecaseImpl).Current", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	res := new(model.UserResponse)

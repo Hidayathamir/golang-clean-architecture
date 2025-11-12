@@ -45,14 +45,14 @@ func (c *TodoController) Create(ctx *fiber.Ctx) error {
 	req := new(model.CreateTodoRequest)
 	if err := ctx.BodyParser(req); err != nil {
 		err = errkit.BadRequest(err)
-		return errkit.AddFuncName("http.(*TodoController).Create", err)
+		return errkit.AddFuncName(err)
 	}
 
 	req.UserID = auth.ID
 
 	res, err := c.Usecase.Create(ctx.UserContext(), req)
 	if err != nil {
-		return errkit.AddFuncName("http.(*TodoController).Create", err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -81,7 +81,7 @@ func (c *TodoController) List(ctx *fiber.Ctx) error {
 		value, err := strconv.ParseBool(raw)
 		if err != nil {
 			err = errkit.BadRequest(err)
-			return errkit.AddFuncName("http.(*TodoController).List", err)
+			return errkit.AddFuncName(err)
 		}
 		isCompleted = &value
 	}
@@ -96,7 +96,7 @@ func (c *TodoController) List(ctx *fiber.Ctx) error {
 
 	res, total, err := c.Usecase.List(ctx.UserContext(), req)
 	if err != nil {
-		return errkit.AddFuncName("http.(*TodoController).List", err)
+		return errkit.AddFuncName(err)
 	}
 
 	paging := &response.PageMetadata{
@@ -131,7 +131,7 @@ func (c *TodoController) Get(ctx *fiber.Ctx) error {
 
 	res, err := c.Usecase.Get(ctx.UserContext(), req)
 	if err != nil {
-		return errkit.AddFuncName("http.(*TodoController).Get", err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -156,7 +156,7 @@ func (c *TodoController) Update(ctx *fiber.Ctx) error {
 	req := new(model.UpdateTodoRequest)
 	if err := ctx.BodyParser(req); err != nil {
 		err = errkit.BadRequest(err)
-		return errkit.AddFuncName("http.(*TodoController).Update", err)
+		return errkit.AddFuncName(err)
 	}
 
 	req.UserID = auth.ID
@@ -164,7 +164,7 @@ func (c *TodoController) Update(ctx *fiber.Ctx) error {
 
 	res, err := c.Usecase.Update(ctx.UserContext(), req)
 	if err != nil {
-		return errkit.AddFuncName("http.(*TodoController).Update", err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -191,7 +191,7 @@ func (c *TodoController) Delete(ctx *fiber.Ctx) error {
 	}
 
 	if err := c.Usecase.Delete(ctx.UserContext(), req); err != nil {
-		return errkit.AddFuncName("http.(*TodoController).Delete", err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, true)
@@ -219,7 +219,7 @@ func (c *TodoController) Complete(ctx *fiber.Ctx) error {
 
 	res, err := c.Usecase.Complete(ctx.UserContext(), req)
 	if err != nil {
-		return errkit.AddFuncName("http.(*TodoController).Complete", err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)

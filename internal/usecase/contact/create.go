@@ -13,20 +13,20 @@ import (
 func (u *ContactUsecaseImpl) Create(ctx context.Context, req *model.CreateContactRequest) (*model.ContactResponse, error) {
 	if err := x.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
-		return nil, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Create", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	contact := new(entity.Contact)
 	converter.ModelCreateContactRequestToEntityContact(req, contact)
 
 	if err := u.ContactRepository.Create(ctx, u.DB.WithContext(ctx), contact); err != nil {
-		return nil, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Create", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	event := new(model.ContactEvent)
 	converter.EntityContactToModelContactEvent(contact, event)
 	if err := u.ContactProducer.Send(ctx, event); err != nil {
-		return nil, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Create", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	res := new(model.ContactResponse)

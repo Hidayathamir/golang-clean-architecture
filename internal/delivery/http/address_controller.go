@@ -44,7 +44,7 @@ func (c *AddressController) Create(ctx *fiber.Ctx) error {
 	req := new(model.CreateAddressRequest)
 	if err := ctx.BodyParser(req); err != nil {
 		err = errkit.BadRequest(err)
-		return errkit.AddFuncName("http.(*AddressController).Create", err)
+		return errkit.AddFuncName(err)
 	}
 
 	req.UserID = auth.ID
@@ -52,7 +52,7 @@ func (c *AddressController) Create(ctx *fiber.Ctx) error {
 
 	res, err := c.Usecase.Create(ctx.UserContext(), req)
 	if err != nil {
-		return errkit.AddFuncName("http.(*AddressController).Create", err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -81,7 +81,7 @@ func (c *AddressController) List(ctx *fiber.Ctx) error {
 
 	res, err := c.Usecase.List(ctx.UserContext(), req)
 	if err != nil {
-		return errkit.AddFuncName("http.(*AddressController).List", err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -113,7 +113,7 @@ func (c *AddressController) Get(ctx *fiber.Ctx) error {
 
 	res, err := c.Usecase.Get(ctx.UserContext(), req)
 	if err != nil {
-		return errkit.AddFuncName("http.(*AddressController).Get", err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -139,7 +139,7 @@ func (c *AddressController) Update(ctx *fiber.Ctx) error {
 	req := new(model.UpdateAddressRequest)
 	if err := ctx.BodyParser(req); err != nil {
 		err = errkit.BadRequest(err)
-		return errkit.AddFuncName("http.(*AddressController).Update", err)
+		return errkit.AddFuncName(err)
 	}
 
 	req.UserID = auth.ID
@@ -148,7 +148,7 @@ func (c *AddressController) Update(ctx *fiber.Ctx) error {
 
 	res, err := c.Usecase.Update(ctx.UserContext(), req)
 	if err != nil {
-		return errkit.AddFuncName("http.(*AddressController).Update", err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -179,7 +179,7 @@ func (c *AddressController) Delete(ctx *fiber.Ctx) error {
 	}
 
 	if err := c.Usecase.Delete(ctx.UserContext(), req); err != nil {
-		return errkit.AddFuncName("http.(*AddressController).Delete", err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, true)

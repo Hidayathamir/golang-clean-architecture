@@ -34,7 +34,7 @@ run-clean:
 	make clean && make run
 
 clean:
-	make errkitcli && make generate && make swag && make format
+	make generate && make swag && make format
 
 format:
 	golangci-lint run ./... --fix
@@ -44,9 +44,6 @@ generate:
 
 swag:
 	swag fmt --exclude ./internal/mock && swag init --parseDependency --parseInternal --generalInfo ./cmd/web/main.go --output ./api/
-
-errkitcli:
-	go run pkg/errkit/errkitcli/main.go
 
 check-tools:
 	@echo "🔍 Checking required tools..."

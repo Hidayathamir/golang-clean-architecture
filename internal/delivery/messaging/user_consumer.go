@@ -29,7 +29,7 @@ func (c UserConsumer) Consume(message *sarama.ConsumerMessage) error {
 	UserEvent := new(model.UserEvent)
 	if err := json.Unmarshal(message.Value, UserEvent); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error("error unmarshalling User event")
-		return errkit.AddFuncName("messaging.UserConsumer.Consume", err)
+		return errkit.AddFuncName(err)
 	}
 
 	// TODO process event

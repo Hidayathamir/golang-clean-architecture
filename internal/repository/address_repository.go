@@ -35,7 +35,7 @@ func (r *AddressRepositoryImpl) FindByIDAndContactID(ctx context.Context, db *go
 	err := db.Where("id = ? AND contact_id = ?", id, contactID).First(address).Error
 	if err != nil {
 		err = errkit.NotFound(err)
-		return errkit.AddFuncName("repository.(*AddressRepositoryImpl).FindByIDAndContactID", err)
+		return errkit.AddFuncName(err)
 	}
 	return nil
 
@@ -44,7 +44,7 @@ func (r *AddressRepositoryImpl) FindByIDAndContactID(ctx context.Context, db *go
 func (r *AddressRepositoryImpl) FindAllByContactID(ctx context.Context, db *gorm.DB, contactID string) (entity.AddressList, error) {
 	var addresses entity.AddressList
 	if err := db.Where("contact_id = ?", contactID).Find(&addresses).Error; err != nil {
-		return nil, errkit.AddFuncName("repository.(*AddressRepositoryImpl).FindAllByContactID", err)
+		return nil, errkit.AddFuncName(err)
 	}
 	return addresses, nil
 }
@@ -52,7 +52,7 @@ func (r *AddressRepositoryImpl) FindAllByContactID(ctx context.Context, db *gorm
 func (r *AddressRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity *entity.Address) error {
 	err := db.Create(entity).Error
 	if err != nil {
-		return errkit.AddFuncName("repository.(*AddressRepositoryImpl).Create", err)
+		return errkit.AddFuncName(err)
 	}
 	return nil
 }
@@ -60,7 +60,7 @@ func (r *AddressRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity 
 func (r *AddressRepositoryImpl) Update(ctx context.Context, db *gorm.DB, entity *entity.Address) error {
 	err := db.Save(entity).Error
 	if err != nil {
-		return errkit.AddFuncName("repository.(*AddressRepositoryImpl).Update", err)
+		return errkit.AddFuncName(err)
 	}
 	return nil
 }
@@ -68,7 +68,7 @@ func (r *AddressRepositoryImpl) Update(ctx context.Context, db *gorm.DB, entity 
 func (r *AddressRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, entity *entity.Address) error {
 	err := db.Delete(entity).Error
 	if err != nil {
-		return errkit.AddFuncName("repository.(*AddressRepositoryImpl).Delete", err)
+		return errkit.AddFuncName(err)
 	}
 	return nil
 }

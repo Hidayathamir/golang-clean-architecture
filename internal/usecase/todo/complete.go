@@ -14,12 +14,12 @@ import (
 func (u *TodoUsecaseImpl) Complete(ctx context.Context, req *model.CompleteTodoRequest) (*model.TodoResponse, error) {
 	if err := x.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
-		return nil, errkit.AddFuncName("todo.(*TodoUsecaseImpl).Complete", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	todo := new(entity.Todo)
 	if err := u.TodoRepository.FindByIDAndUserID(ctx, u.DB.WithContext(ctx), todo, req.ID, req.UserID); err != nil {
-		return nil, errkit.AddFuncName("todo.(*TodoUsecaseImpl).Complete", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	if !todo.IsCompleted {
@@ -28,13 +28,13 @@ func (u *TodoUsecaseImpl) Complete(ctx context.Context, req *model.CompleteTodoR
 		todo.CompletedAt = &now
 
 		if err := u.TodoRepository.Update(ctx, u.DB.WithContext(ctx), todo); err != nil {
-			return nil, errkit.AddFuncName("todo.(*TodoUsecaseImpl).Complete", err)
+			return nil, errkit.AddFuncName(err)
 		}
 
 		event := new(model.TodoCompletedEvent)
 		converter.EntityTodoToModelTodoCompletedEvent(todo, event)
 		if err := u.TodoProducer.Send(ctx, event); err != nil {
-			return nil, errkit.AddFuncName("todo.(*TodoUsecaseImpl).Complete", err)
+			return nil, errkit.AddFuncName(err)
 		}
 	}
 

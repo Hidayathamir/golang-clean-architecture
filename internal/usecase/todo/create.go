@@ -14,14 +14,14 @@ import (
 func (u *TodoUsecaseImpl) Create(ctx context.Context, req *model.CreateTodoRequest) (*model.TodoResponse, error) {
 	if err := x.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
-		return nil, errkit.AddFuncName("todo.(*TodoUsecaseImpl).Create", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	todo := new(entity.Todo)
 	converter.ModelCreateTodoRequestToEntityTodo(req, todo, uuid.New().String())
 
 	if err := u.TodoRepository.Create(ctx, u.DB.WithContext(ctx), todo); err != nil {
-		return nil, errkit.AddFuncName("todo.(*TodoUsecaseImpl).Create", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	res := new(model.TodoResponse)

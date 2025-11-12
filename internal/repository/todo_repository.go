@@ -35,21 +35,21 @@ func NewTodoRepository(cfg *viper.Viper) *TodoRepositoryImpl {
 
 func (r *TodoRepositoryImpl) Create(ctx context.Context, db *gorm.DB, todo *entity.Todo) error {
 	if err := db.WithContext(ctx).Create(todo).Error; err != nil {
-		return errkit.AddFuncName("repository.(*TodoRepositoryImpl).Create", err)
+		return errkit.AddFuncName(err)
 	}
 	return nil
 }
 
 func (r *TodoRepositoryImpl) Update(ctx context.Context, db *gorm.DB, todo *entity.Todo) error {
 	if err := db.WithContext(ctx).Save(todo).Error; err != nil {
-		return errkit.AddFuncName("repository.(*TodoRepositoryImpl).Update", err)
+		return errkit.AddFuncName(err)
 	}
 	return nil
 }
 
 func (r *TodoRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, todo *entity.Todo) error {
 	if err := db.WithContext(ctx).Delete(todo).Error; err != nil {
-		return errkit.AddFuncName("repository.(*TodoRepositoryImpl).Delete", err)
+		return errkit.AddFuncName(err)
 	}
 	return nil
 }
@@ -63,7 +63,7 @@ func (r *TodoRepositoryImpl) FindByIDAndUserID(ctx context.Context, db *gorm.DB,
 		Take(todo).Error
 	if err != nil {
 		err = errkit.NotFound(err)
-		return errkit.AddFuncName("repository.(*TodoRepositoryImpl).FindByIDAndUserID", err)
+		return errkit.AddFuncName(err)
 	}
 
 	return nil
@@ -76,12 +76,12 @@ func (r *TodoRepositoryImpl) List(ctx context.Context, db *gorm.DB, req *model.L
 		Limit(req.Size).
 		Order(fmt.Sprintf("%s DESC", entity.TodoColumnCreatedAt)).
 		Find(&todos).Error; err != nil {
-		return nil, 0, errkit.AddFuncName("repository.(*TodoRepositoryImpl).List", err)
+		return nil, 0, errkit.AddFuncName(err)
 	}
 
 	var total int64
 	if err := db.Model(&entity.Todo{}).Scopes(r.filterTodos(req)).Count(&total).Error; err != nil {
-		return nil, 0, errkit.AddFuncName("repository.(*TodoRepositoryImpl).List", err)
+		return nil, 0, errkit.AddFuncName(err)
 	}
 
 	return todos, total, nil

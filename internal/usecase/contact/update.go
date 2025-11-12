@@ -13,28 +13,28 @@ import (
 func (u *ContactUsecaseImpl) Update(ctx context.Context, req *model.UpdateContactRequest) (*model.ContactResponse, error) {
 	if err := x.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
-		return nil, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Update", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	contact := new(entity.Contact)
 	if err := u.ContactRepository.FindByIDAndUserID(ctx, u.DB.WithContext(ctx), contact, req.ID, req.UserID); err != nil {
-		return nil, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Update", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	converter.ModelUpdateContactRequestToEntityContact(req, contact)
 
 	if err := u.ContactRepository.Update(ctx, u.DB.WithContext(ctx), contact); err != nil {
-		return nil, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Update", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	if _, err := u.SlackClient.IsConnected(ctx, model.SlackIsConnectedRequest{}); err != nil {
-		return nil, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Update", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	event := new(model.ContactEvent)
 	converter.EntityContactToModelContactEvent(contact, event)
 	if err := u.ContactProducer.Send(ctx, event); err != nil {
-		return nil, errkit.AddFuncName("contact.(*ContactUsecaseImpl).Update", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	res := new(model.ContactResponse)

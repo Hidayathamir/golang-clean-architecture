@@ -13,18 +13,18 @@ import (
 func (u *TodoUsecaseImpl) Update(ctx context.Context, req *model.UpdateTodoRequest) (*model.TodoResponse, error) {
 	if err := x.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
-		return nil, errkit.AddFuncName("todo.(*TodoUsecaseImpl).Update", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	todo := new(entity.Todo)
 	if err := u.TodoRepository.FindByIDAndUserID(ctx, u.DB.WithContext(ctx), todo, req.ID, req.UserID); err != nil {
-		return nil, errkit.AddFuncName("todo.(*TodoUsecaseImpl).Update", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	converter.ModelUpdateTodoRequestToEntityTodo(req, todo)
 
 	if err := u.TodoRepository.Update(ctx, u.DB.WithContext(ctx), todo); err != nil {
-		return nil, errkit.AddFuncName("todo.(*TodoUsecaseImpl).Update", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	res := new(model.TodoResponse)

@@ -13,12 +13,12 @@ import (
 func (u *TodoUsecaseImpl) Get(ctx context.Context, req *model.GetTodoRequest) (*model.TodoResponse, error) {
 	if err := x.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
-		return nil, errkit.AddFuncName("todo.(*TodoUsecaseImpl).Get", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	todo := new(entity.Todo)
 	if err := u.TodoRepository.FindByIDAndUserID(ctx, u.DB.WithContext(ctx), todo, req.ID, req.UserID); err != nil {
-		return nil, errkit.AddFuncName("todo.(*TodoUsecaseImpl).Get", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	res := new(model.TodoResponse)

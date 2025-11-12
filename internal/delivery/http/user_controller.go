@@ -41,12 +41,12 @@ func (c *UserController) Register(ctx *fiber.Ctx) error {
 	err := ctx.BodyParser(req)
 	if err != nil {
 		err = errkit.BadRequest(err)
-		return errkit.AddFuncName("http.(*UserController).Register", err)
+		return errkit.AddFuncName(err)
 	}
 
 	res, err := c.Usecase.Create(ctx.UserContext(), req)
 	if err != nil {
-		return errkit.AddFuncName("http.(*UserController).Register", err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -68,12 +68,12 @@ func (c *UserController) Login(ctx *fiber.Ctx) error {
 	err := ctx.BodyParser(req)
 	if err != nil {
 		err = errkit.BadRequest(err)
-		return errkit.AddFuncName("http.(*UserController).Login", err)
+		return errkit.AddFuncName(err)
 	}
 
 	res, err := c.Usecase.Login(ctx.UserContext(), req)
 	if err != nil {
-		return errkit.AddFuncName("http.(*UserController).Login", err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -99,7 +99,7 @@ func (c *UserController) Current(ctx *fiber.Ctx) error {
 
 	res, err := c.Usecase.Current(ctx.UserContext(), req)
 	if err != nil {
-		return errkit.AddFuncName("http.(*UserController).Current", err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -125,7 +125,7 @@ func (c *UserController) Logout(ctx *fiber.Ctx) error {
 
 	res, err := c.Usecase.Logout(ctx.UserContext(), req)
 	if err != nil {
-		return errkit.AddFuncName("http.(*UserController).Logout", err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -149,13 +149,13 @@ func (c *UserController) Update(ctx *fiber.Ctx) error {
 	req := new(model.UpdateUserRequest)
 	if err := ctx.BodyParser(req); err != nil {
 		err = errkit.BadRequest(err)
-		return errkit.AddFuncName("http.(*UserController).Update", err)
+		return errkit.AddFuncName(err)
 	}
 
 	req.ID = auth.ID
 	res, err := c.Usecase.Update(ctx.UserContext(), req)
 	if err != nil {
-		return errkit.AddFuncName("http.(*UserController).Update", err)
+		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)

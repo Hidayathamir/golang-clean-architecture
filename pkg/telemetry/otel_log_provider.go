@@ -20,7 +20,7 @@ var logger log.Logger = global.GetLoggerProvider().Logger(instrumentationScope)
 func InitLogProvider(viperConfig *viper.Viper) (Stop, error) {
 	exporter, err := newLogExporter(viperConfig)
 	if err != nil {
-		return nil, errkit.AddFuncName("telemetry.InitLogProvider", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	lp := sdklog.NewLoggerProvider(
@@ -39,10 +39,10 @@ func InitLogProvider(viperConfig *viper.Viper) (Stop, error) {
 
 	stop := func() {
 		if err := lp.ForceFlush(context.Background()); err != nil {
-			fmt.Println(errkit.AddFuncName("telemetry.InitLogProvider", err))
+			fmt.Println(errkit.AddFuncName(err))
 		}
 		if err := lp.Shutdown(context.Background()); err != nil {
-			fmt.Println(errkit.AddFuncName("telemetry.InitLogProvider", err))
+			fmt.Println(errkit.AddFuncName(err))
 		}
 	}
 
@@ -53,7 +53,7 @@ func newLogExporter(viperConfig *viper.Viper) (sdklog.Exporter, error) {
 	endpoint := viperConfig.GetString(configkey.TelemetryOTLPEndpoint)
 	if endpoint == "" {
 		err := fmt.Errorf("missing OTLP endpoint configuration")
-		return nil, errkit.AddFuncName("telemetry.newLogExporter", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	options := []otlploggrpc.Option{
@@ -63,7 +63,7 @@ func newLogExporter(viperConfig *viper.Viper) (sdklog.Exporter, error) {
 
 	exporter, err := otlploggrpc.New(context.Background(), options...)
 	if err != nil {
-		return nil, errkit.AddFuncName("telemetry.newLogExporter", err)
+		return nil, errkit.AddFuncName(err)
 	}
 
 	return exporter, nil
