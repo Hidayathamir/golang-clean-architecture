@@ -13,7 +13,7 @@ import (
 //go:generate moq -out=../mock/ContactRepository.go -pkg=mock . ContactRepository
 
 type ContactRepository interface {
-	FindByIDAndUserID(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error
+	FindByIDAndUserID(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error
 	Search(ctx context.Context, db *gorm.DB, req *model.SearchContactRequest) (entity.ContactList, int64, error)
 	Create(ctx context.Context, db *gorm.DB, entity *entity.Contact) error
 	Update(ctx context.Context, db *gorm.DB, entity *entity.Contact) error
@@ -32,7 +32,7 @@ func NewContactRepository(cfg *viper.Viper) *ContactRepositoryImpl {
 	}
 }
 
-func (r *ContactRepositoryImpl) FindByIDAndUserID(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+func (r *ContactRepositoryImpl) FindByIDAndUserID(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 	err := db.Where("id = ? AND user_id = ?", id, userID).Take(contact).Error
 	if err != nil {
 		err = errkit.NotFound(err)

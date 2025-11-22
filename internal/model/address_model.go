@@ -1,7 +1,7 @@
 package model
 
 type AddressResponse struct {
-	ID         string `json:"id"`
+	ID         int64  `json:"id"`
 	Street     string `json:"street"`
 	City       string `json:"city"`
 	Province   string `json:"province"`
@@ -14,13 +14,13 @@ type AddressResponse struct {
 type AddressResponseList []AddressResponse
 
 type ListAddressRequest struct {
-	UserID    int64  `json:"-" validate:"required"`
-	ContactID string `json:"-" validate:"required,max=100,uuid"`
+	UserID    int64 `json:"-" validate:"required"`
+	ContactID int64 `json:"-" validate:"required"`
 }
 
 type CreateAddressRequest struct {
 	UserID     int64  `json:"-"           validate:"required"`
-	ContactID  string `json:"-"           validate:"required,max=100,uuid"`
+	ContactID  int64  `json:"-"           validate:"required"`
 	Street     string `json:"street"      validate:"max=255"`
 	City       string `json:"city"        validate:"max=255"`
 	Province   string `json:"province"    validate:"max=255"`
@@ -30,8 +30,8 @@ type CreateAddressRequest struct {
 
 type UpdateAddressRequest struct {
 	UserID     int64  `json:"-"           validate:"required"`
-	ContactID  string `json:"-"           validate:"required,max=100,uuid"`
-	ID         string `json:"-"           validate:"required,max=100,uuid"`
+	ContactID  int64  `json:"-"           validate:"required"`
+	ID         int64  `json:"-"           validate:"required"`
 	Street     string `json:"street"      validate:"max=255"`
 	City       string `json:"city"        validate:"max=255"`
 	Province   string `json:"province"    validate:"max=255"`
@@ -40,13 +40,13 @@ type UpdateAddressRequest struct {
 }
 
 type GetAddressRequest struct {
-	UserID    int64  `json:"-" validate:"required"`
-	ContactID string `json:"-" validate:"required,max=100,uuid"`
-	ID        string `json:"-" validate:"required,max=100,uuid"`
+	UserID    int64 `json:"-" validate:"required"`
+	ContactID int64 `json:"-" validate:"required"`
+	ID        int64 `json:"-" validate:"required"`
 }
 
 type DeleteAddressRequest struct {
-	UserID    int64  `json:"-" validate:"required"`
-	ContactID string `json:"-" validate:"required,max=100,uuid"`
-	ID        string `json:"-" validate:"required,max=100,uuid"`
+	UserID    int64 `json:"-" validate:"required"`
+	ContactID int64 `json:"-" validate:"required"`
+	ID        int64 `json:"-" validate:"required"`
 }

@@ -10,7 +10,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/address"
 	"github.com/go-playground/validator/v10"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -32,16 +31,16 @@ func TestAddressUsecaseImpl_Update_Success(t *testing.T) {
 	const street = "street1"
 	req := &model.UpdateAddressRequest{
 		UserID:    testUserID,
-		ContactID: uuid.NewString(),
-		ID:        uuid.NewString(),
+		ContactID: 1,
+		ID: 1,
 		Street:    street,
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return nil
 	}
 
-	AddressRepository.FindByIDAndContactIDFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactID string) error {
+	AddressRepository.FindByIDAndContactIDFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactID int64) error {
 		return nil
 	}
 
@@ -84,16 +83,16 @@ func TestAddressUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 	const street = "street1"
 	req := &model.UpdateAddressRequest{
 		UserID:    0,
-		ContactID: uuid.NewString(),
-		ID:        uuid.NewString(),
+		ContactID: 1,
+		ID: 1,
 		Street:    street,
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return nil
 	}
 
-	AddressRepository.FindByIDAndContactIDFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactID string) error {
+	AddressRepository.FindByIDAndContactIDFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactID int64) error {
 		return nil
 	}
 
@@ -136,16 +135,16 @@ func TestAddressUsecaseImpl_Update_Fail_FindByIDAndUserID(t *testing.T) {
 	const street = "street1"
 	req := &model.UpdateAddressRequest{
 		UserID:    testUserID,
-		ContactID: uuid.NewString(),
-		ID:        uuid.NewString(),
+		ContactID: 1,
+		ID: 1,
 		Street:    street,
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return assert.AnError
 	}
 
-	AddressRepository.FindByIDAndContactIDFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactID string) error {
+	AddressRepository.FindByIDAndContactIDFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactID int64) error {
 		return nil
 	}
 
@@ -187,16 +186,16 @@ func TestAddressUsecaseImpl_Update_Fail_FindByIDAndContactID(t *testing.T) {
 	const street = "street1"
 	req := &model.UpdateAddressRequest{
 		UserID:    testUserID,
-		ContactID: uuid.NewString(),
-		ID:        uuid.NewString(),
+		ContactID: 1,
+		ID: 1,
 		Street:    street,
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return nil
 	}
 
-	AddressRepository.FindByIDAndContactIDFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactID string) error {
+	AddressRepository.FindByIDAndContactIDFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactID int64) error {
 		return assert.AnError
 	}
 
@@ -238,16 +237,16 @@ func TestAddressUsecaseImpl_Update_Fail_Update(t *testing.T) {
 	const street = "street1"
 	req := &model.UpdateAddressRequest{
 		UserID:    testUserID,
-		ContactID: uuid.NewString(),
-		ID:        uuid.NewString(),
+		ContactID: 1,
+		ID: 1,
 		Street:    street,
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return nil
 	}
 
-	AddressRepository.FindByIDAndContactIDFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactID string) error {
+	AddressRepository.FindByIDAndContactIDFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactID int64) error {
 		return nil
 	}
 
@@ -289,16 +288,16 @@ func TestAddressUsecaseImpl_Update_Fail_Send(t *testing.T) {
 	const street = "street1"
 	req := &model.UpdateAddressRequest{
 		UserID:    testUserID,
-		ContactID: uuid.NewString(),
-		ID:        uuid.NewString(),
+		ContactID: 1,
+		ID: 1,
 		Street:    street,
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return nil
 	}
 
-	AddressRepository.FindByIDAndContactIDFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactID string) error {
+	AddressRepository.FindByIDAndContactIDFunc = func(ctx context.Context, db *gorm.DB, address *entity.Address, id, contactID int64) error {
 		return nil
 	}
 

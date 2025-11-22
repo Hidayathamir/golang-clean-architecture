@@ -3,6 +3,7 @@ package http
 import (
 	"math"
 	"net/http"
+	"strconv"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/middleware"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
@@ -114,9 +115,15 @@ func (c *ContactController) Get(ctx *fiber.Ctx) error {
 
 	auth := middleware.GetUser(ctx)
 
+	contactID, err := strconv.ParseInt(ctx.Params("contactId"), 10, 64)
+	if err != nil {
+		err = errkit.BadRequest(err)
+		return errkit.AddFuncName(err)
+	}
+
 	req := &model.GetContactRequest{
 		UserID: auth.ID,
-		ID:     ctx.Params("contactId"),
+		ID:     contactID,
 	}
 
 	res, err := c.Usecase.Get(ctx.UserContext(), req)
@@ -150,7 +157,13 @@ func (c *ContactController) Update(ctx *fiber.Ctx) error {
 	}
 
 	req.UserID = auth.ID
-	req.ID = ctx.Params("contactId")
+
+	contactID, err := strconv.ParseInt(ctx.Params("contactId"), 10, 64)
+	if err != nil {
+		err = errkit.BadRequest(err)
+		return errkit.AddFuncName(err)
+	}
+	req.ID = contactID
 
 	res, err := c.Usecase.Update(ctx.UserContext(), req)
 	if err != nil {
@@ -174,7 +187,12 @@ func (c *ContactController) Delete(ctx *fiber.Ctx) error {
 	defer span.End()
 
 	auth := middleware.GetUser(ctx)
-	contactID := ctx.Params("contactId")
+
+	contactID, err := strconv.ParseInt(ctx.Params("contactId"), 10, 64)
+	if err != nil {
+		err = errkit.BadRequest(err)
+		return errkit.AddFuncName(err)
+	}
 
 	req := &model.DeleteContactRequest{
 		UserID: auth.ID,

@@ -2,6 +2,7 @@ package integrationtest
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -134,7 +135,7 @@ func TestUpdateContactUnauthorized(t *testing.T) {
 	bodyJSON, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req := httptest.NewRequest(http.MethodPut, "/api/contacts/"+contact.ID, strings.NewReader(string(bodyJSON)))
+	req := httptest.NewRequest(http.MethodPut, fmt.Sprintf("/api/contacts/%d", contact.ID), strings.NewReader(string(bodyJSON)))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 
@@ -164,7 +165,7 @@ func TestGetConnect(t *testing.T) {
 	})
 	contact := GetFirstContact(t, user)
 
-	req := httptest.NewRequest(http.MethodGet, "/api/contacts/"+contact.ID, nil)
+	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/api/contacts/%d", contact.ID), nil)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", bearerToken(token))
 
@@ -198,9 +199,9 @@ func TestGetContactFailed(t *testing.T) {
 		Email:     "eko@example.com",
 		Phone:     "088888888888",
 	})
-	_ = GetFirstContact(t, user)
+	contact := GetFirstContact(t, user)
 
-	req := httptest.NewRequest(http.MethodGet, "/api/contacts/"+uuid.NewString(), nil)
+	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/api/contacts/%d", contact.ID+1000), nil)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", bearerToken(token))
 
@@ -233,7 +234,7 @@ func TestGetContactOtherUser(t *testing.T) {
 	otherPassword := "secret"
 	otherToken := registerAndLoginUser(t, otherUsername, otherPassword, "Other User")
 
-	req := httptest.NewRequest(http.MethodGet, "/api/contacts/"+contact.ID, nil)
+	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/api/contacts/%d", contact.ID), nil)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", bearerToken(otherToken))
 
@@ -276,7 +277,7 @@ func TestUpdateContactOtherUser(t *testing.T) {
 	bodyJSON, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req := httptest.NewRequest(http.MethodPut, "/api/contacts/"+contact.ID, strings.NewReader(string(bodyJSON)))
+	req := httptest.NewRequest(http.MethodPut, fmt.Sprintf("/api/contacts/%d", contact.ID), strings.NewReader(string(bodyJSON)))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", bearerToken(otherToken))
@@ -316,7 +317,7 @@ func TestUpdateContact(t *testing.T) {
 	bodyJSON, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req := httptest.NewRequest(http.MethodPut, "/api/contacts/"+contact.ID, strings.NewReader(string(bodyJSON)))
+	req := httptest.NewRequest(http.MethodPut, fmt.Sprintf("/api/contacts/%d", contact.ID), strings.NewReader(string(bodyJSON)))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", bearerToken(token))
@@ -357,7 +358,7 @@ func TestUpdateContactFailed(t *testing.T) {
 	bodyJSON, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req := httptest.NewRequest(http.MethodPut, "/api/contacts/"+contact.ID, strings.NewReader(string(bodyJSON)))
+	req := httptest.NewRequest(http.MethodPut, fmt.Sprintf("/api/contacts/%d", contact.ID), strings.NewReader(string(bodyJSON)))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", bearerToken(token))
@@ -387,7 +388,7 @@ func TestDeleteContact(t *testing.T) {
 	})
 	contact := GetFirstContact(t, user)
 
-	req := httptest.NewRequest(http.MethodDelete, "/api/contacts/"+contact.ID, nil)
+	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/api/contacts/%d", contact.ID), nil)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", bearerToken(token))
 
@@ -415,9 +416,9 @@ func TestDeleteContactFailed(t *testing.T) {
 		Email:     "eko@example.com",
 		Phone:     "088888888888",
 	})
-	_ = GetFirstContact(t, user)
+	contact := GetFirstContact(t, user)
 
-	req := httptest.NewRequest(http.MethodDelete, "/api/contacts/"+uuid.NewString(), nil)
+	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/api/contacts/%d", contact.ID+1000), nil)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", bearerToken(token))
 
@@ -446,7 +447,7 @@ func TestDeleteContactUnauthorized(t *testing.T) {
 	})
 	contact := GetFirstContact(t, user)
 
-	req := httptest.NewRequest(http.MethodDelete, "/api/contacts/"+contact.ID, nil)
+	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/api/contacts/%d", contact.ID), nil)
 	req.Header.Set("Accept", "application/json")
 
 	res, err := app.Test(req)
@@ -477,7 +478,7 @@ func TestDeleteContactOtherUser(t *testing.T) {
 
 	otherToken := registerAndLoginUser(t, uuid.NewString(), "secret", "Other User")
 
-	req := httptest.NewRequest(http.MethodDelete, "/api/contacts/"+contact.ID, nil)
+	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/api/contacts/%d", contact.ID), nil)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", bearerToken(otherToken))
 

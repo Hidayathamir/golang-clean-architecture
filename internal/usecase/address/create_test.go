@@ -9,7 +9,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/address"
 	"github.com/go-playground/validator/v10"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -30,10 +29,10 @@ func TestAddressUsecaseImpl_Create_Success(t *testing.T) {
 
 	req := &model.CreateAddressRequest{
 		UserID:    testUserID,
-		ContactID: uuid.NewString(),
+		ContactID: 1,
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return nil
 	}
 
@@ -54,8 +53,8 @@ func TestAddressUsecaseImpl_Create_Success(t *testing.T) {
 	expected := &model.AddressResponse{}
 
 	// not comparing id
-	res.ID = ""
-	expected.ID = ""
+	res.ID = 0
+	expected.ID = 0
 	assert.Equal(t, expected, res)
 	assert.Nil(t, err)
 }
@@ -76,10 +75,10 @@ func TestAddressUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 
 	req := &model.CreateAddressRequest{
 		UserID:    0,
-		ContactID: uuid.NewString(),
+		ContactID: 1,
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return nil
 	}
 
@@ -121,10 +120,10 @@ func TestAddressUsecaseImpl_Create_Fail_FindByIDAndUserID(t *testing.T) {
 
 	req := &model.CreateAddressRequest{
 		UserID:    testUserID,
-		ContactID: uuid.NewString(),
+		ContactID: 1,
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return assert.AnError
 	}
 
@@ -165,10 +164,10 @@ func TestAddressUsecaseImpl_Create_Fail_Create(t *testing.T) {
 
 	req := &model.CreateAddressRequest{
 		UserID:    testUserID,
-		ContactID: uuid.NewString(),
+		ContactID: 1,
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return nil
 	}
 
@@ -209,10 +208,10 @@ func TestAddressUsecaseImpl_Create_Fail_Send(t *testing.T) {
 
 	req := &model.CreateAddressRequest{
 		UserID:    testUserID,
-		ContactID: uuid.NewString(),
+		ContactID: 1,
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return nil
 	}
 

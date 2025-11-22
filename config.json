@@ -36,7 +36,7 @@
   },
   "kafka": {
     "bootstrap": {
-      "servers": "localhost:9092"
+      "servers": "localhost:9093"
     },
     "group": {
       "id": "github.com/Hidayathamir/golang-clean-architecture"

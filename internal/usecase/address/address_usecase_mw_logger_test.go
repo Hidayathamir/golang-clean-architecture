@@ -24,7 +24,7 @@ func TestAddressUsecaseMwLogger_Create(t *testing.T) {
 		Next: Next,
 	}
 	Next.CreateFunc = func(ctx context.Context, req *model.CreateAddressRequest) (*model.AddressResponse, error) {
-		return &model.AddressResponse{ID: "id1"}, nil
+		return &model.AddressResponse{ID: 1}, nil
 	}
 	res, err := u.Create(context.Background(), &model.CreateAddressRequest{})
 	assert.NotEmpty(t, res)
@@ -51,7 +51,7 @@ func TestAddressUsecaseMwLogger_Get(t *testing.T) {
 		Next: Next,
 	}
 	Next.GetFunc = func(ctx context.Context, req *model.GetAddressRequest) (*model.AddressResponse, error) {
-		return &model.AddressResponse{ID: "id1"}, nil
+		return &model.AddressResponse{ID: 1}, nil
 	}
 	res, err := u.Get(context.Background(), &model.GetAddressRequest{})
 	assert.NotEmpty(t, res)
@@ -79,7 +79,7 @@ func TestAddressUsecaseMwLogger_Update(t *testing.T) {
 		Next: Next,
 	}
 	Next.UpdateFunc = func(ctx context.Context, req *model.UpdateAddressRequest) (*model.AddressResponse, error) {
-		return &model.AddressResponse{ID: "id1"}, nil
+		return &model.AddressResponse{ID: 1}, nil
 	}
 	res, err := u.Update(context.Background(), &model.UpdateAddressRequest{})
 	assert.NotEmpty(t, res)

@@ -12,8 +12,8 @@ import (
 //go:generate moq -out=../mock/AddressRepository.go -pkg=mock . AddressRepository
 
 type AddressRepository interface {
-	FindByIDAndContactID(ctx context.Context, db *gorm.DB, address *entity.Address, id string, contactID string) error
-	FindAllByContactID(ctx context.Context, db *gorm.DB, contactID string) (entity.AddressList, error)
+	FindByIDAndContactID(ctx context.Context, db *gorm.DB, address *entity.Address, id int64, contactID int64) error
+	FindAllByContactID(ctx context.Context, db *gorm.DB, contactID int64) (entity.AddressList, error)
 	Create(ctx context.Context, db *gorm.DB, entity *entity.Address) error
 	Update(ctx context.Context, db *gorm.DB, entity *entity.Address) error
 	Delete(ctx context.Context, db *gorm.DB, entity *entity.Address) error
@@ -31,7 +31,7 @@ func NewAddressRepository(cfg *viper.Viper) *AddressRepositoryImpl {
 	}
 }
 
-func (r *AddressRepositoryImpl) FindByIDAndContactID(ctx context.Context, db *gorm.DB, address *entity.Address, id string, contactID string) error {
+func (r *AddressRepositoryImpl) FindByIDAndContactID(ctx context.Context, db *gorm.DB, address *entity.Address, id int64, contactID int64) error {
 	err := db.Where("id = ? AND contact_id = ?", id, contactID).First(address).Error
 	if err != nil {
 		err = errkit.NotFound(err)
@@ -41,7 +41,7 @@ func (r *AddressRepositoryImpl) FindByIDAndContactID(ctx context.Context, db *go
 
 }
 
-func (r *AddressRepositoryImpl) FindAllByContactID(ctx context.Context, db *gorm.DB, contactID string) (entity.AddressList, error) {
+func (r *AddressRepositoryImpl) FindAllByContactID(ctx context.Context, db *gorm.DB, contactID int64) (entity.AddressList, error) {
 	var addresses entity.AddressList
 	if err := db.Where("contact_id = ?", contactID).Find(&addresses).Error; err != nil {
 		return nil, errkit.AddFuncName(err)

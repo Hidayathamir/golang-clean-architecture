@@ -9,7 +9,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/contact"
 	"github.com/go-playground/validator/v10"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -26,10 +25,10 @@ func TestContactUsecaseImpl_Get_Success(t *testing.T) {
 
 	req := &model.GetContactRequest{
 		UserID: testUserID,
-		ID:     uuid.NewString(),
+		ID: 1,
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return nil
 	}
 
@@ -57,10 +56,10 @@ func TestContactUsecaseImpl_Get_Fail_ValidateStruct(t *testing.T) {
 
 	req := &model.GetContactRequest{
 		UserID: 0,
-		ID:     uuid.NewString(),
+		ID: 1,
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return assert.AnError
 	}
 
@@ -90,10 +89,10 @@ func TestContactUsecaseImpl_Get_Fail_FindByIDAndUserID(t *testing.T) {
 
 	req := &model.GetContactRequest{
 		UserID: testUserID,
-		ID:     uuid.NewString(),
+		ID: 1,
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return assert.AnError
 	}
 

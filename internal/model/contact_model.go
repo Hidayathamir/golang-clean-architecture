@@ -1,7 +1,7 @@
 package model
 
 type ContactResponse struct {
-	ID        string              `json:"id"`
+	ID        int64               `json:"id"`
 	FirstName string              `json:"first_name"`
 	LastName  string              `json:"last_name"`
 	Email     string              `json:"email"`
@@ -23,7 +23,7 @@ type CreateContactRequest struct {
 
 type UpdateContactRequest struct {
 	UserID    int64  `json:"-"          validate:"required"`
-	ID        string `json:"-"          validate:"required,max=100,uuid"`
+	ID        int64  `json:"-"          validate:"required"`
 	FirstName string `json:"first_name" validate:"required,max=100"`
 	LastName  string `json:"last_name"  validate:"max=100"`
 	Email     string `json:"email"      validate:"max=200,email"`
@@ -40,11 +40,11 @@ type SearchContactRequest struct {
 }
 
 type GetContactRequest struct {
-	UserID int64  `json:"-" validate:"required"`
-	ID     string `json:"-" validate:"required,max=100,uuid"`
+	UserID int64 `json:"-" validate:"required"`
+	ID     int64 `json:"-" validate:"required"`
 }
 
 type DeleteContactRequest struct {
-	UserID int64  `json:"-" validate:"required"`
-	ID     string `json:"-" validate:"required,max=100,uuid"`
+	UserID int64 `json:"-" validate:"required"`
+	ID     int64 `json:"-" validate:"required"`
 }

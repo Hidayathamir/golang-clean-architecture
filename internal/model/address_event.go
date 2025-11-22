@@ -1,8 +1,8 @@
 package model
 
 type AddressEvent struct {
-	ID         string `json:"id"`
-	ContactID  string `json:"contact_id"`
+	ID         int64  `json:"id"`
+	ContactID  int64  `json:"contact_id"`
 	Street     string `json:"street"`
 	City       string `json:"city"`
 	Province   string `json:"province"`
@@ -12,6 +12,6 @@ type AddressEvent struct {
 	UpdatedAt  int64  `json:"updated_at"`
 }
 
-func (a *AddressEvent) GetID() string {
+func (a *AddressEvent) GetID() int64 {
 	return a.ID
 }

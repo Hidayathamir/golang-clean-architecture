@@ -23,7 +23,7 @@ func NewContactRepositoryMwLogger(next ContactRepository) *ContactRepositoryMwLo
 	}
 }
 
-func (r *ContactRepositoryMwLogger) FindByIDAndUserID(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+func (r *ContactRepositoryMwLogger) FindByIDAndUserID(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 

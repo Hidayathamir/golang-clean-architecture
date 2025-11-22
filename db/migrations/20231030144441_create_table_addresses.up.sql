@@ -1,7 +1,7 @@
 create table if not exists addresses
 (
-    id          varchar(100) not null,
-    contact_id  varchar(100) not null,
+    id          bigserial    not null,
+    contact_id  bigint       not null,
     street      varchar(255),
     city        varchar(255),
     province    varchar(255),

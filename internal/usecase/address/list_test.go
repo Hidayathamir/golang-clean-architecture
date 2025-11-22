@@ -26,12 +26,12 @@ func TestAddressUsecaseImpl_List_Successs(t *testing.T) {
 
 	req := &model.ListAddressRequest{}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return nil
 	}
 
 	addresses := entity.AddressList{{}}
-	AddressRepository.FindAllByContactIDFunc = func(ctx context.Context, db *gorm.DB, contactID string) (entity.AddressList, error) {
+	AddressRepository.FindAllByContactIDFunc = func(ctx context.Context, db *gorm.DB, contactID int64) (entity.AddressList, error) {
 		return addresses, nil
 	}
 
@@ -61,12 +61,12 @@ func TestAddressUsecaseImpl_List_Fail_FindByIDAndUserID(t *testing.T) {
 
 	req := &model.ListAddressRequest{}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return assert.AnError
 	}
 
 	var addresses entity.AddressList
-	AddressRepository.FindAllByContactIDFunc = func(ctx context.Context, db *gorm.DB, contactID string) (entity.AddressList, error) {
+	AddressRepository.FindAllByContactIDFunc = func(ctx context.Context, db *gorm.DB, contactID int64) (entity.AddressList, error) {
 		return addresses, nil
 	}
 
@@ -97,11 +97,11 @@ func TestAddressUsecaseImpl_List_Fail_FindAllByContactID(t *testing.T) {
 
 	req := &model.ListAddressRequest{}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return nil
 	}
 
-	AddressRepository.FindAllByContactIDFunc = func(ctx context.Context, db *gorm.DB, contactID string) (entity.AddressList, error) {
+	AddressRepository.FindAllByContactIDFunc = func(ctx context.Context, db *gorm.DB, contactID int64) (entity.AddressList, error) {
 		return nil, assert.AnError
 	}
 

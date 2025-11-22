@@ -22,7 +22,7 @@ func NewAddressRepositoryMwLogger(next AddressRepository) *AddressRepositoryMwLo
 	}
 }
 
-func (r *AddressRepositoryMwLogger) FindAllByContactID(ctx context.Context, db *gorm.DB, contactID string) (entity.AddressList, error) {
+func (r *AddressRepositoryMwLogger) FindAllByContactID(ctx context.Context, db *gorm.DB, contactID int64) (entity.AddressList, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -38,7 +38,7 @@ func (r *AddressRepositoryMwLogger) FindAllByContactID(ctx context.Context, db *
 	return addresses, err
 }
 
-func (r *AddressRepositoryMwLogger) FindByIDAndContactID(ctx context.Context, db *gorm.DB, address *entity.Address, id string, contactID string) error {
+func (r *AddressRepositoryMwLogger) FindByIDAndContactID(ctx context.Context, db *gorm.DB, address *entity.Address, id int64, contactID int64) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 

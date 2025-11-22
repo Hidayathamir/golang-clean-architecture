@@ -27,10 +27,10 @@ var _ repository.AddressRepository = &AddressRepositoryMock{}
 //			DeleteFunc: func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Address) error {
 //				panic("mock out the Delete method")
 //			},
-//			FindAllByContactIDFunc: func(ctx context.Context, db *gorm.DB, contactID string) (entity.AddressList, error) {
+//			FindAllByContactIDFunc: func(ctx context.Context, db *gorm.DB, contactID int64) (entity.AddressList, error) {
 //				panic("mock out the FindAllByContactID method")
 //			},
-//			FindByIDAndContactIDFunc: func(ctx context.Context, db *gorm.DB, address *entity.Address, id string, contactID string) error {
+//			FindByIDAndContactIDFunc: func(ctx context.Context, db *gorm.DB, address *entity.Address, id int64, contactID int64) error {
 //				panic("mock out the FindByIDAndContactID method")
 //			},
 //			UpdateFunc: func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Address) error {
@@ -50,10 +50,10 @@ type AddressRepositoryMock struct {
 	DeleteFunc func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Address) error
 
 	// FindAllByContactIDFunc mocks the FindAllByContactID method.
-	FindAllByContactIDFunc func(ctx context.Context, db *gorm.DB, contactID string) (entity.AddressList, error)
+	FindAllByContactIDFunc func(ctx context.Context, db *gorm.DB, contactID int64) (entity.AddressList, error)
 
 	// FindByIDAndContactIDFunc mocks the FindByIDAndContactID method.
-	FindByIDAndContactIDFunc func(ctx context.Context, db *gorm.DB, address *entity.Address, id string, contactID string) error
+	FindByIDAndContactIDFunc func(ctx context.Context, db *gorm.DB, address *entity.Address, id int64, contactID int64) error
 
 	// UpdateFunc mocks the Update method.
 	UpdateFunc func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Address) error
@@ -85,7 +85,7 @@ type AddressRepositoryMock struct {
 			// Db is the db argument value.
 			Db *gorm.DB
 			// ContactID is the contactID argument value.
-			ContactID string
+			ContactID int64
 		}
 		// FindByIDAndContactID holds details about calls to the FindByIDAndContactID method.
 		FindByIDAndContactID []struct {
@@ -96,9 +96,9 @@ type AddressRepositoryMock struct {
 			// Address is the address argument value.
 			Address *entity.Address
 			// ID is the id argument value.
-			ID string
+			ID int64
 			// ContactID is the contactID argument value.
-			ContactID string
+			ContactID int64
 		}
 		// Update holds details about calls to the Update method.
 		Update []struct {
@@ -198,14 +198,14 @@ func (mock *AddressRepositoryMock) DeleteCalls() []struct {
 }
 
 // FindAllByContactID calls FindAllByContactIDFunc.
-func (mock *AddressRepositoryMock) FindAllByContactID(ctx context.Context, db *gorm.DB, contactID string) (entity.AddressList, error) {
+func (mock *AddressRepositoryMock) FindAllByContactID(ctx context.Context, db *gorm.DB, contactID int64) (entity.AddressList, error) {
 	if mock.FindAllByContactIDFunc == nil {
 		panic("AddressRepositoryMock.FindAllByContactIDFunc: method is nil but AddressRepository.FindAllByContactID was just called")
 	}
 	callInfo := struct {
 		Ctx       context.Context
 		Db        *gorm.DB
-		ContactID string
+		ContactID int64
 	}{
 		Ctx:       ctx,
 		Db:        db,
@@ -224,12 +224,12 @@ func (mock *AddressRepositoryMock) FindAllByContactID(ctx context.Context, db *g
 func (mock *AddressRepositoryMock) FindAllByContactIDCalls() []struct {
 	Ctx       context.Context
 	Db        *gorm.DB
-	ContactID string
+	ContactID int64
 } {
 	var calls []struct {
 		Ctx       context.Context
 		Db        *gorm.DB
-		ContactID string
+		ContactID int64
 	}
 	mock.lockFindAllByContactID.RLock()
 	calls = mock.calls.FindAllByContactID
@@ -238,7 +238,7 @@ func (mock *AddressRepositoryMock) FindAllByContactIDCalls() []struct {
 }
 
 // FindByIDAndContactID calls FindByIDAndContactIDFunc.
-func (mock *AddressRepositoryMock) FindByIDAndContactID(ctx context.Context, db *gorm.DB, address *entity.Address, id string, contactID string) error {
+func (mock *AddressRepositoryMock) FindByIDAndContactID(ctx context.Context, db *gorm.DB, address *entity.Address, id int64, contactID int64) error {
 	if mock.FindByIDAndContactIDFunc == nil {
 		panic("AddressRepositoryMock.FindByIDAndContactIDFunc: method is nil but AddressRepository.FindByIDAndContactID was just called")
 	}
@@ -246,8 +246,8 @@ func (mock *AddressRepositoryMock) FindByIDAndContactID(ctx context.Context, db 
 		Ctx       context.Context
 		Db        *gorm.DB
 		Address   *entity.Address
-		ID        string
-		ContactID string
+		ID        int64
+		ContactID int64
 	}{
 		Ctx:       ctx,
 		Db:        db,
@@ -269,15 +269,15 @@ func (mock *AddressRepositoryMock) FindByIDAndContactIDCalls() []struct {
 	Ctx       context.Context
 	Db        *gorm.DB
 	Address   *entity.Address
-	ID        string
-	ContactID string
+	ID        int64
+	ContactID int64
 } {
 	var calls []struct {
 		Ctx       context.Context
 		Db        *gorm.DB
 		Address   *entity.Address
-		ID        string
-		ContactID string
+		ID        int64
+		ContactID int64
 	}
 	mock.lockFindByIDAndContactID.RLock()
 	calls = mock.calls.FindByIDAndContactID

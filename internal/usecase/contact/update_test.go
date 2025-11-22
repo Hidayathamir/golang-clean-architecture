@@ -9,7 +9,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/contact"
 	"github.com/go-playground/validator/v10"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -30,12 +29,12 @@ func TestContactUsecaseImpl_Update_Success(t *testing.T) {
 
 	req := &model.UpdateContactRequest{
 		UserID:    testUserID,
-		ID:        uuid.NewString(),
+		ID:        1,
 		FirstName: "firstname1",
 		Email:     "hidayat@gmail.com",
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return nil
 	}
 
@@ -58,7 +57,7 @@ func TestContactUsecaseImpl_Update_Success(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	var expected = &model.ContactResponse{
-		ID:        "",
+		ID:        0,
 		FirstName: "firstname1",
 		LastName:  "",
 		Email:     "hidayat@gmail.com",
@@ -88,12 +87,12 @@ func TestContactUsecaseImpl_Update_ValidateStruct(t *testing.T) {
 
 	req := &model.UpdateContactRequest{
 		UserID:    0,
-		ID:        uuid.NewString(),
+		ID:        1,
 		FirstName: "firstname1",
 		Email:     "hidayat@gmail.com",
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return nil
 	}
 
@@ -139,12 +138,12 @@ func TestContactUsecaseImpl_Update_Fail_FindByIDAndUserID(t *testing.T) {
 
 	req := &model.UpdateContactRequest{
 		UserID:    testUserID,
-		ID:        uuid.NewString(),
+		ID:        1,
 		FirstName: "firstname1",
 		Email:     "hidayat@gmail.com",
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return assert.AnError
 	}
 
@@ -189,12 +188,12 @@ func TestContactUsecaseImpl_Update_Fail_Update(t *testing.T) {
 
 	req := &model.UpdateContactRequest{
 		UserID:    testUserID,
-		ID:        uuid.NewString(),
+		ID:        1,
 		FirstName: "firstname1",
 		Email:     "hidayat@gmail.com",
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return nil
 	}
 
@@ -239,12 +238,12 @@ func TestContactUsecaseImpl_Update_Fail_IsConnected(t *testing.T) {
 
 	req := &model.UpdateContactRequest{
 		UserID:    testUserID,
-		ID:        uuid.NewString(),
+		ID:        1,
 		FirstName: "firstname1",
 		Email:     "hidayat@gmail.com",
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return nil
 	}
 
@@ -289,12 +288,12 @@ func TestContactUsecaseImpl_Update_Fail_Send(t *testing.T) {
 
 	req := &model.UpdateContactRequest{
 		UserID:    testUserID,
-		ID:        uuid.NewString(),
+		ID:        1,
 		FirstName: "firstname1",
 		Email:     "hidayat@gmail.com",
 	}
 
-	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id string, userID int64) error {
+	ContactRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, contact *entity.Contact, id int64, userID int64) error {
 		return nil
 	}
 

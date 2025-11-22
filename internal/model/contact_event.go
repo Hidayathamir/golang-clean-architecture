@@ -1,7 +1,7 @@
 package model
 
 type ContactEvent struct {
-	ID        string `json:"id"`
+	ID        int64  `json:"id"`
 	UserID    int64  `json:"user_id"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
@@ -11,6 +11,6 @@ type ContactEvent struct {
 	UpdatedAt int64  `json:"updated_at"`
 }
 
-func (c *ContactEvent) GetID() string {
+func (c *ContactEvent) GetID() int64 {
 	return c.ID
 }

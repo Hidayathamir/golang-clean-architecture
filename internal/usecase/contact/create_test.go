@@ -51,8 +51,8 @@ func TestContactUsecaseImpl_Create_Success(t *testing.T) {
 	}
 
 	// not comparing id
-	res.ID = ""
-	expected.ID = ""
+	res.ID = 0
+	expected.ID = 0
 	assert.Equal(t, expected, res)
 	assert.Nil(t, err)
 }

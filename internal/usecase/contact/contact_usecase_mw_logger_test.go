@@ -24,7 +24,7 @@ func TestContactUsecaseMwLogger_Create(t *testing.T) {
 		Next: Next,
 	}
 	Next.CreateFunc = func(ctx context.Context, req *model.CreateContactRequest) (*model.ContactResponse, error) {
-		return &model.ContactResponse{ID: "id1"}, nil
+		return &model.ContactResponse{ID: 1}, nil
 	}
 	res, err := u.Create(context.Background(), &model.CreateContactRequest{})
 	assert.NotEmpty(t, res)
@@ -51,7 +51,7 @@ func TestContactUsecaseMwLogger_Get(t *testing.T) {
 		Next: Next,
 	}
 	Next.GetFunc = func(ctx context.Context, req *model.GetContactRequest) (*model.ContactResponse, error) {
-		return &model.ContactResponse{ID: "id1"}, nil
+		return &model.ContactResponse{ID: 1}, nil
 	}
 	res, err := u.Get(context.Background(), &model.GetContactRequest{})
 	assert.NotEmpty(t, res)
@@ -80,7 +80,7 @@ func TestContactUsecaseMwLogger_Update(t *testing.T) {
 		Next: Next,
 	}
 	Next.UpdateFunc = func(ctx context.Context, req *model.UpdateContactRequest) (*model.ContactResponse, error) {
-		return &model.ContactResponse{ID: "id1"}, nil
+		return &model.ContactResponse{ID: 1}, nil
 	}
 	res, err := u.Update(context.Background(), &model.UpdateContactRequest{})
 	assert.NotEmpty(t, res)

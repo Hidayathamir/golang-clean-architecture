@@ -2,6 +2,7 @@ package address
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
@@ -22,7 +23,7 @@ func (u *AddressUsecaseImpl) Delete(ctx context.Context, req *model.DeleteAddres
 
 	err := u.DB.Transaction(func(tx *gorm.DB) error {
 		if _, err := u.PaymentClient.Refund(ctx, model.PaymentRefundRequest{
-			TransactionID: address.ID,
+			TransactionID: strconv.FormatInt(address.ID, 10),
 		}); err != nil {
 			return errkit.AddFuncName(err)
 		}

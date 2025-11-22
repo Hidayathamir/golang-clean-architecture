@@ -3,6 +3,7 @@ package messaging
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
@@ -47,7 +48,7 @@ func (p *ContactProducerImpl) Send(ctx context.Context, event *model.ContactEven
 
 	message := &sarama.ProducerMessage{
 		Topic: p.Topic,
-		Key:   sarama.StringEncoder(event.GetID()),
+		Key:   sarama.StringEncoder(strconv.FormatInt(event.GetID(), 10)),
 		Value: sarama.ByteEncoder(value),
 	}
 
