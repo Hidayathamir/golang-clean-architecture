@@ -1,7 +1,7 @@
 package model
 
 type TodoResponse struct {
-	ID          string `json:"id"`
+	ID          int64  `json:"id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	IsCompleted bool   `json:"is_completed"`
@@ -18,24 +18,24 @@ type CreateTodoRequest struct {
 
 type UpdateTodoRequest struct {
 	UserID      int64  `json:"-"           validate:"required"`
-	ID          string `json:"-"           validate:"required,max=100,uuid"`
+	ID          int64  `json:"-"           validate:"required,min=1"`
 	Title       string `json:"title"       validate:"required,max=200"`
 	Description string `json:"description" validate:"max=1000"`
 }
 
 type GetTodoRequest struct {
-	UserID int64  `json:"-" validate:"required"`
-	ID     string `json:"-" validate:"required,max=100,uuid"`
+	UserID int64 `json:"-" validate:"required"`
+	ID     int64 `json:"-" validate:"required,min=1"`
 }
 
 type DeleteTodoRequest struct {
-	UserID int64  `json:"-" validate:"required"`
-	ID     string `json:"-" validate:"required,max=100,uuid"`
+	UserID int64 `json:"-" validate:"required"`
+	ID     int64 `json:"-" validate:"required,min=1"`
 }
 
 type CompleteTodoRequest struct {
-	UserID int64  `json:"-" validate:"required"`
-	ID     string `json:"-" validate:"required,max=100,uuid"`
+	UserID int64 `json:"-" validate:"required"`
+	ID     int64 `json:"-" validate:"required,min=1"`
 }
 
 type ListTodoRequest struct {

@@ -33,6 +33,7 @@ func TestTodoUsecaseImpl_Create_Success(t *testing.T) {
 	var capturedTodo *entity.Todo
 	TodoRepository.CreateFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo) error {
 		capturedTodo = todo
+		todo.ID = 1                    // simulate auto-generated ID
 		todo.CreatedAt = 1699432800000 // Fixed timestamp for test
 		todo.UpdatedAt = 1699432800000
 		return nil
@@ -44,7 +45,7 @@ func TestTodoUsecaseImpl_Create_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	assert.NotEmpty(t, capturedTodo.ID) // Verify ID was generated
+	assert.NotZero(t, capturedTodo.ID) // Verify ID was generated
 	assert.Equal(t, req.UserID, capturedTodo.UserID)
 	assert.Equal(t, req.Title, capturedTodo.Title)
 	assert.Equal(t, req.Description, capturedTodo.Description)

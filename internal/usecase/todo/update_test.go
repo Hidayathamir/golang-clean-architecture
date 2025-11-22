@@ -8,7 +8,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/todo"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -25,13 +24,13 @@ func TestTodoUsecaseImpl_Update_Success(t *testing.T) {
 
 	const title = "Updated Title"
 	req := &model.UpdateTodoRequest{
-		ID:          uuid.NewString(),
+		ID:          10,
 		UserID:      testUserID,
 		Title:       title,
 		Description: "Updated Description",
 	}
 
-	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
+	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id int64, userID int64) error {
 		todo.ID = req.ID
 		todo.UserID = req.UserID
 		return nil
@@ -96,13 +95,13 @@ func TestTodoUsecaseImpl_Update_Fail_FindByIDAndUserID(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.UpdateTodoRequest{
-		ID:          uuid.NewString(),
+		ID:          10,
 		UserID:      testUserID,
 		Title:       "Updated Title",
 		Description: "Updated Description",
 	}
 
-	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
+	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id int64, userID int64) error {
 		return assert.AnError
 	}
 
@@ -129,13 +128,13 @@ func TestTodoUsecaseImpl_Update_Fail_Update(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.UpdateTodoRequest{
-		ID:          uuid.NewString(),
+		ID:          10,
 		UserID:      testUserID,
 		Title:       "Updated Title",
 		Description: "Updated Description",
 	}
 
-	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
+	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id int64, userID int64) error {
 		return nil
 	}
 

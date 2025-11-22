@@ -5,12 +5,11 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 )
 
-func ModelCreateTodoRequestToEntityTodo(req *model.CreateTodoRequest, todo *entity.Todo, todoID string) {
+func ModelCreateTodoRequestToEntityTodo(req *model.CreateTodoRequest, todo *entity.Todo) {
 	if req == nil || todo == nil {
 		return
 	}
 
-	todo.ID = todoID
 	todo.UserID = req.UserID
 	todo.Title = req.Title
 	todo.Description = req.Description

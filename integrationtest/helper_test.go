@@ -14,7 +14,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -303,7 +302,6 @@ func GetFirstAddress(t *testing.T, contact *entity.Contact) *entity.Address {
 func CreateTodos(t *testing.T, user *entity.User, total int) {
 	for i := range total {
 		todo := &entity.Todo{
-			ID:          uuid.NewString(),
 			UserID:      user.ID,
 			Title:       "Todo " + strconv.Itoa(i),
 			Description: "Description " + strconv.Itoa(i),

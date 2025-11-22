@@ -31,7 +31,7 @@ func TestTodoUsecaseImpl_List_Success(t *testing.T) {
 	now := int64(1699432800000) // Fixed timestamp for test
 	mockTodos := entity.TodoList{
 		{
-			ID:          "todo1",
+			ID:          1,
 			UserID:      req.UserID,
 			Title:       "Test Todo 1",
 			Description: "Description 1",
@@ -41,7 +41,7 @@ func TestTodoUsecaseImpl_List_Success(t *testing.T) {
 			UpdatedAt:   now,
 		},
 		{
-			ID:          "todo2",
+			ID:          2,
 			UserID:      req.UserID,
 			Title:       "Test Todo 2",
 			Description: "Description 2",

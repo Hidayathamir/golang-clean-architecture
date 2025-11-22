@@ -24,8 +24,8 @@ func NewTodoCommandConsumer(usecase todousecase.TodoUsecase) *TodoCommandConsume
 }
 
 type completeTodoCommand struct {
-	UserID int64  `json:"user_id"`
-	TodoID string `json:"todo_id"`
+	UserID int64 `json:"user_id"`
+	TodoID int64 `json:"todo_id"`
 }
 
 func (c *TodoCommandConsumer) Consume(message *sarama.ConsumerMessage) error {
@@ -38,7 +38,7 @@ func (c *TodoCommandConsumer) Consume(message *sarama.ConsumerMessage) error {
 		return errkit.AddFuncName(err)
 	}
 
-	if cmd.UserID <= 0 || cmd.TodoID == "" {
+	if cmd.UserID <= 0 || cmd.TodoID <= 0 {
 		err := errkit.BadRequest(fmt.Errorf("invalid todo command payload: %+v", cmd))
 		x.Logger.WithContext(ctx).WithError(err).Warn("todo command missing identifiers")
 		return errkit.AddFuncName(err)

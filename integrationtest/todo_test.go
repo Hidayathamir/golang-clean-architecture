@@ -77,7 +77,7 @@ func TestGetTodo(t *testing.T) {
 	})
 	todo := GetFirstTodo(t, user)
 
-	req := httptest.NewRequest(http.MethodGet, "/api/todos/"+todo.ID, nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/todos/"+strconv.FormatInt(todo.ID, 10), nil)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", bearerToken(token))
 
@@ -110,7 +110,7 @@ func TestGetTodoFailed(t *testing.T) {
 		Description: "Milk, bread, eggs",
 	})
 
-	req := httptest.NewRequest(http.MethodGet, "/api/todos/"+uuid.NewString(), nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/todos/999999", nil)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", bearerToken(token))
 
@@ -143,7 +143,7 @@ func TestGetTodoOtherUser(t *testing.T) {
 
 	otherToken := registerAndLoginUser(t, uuid.NewString(), "secret", "Other User")
 
-	req := httptest.NewRequest(http.MethodGet, "/api/todos/"+todo.ID, nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/todos/"+strconv.FormatInt(todo.ID, 10), nil)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", bearerToken(otherToken))
 
@@ -178,7 +178,7 @@ func TestUpdateTodo(t *testing.T) {
 	bodyJSON, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req := httptest.NewRequest(http.MethodPut, "/api/todos/"+todo.ID, strings.NewReader(string(bodyJSON)))
+	req := httptest.NewRequest(http.MethodPut, "/api/todos/"+strconv.FormatInt(todo.ID, 10), strings.NewReader(string(bodyJSON)))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", bearerToken(token))
@@ -218,7 +218,7 @@ func TestUpdateTodoUnauthorized(t *testing.T) {
 	bodyJSON, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req := httptest.NewRequest(http.MethodPut, "/api/todos/"+todo.ID, strings.NewReader(string(bodyJSON)))
+	req := httptest.NewRequest(http.MethodPut, "/api/todos/"+strconv.FormatInt(todo.ID, 10), strings.NewReader(string(bodyJSON)))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 
@@ -253,7 +253,7 @@ func TestUpdateTodoFailed(t *testing.T) {
 	bodyJSON, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req := httptest.NewRequest(http.MethodPut, "/api/todos/"+todo.ID, strings.NewReader(string(bodyJSON)))
+	req := httptest.NewRequest(http.MethodPut, "/api/todos/"+strconv.FormatInt(todo.ID, 10), strings.NewReader(string(bodyJSON)))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", bearerToken(token))
@@ -291,7 +291,7 @@ func TestUpdateTodoOtherUser(t *testing.T) {
 	bodyJSON, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req := httptest.NewRequest(http.MethodPut, "/api/todos/"+todo.ID, strings.NewReader(string(bodyJSON)))
+	req := httptest.NewRequest(http.MethodPut, "/api/todos/"+strconv.FormatInt(todo.ID, 10), strings.NewReader(string(bodyJSON)))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", bearerToken(otherToken))
@@ -320,7 +320,7 @@ func TestDeleteTodo(t *testing.T) {
 	})
 	todo := GetFirstTodo(t, user)
 
-	req := httptest.NewRequest(http.MethodDelete, "/api/todos/"+todo.ID, nil)
+	req := httptest.NewRequest(http.MethodDelete, "/api/todos/"+strconv.FormatInt(todo.ID, 10), nil)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", bearerToken(token))
 
@@ -347,7 +347,7 @@ func TestDeleteTodoFailed(t *testing.T) {
 		Description: "Milk, bread, eggs",
 	})
 
-	req := httptest.NewRequest(http.MethodDelete, "/api/todos/"+uuid.NewString(), nil)
+	req := httptest.NewRequest(http.MethodDelete, "/api/todos/999999", nil)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", bearerToken(token))
 
@@ -375,7 +375,7 @@ func TestDeleteTodoUnauthorized(t *testing.T) {
 	})
 	todo := GetFirstTodo(t, user)
 
-	req := httptest.NewRequest(http.MethodDelete, "/api/todos/"+todo.ID, nil)
+	req := httptest.NewRequest(http.MethodDelete, "/api/todos/"+strconv.FormatInt(todo.ID, 10), nil)
 	req.Header.Set("Accept", "application/json")
 
 	res, err := app.Test(req)
@@ -402,7 +402,7 @@ func TestCompleteTodo(t *testing.T) {
 	})
 	todo := GetFirstTodo(t, user)
 
-	req := httptest.NewRequest(http.MethodPatch, "/api/todos/"+todo.ID+"/_complete", nil)
+	req := httptest.NewRequest(http.MethodPatch, "/api/todos/"+strconv.FormatInt(todo.ID, 10)+"/_complete", nil)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", bearerToken(token))
 
@@ -513,7 +513,6 @@ func TestListTodosWithFilters(t *testing.T) {
 	for i := range 3 {
 		completedAt := now + int64(i)
 		todo := &entity.Todo{
-			ID:          uuid.NewString(),
 			UserID:      user.ID,
 			Title:       "Todo Completed " + strconv.Itoa(i),
 			Description: "Completed task " + strconv.Itoa(i),
@@ -658,7 +657,7 @@ func TestDeleteTodoOtherUser(t *testing.T) {
 
 	otherToken := registerAndLoginUser(t, uuid.NewString(), "secret", "Other User")
 
-	req := httptest.NewRequest(http.MethodDelete, "/api/todos/"+todo.ID, nil)
+	req := httptest.NewRequest(http.MethodDelete, "/api/todos/"+strconv.FormatInt(todo.ID, 10), nil)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", bearerToken(otherToken))
 
@@ -686,7 +685,7 @@ func TestCompleteTodoUnauthorized(t *testing.T) {
 	})
 	todo := GetFirstTodo(t, user)
 
-	req := httptest.NewRequest(http.MethodPatch, "/api/todos/"+todo.ID+"/_complete", nil)
+	req := httptest.NewRequest(http.MethodPatch, "/api/todos/"+strconv.FormatInt(todo.ID, 10)+"/_complete", nil)
 	req.Header.Set("Accept", "application/json")
 
 	res, err := app.Test(req)
@@ -715,7 +714,7 @@ func TestCompleteTodoOtherUser(t *testing.T) {
 
 	otherToken := registerAndLoginUser(t, uuid.NewString(), "secret", "Other User")
 
-	req := httptest.NewRequest(http.MethodPatch, "/api/todos/"+todo.ID+"/_complete", nil)
+	req := httptest.NewRequest(http.MethodPatch, "/api/todos/"+strconv.FormatInt(todo.ID, 10)+"/_complete", nil)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", bearerToken(otherToken))
 

@@ -115,7 +115,7 @@ func (c *TodoController) List(ctx *fiber.Ctx) error {
 //	@Description	Get todo by ID
 //	@Tags			todos
 //	@Security		SimpleApiKeyAuth
-//	@Param			todoId	path		string	true	"Todo ID"
+//	@Param			todoId	path		int	true	"Todo ID"
 //	@Success		200		{object}	response.WebResponse[model.TodoResponse]
 //	@Router			/api/todos/{todoId} [get]
 func (c *TodoController) Get(ctx *fiber.Ctx) error {
@@ -124,9 +124,15 @@ func (c *TodoController) Get(ctx *fiber.Ctx) error {
 
 	auth := middleware.GetUser(ctx)
 
+	todoID, err := strconv.ParseInt(ctx.Params("todoId"), 10, 64)
+	if err != nil {
+		err = errkit.BadRequest(err)
+		return errkit.AddFuncName(err)
+	}
+
 	req := &model.GetTodoRequest{
 		UserID: auth.ID,
-		ID:     ctx.Params("todoId"),
+		ID:     todoID,
 	}
 
 	res, err := c.Usecase.Get(ctx.UserContext(), req)
@@ -143,7 +149,7 @@ func (c *TodoController) Get(ctx *fiber.Ctx) error {
 //	@Description	Update todo attributes
 //	@Tags			todos
 //	@Security		SimpleApiKeyAuth
-//	@Param			todoId	path		string					true	"Todo ID"
+//	@Param			todoId	path		int					true	"Todo ID"
 //	@Param			request	body		model.UpdateTodoRequest	true	"Update Todo Request"
 //	@Success		200		{object}	response.WebResponse[model.TodoResponse]
 //	@Router			/api/todos/{todoId} [put]
@@ -159,8 +165,14 @@ func (c *TodoController) Update(ctx *fiber.Ctx) error {
 		return errkit.AddFuncName(err)
 	}
 
+	todoID, err := strconv.ParseInt(ctx.Params("todoId"), 10, 64)
+	if err != nil {
+		err = errkit.BadRequest(err)
+		return errkit.AddFuncName(err)
+	}
+
 	req.UserID = auth.ID
-	req.ID = ctx.Params("todoId")
+	req.ID = todoID
 
 	res, err := c.Usecase.Update(ctx.UserContext(), req)
 	if err != nil {
@@ -176,7 +188,7 @@ func (c *TodoController) Update(ctx *fiber.Ctx) error {
 //	@Description	Delete todo by ID
 //	@Tags			todos
 //	@Security		SimpleApiKeyAuth
-//	@Param			todoId	path		string	true	"Todo ID"
+//	@Param			todoId	path		int	true	"Todo ID"
 //	@Success		200		{object}	response.WebResponse[bool]
 //	@Router			/api/todos/{todoId} [delete]
 func (c *TodoController) Delete(ctx *fiber.Ctx) error {
@@ -185,9 +197,15 @@ func (c *TodoController) Delete(ctx *fiber.Ctx) error {
 
 	auth := middleware.GetUser(ctx)
 
+	todoID, err := strconv.ParseInt(ctx.Params("todoId"), 10, 64)
+	if err != nil {
+		err = errkit.BadRequest(err)
+		return errkit.AddFuncName(err)
+	}
+
 	req := &model.DeleteTodoRequest{
 		UserID: auth.ID,
-		ID:     ctx.Params("todoId"),
+		ID:     todoID,
 	}
 
 	if err := c.Usecase.Delete(ctx.UserContext(), req); err != nil {
@@ -203,7 +221,7 @@ func (c *TodoController) Delete(ctx *fiber.Ctx) error {
 //	@Description	Mark todo as completed and emit event
 //	@Tags			todos
 //	@Security		SimpleApiKeyAuth
-//	@Param			todoId	path		string	true	"Todo ID"
+//	@Param			todoId	path		int	true	"Todo ID"
 //	@Success		200		{object}	response.WebResponse[model.TodoResponse]
 //	@Router			/api/todos/{todoId}/_complete [patch]
 func (c *TodoController) Complete(ctx *fiber.Ctx) error {
@@ -212,9 +230,15 @@ func (c *TodoController) Complete(ctx *fiber.Ctx) error {
 
 	auth := middleware.GetUser(ctx)
 
+	todoID, err := strconv.ParseInt(ctx.Params("todoId"), 10, 64)
+	if err != nil {
+		err = errkit.BadRequest(err)
+		return errkit.AddFuncName(err)
+	}
+
 	req := &model.CompleteTodoRequest{
 		UserID: auth.ID,
-		ID:     ctx.Params("todoId"),
+		ID:     todoID,
 	}
 
 	res, err := c.Usecase.Complete(ctx.UserContext(), req)

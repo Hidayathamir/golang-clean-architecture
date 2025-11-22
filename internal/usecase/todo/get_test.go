@@ -8,7 +8,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/todo"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -24,11 +23,11 @@ func TestTodoUsecaseImpl_Get_Success(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.GetTodoRequest{
-		ID:     uuid.NewString(),
+		ID:     10,
 		UserID: testUserID,
 	}
 
-	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
+	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id int64, userID int64) error {
 		todo.ID = req.ID
 		todo.UserID = req.UserID
 		todo.Title = "Test Todo"
@@ -91,11 +90,11 @@ func TestTodoUsecaseImpl_Get_Fail_FindByIDAndUserID(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	req := &model.GetTodoRequest{
-		ID:     uuid.NewString(),
+		ID:     10,
 		UserID: testUserID,
 	}
 
-	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
+	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id int64, userID int64) error {
 		return assert.AnError
 	}
 

@@ -17,7 +17,7 @@ type TodoRepository interface {
 	Create(ctx context.Context, db *gorm.DB, todo *entity.Todo) error
 	Update(ctx context.Context, db *gorm.DB, todo *entity.Todo) error
 	Delete(ctx context.Context, db *gorm.DB, todo *entity.Todo) error
-	FindByIDAndUserID(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error
+	FindByIDAndUserID(ctx context.Context, db *gorm.DB, todo *entity.Todo, id int64, userID int64) error
 	List(ctx context.Context, db *gorm.DB, req *model.ListTodoRequest) (entity.TodoList, int64, error)
 }
 
@@ -54,7 +54,7 @@ func (r *TodoRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, todo *enti
 	return nil
 }
 
-func (r *TodoRepositoryImpl) FindByIDAndUserID(ctx context.Context, db *gorm.DB, todo *entity.Todo, id string, userID int64) error {
+func (r *TodoRepositoryImpl) FindByIDAndUserID(ctx context.Context, db *gorm.DB, todo *entity.Todo, id int64, userID int64) error {
 	err := db.WithContext(ctx).
 		Where(map[string]any{
 			entity.TodoColumnID:     id,

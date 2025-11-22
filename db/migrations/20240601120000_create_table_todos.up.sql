@@ -1,6 +1,6 @@
 create table if not exists todos
 (
-    id           varchar(100) not null,
+    id           bigserial    not null,
     user_id      bigint       not null,
     title        varchar(200) not null,
     description  text         null,

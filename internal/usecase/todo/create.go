@@ -8,7 +8,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
-	"github.com/google/uuid"
 )
 
 func (u *TodoUsecaseImpl) Create(ctx context.Context, req *model.CreateTodoRequest) (*model.TodoResponse, error) {
@@ -18,7 +17,7 @@ func (u *TodoUsecaseImpl) Create(ctx context.Context, req *model.CreateTodoReque
 	}
 
 	todo := new(entity.Todo)
-	converter.ModelCreateTodoRequestToEntityTodo(req, todo, uuid.New().String())
+	converter.ModelCreateTodoRequestToEntityTodo(req, todo)
 
 	if err := u.TodoRepository.Create(ctx, u.DB.WithContext(ctx), todo); err != nil {
 		return nil, errkit.AddFuncName(err)
