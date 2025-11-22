@@ -129,7 +129,7 @@ definitions:
       created_at:
         type: integer
       id:
-        type: string
+        type: integer
       postal_code:
         type: string
       province:
@@ -152,7 +152,7 @@ definitions:
       first_name:
         type: string
       id:
-        type: string
+        type: integer
       last_name:
         type: string
       phone:
@@ -243,7 +243,7 @@ definitions:
       description:
         type: string
       id:
-        type: string
+        type: integer
       is_completed:
         type: boolean
       title:
@@ -619,7 +619,7 @@ paths:
         in: path
         name: todoId
         required: true
-        type: string
+        type: integer
       responses:
         "200":
           description: OK
@@ -637,7 +637,7 @@ paths:
         in: path
         name: todoId
         required: true
-        type: string
+        type: integer
       responses:
         "200":
           description: OK
@@ -655,7 +655,7 @@ paths:
         in: path
         name: todoId
         required: true
-        type: string
+        type: integer
       - description: Update Todo Request
         in: body
         name: request
@@ -680,7 +680,7 @@ paths:
         in: path
         name: todoId
         required: true
-        type: string
+        type: integer
       responses:
         "200":
           description: OK

@@ -483,7 +483,7 @@ const docTemplate = `{
                 "summary": "Get todo",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "Todo ID",
                         "name": "todoId",
                         "in": "path",
@@ -512,7 +512,7 @@ const docTemplate = `{
                 "summary": "Update todo",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "Todo ID",
                         "name": "todoId",
                         "in": "path",
@@ -550,7 +550,7 @@ const docTemplate = `{
                 "summary": "Delete todo",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "Todo ID",
                         "name": "todoId",
                         "in": "path",
@@ -581,7 +581,7 @@ const docTemplate = `{
                 "summary": "Complete todo",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "Todo ID",
                         "name": "todoId",
                         "in": "path",
@@ -928,7 +928,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "postal_code": {
                     "type": "string"
@@ -963,7 +963,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "last_name": {
                     "type": "string"
@@ -1093,7 +1093,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "is_completed": {
                     "type": "boolean"

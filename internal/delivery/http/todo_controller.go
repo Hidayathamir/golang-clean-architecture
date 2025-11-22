@@ -149,7 +149,7 @@ func (c *TodoController) Get(ctx *fiber.Ctx) error {
 //	@Description	Update todo attributes
 //	@Tags			todos
 //	@Security		SimpleApiKeyAuth
-//	@Param			todoId	path		int					true	"Todo ID"
+//	@Param			todoId	path		int						true	"Todo ID"
 //	@Param			request	body		model.UpdateTodoRequest	true	"Update Todo Request"
 //	@Success		200		{object}	response.WebResponse[model.TodoResponse]
 //	@Router			/api/todos/{todoId} [put]
