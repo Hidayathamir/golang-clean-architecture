@@ -12,7 +12,7 @@ This repo is a reusable Golang clean architecture template. The `architecture.pn
 - `cmd/`: Binary entrypoints with wiring, flags, middlewares, and dependency injection per executable.
 - `internal/`: Clean architecture core.
   - `delivery`: HTTP / worker handlers, validation, presenter logic.
-  - `usecase`: Application services orchestrating repositories and gateways.
+  - `usecase`: Application services orchestrating repositories and gateways. Unlike layer delivery and repository, layer usecase we split based on domain.
   - `entity` & `model`: Domain structs (entity) versus transport/view models (model).
   - `repository`: Interfaces + implementations over databases or caches.
   - `gateway`: Clients for outbound HTTP/gRPC/queue calls.
