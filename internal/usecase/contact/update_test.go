@@ -3,6 +3,7 @@ package contact_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
@@ -62,8 +63,8 @@ func TestContactUsecaseImpl_Update_Success(t *testing.T) {
 		LastName:  "",
 		Email:     "hidayat@gmail.com",
 		Phone:     "",
-		CreatedAt: 0,
-		UpdatedAt: 0,
+		CreatedAt: time.Time{},
+		UpdatedAt: time.Time{},
 		Addresses: nil,
 	}
 

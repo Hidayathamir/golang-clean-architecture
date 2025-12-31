@@ -1,13 +1,19 @@
 package model
 
+import (
+	"time"
+
+	"github.com/guregu/null/v6"
+)
+
 type TodoResponse struct {
-	ID          int64  `json:"id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	IsCompleted bool   `json:"is_completed"`
-	CompletedAt *int64 `json:"completed_at,omitempty"`
-	CreatedAt   int64  `json:"created_at"`
-	UpdatedAt   int64  `json:"updated_at"`
+	ID          int64     `json:"id"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	IsCompleted bool      `json:"is_completed"`
+	CompletedAt null.Time `json:"completed_at,omitempty"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 type CreateTodoRequest struct {

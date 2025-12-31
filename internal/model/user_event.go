@@ -1,13 +1,16 @@
 package model
 
-import "strconv"
+import (
+	"strconv"
+	"time"
+)
 
 type UserEvent struct {
-	ID        int64  `json:"id,omitempty"`
-	Username  string `json:"username,omitempty"`
-	Name      string `json:"name,omitempty"`
-	CreatedAt int64  `json:"created_at,omitempty"`
-	UpdatedAt int64  `json:"updated_at,omitempty"`
+	ID        int64     `json:"id,omitempty"`
+	Username  string    `json:"username,omitempty"`
+	Name      string    `json:"name,omitempty"`
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 }
 
 func (u *UserEvent) GetID() string {

@@ -5,9 +5,9 @@ create table if not exists todos
     title        varchar(200) not null,
     description  text         null,
     is_completed boolean      not null default false,
-    completed_at bigint       null,
-    created_at   bigint       not null,
-    updated_at   bigint       not null,
+    completed_at timestamptz  null,
+    created_at   timestamptz  not null default now(),
+    updated_at   timestamptz  not null default now(),
     constraint todos_pkey primary key (id),
     constraint todos_user_fk foreign key (user_id) references users (id) on delete cascade
 );

@@ -9,6 +9,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/guregu/null/v6"
 )
 
 func (u *TodoUsecaseImpl) Complete(ctx context.Context, req *model.CompleteTodoRequest) (*model.TodoResponse, error) {
@@ -23,9 +24,9 @@ func (u *TodoUsecaseImpl) Complete(ctx context.Context, req *model.CompleteTodoR
 	}
 
 	if !todo.IsCompleted {
-		now := time.Now().UnixMilli()
+		now := time.Now().UTC()
 		todo.IsCompleted = true
-		todo.CompletedAt = &now
+		todo.CompletedAt = null.TimeFrom(now)
 
 		if err := u.TodoRepository.Update(ctx, u.DB.WithContext(ctx), todo); err != nil {
 			return nil, errkit.AddFuncName(err)

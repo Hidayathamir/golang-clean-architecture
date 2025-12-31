@@ -6,8 +6,8 @@ create table if not exists contacts
     email      varchar(100) null,
     phone      varchar(100) null,
     user_id    bigint       not null,
-    created_at bigint       not null,
-    updated_at bigint       not null,
+    created_at timestamptz  not null default now(),
+    updated_at timestamptz  not null default now(),
     primary key (id),
     constraint fk_contacts_user_id foreign key (user_id) references users (id)
 );

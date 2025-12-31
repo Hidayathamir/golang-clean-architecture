@@ -3,6 +3,7 @@ package todo_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
@@ -30,12 +31,13 @@ func TestTodoUsecaseImpl_Create_Success(t *testing.T) {
 		Description: "Test Description",
 	}
 
+	fixedTime := time.UnixMilli(1699432800000).UTC()
 	var capturedTodo *entity.Todo
 	TodoRepository.CreateFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo) error {
 		capturedTodo = todo
-		todo.ID = 1                    // simulate auto-generated ID
-		todo.CreatedAt = 1699432800000 // Fixed timestamp for test
-		todo.UpdatedAt = 1699432800000
+		todo.ID = 1 // simulate auto-generated ID
+		todo.CreatedAt = fixedTime
+		todo.UpdatedAt = fixedTime
 		return nil
 	}
 
@@ -50,7 +52,7 @@ func TestTodoUsecaseImpl_Create_Success(t *testing.T) {
 	assert.Equal(t, req.Title, capturedTodo.Title)
 	assert.Equal(t, req.Description, capturedTodo.Description)
 	assert.False(t, capturedTodo.IsCompleted)
-	assert.Nil(t, capturedTodo.CompletedAt)
+	assert.False(t, capturedTodo.CompletedAt.Valid)
 
 	assert.Equal(t, capturedTodo.ID, res.ID)
 	assert.Equal(t, capturedTodo.Title, res.Title)

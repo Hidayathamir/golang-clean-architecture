@@ -14,6 +14,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/google/uuid"
+	"github.com/guregu/null/v6"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -31,7 +32,7 @@ func TestCreateTodo(t *testing.T) {
 	assert.Equal(t, requestBody.Title, resData.Title)
 	assert.Equal(t, requestBody.Description, resData.Description)
 	assert.False(t, resData.IsCompleted)
-	assert.Nil(t, resData.CompletedAt)
+	assert.False(t, resData.CompletedAt.Valid)
 	assert.NotEmpty(t, resData.ID)
 	assert.NotZero(t, resData.CreatedAt)
 	assert.NotZero(t, resData.UpdatedAt)
@@ -197,7 +198,7 @@ func TestUpdateTodo(t *testing.T) {
 	assert.Equal(t, requestBody.Title, responseBody.Data.Title)
 	assert.Equal(t, requestBody.Description, responseBody.Data.Description)
 	assert.False(t, responseBody.Data.IsCompleted)
-	assert.Nil(t, responseBody.Data.CompletedAt)
+	assert.False(t, responseBody.Data.CompletedAt.Valid)
 	assert.NotZero(t, responseBody.Data.UpdatedAt)
 }
 
@@ -418,13 +419,13 @@ func TestCompleteTodo(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.True(t, responseBody.Data.IsCompleted)
-	assert.NotNil(t, responseBody.Data.CompletedAt)
+	assert.True(t, responseBody.Data.CompletedAt.Valid)
 
 	var updated entity.Todo
 	err = db.Where("id = ?", todo.ID).First(&updated).Error
 	assert.Nil(t, err)
 	assert.True(t, updated.IsCompleted)
-	assert.NotNil(t, updated.CompletedAt)
+	assert.True(t, updated.CompletedAt.Valid)
 }
 
 func TestListTodos(t *testing.T) {
@@ -509,15 +510,15 @@ func TestListTodosWithFilters(t *testing.T) {
 
 	CreateTodos(t, user, 5)
 
-	now := time.Now().UnixMilli()
+	now := time.Now().UTC()
 	for i := range 3 {
-		completedAt := now + int64(i)
+		completedAt := now.Add(time.Duration(i) * time.Millisecond)
 		todo := &entity.Todo{
 			UserID:      user.ID,
 			Title:       "Todo Completed " + strconv.Itoa(i),
 			Description: "Completed task " + strconv.Itoa(i),
 			IsCompleted: true,
-			CompletedAt: &completedAt,
+			CompletedAt: null.TimeFrom(completedAt),
 		}
 		err := db.Create(todo).Error
 		assert.Nil(t, err)
@@ -546,7 +547,7 @@ func TestListTodosWithFilters(t *testing.T) {
 
 	for _, todo := range responseBody.Data {
 		assert.True(t, todo.IsCompleted)
-		assert.NotNil(t, todo.CompletedAt)
+		assert.True(t, todo.CompletedAt.Valid)
 	}
 }
 

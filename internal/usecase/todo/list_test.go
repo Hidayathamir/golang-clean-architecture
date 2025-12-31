@@ -3,11 +3,13 @@ package todo_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/todo"
+	"github.com/guregu/null/v6"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -28,7 +30,7 @@ func TestTodoUsecaseImpl_List_Success(t *testing.T) {
 		Size:   10,
 	}
 
-	now := int64(1699432800000) // Fixed timestamp for test
+	now := time.UnixMilli(1699432800000).UTC() // Fixed timestamp for test
 	mockTodos := entity.TodoList{
 		{
 			ID:          1,
@@ -36,7 +38,7 @@ func TestTodoUsecaseImpl_List_Success(t *testing.T) {
 			Title:       "Test Todo 1",
 			Description: "Description 1",
 			IsCompleted: true,
-			CompletedAt: &now,
+			CompletedAt: null.TimeFrom(now),
 			CreatedAt:   now,
 			UpdatedAt:   now,
 		},

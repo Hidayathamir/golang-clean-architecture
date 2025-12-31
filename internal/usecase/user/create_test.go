@@ -3,6 +3,7 @@ package user_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
@@ -54,8 +55,8 @@ func TestUserUsecaseImpl_Create_Success(t *testing.T) {
 		Username:  "user1",
 		Name:      "name1",
 		Token:     "",
-		CreatedAt: 0,
-		UpdatedAt: 0,
+		CreatedAt: time.Time{},
+		UpdatedAt: time.Time{},
 	}
 
 	assert.Equal(t, expected, res)

@@ -3,6 +3,7 @@ package converter
 import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/guregu/null/v6"
 )
 
 func ModelCreateTodoRequestToEntityTodo(req *model.CreateTodoRequest, todo *entity.Todo) {
@@ -14,7 +15,7 @@ func ModelCreateTodoRequestToEntityTodo(req *model.CreateTodoRequest, todo *enti
 	todo.Title = req.Title
 	todo.Description = req.Description
 	todo.IsCompleted = false
-	todo.CompletedAt = nil
+	todo.CompletedAt = null.Time{}
 }
 
 func ModelUpdateTodoRequestToEntityTodo(req *model.UpdateTodoRequest, todo *entity.Todo) {

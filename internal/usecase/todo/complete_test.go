@@ -9,6 +9,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/todo"
+	"github.com/guregu/null/v6"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -31,7 +32,7 @@ func TestTodoUsecaseImpl_Complete_Success(t *testing.T) {
 		UserID: testUserID,
 	}
 
-	now := time.Now().UnixMilli()
+	now := time.UnixMilli(time.Now().UnixMilli()).UTC()
 	incompleteTodo := &entity.Todo{
 		ID:          todoID,
 		UserID:      req.UserID,
@@ -68,7 +69,7 @@ func TestTodoUsecaseImpl_Complete_Success(t *testing.T) {
 	// Verify todo was updated correctly
 	assert.NotNil(t, updatedTodo)
 	assert.True(t, updatedTodo.IsCompleted)
-	assert.NotNil(t, updatedTodo.CompletedAt)
+	assert.True(t, updatedTodo.CompletedAt.Valid)
 	assert.Equal(t, incompleteTodo.ID, updatedTodo.ID)
 	assert.Equal(t, incompleteTodo.UserID, updatedTodo.UserID)
 	assert.Equal(t, incompleteTodo.Title, updatedTodo.Title)
@@ -167,14 +168,14 @@ func TestTodoUsecaseImpl_Complete_AlreadyCompleted(t *testing.T) {
 		UserID: testUserID,
 	}
 
-	completedAt := time.Now().UnixMilli()
+	completedAt := null.TimeFrom(time.UnixMilli(time.Now().UnixMilli()).UTC())
 	completedTodo := &entity.Todo{
 		ID:          todoID,
 		UserID:      req.UserID,
 		Title:       "Test Todo",
 		Description: "Test Description",
 		IsCompleted: true,
-		CompletedAt: &completedAt,
+		CompletedAt: completedAt,
 	}
 
 	TodoRepository.FindByIDAndUserIDFunc = func(ctx context.Context, db *gorm.DB, todo *entity.Todo, id int64, userID int64) error {
@@ -189,7 +190,7 @@ func TestTodoUsecaseImpl_Complete_AlreadyCompleted(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	assert.True(t, res.IsCompleted)
-	assert.Equal(t, completedAt, *res.CompletedAt)
+	assert.Equal(t, completedAt, res.CompletedAt)
 	assert.Equal(t, completedTodo.Title, res.Title)
 	assert.Equal(t, completedTodo.Description, res.Description)
 	assert.Nil(t, err)
