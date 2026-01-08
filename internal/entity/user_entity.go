@@ -1,14 +1,19 @@
 package entity
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type User struct {
-	ID        int64     `gorm:"column:id;primaryKey"`
-	Username  string    `gorm:"column:username;uniqueIndex"`
-	Password  string    `gorm:"column:password"`
-	Name      string    `gorm:"column:name"`
-	CreatedAt time.Time `gorm:"column:created_at;type:timestamptz;autoCreateTime"`
-	UpdatedAt time.Time `gorm:"column:updated_at;type:timestamptz;autoUpdateTime"`
+	ID        int64          `gorm:"column:id;primaryKey"`
+	Username  string         `gorm:"column:username;uniqueIndex"`
+	Password  string         `gorm:"column:password"`
+	Name      string         `gorm:"column:name"`
+	CreatedAt time.Time      `gorm:"column:created_at;type:timestamptz;autoCreateTime"`
+	UpdatedAt time.Time      `gorm:"column:updated_at;type:timestamptz;autoUpdateTime"`
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 
 	Contacts ContactList `gorm:"foreignKey:user_id;references:id"`
 	Todos    TodoList    `gorm:"foreignKey:user_id;references:id"`

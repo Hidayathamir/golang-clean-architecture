@@ -9,6 +9,7 @@ create table if not exists addresses
     country     varchar(100),
     created_at  timestamptz  not null default now(),
     updated_at  timestamptz  not null default now(),
+    deleted_at  timestamptz  null,
     primary key (id),
     constraint fk_addresses_contact_id foreign key (contact_id) references contacts (id)
 );

@@ -8,6 +8,7 @@ create table if not exists contacts
     user_id    bigint       not null,
     created_at timestamptz  not null default now(),
     updated_at timestamptz  not null default now(),
+    deleted_at timestamptz  null,
     primary key (id),
     constraint fk_contacts_user_id foreign key (user_id) references users (id)
 );

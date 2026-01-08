@@ -1,17 +1,22 @@
 package entity
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Address struct {
-	ID         int64     `gorm:"column:id;primaryKey"`
-	ContactID  int64     `gorm:"column:contact_id"`
-	Street     string    `gorm:"column:street"`
-	City       string    `gorm:"column:city"`
-	Province   string    `gorm:"column:province"`
-	PostalCode string    `gorm:"column:postal_code"`
-	Country    string    `gorm:"column:country"`
-	CreatedAt  time.Time `gorm:"column:created_at;type:timestamptz;autoCreateTime"`
-	UpdatedAt  time.Time `gorm:"column:updated_at;type:timestamptz;autoUpdateTime"`
+	ID         int64          `gorm:"column:id;primaryKey"`
+	ContactID  int64          `gorm:"column:contact_id"`
+	Street     string         `gorm:"column:street"`
+	City       string         `gorm:"column:city"`
+	Province   string         `gorm:"column:province"`
+	PostalCode string         `gorm:"column:postal_code"`
+	Country    string         `gorm:"column:country"`
+	CreatedAt  time.Time      `gorm:"column:created_at;type:timestamptz;autoCreateTime"`
+	UpdatedAt  time.Time      `gorm:"column:updated_at;type:timestamptz;autoUpdateTime"`
+	DeletedAt  gorm.DeletedAt `gorm:"index"`
 
 	Contact Contact `gorm:"foreignKey:contact_id;references:id"`
 }

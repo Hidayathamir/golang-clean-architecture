@@ -218,28 +218,28 @@ func ClearAll() {
 }
 
 func ClearUsers() {
-	err := db.Where("id is not null").Delete(&entity.User{}).Error
+	err := db.Unscoped().Where("id is not null").Delete(&entity.User{}).Error
 	if err != nil {
 		x.Logger.Panicf("Failed clear user data : %+v", err)
 	}
 }
 
 func ClearContact() {
-	err := db.Where("id is not null").Delete(&entity.Contact{}).Error
+	err := db.Unscoped().Where("id is not null").Delete(&entity.Contact{}).Error
 	if err != nil {
 		x.Logger.Panicf("Failed clear contact data : %+v", err)
 	}
 }
 
 func ClearAddresses() {
-	err := db.Where("id is not null").Delete(&entity.Address{}).Error
+	err := db.Unscoped().Where("id is not null").Delete(&entity.Address{}).Error
 	if err != nil {
 		x.Logger.Panicf("Failed clear address data : %+v", err)
 	}
 }
 
 func ClearTodos() {
-	err := db.Where("id is not null").Delete(&entity.Todo{}).Error
+	err := db.Unscoped().Where("id is not null").Delete(&entity.Todo{}).Error
 	if err != nil {
 		x.Logger.Panicf("Failed clear todo data : %+v", err)
 	}

@@ -7,6 +7,7 @@ create table if not exists users
     token      varchar(100) null,
     created_at timestamptz  not null default now(),
     updated_at timestamptz  not null default now(),
+    deleted_at timestamptz  null,
     primary key (id),
     constraint users_username_key unique (username)
 );

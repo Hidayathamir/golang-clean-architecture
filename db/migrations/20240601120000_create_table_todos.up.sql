@@ -8,6 +8,7 @@ create table if not exists todos
     completed_at timestamptz  null,
     created_at   timestamptz  not null default now(),
     updated_at   timestamptz  not null default now(),
+    deleted_at   timestamptz  null,
     constraint todos_pkey primary key (id),
     constraint todos_user_fk foreign key (user_id) references users (id) on delete cascade
 );
