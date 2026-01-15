@@ -6,6 +6,18 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	ContactTableName       = "contacts"
+	ContactColumnID        = "id"
+	ContactColumnFirstName = "first_name"
+	ContactColumnLastName  = "last_name"
+	ContactColumnEmail     = "email"
+	ContactColumnPhone     = "phone"
+	ContactColumnUserID    = "user_id"
+	ContactColumnCreatedAt = "created_at"
+	ContactColumnUpdatedAt = "updated_at"
+)
+
 type Contact struct {
 	ID        int64          `gorm:"column:id;primaryKey"`
 	FirstName string         `gorm:"column:first_name"`
@@ -22,7 +34,7 @@ type Contact struct {
 }
 
 func (c *Contact) TableName() string {
-	return "contacts"
+	return ContactTableName
 }
 
 type ContactList []Contact
