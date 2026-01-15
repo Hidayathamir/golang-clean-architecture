@@ -3,12 +3,12 @@ package model
 import "time"
 
 type UserResponse struct {
-	ID        int64     `json:"id,omitempty"`
-	Username  string    `json:"username,omitempty"`
-	Name      string    `json:"name,omitempty"`
-	Token     string    `json:"token,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	ID        int64     `json:"id"`
+	Username  string    `json:"username"`
+	Name      string    `json:"name"`
+	Token     string    `json:"token"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type VerifyUserRequest struct {
@@ -22,9 +22,9 @@ type RegisterUserRequest struct {
 }
 
 type UpdateUserRequest struct {
-	ID       int64  `json:"-"                  validate:"required"`
-	Password string `json:"password,omitempty" validate:"max=100"`
-	Name     string `json:"name,omitempty"     validate:"max=100"`
+	ID       int64  `json:"-"        validate:"required"`
+	Password string `json:"password" validate:"max=100"`
+	Name     string `json:"name"     validate:"max=100"`
 }
 
 type LoginUserRequest struct {

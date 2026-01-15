@@ -10,7 +10,7 @@ type ContactResponse struct {
 	Phone     string              `json:"phone"`
 	CreatedAt time.Time           `json:"created_at"`
 	UpdatedAt time.Time           `json:"updated_at"`
-	Addresses AddressResponseList `json:"addresses,omitempty"`
+	Addresses AddressResponseList `json:"addresses"`
 }
 
 type ContactResponseList []ContactResponse

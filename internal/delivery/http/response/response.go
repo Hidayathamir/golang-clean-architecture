@@ -9,7 +9,7 @@ import (
 
 type WebResponse[T any] struct {
 	Data         T             `json:"data"`
-	Paging       *PageMetadata `json:"paging,omitempty"`
+	Paging       *PageMetadata `json:"paging"`
 	ErrorMessage string        `json:"error_message"`
 	ErrorDetail  []string      `json:"error_detail"`
 }
