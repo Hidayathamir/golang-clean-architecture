@@ -1,0 +1,1 @@
+drop index idx_comments_deleted_at;
