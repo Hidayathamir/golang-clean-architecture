@@ -1,1 +1,0 @@
-drop index users_username_active_idx;

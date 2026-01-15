@@ -1,0 +1,1 @@
+drop index idx_contacts_deleted_at;

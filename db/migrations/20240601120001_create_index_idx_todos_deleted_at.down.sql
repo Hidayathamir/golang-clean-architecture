@@ -1,0 +1,1 @@
+drop index idx_todos_deleted_at;
