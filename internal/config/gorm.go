@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -25,20 +26,12 @@ func NewDatabase(viperConfig *viper.Viper) *gorm.DB {
 
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable TimeZone=UTC", host, port, username, password, database)
 
-	gormLogger := logger.New(&logrusWriter{Logger: x.Logger}, logger.Config{
-		SlowThreshold:             time.Second * 5,
-		Colorful:                  false,
-		IgnoreRecordNotFoundError: true,
-		ParameterizedQueries:      true,
-		LogLevel:                  logger.Info,
-	})
-
 	const maxAttempts = 5
 
 	var db *gorm.DB
 	var err error
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
-		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: gormLogger})
+		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: &gormLogger{}})
 		if err == nil {
 			break
 		}
@@ -72,10 +65,34 @@ func NewDatabase(viperConfig *viper.Viper) *gorm.DB {
 	return db
 }
 
-type logrusWriter struct {
-	Logger *logrus.Logger
+type gormLogger struct{}
+
+func (l *gormLogger) LogMode(level logger.LogLevel) logger.Interface {
+	return l
 }
 
-func (l *logrusWriter) Printf(message string, args ...interface{}) {
-	l.Logger.Tracef(message, args...)
+func (l *gormLogger) Info(ctx context.Context, msg string, data ...any) {
+	x.Logger.WithContext(ctx).Infof(msg, data...)
+}
+
+func (l *gormLogger) Warn(ctx context.Context, msg string, data ...any) {
+	x.Logger.WithContext(ctx).Warnf(msg, data...)
+}
+
+func (l *gormLogger) Error(ctx context.Context, msg string, data ...any) {
+	x.Logger.WithContext(ctx).Errorf(msg, data...)
+}
+
+func (l *gormLogger) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
+	sql, rows := fc()
+	entry := x.Logger.WithContext(ctx).WithFields(logrus.Fields{
+		"elapsed": time.Since(begin),
+		"rows":    rows,
+	})
+
+	if err != nil {
+		entry.Error(sql)
+	} else {
+		entry.Info(sql)
+	}
 }
