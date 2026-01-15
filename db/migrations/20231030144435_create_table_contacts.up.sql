@@ -1,14 +1,13 @@
-create table if not exists contacts
+create table contacts
 (
-    id         bigserial    not null,
-    first_name varchar(100) not null,
-    last_name  varchar(100) null,
-    email      varchar(100) null,
-    phone      varchar(100) null,
+    id         bigserial    primary key,
+    first_name varchar      not null,
+    last_name  varchar      null,
+    email      varchar      null,
+    phone      varchar      null,
     user_id    bigint       not null,
     created_at timestamptz  not null default now(),
     updated_at timestamptz  not null default now(),
     deleted_at timestamptz  null,
-    primary key (id),
-    constraint fk_contacts_user_id foreign key (user_id) references users (id)
+    constraint fk_contacts_user_id foreign key (user_id) references users (id)  on delete cascade
 );

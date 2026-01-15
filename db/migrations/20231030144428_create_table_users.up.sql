@@ -1,13 +1,11 @@
-create table if not exists users
+create table users
 (
-    id         bigserial    not null,
-    username   varchar(100) not null,
-    name       varchar(100) not null,
-    password   varchar(100) not null,
-    token      varchar(100) null,
-    created_at timestamptz  not null default now(),
-    updated_at timestamptz  not null default now(),
-    deleted_at timestamptz  null,
-    primary key (id),
-    constraint users_username_key unique (username)
+    id          bigserial   primary key,
+    username    varchar     not null,
+    password    text        not null,
+    name        varchar     not null,
+    token       text        null,
+    created_at  timestamptz not null default now (),
+    updated_at  timestamptz not null default now (),
+    deleted_at  timestamptz null
 );
