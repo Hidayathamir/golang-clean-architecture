@@ -9,19 +9,19 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var _ UserProducer = &UserProducerMwLogger{}
+var _ ImageUploadedProducer = &ImageUploadedProducerMwLogger{}
 
-type UserProducerMwLogger struct {
-	Next UserProducer
+type ImageUploadedProducerMwLogger struct {
+	Next ImageUploadedProducer
 }
 
-func NewUserProducerMwLogger(next UserProducer) *UserProducerMwLogger {
-	return &UserProducerMwLogger{
+func NewImageUploadedProducerMwLogger(next ImageUploadedProducer) *ImageUploadedProducerMwLogger {
+	return &ImageUploadedProducerMwLogger{
 		Next: next,
 	}
 }
 
-func (p *UserProducerMwLogger) Send(ctx context.Context, event *model.UserEvent) error {
+func (p *ImageUploadedProducerMwLogger) Send(ctx context.Context, event *model.ImageUploadedEvent) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 

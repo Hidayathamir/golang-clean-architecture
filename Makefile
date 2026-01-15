@@ -34,13 +34,13 @@ run-clean:
 	make clean && make run
 
 clean:
-	make generate && make swag && make format
+	make generate && make swag && make format && echo "done"
 
 format:
 	golangci-lint run ./... --fix
 
 generate:
-	go generate ./internal/...
+	rm -rf internal/mock &&	go generate ./internal/...
 
 swag:
 	swag fmt --exclude ./internal/mock && swag init --parseDependency --parseInternal --generalInfo ./cmd/web/main.go --output ./api/

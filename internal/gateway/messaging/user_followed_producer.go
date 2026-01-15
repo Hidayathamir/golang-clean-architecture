@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/consttopic"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
@@ -12,29 +13,29 @@ import (
 	"github.com/spf13/viper"
 )
 
-//go:generate moq -out=../../mock/UserProducer.go -pkg=mock . UserProducer
+//go:generate moq -out=../../mock/UserFollowedProducer.go -pkg=mock . UserFollowedProducer
 
-type UserProducer interface {
-	Send(ctx context.Context, event *model.UserEvent) error
+type UserFollowedProducer interface {
+	Send(ctx context.Context, event *model.UserFollowedEvent) error
 }
 
-var _ UserProducer = &UserProducerImpl{}
+var _ UserFollowedProducer = &UserFollowedProducerImpl{}
 
-type UserProducerImpl struct {
+type UserFollowedProducerImpl struct {
 	Config   *viper.Viper
 	Producer sarama.SyncProducer
 	Topic    string
 }
 
-func NewUserProducer(cfg *viper.Viper, producer sarama.SyncProducer) *UserProducerImpl {
-	return &UserProducerImpl{
+func NewUserFollowedProducer(cfg *viper.Viper, producer sarama.SyncProducer) *UserFollowedProducerImpl {
+	return &UserFollowedProducerImpl{
 		Config:   cfg,
 		Producer: producer,
-		Topic:    "users",
+		Topic:    consttopic.UserFollowed,
 	}
 }
 
-func (p *UserProducerImpl) Send(ctx context.Context, event *model.UserEvent) error {
+func (p *UserFollowedProducerImpl) Send(ctx context.Context, event *model.UserFollowedEvent) error {
 	if p.Producer == nil {
 		x.Logger.Warn("Kafka producer is disabled")
 		return nil
@@ -59,5 +60,6 @@ func (p *UserProducerImpl) Send(ctx context.Context, event *model.UserEvent) err
 	}
 
 	x.Logger.Debugf("Message sent to topic %s, partition %d, offset %d", p.Topic, partition, offset)
+
 	return nil
 }

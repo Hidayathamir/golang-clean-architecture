@@ -41,7 +41,7 @@ func EntityUserToModelUserResponse(user *entity.User, res *model.UserResponse) {
 	res.UpdatedAt = user.UpdatedAt
 }
 
-func EntityUserToModelUserEvent(user *entity.User, event *model.UserEvent) {
+func EntityUserToModelUserFollowedEvent(user *entity.User, event *model.UserFollowedEvent) {
 	if user == nil || event == nil {
 		return
 	}

@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type UserEvent struct {
+type UserFollowedEvent struct {
 	ID        int64     `json:"id"`
 	Username  string    `json:"username"`
 	Name      string    `json:"name"`
@@ -13,6 +13,6 @@ type UserEvent struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func (u *UserEvent) GetID() string {
+func (u *UserFollowedEvent) GetID() string {
 	return strconv.FormatInt(u.ID, 10)
 }

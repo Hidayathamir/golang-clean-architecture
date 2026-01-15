@@ -21,6 +21,21 @@ func NewUserUsecaseMwLogger(next UserUsecase) *UserUsecaseMwLogger {
 	}
 }
 
+func (u *UserUsecaseMwLogger) Follow(ctx context.Context, req *model.FollowUserRequest) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := u.Next.Follow(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+	}
+	x.LogMw(ctx, fields, err)
+
+	return err
+}
+
 func (u *UserUsecaseMwLogger) Create(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()

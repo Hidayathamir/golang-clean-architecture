@@ -16,13 +16,13 @@ import (
 func TestUserUsecaseImpl_Logout_Success(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserProducerMock{}
+	UserProducer := &mock.UserFollowedProducerMock{}
 	S3Client := &mock.S3ClientMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
-		S3Client:       S3Client,
+		DB:                   gormDB,
+		UserRepository:       UserRepository,
+		UserFollowedProducer: UserProducer,
+		S3Client:             S3Client,
 	}
 
 	// ------------------------------------------------------- //
@@ -39,7 +39,7 @@ func TestUserUsecaseImpl_Logout_Success(t *testing.T) {
 		return model.S3DeleteObjectResponse{Deleted: true}, nil
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	UserProducer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -58,13 +58,13 @@ func TestUserUsecaseImpl_Logout_Success(t *testing.T) {
 func TestUserUsecaseImpl_Logout_Fail_ValidateStruct(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserProducerMock{}
+	UserProducer := &mock.UserFollowedProducerMock{}
 	S3Client := &mock.S3ClientMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
-		S3Client:       S3Client,
+		DB:                   gormDB,
+		UserRepository:       UserRepository,
+		UserFollowedProducer: UserProducer,
+		S3Client:             S3Client,
 	}
 
 	// ------------------------------------------------------- //
@@ -81,7 +81,7 @@ func TestUserUsecaseImpl_Logout_Fail_ValidateStruct(t *testing.T) {
 		return model.S3DeleteObjectResponse{Deleted: true}, nil
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	UserProducer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -102,13 +102,13 @@ func TestUserUsecaseImpl_Logout_Fail_ValidateStruct(t *testing.T) {
 func TestUserUsecaseImpl_Logout_Fail_FindByID(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserProducerMock{}
+	UserProducer := &mock.UserFollowedProducerMock{}
 	S3Client := &mock.S3ClientMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
-		S3Client:       S3Client,
+		DB:                   gormDB,
+		UserRepository:       UserRepository,
+		UserFollowedProducer: UserProducer,
+		S3Client:             S3Client,
 	}
 
 	// ------------------------------------------------------- //
@@ -125,7 +125,7 @@ func TestUserUsecaseImpl_Logout_Fail_FindByID(t *testing.T) {
 		return model.S3DeleteObjectResponse{Deleted: true}, nil
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	UserProducer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -145,13 +145,13 @@ func TestUserUsecaseImpl_Logout_Fail_FindByID(t *testing.T) {
 func TestUserUsecaseImpl_Logout_Fail_DeleteObject(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserProducerMock{}
+	UserProducer := &mock.UserFollowedProducerMock{}
 	S3Client := &mock.S3ClientMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
-		S3Client:       S3Client,
+		DB:                   gormDB,
+		UserRepository:       UserRepository,
+		UserFollowedProducer: UserProducer,
+		S3Client:             S3Client,
 	}
 
 	// ------------------------------------------------------- //
@@ -168,7 +168,7 @@ func TestUserUsecaseImpl_Logout_Fail_DeleteObject(t *testing.T) {
 		return model.S3DeleteObjectResponse{Deleted: false}, assert.AnError
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	UserProducer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -188,13 +188,13 @@ func TestUserUsecaseImpl_Logout_Fail_DeleteObject(t *testing.T) {
 func TestUserUsecaseImpl_Logout_Fail_Send(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserProducerMock{}
+	UserProducer := &mock.UserFollowedProducerMock{}
 	S3Client := &mock.S3ClientMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
-		S3Client:       S3Client,
+		DB:                   gormDB,
+		UserRepository:       UserRepository,
+		UserFollowedProducer: UserProducer,
+		S3Client:             S3Client,
 	}
 
 	// ------------------------------------------------------- //
@@ -211,7 +211,7 @@ func TestUserUsecaseImpl_Logout_Fail_Send(t *testing.T) {
 		return model.S3DeleteObjectResponse{Deleted: true}, nil
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	UserProducer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return assert.AnError
 	}
 

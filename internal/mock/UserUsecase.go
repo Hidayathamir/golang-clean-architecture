@@ -26,6 +26,9 @@ var _ user.UserUsecase = &UserUsecaseMock{}
 //			CurrentFunc: func(ctx context.Context, req *model.GetUserRequest) (*model.UserResponse, error) {
 //				panic("mock out the Current method")
 //			},
+//			FollowFunc: func(ctx context.Context, req *model.FollowUserRequest) error {
+//				panic("mock out the Follow method")
+//			},
 //			LoginFunc: func(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error) {
 //				panic("mock out the Login method")
 //			},
@@ -50,6 +53,9 @@ type UserUsecaseMock struct {
 
 	// CurrentFunc mocks the Current method.
 	CurrentFunc func(ctx context.Context, req *model.GetUserRequest) (*model.UserResponse, error)
+
+	// FollowFunc mocks the Follow method.
+	FollowFunc func(ctx context.Context, req *model.FollowUserRequest) error
 
 	// LoginFunc mocks the Login method.
 	LoginFunc func(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error)
@@ -78,6 +84,13 @@ type UserUsecaseMock struct {
 			Ctx context.Context
 			// Req is the req argument value.
 			Req *model.GetUserRequest
+		}
+		// Follow holds details about calls to the Follow method.
+		Follow []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req *model.FollowUserRequest
 		}
 		// Login holds details about calls to the Login method.
 		Login []struct {
@@ -110,6 +123,7 @@ type UserUsecaseMock struct {
 	}
 	lockCreate  sync.RWMutex
 	lockCurrent sync.RWMutex
+	lockFollow  sync.RWMutex
 	lockLogin   sync.RWMutex
 	lockLogout  sync.RWMutex
 	lockUpdate  sync.RWMutex
@@ -185,6 +199,42 @@ func (mock *UserUsecaseMock) CurrentCalls() []struct {
 	mock.lockCurrent.RLock()
 	calls = mock.calls.Current
 	mock.lockCurrent.RUnlock()
+	return calls
+}
+
+// Follow calls FollowFunc.
+func (mock *UserUsecaseMock) Follow(ctx context.Context, req *model.FollowUserRequest) error {
+	if mock.FollowFunc == nil {
+		panic("UserUsecaseMock.FollowFunc: method is nil but UserUsecase.Follow was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req *model.FollowUserRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockFollow.Lock()
+	mock.calls.Follow = append(mock.calls.Follow, callInfo)
+	mock.lockFollow.Unlock()
+	return mock.FollowFunc(ctx, req)
+}
+
+// FollowCalls gets all the calls that were made to Follow.
+// Check the length with:
+//
+//	len(mockedUserUsecase.FollowCalls())
+func (mock *UserUsecaseMock) FollowCalls() []struct {
+	Ctx context.Context
+	Req *model.FollowUserRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req *model.FollowUserRequest
+	}
+	mock.lockFollow.RLock()
+	calls = mock.calls.Follow
+	mock.lockFollow.RUnlock()
 	return calls
 }
 

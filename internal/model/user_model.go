@@ -39,3 +39,6 @@ type LogoutUserRequest struct {
 type GetUserRequest struct {
 	ID int64 `json:"id" validate:"required"`
 }
+
+type FollowUserRequest struct {
+}

@@ -20,12 +20,12 @@ import (
 	"gorm.io/gorm"
 )
 
-func newLoginUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepositoryMock, *mock.UserProducerMock, *mock.SlackClientMock) {
+func newLoginUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepositoryMock, *mock.UserFollowedProducerMock, *mock.SlackClientMock) {
 	t.Helper()
 
 	gormDB, _ := newFakeDB(t)
 	repo := &mock.UserRepositoryMock{}
-	producer := &mock.UserProducerMock{}
+	producer := &mock.UserFollowedProducerMock{}
 	slack := &mock.SlackClientMock{}
 
 	cfg := viper.New()
@@ -34,11 +34,11 @@ func newLoginUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepositoryM
 	cfg.Set(configkey.AuthJWTExpireSeconds, 60)
 
 	u := &user.UserUsecaseImpl{
-		Config:         cfg,
-		DB:             gormDB,
-		UserRepository: repo,
-		UserProducer:   producer,
-		SlackClient:    slack,
+		Config:               cfg,
+		DB:                   gormDB,
+		UserRepository:       repo,
+		UserFollowedProducer: producer,
+		SlackClient:          slack,
 	}
 
 	return u, repo, producer, slack
@@ -65,7 +65,7 @@ func TestUserUsecaseImpl_Login_Success(t *testing.T) {
 		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
-	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	producer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -107,7 +107,7 @@ func TestUserUsecaseImpl_Login_Fail_ValidateStruct(t *testing.T) {
 		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
-	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	producer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -135,7 +135,7 @@ func TestUserUsecaseImpl_Login_Fail_FindByUsername(t *testing.T) {
 		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
-	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	producer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -167,7 +167,7 @@ func TestUserUsecaseImpl_Login_Fail_CompareHashAndPassword(t *testing.T) {
 		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
-	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	producer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -198,7 +198,7 @@ func TestUserUsecaseImpl_Login_Fail_IsConnected(t *testing.T) {
 		return model.SlackIsConnectedResponse{Connected: false}, assert.AnError
 	}
 
-	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	producer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -230,7 +230,7 @@ func TestUserUsecaseImpl_Login_Fail_Send(t *testing.T) {
 		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
-	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	producer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return assert.AnError
 	}
 
@@ -244,7 +244,7 @@ func TestUserUsecaseImpl_Login_Fail_Send(t *testing.T) {
 func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	repo := &mock.UserRepositoryMock{}
-	producer := &mock.UserProducerMock{}
+	producer := &mock.UserFollowedProducerMock{}
 	slack := &mock.SlackClientMock{}
 
 	cfg := viper.New()
@@ -252,11 +252,11 @@ func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 	cfg.Set(configkey.AuthJWTExpireSeconds, 60)
 
 	u := &user.UserUsecaseImpl{
-		Config:         cfg,
-		DB:             gormDB,
-		UserRepository: repo,
-		UserProducer:   producer,
-		SlackClient:    slack,
+		Config:               cfg,
+		DB:                   gormDB,
+		UserRepository:       repo,
+		UserFollowedProducer: producer,
+		SlackClient:          slack,
 	}
 
 	req := &model.LoginUserRequest{
@@ -277,7 +277,7 @@ func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
-	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	producer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 

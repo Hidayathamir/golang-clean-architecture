@@ -19,7 +19,7 @@ func TestNewUserUsecase(t *testing.T) {
 
 	var UserRepository repository.UserRepository = &mock.UserRepositoryMock{}
 
-	var UserProducer messaging.UserProducer = &mock.UserProducerMock{}
+	var UserProducer messaging.UserFollowedProducer = &mock.UserFollowedProducerMock{}
 
 	var S3Client rest.S3Client = &mock.S3ClientMock{}
 	var SlackClient rest.SlackClient = &mock.SlackClientMock{}

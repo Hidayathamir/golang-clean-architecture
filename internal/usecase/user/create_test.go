@@ -17,11 +17,11 @@ import (
 func TestUserUsecaseImpl_Create_Success(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserProducerMock{}
+	UserProducer := &mock.UserFollowedProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
+		DB:                   gormDB,
+		UserRepository:       UserRepository,
+		UserFollowedProducer: UserProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -40,7 +40,7 @@ func TestUserUsecaseImpl_Create_Success(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	UserProducer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -66,11 +66,11 @@ func TestUserUsecaseImpl_Create_Success(t *testing.T) {
 func TestUserUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserProducerMock{}
+	UserProducer := &mock.UserFollowedProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
+		DB:                   gormDB,
+		UserRepository:       UserRepository,
+		UserFollowedProducer: UserProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -89,7 +89,7 @@ func TestUserUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	UserProducer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -110,11 +110,11 @@ func TestUserUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 func TestUserUsecaseImpl_Create_Fail_CountByUsername(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserProducerMock{}
+	UserProducer := &mock.UserFollowedProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
+		DB:                   gormDB,
+		UserRepository:       UserRepository,
+		UserFollowedProducer: UserProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -133,7 +133,7 @@ func TestUserUsecaseImpl_Create_Fail_CountByUsername(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	UserProducer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -153,11 +153,11 @@ func TestUserUsecaseImpl_Create_Fail_CountByUsername(t *testing.T) {
 func TestUserUsecaseImpl_Create_Fail_UserAlreadyExists(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserProducerMock{}
+	UserProducer := &mock.UserFollowedProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
+		DB:                   gormDB,
+		UserRepository:       UserRepository,
+		UserFollowedProducer: UserProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -176,7 +176,7 @@ func TestUserUsecaseImpl_Create_Fail_UserAlreadyExists(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	UserProducer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -196,11 +196,11 @@ func TestUserUsecaseImpl_Create_Fail_UserAlreadyExists(t *testing.T) {
 func TestUserUsecaseImpl_Create_Fail_Create(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserProducerMock{}
+	UserProducer := &mock.UserFollowedProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
+		DB:                   gormDB,
+		UserRepository:       UserRepository,
+		UserFollowedProducer: UserProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -219,7 +219,7 @@ func TestUserUsecaseImpl_Create_Fail_Create(t *testing.T) {
 		return assert.AnError
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	UserProducer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -239,11 +239,11 @@ func TestUserUsecaseImpl_Create_Fail_Create(t *testing.T) {
 func TestUserUsecaseImpl_Create_Fail_Send(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserProducerMock{}
+	UserProducer := &mock.UserFollowedProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
+		DB:                   gormDB,
+		UserRepository:       UserRepository,
+		UserFollowedProducer: UserProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -262,7 +262,7 @@ func TestUserUsecaseImpl_Create_Fail_Send(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	UserProducer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return assert.AnError
 	}
 

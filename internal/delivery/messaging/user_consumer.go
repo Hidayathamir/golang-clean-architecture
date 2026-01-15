@@ -26,15 +26,15 @@ func (c UserConsumer) Consume(message *sarama.ConsumerMessage) error {
 	ctx, span := telemetry.StartConsumer(message)
 	defer span.End()
 
-	UserEvent := new(model.UserEvent)
-	if err := json.Unmarshal(message.Value, UserEvent); err != nil {
+	UserFollowedEvent := new(model.UserFollowedEvent)
+	if err := json.Unmarshal(message.Value, UserFollowedEvent); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error("error unmarshalling User event")
 		return errkit.AddFuncName(err)
 	}
 
 	// TODO process event
 	x.Logger.WithContext(ctx).WithFields(logrus.Fields{
-		"event":     UserEvent,
+		"event":     UserFollowedEvent,
 		"partition": message.Partition,
 	}).Info("Received topic users")
 	return nil

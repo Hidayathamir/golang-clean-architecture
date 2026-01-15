@@ -29,9 +29,9 @@ func (u *UserUsecaseImpl) Logout(ctx context.Context, req *model.LogoutUserReque
 		return false, errkit.AddFuncName(err)
 	}
 
-	event := new(model.UserEvent)
-	converter.EntityUserToModelUserEvent(user, event)
-	if err := u.UserProducer.Send(ctx, event); err != nil {
+	event := new(model.UserFollowedEvent)
+	converter.EntityUserToModelUserFollowedEvent(user, event)
+	if err := u.UserFollowedProducer.Send(ctx, event); err != nil {
 		return false, errkit.AddFuncName(err)
 	}
 

@@ -8,6 +8,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/address"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/contact"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/image"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/todo"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/IBM/sarama"
@@ -18,6 +19,7 @@ import (
 
 type Usecases struct {
 	UserUsecase    user.UserUsecase
+	ImageUsecase   image.ImageUsecase
 	ContactUsecase contact.ContactUsecase
 	AddressUsecase address.AddressUsecase
 	TodoUsecase    todo.TodoUsecase
@@ -33,6 +35,10 @@ func SetupUsecases(
 	userRepository = repository.NewUserRepository(viperConfig)
 	userRepository = repository.NewUserRepositoryMwLogger(userRepository)
 
+	var imageRepository repository.ImageRepository
+	imageRepository = repository.NewImageRepository(viperConfig)
+	imageRepository = repository.NewImageRepositoryMwLogger(imageRepository)
+
 	var contactRepository repository.ContactRepository
 	contactRepository = repository.NewContactRepository(viperConfig)
 	contactRepository = repository.NewContactRepositoryMwLogger(contactRepository)
@@ -46,9 +52,21 @@ func SetupUsecases(
 	todoRepository = repository.NewTodoRepositoryMwLogger(todoRepository)
 
 	// setup producer
-	var userProducer messaging.UserProducer
-	userProducer = messaging.NewUserProducer(viperConfig, producer)
-	userProducer = messaging.NewUserProducerMwLogger(userProducer)
+	var userFollowedProducer messaging.UserFollowedProducer
+	userFollowedProducer = messaging.NewUserFollowedProducer(viperConfig, producer)
+	userFollowedProducer = messaging.NewUserFollowedProducerMwLogger(userFollowedProducer)
+
+	var imageUploadedProducer messaging.ImageUploadedProducer
+	imageUploadedProducer = messaging.NewImageUploadedProducer(viperConfig, producer)
+	imageUploadedProducer = messaging.NewImageUploadedProducerMwLogger(imageUploadedProducer)
+
+	var imageLikedProducer messaging.ImageLikedProducer
+	imageLikedProducer = messaging.NewImageLikedProducer(viperConfig, producer)
+	imageLikedProducer = messaging.NewImageLikedProducerMwLogger(imageLikedProducer)
+
+	var imageCommentedProducer messaging.ImageCommentedProducer
+	imageCommentedProducer = messaging.NewImageCommentedProducer(viperConfig, producer)
+	imageCommentedProducer = messaging.NewImageCommentedProducerMwLogger(imageCommentedProducer)
 
 	var contactProducer messaging.ContactProducer
 	contactProducer = messaging.NewContactProducer(viperConfig, producer)
@@ -77,8 +95,12 @@ func SetupUsecases(
 
 	// setup use cases
 	var userUsecase user.UserUsecase
-	userUsecase = user.NewUserUsecase(viperConfig, db, userRepository, userProducer, s3Client, slackClient)
+	userUsecase = user.NewUserUsecase(viperConfig, db, userRepository, userFollowedProducer, s3Client, slackClient)
 	userUsecase = user.NewUserUsecaseMwLogger(userUsecase)
+
+	var imageUsecase image.ImageUsecase
+	imageUsecase = image.NewImageUsecase(viperConfig, db, imageRepository, imageUploadedProducer, imageLikedProducer, imageCommentedProducer, s3Client)
+	imageUsecase = image.NewImageUsecaseMwLogger(imageUsecase)
 
 	var contactUsecase contact.ContactUsecase
 	contactUsecase = contact.NewContactUsecase(viperConfig, db, contactRepository, contactProducer, slackClient)
@@ -94,6 +116,7 @@ func SetupUsecases(
 
 	return &Usecases{
 		UserUsecase:    userUsecase,
+		ImageUsecase:   imageUsecase,
 		ContactUsecase: contactUsecase,
 		AddressUsecase: addressUsecase,
 		TodoUsecase:    todoUsecase,

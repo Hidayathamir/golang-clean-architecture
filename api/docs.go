@@ -925,7 +925,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "created_at": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "id": {
                     "type": "integer"
@@ -940,7 +940,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
@@ -954,7 +954,7 @@ const docTemplate = `{
                     }
                 },
                 "created_at": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "email": {
                     "type": "string"
@@ -972,7 +972,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
@@ -1084,10 +1084,10 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "completed_at": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "created_at": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "description": {
                     "type": "string"
@@ -1102,7 +1102,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
@@ -1188,7 +1188,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "created_at": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "id": {
                     "type": "integer"
@@ -1200,7 +1200,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "username": {
                     "type": "string"

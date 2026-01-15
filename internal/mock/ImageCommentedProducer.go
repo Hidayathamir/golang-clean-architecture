@@ -10,28 +10,28 @@ import (
 	"sync"
 )
 
-// Ensure, that UserProducerMock does implement messaging.UserProducer.
+// Ensure, that ImageCommentedProducerMock does implement messaging.ImageCommentedProducer.
 // If this is not the case, regenerate this file with moq.
-var _ messaging.UserProducer = &UserProducerMock{}
+var _ messaging.ImageCommentedProducer = &ImageCommentedProducerMock{}
 
-// UserProducerMock is a mock implementation of messaging.UserProducer.
+// ImageCommentedProducerMock is a mock implementation of messaging.ImageCommentedProducer.
 //
-//	func TestSomethingThatUsesUserProducer(t *testing.T) {
+//	func TestSomethingThatUsesImageCommentedProducer(t *testing.T) {
 //
-//		// make and configure a mocked messaging.UserProducer
-//		mockedUserProducer := &UserProducerMock{
-//			SendFunc: func(ctx context.Context, event *model.UserEvent) error {
+//		// make and configure a mocked messaging.ImageCommentedProducer
+//		mockedImageCommentedProducer := &ImageCommentedProducerMock{
+//			SendFunc: func(ctx context.Context, event *model.ImageCommentedEvent) error {
 //				panic("mock out the Send method")
 //			},
 //		}
 //
-//		// use mockedUserProducer in code that requires messaging.UserProducer
+//		// use mockedImageCommentedProducer in code that requires messaging.ImageCommentedProducer
 //		// and then make assertions.
 //
 //	}
-type UserProducerMock struct {
+type ImageCommentedProducerMock struct {
 	// SendFunc mocks the Send method.
-	SendFunc func(ctx context.Context, event *model.UserEvent) error
+	SendFunc func(ctx context.Context, event *model.ImageCommentedEvent) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -40,20 +40,20 @@ type UserProducerMock struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Event is the event argument value.
-			Event *model.UserEvent
+			Event *model.ImageCommentedEvent
 		}
 	}
 	lockSend sync.RWMutex
 }
 
 // Send calls SendFunc.
-func (mock *UserProducerMock) Send(ctx context.Context, event *model.UserEvent) error {
+func (mock *ImageCommentedProducerMock) Send(ctx context.Context, event *model.ImageCommentedEvent) error {
 	if mock.SendFunc == nil {
-		panic("UserProducerMock.SendFunc: method is nil but UserProducer.Send was just called")
+		panic("ImageCommentedProducerMock.SendFunc: method is nil but ImageCommentedProducer.Send was just called")
 	}
 	callInfo := struct {
 		Ctx   context.Context
-		Event *model.UserEvent
+		Event *model.ImageCommentedEvent
 	}{
 		Ctx:   ctx,
 		Event: event,
@@ -67,14 +67,14 @@ func (mock *UserProducerMock) Send(ctx context.Context, event *model.UserEvent) 
 // SendCalls gets all the calls that were made to Send.
 // Check the length with:
 //
-//	len(mockedUserProducer.SendCalls())
-func (mock *UserProducerMock) SendCalls() []struct {
+//	len(mockedImageCommentedProducer.SendCalls())
+func (mock *ImageCommentedProducerMock) SendCalls() []struct {
 	Ctx   context.Context
-	Event *model.UserEvent
+	Event *model.ImageCommentedEvent
 } {
 	var calls []struct {
 		Ctx   context.Context
-		Event *model.UserEvent
+		Event *model.ImageCommentedEvent
 	}
 	mock.lockSend.RLock()
 	calls = mock.calls.Send
