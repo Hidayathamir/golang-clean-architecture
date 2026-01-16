@@ -9,6 +9,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
 func ModelUploadImageRequestToEntityImage(ctx context.Context, req *model.UploadImageRequest, image *entity.Image, url string) {
@@ -25,7 +26,7 @@ func ModelUploadImageRequestToModelS3UploadImageRequest(ctx context.Context, req
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
-	defer file.Close()
+	defer x.LogIfErr(file.Close())
 	s3UploadImgReq.Body = file
 	return nil
 }
