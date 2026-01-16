@@ -26,7 +26,7 @@ var _ rest.S3Client = &S3ClientMock{}
 //			DownloadFunc: func(ctx context.Context, req model.S3DownloadRequest) (model.S3DownloadResponse, error) {
 //				panic("mock out the Download method")
 //			},
-//			UploadImageFunc: func(ctx context.Context, req model.S3UploadImageRequest) error {
+//			UploadImageFunc: func(ctx context.Context, req model.S3UploadImageRequest) (string, error) {
 //				panic("mock out the UploadImage method")
 //			},
 //		}
@@ -43,7 +43,7 @@ type S3ClientMock struct {
 	DownloadFunc func(ctx context.Context, req model.S3DownloadRequest) (model.S3DownloadResponse, error)
 
 	// UploadImageFunc mocks the UploadImage method.
-	UploadImageFunc func(ctx context.Context, req model.S3UploadImageRequest) error
+	UploadImageFunc func(ctx context.Context, req model.S3UploadImageRequest) (string, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -147,7 +147,7 @@ func (mock *S3ClientMock) DownloadCalls() []struct {
 }
 
 // UploadImage calls UploadImageFunc.
-func (mock *S3ClientMock) UploadImage(ctx context.Context, req model.S3UploadImageRequest) error {
+func (mock *S3ClientMock) UploadImage(ctx context.Context, req model.S3UploadImageRequest) (string, error) {
 	if mock.UploadImageFunc == nil {
 		panic("S3ClientMock.UploadImageFunc: method is nil but S3Client.UploadImage was just called")
 	}

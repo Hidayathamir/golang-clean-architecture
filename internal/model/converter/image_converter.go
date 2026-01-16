@@ -2,16 +2,32 @@ package converter
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 )
 
-func ModelUploadImageRequestToEntityImage(ctx context.Context, req *model.UploadImageRequest, image *entity.Image) {
+func ModelUploadImageRequestToEntityImage(ctx context.Context, req *model.UploadImageRequest, image *entity.Image, url string) {
 	userAuth := ctxuserauth.Get(ctx)
 	image.UserID = userAuth.ID
-	image.URL = "TODO: dummy url"
+	image.URL = url
+}
+
+func ModelUploadImageRequestToModelS3UploadImageRequest(ctx context.Context, req *model.UploadImageRequest, s3UploadImgReq *model.S3UploadImageRequest) error {
+	timenow := time.Now().Unix()
+	userAuth := ctxuserauth.Get(ctx)
+	s3UploadImgReq.Key = fmt.Sprintf("%v_%v_%s", timenow, userAuth.ID, req.File.Filename)
+	file, err := req.File.Open()
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+	defer file.Close()
+	s3UploadImgReq.Body = file
+	return nil
 }
 
 func EntityImageToModelImageUploadedEvent(ctx context.Context, image *entity.Image, event *model.ImageUploadedEvent) {

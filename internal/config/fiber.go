@@ -12,6 +12,7 @@ func NewFiber(viperConfig *viper.Viper) *fiber.App {
 		AppName:      viperConfig.GetString(configkey.AppName),
 		ErrorHandler: response.Error,
 		Prefork:      viperConfig.GetBool(configkey.WebPrefork),
+		BodyLimit:    15 * 1024 * 1024, // 15MB
 	})
 
 	return app

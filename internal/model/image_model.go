@@ -1,6 +1,9 @@
 package model
 
+import "mime/multipart"
+
 type UploadImageRequest struct {
+	File *multipart.FileHeader
 }
 
 type LikeImageRequest struct {

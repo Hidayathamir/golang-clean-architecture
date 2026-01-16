@@ -17,8 +17,18 @@ func (u *ImageUsecaseImpl) Upload(ctx context.Context, req *model.UploadImageReq
 		return errkit.AddFuncName(err)
 	}
 
+	s3UploadImgReq := model.S3UploadImageRequest{}
+	if err := converter.ModelUploadImageRequestToModelS3UploadImageRequest(ctx, req, &s3UploadImgReq); err != nil {
+		return errkit.AddFuncName(err)
+	}
+
+	url, err := u.S3Client.UploadImage(ctx, s3UploadImgReq)
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+
 	image := new(entity.Image)
-	converter.ModelUploadImageRequestToEntityImage(ctx, req, image)
+	converter.ModelUploadImageRequestToEntityImage(ctx, req, image, url)
 
 	if err := u.ImageRepository.Create(ctx, u.DB, image); err != nil {
 		return errkit.AddFuncName(err)
