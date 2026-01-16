@@ -34,3 +34,34 @@ type CommentImageRequest struct {
 type GetImageRequest struct {
 	ID int64
 }
+
+type LikeResponse struct {
+	ID        int64          `json:"id"`
+	UserID    int64          `json:"user_id"`
+	ImageID   int64          `json:"image_id"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `json:"deleted_at"`
+}
+
+type LikeResponseList []LikeResponse
+
+type CommentResponse struct {
+	ID        int64          `json:"id"`
+	UserID    int64          `json:"user_id"`
+	ImageID   int64          `json:"image_id"`
+	Comment   string         `json:"comment"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `json:"deleted_at"`
+}
+
+type CommentResponseList []CommentResponse
+
+type GetLikeRequest struct {
+	ImageID int64
+}
+
+type GetCommentRequest struct {
+	ImageID int64
+}

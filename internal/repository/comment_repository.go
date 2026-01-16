@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/column"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
@@ -13,6 +14,7 @@ import (
 
 type CommentRepository interface {
 	Create(ctx context.Context, db *gorm.DB, comment *entity.Comment) error
+	FindByImageID(ctx context.Context, db *gorm.DB, commentList entity.CommentList, imageID int64) error
 }
 
 var _ CommentRepository = &CommentRepositoryImpl{}
@@ -29,6 +31,14 @@ func NewCommentRepository(cfg *viper.Viper) *CommentRepositoryImpl {
 
 func (r *CommentRepositoryImpl) Create(ctx context.Context, db *gorm.DB, comment *entity.Comment) error {
 	err := db.Create(comment).Error
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+	return nil
+}
+
+func (r *CommentRepositoryImpl) FindByImageID(ctx context.Context, db *gorm.DB, commentList entity.CommentList, imageID int64) error {
+	err := db.Where(column.ImageID.Eq(imageID)).Find(commentList).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}

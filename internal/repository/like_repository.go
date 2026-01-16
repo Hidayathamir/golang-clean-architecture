@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/column"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
@@ -13,6 +14,7 @@ import (
 
 type LikeRepository interface {
 	Create(ctx context.Context, db *gorm.DB, like *entity.Like) error
+	FindByImageID(ctx context.Context, db *gorm.DB, likeList entity.LikeList, imageID int64) error
 }
 
 var _ LikeRepository = &LikeRepositoryImpl{}
@@ -29,6 +31,14 @@ func NewLikeRepository(cfg *viper.Viper) *LikeRepositoryImpl {
 
 func (r *LikeRepositoryImpl) Create(ctx context.Context, db *gorm.DB, like *entity.Like) error {
 	err := db.Create(like).Error
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+	return nil
+}
+
+func (r *LikeRepositoryImpl) FindByImageID(ctx context.Context, db *gorm.DB, likeList entity.LikeList, imageID int64) error {
+	err := db.Where(column.ImageID.Eq(imageID)).Find(likeList).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}

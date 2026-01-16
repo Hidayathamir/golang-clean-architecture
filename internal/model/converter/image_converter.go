@@ -80,3 +80,38 @@ func EntityImageToModelImageResponse(ctx context.Context, image *entity.Image, r
 	res.UpdatedAt = image.UpdatedAt
 	res.DeletedAt = image.DeletedAt
 }
+
+func EntityLikeToModelLikeResponse(ctx context.Context, like *entity.Like, res *model.LikeResponse) {
+	res.ID = like.ID
+	res.UserID = like.UserID
+	res.ImageID = like.ImageID
+	res.CreatedAt = like.CreatedAt
+	res.UpdatedAt = like.UpdatedAt
+	res.DeletedAt = like.DeletedAt
+}
+
+func EntityLikeListToModelLikeResponseList(ctx context.Context, likeList entity.LikeList, res model.LikeResponseList) {
+	for _, like := range likeList {
+		r := model.LikeResponse{}
+		EntityLikeToModelLikeResponse(ctx, &like, &r)
+		res = append(res, r)
+	}
+}
+
+func EntityCommentToModelCommentResponse(ctx context.Context, comment *entity.Comment, res *model.CommentResponse) {
+	res.ID = comment.ID
+	res.UserID = comment.UserID
+	res.ImageID = comment.ImageID
+	res.Comment = comment.Comment
+	res.CreatedAt = comment.CreatedAt
+	res.UpdatedAt = comment.UpdatedAt
+	res.DeletedAt = comment.DeletedAt
+}
+
+func EntityCommentListToModelCommentResponseList(ctx context.Context, commentList entity.CommentList, res model.CommentResponseList) {
+	for _, comment := range commentList {
+		r := model.CommentResponse{}
+		EntityCommentToModelCommentResponse(ctx, &comment, &r)
+		res = append(res, r)
+	}
+}

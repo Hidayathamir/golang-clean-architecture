@@ -23,8 +23,14 @@ var _ image.ImageUsecase = &ImageUsecaseMock{}
 //			CommentFunc: func(ctx context.Context, req *model.CommentImageRequest) error {
 //				panic("mock out the Comment method")
 //			},
+//			GetCommentFunc: func(ctx context.Context, req *model.GetCommentRequest) (model.CommentResponseList, error) {
+//				panic("mock out the GetComment method")
+//			},
 //			GetImageFunc: func(ctx context.Context, req *model.GetImageRequest) (*model.ImageResponse, error) {
 //				panic("mock out the GetImage method")
+//			},
+//			GetLikeFunc: func(ctx context.Context, req *model.GetLikeRequest) (model.LikeResponseList, error) {
+//				panic("mock out the GetLike method")
 //			},
 //			LikeFunc: func(ctx context.Context, req *model.LikeImageRequest) error {
 //				panic("mock out the Like method")
@@ -42,8 +48,14 @@ type ImageUsecaseMock struct {
 	// CommentFunc mocks the Comment method.
 	CommentFunc func(ctx context.Context, req *model.CommentImageRequest) error
 
+	// GetCommentFunc mocks the GetComment method.
+	GetCommentFunc func(ctx context.Context, req *model.GetCommentRequest) (model.CommentResponseList, error)
+
 	// GetImageFunc mocks the GetImage method.
 	GetImageFunc func(ctx context.Context, req *model.GetImageRequest) (*model.ImageResponse, error)
+
+	// GetLikeFunc mocks the GetLike method.
+	GetLikeFunc func(ctx context.Context, req *model.GetLikeRequest) (model.LikeResponseList, error)
 
 	// LikeFunc mocks the Like method.
 	LikeFunc func(ctx context.Context, req *model.LikeImageRequest) error
@@ -60,12 +72,26 @@ type ImageUsecaseMock struct {
 			// Req is the req argument value.
 			Req *model.CommentImageRequest
 		}
+		// GetComment holds details about calls to the GetComment method.
+		GetComment []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req *model.GetCommentRequest
+		}
 		// GetImage holds details about calls to the GetImage method.
 		GetImage []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
 			Req *model.GetImageRequest
+		}
+		// GetLike holds details about calls to the GetLike method.
+		GetLike []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req *model.GetLikeRequest
 		}
 		// Like holds details about calls to the Like method.
 		Like []struct {
@@ -82,10 +108,12 @@ type ImageUsecaseMock struct {
 			Req *model.UploadImageRequest
 		}
 	}
-	lockComment  sync.RWMutex
-	lockGetImage sync.RWMutex
-	lockLike     sync.RWMutex
-	lockUpload   sync.RWMutex
+	lockComment    sync.RWMutex
+	lockGetComment sync.RWMutex
+	lockGetImage   sync.RWMutex
+	lockGetLike    sync.RWMutex
+	lockLike       sync.RWMutex
+	lockUpload     sync.RWMutex
 }
 
 // Comment calls CommentFunc.
@@ -124,6 +152,42 @@ func (mock *ImageUsecaseMock) CommentCalls() []struct {
 	return calls
 }
 
+// GetComment calls GetCommentFunc.
+func (mock *ImageUsecaseMock) GetComment(ctx context.Context, req *model.GetCommentRequest) (model.CommentResponseList, error) {
+	if mock.GetCommentFunc == nil {
+		panic("ImageUsecaseMock.GetCommentFunc: method is nil but ImageUsecase.GetComment was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req *model.GetCommentRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockGetComment.Lock()
+	mock.calls.GetComment = append(mock.calls.GetComment, callInfo)
+	mock.lockGetComment.Unlock()
+	return mock.GetCommentFunc(ctx, req)
+}
+
+// GetCommentCalls gets all the calls that were made to GetComment.
+// Check the length with:
+//
+//	len(mockedImageUsecase.GetCommentCalls())
+func (mock *ImageUsecaseMock) GetCommentCalls() []struct {
+	Ctx context.Context
+	Req *model.GetCommentRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req *model.GetCommentRequest
+	}
+	mock.lockGetComment.RLock()
+	calls = mock.calls.GetComment
+	mock.lockGetComment.RUnlock()
+	return calls
+}
+
 // GetImage calls GetImageFunc.
 func (mock *ImageUsecaseMock) GetImage(ctx context.Context, req *model.GetImageRequest) (*model.ImageResponse, error) {
 	if mock.GetImageFunc == nil {
@@ -157,6 +221,42 @@ func (mock *ImageUsecaseMock) GetImageCalls() []struct {
 	mock.lockGetImage.RLock()
 	calls = mock.calls.GetImage
 	mock.lockGetImage.RUnlock()
+	return calls
+}
+
+// GetLike calls GetLikeFunc.
+func (mock *ImageUsecaseMock) GetLike(ctx context.Context, req *model.GetLikeRequest) (model.LikeResponseList, error) {
+	if mock.GetLikeFunc == nil {
+		panic("ImageUsecaseMock.GetLikeFunc: method is nil but ImageUsecase.GetLike was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req *model.GetLikeRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockGetLike.Lock()
+	mock.calls.GetLike = append(mock.calls.GetLike, callInfo)
+	mock.lockGetLike.Unlock()
+	return mock.GetLikeFunc(ctx, req)
+}
+
+// GetLikeCalls gets all the calls that were made to GetLike.
+// Check the length with:
+//
+//	len(mockedImageUsecase.GetLikeCalls())
+func (mock *ImageUsecaseMock) GetLikeCalls() []struct {
+	Ctx context.Context
+	Req *model.GetLikeRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req *model.GetLikeRequest
+	}
+	mock.lockGetLike.RLock()
+	calls = mock.calls.GetLike
+	mock.lockGetLike.RUnlock()
 	return calls
 }
 

@@ -24,6 +24,9 @@ var _ repository.CommentRepository = &CommentRepositoryMock{}
 //			CreateFunc: func(ctx context.Context, db *gorm.DB, comment *entity.Comment) error {
 //				panic("mock out the Create method")
 //			},
+//			FindByImageIDFunc: func(ctx context.Context, db *gorm.DB, commentList entity.CommentList, imageID int64) error {
+//				panic("mock out the FindByImageID method")
+//			},
 //		}
 //
 //		// use mockedCommentRepository in code that requires repository.CommentRepository
@@ -33,6 +36,9 @@ var _ repository.CommentRepository = &CommentRepositoryMock{}
 type CommentRepositoryMock struct {
 	// CreateFunc mocks the Create method.
 	CreateFunc func(ctx context.Context, db *gorm.DB, comment *entity.Comment) error
+
+	// FindByImageIDFunc mocks the FindByImageID method.
+	FindByImageIDFunc func(ctx context.Context, db *gorm.DB, commentList entity.CommentList, imageID int64) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -45,8 +51,20 @@ type CommentRepositoryMock struct {
 			// Comment is the comment argument value.
 			Comment *entity.Comment
 		}
+		// FindByImageID holds details about calls to the FindByImageID method.
+		FindByImageID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
+			// CommentList is the commentList argument value.
+			CommentList entity.CommentList
+			// ImageID is the imageID argument value.
+			ImageID int64
+		}
 	}
-	lockCreate sync.RWMutex
+	lockCreate        sync.RWMutex
+	lockFindByImageID sync.RWMutex
 }
 
 // Create calls CreateFunc.
@@ -86,5 +104,49 @@ func (mock *CommentRepositoryMock) CreateCalls() []struct {
 	mock.lockCreate.RLock()
 	calls = mock.calls.Create
 	mock.lockCreate.RUnlock()
+	return calls
+}
+
+// FindByImageID calls FindByImageIDFunc.
+func (mock *CommentRepositoryMock) FindByImageID(ctx context.Context, db *gorm.DB, commentList entity.CommentList, imageID int64) error {
+	if mock.FindByImageIDFunc == nil {
+		panic("CommentRepositoryMock.FindByImageIDFunc: method is nil but CommentRepository.FindByImageID was just called")
+	}
+	callInfo := struct {
+		Ctx         context.Context
+		Db          *gorm.DB
+		CommentList entity.CommentList
+		ImageID     int64
+	}{
+		Ctx:         ctx,
+		Db:          db,
+		CommentList: commentList,
+		ImageID:     imageID,
+	}
+	mock.lockFindByImageID.Lock()
+	mock.calls.FindByImageID = append(mock.calls.FindByImageID, callInfo)
+	mock.lockFindByImageID.Unlock()
+	return mock.FindByImageIDFunc(ctx, db, commentList, imageID)
+}
+
+// FindByImageIDCalls gets all the calls that were made to FindByImageID.
+// Check the length with:
+//
+//	len(mockedCommentRepository.FindByImageIDCalls())
+func (mock *CommentRepositoryMock) FindByImageIDCalls() []struct {
+	Ctx         context.Context
+	Db          *gorm.DB
+	CommentList entity.CommentList
+	ImageID     int64
+} {
+	var calls []struct {
+		Ctx         context.Context
+		Db          *gorm.DB
+		CommentList entity.CommentList
+		ImageID     int64
+	}
+	mock.lockFindByImageID.RLock()
+	calls = mock.calls.FindByImageID
+	mock.lockFindByImageID.RUnlock()
 	return calls
 }

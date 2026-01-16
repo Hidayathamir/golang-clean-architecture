@@ -36,3 +36,19 @@ func (r *LikeRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, like *
 
 	return err
 }
+
+func (r *LikeRepositoryMwLogger) FindByImageID(ctx context.Context, db *gorm.DB, likeList entity.LikeList, imageID int64) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := r.Next.FindByImageID(ctx, db, likeList, imageID)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"len(likeList)": len(likeList),
+		"imageID":       imageID,
+	}
+	x.LogMw(ctx, fields, err)
+
+	return err
+}

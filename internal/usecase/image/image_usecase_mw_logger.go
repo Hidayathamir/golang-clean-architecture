@@ -82,3 +82,35 @@ func (u *ImageUsecaseMwLogger) GetImage(ctx context.Context, req *model.GetImage
 
 	return res, err
 }
+
+func (u *ImageUsecaseMwLogger) GetComment(ctx context.Context, req *model.GetCommentRequest) (model.CommentResponseList, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	res, err := u.Next.GetComment(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req":      req,
+		"len(res)": len(res),
+	}
+	x.LogMw(ctx, fields, err)
+
+	return res, err
+}
+
+func (u *ImageUsecaseMwLogger) GetLike(ctx context.Context, req *model.GetLikeRequest) (model.LikeResponseList, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	res, err := u.Next.GetLike(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req":      req,
+		"len(res)": len(res),
+	}
+	x.LogMw(ctx, fields, err)
+
+	return res, err
+}
