@@ -425,6 +425,84 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/images/_comment": {
+            "post": {
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
+                ],
+                "description": "Comment an image",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "images"
+                ],
+                "summary": "Comment image",
+                "parameters": [
+                    {
+                        "description": "Comment Image Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentImageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/images/_like": {
+            "post": {
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
+                ],
+                "description": "Like an image",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "images"
+                ],
+                "summary": "Like image",
+                "parameters": [
+                    {
+                        "description": "Like Image Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeImageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/todos": {
             "get": {
                 "security": [
@@ -972,6 +1050,26 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "string"
+                },
+                "error_detail": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "error_message": {
+                    "type": "string"
+                },
+                "paging": {
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata"
+                }
+            }
+        },
         "github_com_Hidayathamir_golang-clean-architecture_internal_model.AddressResponse": {
             "type": "object",
             "properties": {
@@ -998,6 +1096,17 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
+                }
+            }
+        },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentImageRequest": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "image_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -1123,6 +1232,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeImageRequest": {
+            "type": "object",
+            "properties": {
+                "image_id": {
                     "type": "integer"
                 }
             }

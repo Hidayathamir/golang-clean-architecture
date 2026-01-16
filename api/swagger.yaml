@@ -146,6 +146,19 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
     type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string:
+    properties:
+      data:
+        type: string
+      error_detail:
+        items:
+          type: string
+        type: array
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
+    type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.AddressResponse:
     properties:
       city:
@@ -164,6 +177,13 @@ definitions:
         type: string
       updated_at:
         type: string
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentImageRequest:
+    properties:
+      comment:
+        type: string
+      image_id:
+        type: integer
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.ContactResponse:
     properties:
@@ -249,6 +269,11 @@ definitions:
       url:
         type: string
       user_id:
+        type: integer
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeImageRequest:
+    properties:
+      image_id:
         type: integer
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.LoginUserRequest:
@@ -647,6 +672,54 @@ paths:
       security:
       - SimpleApiKeyAuth: []
       summary: Upload image
+      tags:
+      - images
+  /api/images/_comment:
+    post:
+      consumes:
+      - application/json
+      description: Comment an image
+      parameters:
+      - description: Comment Image Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentImageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Comment image
+      tags:
+      - images
+  /api/images/_like:
+    post:
+      consumes:
+      - application/json
+      description: Like an image
+      parameters:
+      - description: Like Image Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeImageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Like image
       tags:
       - images
   /api/todos:

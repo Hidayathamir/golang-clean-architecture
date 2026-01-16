@@ -56,6 +56,17 @@ func (c *ImageController) Upload(ctx *fiber.Ctx) error {
 	return response.Data(ctx, http.StatusOK, res)
 }
 
+// Like godoc
+//
+//	@Summary		Like image
+//	@Description	Like an image
+//	@Tags			images
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body	model.LikeImageRequest	true	"Like Image Request"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[string]
+//	@Router			/api/images/_like [post]
 func (c *ImageController) Like(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
@@ -68,6 +79,36 @@ func (c *ImageController) Like(ctx *fiber.Ctx) error {
 	}
 
 	err = c.Usecase.Like(ctx.UserContext(), req)
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+
+	return response.Data(ctx, http.StatusOK, "ok")
+}
+
+// Comment godoc
+//
+//	@Summary		Comment image
+//	@Description	Comment an image
+//	@Tags			images
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body	model.CommentImageRequest	true	"Comment Image Request"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[string]
+//	@Router			/api/images/_comment [post]
+func (c *ImageController) Comment(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
+	req := new(model.CommentImageRequest)
+	err := ctx.BodyParser(req)
+	if err != nil {
+		err = errkit.BadRequest(err)
+		return errkit.AddFuncName(err)
+	}
+
+	err = c.Usecase.Comment(ctx.UserContext(), req)
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
