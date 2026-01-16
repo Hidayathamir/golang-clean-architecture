@@ -3,19 +3,8 @@ package entity
 import (
 	"time"
 
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/table"
 	"gorm.io/gorm"
-)
-
-const (
-	ImageTableName          = "images"
-	ImageColumnID           = "id"
-	ImageColumnUserID       = "user_id"
-	ImageColumnURL          = "url"
-	ImageColumnLikeCount    = "like_count"
-	ImageColumnCommentCount = "comment_count"
-	ImageColumnCreatedAt    = "created_at"
-	ImageColumnUpdatedAt    = "updated_at"
-	ImageColumnDeletedAt    = "deleted_at"
 )
 
 type Image struct {
@@ -32,7 +21,7 @@ type Image struct {
 }
 
 func (i *Image) TableName() string {
-	return ImageTableName
+	return table.Image
 }
 
 type ImageList []Image

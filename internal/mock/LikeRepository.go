@@ -21,7 +21,7 @@ var _ repository.LikeRepository = &LikeRepositoryMock{}
 //
 //		// make and configure a mocked repository.LikeRepository
 //		mockedLikeRepository := &LikeRepositoryMock{
-//			CreateFunc: func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Like) error {
+//			CreateFunc: func(ctx context.Context, db *gorm.DB, like *entity.Like) error {
 //				panic("mock out the Create method")
 //			},
 //		}
@@ -32,7 +32,7 @@ var _ repository.LikeRepository = &LikeRepositoryMock{}
 //	}
 type LikeRepositoryMock struct {
 	// CreateFunc mocks the Create method.
-	CreateFunc func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Like) error
+	CreateFunc func(ctx context.Context, db *gorm.DB, like *entity.Like) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -42,31 +42,31 @@ type LikeRepositoryMock struct {
 			Ctx context.Context
 			// Db is the db argument value.
 			Db *gorm.DB
-			// EntityMoqParam is the entityMoqParam argument value.
-			EntityMoqParam *entity.Like
+			// Like is the like argument value.
+			Like *entity.Like
 		}
 	}
 	lockCreate sync.RWMutex
 }
 
 // Create calls CreateFunc.
-func (mock *LikeRepositoryMock) Create(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Like) error {
+func (mock *LikeRepositoryMock) Create(ctx context.Context, db *gorm.DB, like *entity.Like) error {
 	if mock.CreateFunc == nil {
 		panic("LikeRepositoryMock.CreateFunc: method is nil but LikeRepository.Create was just called")
 	}
 	callInfo := struct {
-		Ctx            context.Context
-		Db             *gorm.DB
-		EntityMoqParam *entity.Like
+		Ctx  context.Context
+		Db   *gorm.DB
+		Like *entity.Like
 	}{
-		Ctx:            ctx,
-		Db:             db,
-		EntityMoqParam: entityMoqParam,
+		Ctx:  ctx,
+		Db:   db,
+		Like: like,
 	}
 	mock.lockCreate.Lock()
 	mock.calls.Create = append(mock.calls.Create, callInfo)
 	mock.lockCreate.Unlock()
-	return mock.CreateFunc(ctx, db, entityMoqParam)
+	return mock.CreateFunc(ctx, db, like)
 }
 
 // CreateCalls gets all the calls that were made to Create.
@@ -74,14 +74,14 @@ func (mock *LikeRepositoryMock) Create(ctx context.Context, db *gorm.DB, entityM
 //
 //	len(mockedLikeRepository.CreateCalls())
 func (mock *LikeRepositoryMock) CreateCalls() []struct {
-	Ctx            context.Context
-	Db             *gorm.DB
-	EntityMoqParam *entity.Like
+	Ctx  context.Context
+	Db   *gorm.DB
+	Like *entity.Like
 } {
 	var calls []struct {
-		Ctx            context.Context
-		Db             *gorm.DB
-		EntityMoqParam *entity.Like
+		Ctx  context.Context
+		Db   *gorm.DB
+		Like *entity.Like
 	}
 	mock.lockCreate.RLock()
 	calls = mock.calls.Create

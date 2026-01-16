@@ -3,20 +3,10 @@ package entity
 import (
 	"time"
 
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/table"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
-)
-
-const (
-	UserTableName            = "users"
-	UserColumnID             = "id"
-	UserColumnUsername       = "username"
-	UserColumnPassword       = "password"
-	UserColumnName           = "name"
-	UserColumnFollowerCount  = "follower_count"
-	UserColumnFollowingCount = "following_count"
-	UserColumnCreatedAt      = "created_at"
-	UserColumnUpdatedAt      = "updated_at"
-	UserColumnDeletedAt      = "deleted_at"
 )
 
 type User struct {
@@ -32,7 +22,15 @@ type User struct {
 }
 
 func (u *User) TableName() string {
-	return UserTableName
+	return table.User
+}
+
+func (u *User) ValidatePassword(password string) error {
+	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)); err != nil {
+		return errkit.AddFuncName(err)
+	}
+
+	return nil
 }
 
 type UserList []User

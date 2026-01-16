@@ -12,7 +12,7 @@ import (
 //go:generate moq -out=../mock/LikeRepository.go -pkg=mock . LikeRepository
 
 type LikeRepository interface {
-	Create(ctx context.Context, db *gorm.DB, entity *entity.Like) error
+	Create(ctx context.Context, db *gorm.DB, like *entity.Like) error
 }
 
 var _ LikeRepository = &LikeRepositoryImpl{}
@@ -27,8 +27,8 @@ func NewLikeRepository(cfg *viper.Viper) *LikeRepositoryImpl {
 	}
 }
 
-func (r *LikeRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity *entity.Like) error {
-	err := db.Create(entity).Error
+func (r *LikeRepositoryImpl) Create(ctx context.Context, db *gorm.DB, like *entity.Like) error {
+	err := db.Create(like).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}

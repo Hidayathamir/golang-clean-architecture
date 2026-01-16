@@ -32,9 +32,6 @@ var _ user.UserUsecase = &UserUsecaseMock{}
 //			LoginFunc: func(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error) {
 //				panic("mock out the Login method")
 //			},
-//			LogoutFunc: func(ctx context.Context, req *model.LogoutUserRequest) (bool, error) {
-//				panic("mock out the Logout method")
-//			},
 //			UpdateFunc: func(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error) {
 //				panic("mock out the Update method")
 //			},
@@ -59,9 +56,6 @@ type UserUsecaseMock struct {
 
 	// LoginFunc mocks the Login method.
 	LoginFunc func(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error)
-
-	// LogoutFunc mocks the Logout method.
-	LogoutFunc func(ctx context.Context, req *model.LogoutUserRequest) (bool, error)
 
 	// UpdateFunc mocks the Update method.
 	UpdateFunc func(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error)
@@ -99,13 +93,6 @@ type UserUsecaseMock struct {
 			// Req is the req argument value.
 			Req *model.LoginUserRequest
 		}
-		// Logout holds details about calls to the Logout method.
-		Logout []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
-			// Req is the req argument value.
-			Req *model.LogoutUserRequest
-		}
 		// Update holds details about calls to the Update method.
 		Update []struct {
 			// Ctx is the ctx argument value.
@@ -125,7 +112,6 @@ type UserUsecaseMock struct {
 	lockCurrent sync.RWMutex
 	lockFollow  sync.RWMutex
 	lockLogin   sync.RWMutex
-	lockLogout  sync.RWMutex
 	lockUpdate  sync.RWMutex
 	lockVerify  sync.RWMutex
 }
@@ -271,42 +257,6 @@ func (mock *UserUsecaseMock) LoginCalls() []struct {
 	mock.lockLogin.RLock()
 	calls = mock.calls.Login
 	mock.lockLogin.RUnlock()
-	return calls
-}
-
-// Logout calls LogoutFunc.
-func (mock *UserUsecaseMock) Logout(ctx context.Context, req *model.LogoutUserRequest) (bool, error) {
-	if mock.LogoutFunc == nil {
-		panic("UserUsecaseMock.LogoutFunc: method is nil but UserUsecase.Logout was just called")
-	}
-	callInfo := struct {
-		Ctx context.Context
-		Req *model.LogoutUserRequest
-	}{
-		Ctx: ctx,
-		Req: req,
-	}
-	mock.lockLogout.Lock()
-	mock.calls.Logout = append(mock.calls.Logout, callInfo)
-	mock.lockLogout.Unlock()
-	return mock.LogoutFunc(ctx, req)
-}
-
-// LogoutCalls gets all the calls that were made to Logout.
-// Check the length with:
-//
-//	len(mockedUserUsecase.LogoutCalls())
-func (mock *UserUsecaseMock) LogoutCalls() []struct {
-	Ctx context.Context
-	Req *model.LogoutUserRequest
-} {
-	var calls []struct {
-		Ctx context.Context
-		Req *model.LogoutUserRequest
-	}
-	mock.lockLogout.RLock()
-	calls = mock.calls.Logout
-	mock.lockLogout.RUnlock()
 	return calls
 }
 

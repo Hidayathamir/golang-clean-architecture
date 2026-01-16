@@ -42,7 +42,6 @@ func setupGuestRoute(router fiber.Router, controllers *config.Controllers) {
 func setupAuthRoute(router fiber.Router, controllers *config.Controllers) {
 	users := router.Group("/users")
 	{
-		users.Delete("", controllers.UserController.Logout)
 		users.Patch("/_current", controllers.UserController.Update)
 		users.Get("/_current", controllers.UserController.Current)
 	}

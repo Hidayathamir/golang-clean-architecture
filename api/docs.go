@@ -661,26 +661,6 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "SimpleApiKeyAuth": []
-                    }
-                ],
-                "description": "Logout the current authenticated user",
-                "tags": [
-                    "users"
-                ],
-                "summary": "Logout user",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-bool"
-                        }
-                    }
-                }
             }
         },
         "/api/users/_current": {

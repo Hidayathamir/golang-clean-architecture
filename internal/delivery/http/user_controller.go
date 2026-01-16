@@ -105,32 +105,6 @@ func (c *UserController) Current(ctx *fiber.Ctx) error {
 	return response.Data(ctx, http.StatusOK, res)
 }
 
-// Logout godoc
-//
-//	@Summary		Logout user
-//	@Description	Logout the current authenticated user
-//	@Tags			users
-//	@Security		SimpleApiKeyAuth
-//	@Success		200	{object}	response.WebResponse[bool]
-//	@Router			/api/users [delete]
-func (c *UserController) Logout(ctx *fiber.Ctx) error {
-	span := telemetry.StartController(ctx)
-	defer span.End()
-
-	userAuth := ctxuserauth.Get(ctx.UserContext())
-
-	req := &model.LogoutUserRequest{
-		ID: userAuth.ID,
-	}
-
-	res, err := c.Usecase.Logout(ctx.UserContext(), req)
-	if err != nil {
-		return errkit.AddFuncName(err)
-	}
-
-	return response.Data(ctx, http.StatusOK, res)
-}
-
 // Update godoc
 //
 //	@Summary		Update user

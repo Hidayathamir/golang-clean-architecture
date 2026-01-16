@@ -3,17 +3,8 @@ package entity
 import (
 	"time"
 
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/table"
 	"gorm.io/gorm"
-)
-
-const (
-	FollowTableName         = "follows"
-	FollowColumnID          = "id"
-	FollowColumnFollowerID  = "follower_id"
-	FollowColumnFollowingID = "following_id"
-	FollowColumnCreatedAt   = "created_at"
-	FollowColumnUpdatedAt   = "updated_at"
-	FollowColumnDeletedAt   = "deleted_at"
 )
 
 type Follow struct {
@@ -29,7 +20,7 @@ type Follow struct {
 }
 
 func (f *Follow) TableName() string {
-	return FollowTableName
+	return table.Follow
 }
 
 type FollowList []Follow

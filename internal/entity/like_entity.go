@@ -3,17 +3,8 @@ package entity
 import (
 	"time"
 
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/table"
 	"gorm.io/gorm"
-)
-
-const (
-	LikeTableName       = "likes"
-	LikeColumnID        = "id"
-	LikeColumnUserID    = "user_id"
-	LikeColumnImageID   = "image_id"
-	LikeColumnCreatedAt = "created_at"
-	LikeColumnUpdatedAt = "updated_at"
-	LikeColumnDeletedAt = "deleted_at"
 )
 
 type Like struct {
@@ -29,7 +20,7 @@ type Like struct {
 }
 
 func (l *Like) TableName() string {
-	return LikeTableName
+	return table.Like
 }
 
 type LikeList []Like

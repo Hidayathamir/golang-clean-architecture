@@ -21,7 +21,7 @@ var _ repository.ImageRepository = &ImageRepositoryMock{}
 //
 //		// make and configure a mocked repository.ImageRepository
 //		mockedImageRepository := &ImageRepositoryMock{
-//			CreateFunc: func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Image) error {
+//			CreateFunc: func(ctx context.Context, db *gorm.DB, image *entity.Image) error {
 //				panic("mock out the Create method")
 //			},
 //		}
@@ -32,7 +32,7 @@ var _ repository.ImageRepository = &ImageRepositoryMock{}
 //	}
 type ImageRepositoryMock struct {
 	// CreateFunc mocks the Create method.
-	CreateFunc func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Image) error
+	CreateFunc func(ctx context.Context, db *gorm.DB, image *entity.Image) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -42,31 +42,31 @@ type ImageRepositoryMock struct {
 			Ctx context.Context
 			// Db is the db argument value.
 			Db *gorm.DB
-			// EntityMoqParam is the entityMoqParam argument value.
-			EntityMoqParam *entity.Image
+			// Image is the image argument value.
+			Image *entity.Image
 		}
 	}
 	lockCreate sync.RWMutex
 }
 
 // Create calls CreateFunc.
-func (mock *ImageRepositoryMock) Create(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Image) error {
+func (mock *ImageRepositoryMock) Create(ctx context.Context, db *gorm.DB, image *entity.Image) error {
 	if mock.CreateFunc == nil {
 		panic("ImageRepositoryMock.CreateFunc: method is nil but ImageRepository.Create was just called")
 	}
 	callInfo := struct {
-		Ctx            context.Context
-		Db             *gorm.DB
-		EntityMoqParam *entity.Image
+		Ctx   context.Context
+		Db    *gorm.DB
+		Image *entity.Image
 	}{
-		Ctx:            ctx,
-		Db:             db,
-		EntityMoqParam: entityMoqParam,
+		Ctx:   ctx,
+		Db:    db,
+		Image: image,
 	}
 	mock.lockCreate.Lock()
 	mock.calls.Create = append(mock.calls.Create, callInfo)
 	mock.lockCreate.Unlock()
-	return mock.CreateFunc(ctx, db, entityMoqParam)
+	return mock.CreateFunc(ctx, db, image)
 }
 
 // CreateCalls gets all the calls that were made to Create.
@@ -74,14 +74,14 @@ func (mock *ImageRepositoryMock) Create(ctx context.Context, db *gorm.DB, entity
 //
 //	len(mockedImageRepository.CreateCalls())
 func (mock *ImageRepositoryMock) CreateCalls() []struct {
-	Ctx            context.Context
-	Db             *gorm.DB
-	EntityMoqParam *entity.Image
+	Ctx   context.Context
+	Db    *gorm.DB
+	Image *entity.Image
 } {
 	var calls []struct {
-		Ctx            context.Context
-		Db             *gorm.DB
-		EntityMoqParam *entity.Image
+		Ctx   context.Context
+		Db    *gorm.DB
+		Image *entity.Image
 	}
 	mock.lockCreate.RLock()
 	calls = mock.calls.Create

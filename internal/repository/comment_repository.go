@@ -12,7 +12,7 @@ import (
 //go:generate moq -out=../mock/CommentRepository.go -pkg=mock . CommentRepository
 
 type CommentRepository interface {
-	Create(ctx context.Context, db *gorm.DB, entity *entity.Comment) error
+	Create(ctx context.Context, db *gorm.DB, comment *entity.Comment) error
 }
 
 var _ CommentRepository = &CommentRepositoryImpl{}
@@ -27,8 +27,8 @@ func NewCommentRepository(cfg *viper.Viper) *CommentRepositoryImpl {
 	}
 }
 
-func (r *CommentRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity *entity.Comment) error {
-	err := db.Create(entity).Error
+func (r *CommentRepositoryImpl) Create(ctx context.Context, db *gorm.DB, comment *entity.Comment) error {
+	err := db.Create(comment).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}

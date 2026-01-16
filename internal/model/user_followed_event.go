@@ -8,13 +8,6 @@ import (
 )
 
 type UserFollowedEvent struct {
-	// TODO: RM
-	// ID        int64     `json:"id"`
-	Username string `json:"username"`
-	Name     string `json:"name"`
-	// CreatedAt time.Time `json:"created_at"`
-	// UpdatedAt time.Time `json:"updated_at"`
-
 	ID          int64          `json:"id"`
 	FollowerID  int64          `json:"follower_id"`
 	FollowingID int64          `json:"following_id"`

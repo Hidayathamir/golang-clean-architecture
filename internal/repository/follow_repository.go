@@ -12,7 +12,7 @@ import (
 //go:generate moq -out=../mock/FollowRepository.go -pkg=mock . FollowRepository
 
 type FollowRepository interface {
-	Create(ctx context.Context, db *gorm.DB, entity *entity.Follow) error
+	Create(ctx context.Context, db *gorm.DB, follow *entity.Follow) error
 }
 
 var _ FollowRepository = &FollowRepositoryImpl{}
@@ -27,8 +27,8 @@ func NewFollowRepository(cfg *viper.Viper) *FollowRepositoryImpl {
 	}
 }
 
-func (r *FollowRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity *entity.Follow) error {
-	err := db.Create(entity).Error
+func (r *FollowRepositoryImpl) Create(ctx context.Context, db *gorm.DB, follow *entity.Follow) error {
+	err := db.Create(follow).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}

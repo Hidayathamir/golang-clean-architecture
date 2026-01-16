@@ -21,7 +21,7 @@ var _ repository.CommentRepository = &CommentRepositoryMock{}
 //
 //		// make and configure a mocked repository.CommentRepository
 //		mockedCommentRepository := &CommentRepositoryMock{
-//			CreateFunc: func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Comment) error {
+//			CreateFunc: func(ctx context.Context, db *gorm.DB, comment *entity.Comment) error {
 //				panic("mock out the Create method")
 //			},
 //		}
@@ -32,7 +32,7 @@ var _ repository.CommentRepository = &CommentRepositoryMock{}
 //	}
 type CommentRepositoryMock struct {
 	// CreateFunc mocks the Create method.
-	CreateFunc func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Comment) error
+	CreateFunc func(ctx context.Context, db *gorm.DB, comment *entity.Comment) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -42,31 +42,31 @@ type CommentRepositoryMock struct {
 			Ctx context.Context
 			// Db is the db argument value.
 			Db *gorm.DB
-			// EntityMoqParam is the entityMoqParam argument value.
-			EntityMoqParam *entity.Comment
+			// Comment is the comment argument value.
+			Comment *entity.Comment
 		}
 	}
 	lockCreate sync.RWMutex
 }
 
 // Create calls CreateFunc.
-func (mock *CommentRepositoryMock) Create(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Comment) error {
+func (mock *CommentRepositoryMock) Create(ctx context.Context, db *gorm.DB, comment *entity.Comment) error {
 	if mock.CreateFunc == nil {
 		panic("CommentRepositoryMock.CreateFunc: method is nil but CommentRepository.Create was just called")
 	}
 	callInfo := struct {
-		Ctx            context.Context
-		Db             *gorm.DB
-		EntityMoqParam *entity.Comment
+		Ctx     context.Context
+		Db      *gorm.DB
+		Comment *entity.Comment
 	}{
-		Ctx:            ctx,
-		Db:             db,
-		EntityMoqParam: entityMoqParam,
+		Ctx:     ctx,
+		Db:      db,
+		Comment: comment,
 	}
 	mock.lockCreate.Lock()
 	mock.calls.Create = append(mock.calls.Create, callInfo)
 	mock.lockCreate.Unlock()
-	return mock.CreateFunc(ctx, db, entityMoqParam)
+	return mock.CreateFunc(ctx, db, comment)
 }
 
 // CreateCalls gets all the calls that were made to Create.
@@ -74,14 +74,14 @@ func (mock *CommentRepositoryMock) Create(ctx context.Context, db *gorm.DB, enti
 //
 //	len(mockedCommentRepository.CreateCalls())
 func (mock *CommentRepositoryMock) CreateCalls() []struct {
-	Ctx            context.Context
-	Db             *gorm.DB
-	EntityMoqParam *entity.Comment
+	Ctx     context.Context
+	Db      *gorm.DB
+	Comment *entity.Comment
 } {
 	var calls []struct {
-		Ctx            context.Context
-		Db             *gorm.DB
-		EntityMoqParam *entity.Comment
+		Ctx     context.Context
+		Db      *gorm.DB
+		Comment *entity.Comment
 	}
 	mock.lockCreate.RLock()
 	calls = mock.calls.Create

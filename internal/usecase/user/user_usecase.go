@@ -18,7 +18,6 @@ type UserUsecase interface {
 	Create(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error)
 	Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error)
 	Current(ctx context.Context, req *model.GetUserRequest) (*model.UserResponse, error)
-	Logout(ctx context.Context, req *model.LogoutUserRequest) (bool, error)
 	Update(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error)
 	Follow(ctx context.Context, req *model.FollowUserRequest) error
 }

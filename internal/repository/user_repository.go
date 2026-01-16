@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/column"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
@@ -12,11 +13,11 @@ import (
 //go:generate moq -out=../mock/UserRepository.go -pkg=mock . UserRepository
 
 type UserRepository interface {
-	Create(ctx context.Context, db *gorm.DB, entity *entity.User) error
-	Update(ctx context.Context, db *gorm.DB, entity *entity.User) error
+	Create(ctx context.Context, db *gorm.DB, user *entity.User) error
+	Update(ctx context.Context, db *gorm.DB, user *entity.User) error
 	CountByUsername(ctx context.Context, db *gorm.DB, username string) (int64, error)
-	FindByID(ctx context.Context, db *gorm.DB, entity *entity.User, id int64) error
-	FindByUsername(ctx context.Context, db *gorm.DB, entity *entity.User, username string) error
+	FindByID(ctx context.Context, db *gorm.DB, user *entity.User, id int64) error
+	FindByUsername(ctx context.Context, db *gorm.DB, user *entity.User, username string) error
 }
 
 var _ UserRepository = &UserRepositoryImpl{}
@@ -31,24 +32,24 @@ func NewUserRepository(cfg *viper.Viper) *UserRepositoryImpl {
 	}
 }
 
-func (r *UserRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity *entity.User) error {
-	err := db.Create(entity).Error
+func (r *UserRepositoryImpl) Create(ctx context.Context, db *gorm.DB, user *entity.User) error {
+	err := db.Create(user).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
 	return nil
 }
 
-func (r *UserRepositoryImpl) Update(ctx context.Context, db *gorm.DB, entity *entity.User) error {
-	err := db.Save(entity).Error
+func (r *UserRepositoryImpl) Update(ctx context.Context, db *gorm.DB, user *entity.User) error {
+	err := db.Save(user).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
 	return nil
 }
 
-func (r *UserRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, entity *entity.User) error {
-	err := db.Delete(entity).Error
+func (r *UserRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, user *entity.User) error {
+	err := db.Delete(user).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
@@ -57,15 +58,15 @@ func (r *UserRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, entity *en
 
 func (r *UserRepositoryImpl) CountByUsername(ctx context.Context, db *gorm.DB, username string) (int64, error) {
 	var total int64
-	err := db.Model(new(entity.User)).Where("username = ?", username).Count(&total).Error
+	err := db.Model(new(entity.User)).Where(column.Username.Eq(username)).Count(&total).Error
 	if err != nil {
 		return 0, errkit.AddFuncName(err)
 	}
 	return total, nil
 }
 
-func (r *UserRepositoryImpl) FindByID(ctx context.Context, db *gorm.DB, entity *entity.User, id int64) error {
-	err := db.Where("id = ?", id).Take(entity).Error
+func (r *UserRepositoryImpl) FindByID(ctx context.Context, db *gorm.DB, user *entity.User, id int64) error {
+	err := db.Where(column.ID.Eq(id)).Take(user).Error
 	if err != nil {
 		err = errkit.NotFound(err)
 		return errkit.AddFuncName(err)
@@ -73,8 +74,8 @@ func (r *UserRepositoryImpl) FindByID(ctx context.Context, db *gorm.DB, entity *
 	return nil
 }
 
-func (r *UserRepositoryImpl) FindByUsername(ctx context.Context, db *gorm.DB, entity *entity.User, username string) error {
-	err := db.Where("username = ?", username).Take(entity).Error
+func (r *UserRepositoryImpl) FindByUsername(ctx context.Context, db *gorm.DB, user *entity.User, username string) error {
+	err := db.Where(column.Username.Eq(username)).Take(user).Error
 	if err != nil {
 		err = errkit.NotFound(err)
 		return errkit.AddFuncName(err)

@@ -33,27 +33,11 @@ func ModelUpdateUserRequestToEntityUser(req *model.UpdateUserRequest, user *enti
 }
 
 func EntityUserToModelUserResponse(user *entity.User, res *model.UserResponse) {
-	if user == nil || res == nil {
-		return
-	}
-
 	res.ID = user.ID
 	res.Username = user.Username
 	res.Name = user.Name
 	res.CreatedAt = user.CreatedAt
 	res.UpdatedAt = user.UpdatedAt
-}
-
-func EntityUserToModelUserFollowedEvent(user *entity.User, event *model.UserFollowedEvent) {
-	if user == nil || event == nil {
-		return
-	}
-
-	event.ID = user.ID
-	event.Username = user.Username
-	event.Name = user.Name
-	event.CreatedAt = user.CreatedAt
-	event.UpdatedAt = user.UpdatedAt
 }
 
 func EntityUserToModelUserAuth(user *entity.User, userAuth *model.UserAuth) {

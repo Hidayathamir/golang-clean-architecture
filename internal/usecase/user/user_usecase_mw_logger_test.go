@@ -59,20 +59,6 @@ func TestUserUsecaseMwLogger_Login(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestUserUsecaseMwLogger_Logout(t *testing.T) {
-	x.SetLogger(logrus.New())
-	Next := &mock.UserUsecaseMock{}
-	u := &user.UserUsecaseMwLogger{
-		Next: Next,
-	}
-	Next.LogoutFunc = func(ctx context.Context, req *model.LogoutUserRequest) (bool, error) {
-		return true, nil
-	}
-	res, err := u.Logout(context.Background(), &model.LogoutUserRequest{})
-	assert.NotEmpty(t, res)
-	assert.Nil(t, err)
-}
-
 func TestUserUsecaseMwLogger_Update(t *testing.T) {
 	x.SetLogger(logrus.New())
 	Next := &mock.UserUsecaseMock{}

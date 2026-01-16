@@ -728,18 +728,6 @@ paths:
       tags:
       - todos
   /api/users:
-    delete:
-      description: Logout the current authenticated user
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-bool'
-      security:
-      - SimpleApiKeyAuth: []
-      summary: Logout user
-      tags:
-      - users
     post:
       description: Register a new user account
       parameters:

@@ -3,18 +3,8 @@ package entity
 import (
 	"time"
 
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/table"
 	"gorm.io/gorm"
-)
-
-const (
-	CommentTableName       = "comments"
-	CommentColumnID        = "id"
-	CommentColumnUserID    = "user_id"
-	CommentColumnImageID   = "image_id"
-	CommentColumnComment   = "comment"
-	CommentColumnCreatedAt = "created_at"
-	CommentColumnUpdatedAt = "updated_at"
-	CommentColumnDeletedAt = "deleted_at"
 )
 
 type Comment struct {
@@ -31,7 +21,7 @@ type Comment struct {
 }
 
 func (c *Comment) TableName() string {
-	return CommentTableName
+	return table.Comment
 }
 
 type CommentList []Comment

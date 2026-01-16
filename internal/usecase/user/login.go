@@ -8,7 +8,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func (u *UserUsecaseImpl) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error) {
@@ -23,18 +22,8 @@ func (u *UserUsecaseImpl) Login(ctx context.Context, req *model.LoginUserRequest
 		return nil, errkit.AddFuncName(err)
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+	if err := user.ValidatePassword(req.Password); err != nil {
 		err = errkit.Unauthorized(err)
-		return nil, errkit.AddFuncName(err)
-	}
-
-	if _, err := u.SlackClient.IsConnected(ctx, model.SlackIsConnectedRequest{}); err != nil {
-		return nil, errkit.AddFuncName(err)
-	}
-
-	event := new(model.UserFollowedEvent)
-	converter.EntityUserToModelUserFollowedEvent(user, event)
-	if err := u.UserFollowedProducer.Send(ctx, event); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 

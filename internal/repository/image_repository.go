@@ -12,7 +12,7 @@ import (
 //go:generate moq -out=../mock/ImageRepository.go -pkg=mock . ImageRepository
 
 type ImageRepository interface {
-	Create(ctx context.Context, db *gorm.DB, entity *entity.Image) error
+	Create(ctx context.Context, db *gorm.DB, image *entity.Image) error
 }
 
 var _ ImageRepository = &ImageRepositoryImpl{}
@@ -27,8 +27,8 @@ func NewImageRepository(cfg *viper.Viper) *ImageRepositoryImpl {
 	}
 }
 
-func (r *ImageRepositoryImpl) Create(ctx context.Context, db *gorm.DB, entity *entity.Image) error {
-	err := db.Create(entity).Error
+func (r *ImageRepositoryImpl) Create(ctx context.Context, db *gorm.DB, image *entity.Image) error {
+	err := db.Create(image).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}

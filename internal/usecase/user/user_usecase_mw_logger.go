@@ -84,22 +84,6 @@ func (u *UserUsecaseMwLogger) Login(ctx context.Context, req *model.LoginUserReq
 	return res, err
 }
 
-func (u *UserUsecaseMwLogger) Logout(ctx context.Context, req *model.LogoutUserRequest) (bool, error) {
-	ctx, span := telemetry.Start(ctx)
-	defer span.End()
-
-	res, err := u.Next.Logout(ctx, req)
-	telemetry.RecordError(span, err)
-
-	fields := logrus.Fields{
-		"req": req,
-		"res": res,
-	}
-	x.LogMw(ctx, fields, err)
-
-	return res, err
-}
-
 func (u *UserUsecaseMwLogger) Update(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
