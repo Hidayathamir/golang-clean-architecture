@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
@@ -114,4 +115,68 @@ func (c *ImageController) Comment(ctx *fiber.Ctx) error {
 	}
 
 	return response.Data(ctx, http.StatusOK, "ok")
+}
+
+// GetLike godoc
+//
+//	@Summary		Get image likes
+//	@Description	Get list of likes for an image
+//	@Tags			images
+//	@Produce		json
+//	@Param			imageId	path	int	true	"Image ID"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[model.LikeResponseList]
+//	@Router			/api/images/{imageId}/likes [get]
+func (c *ImageController) GetLike(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
+	imageID, err := strconv.ParseInt(ctx.Params("imageId"), 10, 64)
+	if err != nil {
+		err = errkit.BadRequest(err)
+		return errkit.AddFuncName(err)
+	}
+
+	req := &model.GetLikeRequest{
+		ImageID: imageID,
+	}
+
+	res, err := c.Usecase.GetLike(ctx.UserContext(), req)
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+
+	return response.Data(ctx, http.StatusOK, res)
+}
+
+// GetComment godoc
+//
+//	@Summary		Get image comments
+//	@Description	Get list of comments for an image
+//	@Tags			images
+//	@Produce		json
+//	@Param			imageId	path	int	true	"Image ID"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[model.CommentResponseList]
+//	@Router			/api/images/{imageId}/comments [get]
+func (c *ImageController) GetComment(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
+	imageID, err := strconv.ParseInt(ctx.Params("imageId"), 10, 64)
+	if err != nil {
+		err = errkit.BadRequest(err)
+		return errkit.AddFuncName(err)
+	}
+
+	req := &model.GetCommentRequest{
+		ImageID: imageID,
+	}
+
+	res, err := c.Usecase.GetComment(ctx.UserContext(), req)
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+
+	return response.Data(ctx, http.StatusOK, res)
 }

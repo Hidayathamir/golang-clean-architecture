@@ -51,6 +51,21 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
     type: object
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_CommentResponseList
+  : properties:
+      data:
+        items:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentResponse'
+        type: array
+      error_detail:
+        items:
+          type: string
+        type: array
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
+    type: object
   ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponse
   : properties:
       data:
@@ -83,6 +98,21 @@ definitions:
   : properties:
       data:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.ImageResponse'
+      error_detail:
+        items:
+          type: string
+        type: array
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
+    type: object
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_LikeResponseList
+  : properties:
+      data:
+        items:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeResponse'
+        type: array
       error_detail:
         items:
           type: string
@@ -185,6 +215,23 @@ definitions:
       image_id:
         type: integer
     type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentResponse:
+    properties:
+      comment:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      image_id:
+        type: integer
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.ContactResponse:
     properties:
       addresses:
@@ -274,6 +321,21 @@ definitions:
   github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeImageRequest:
     properties:
       image_id:
+        type: integer
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeResponse:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      image_id:
+        type: integer
+      updated_at:
+        type: string
+      user_id:
         type: integer
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.LoginUserRequest:
@@ -720,6 +782,48 @@ paths:
       security:
       - SimpleApiKeyAuth: []
       summary: Like image
+      tags:
+      - images
+  /api/images/{imageId}/comments:
+    get:
+      description: Get list of comments for an image
+      parameters:
+      - description: Image ID
+        in: path
+        name: imageId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_CommentResponseList'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Get image comments
+      tags:
+      - images
+  /api/images/{imageId}/likes:
+    get:
+      description: Get list of likes for an image
+      parameters:
+      - description: Image ID
+        in: path
+        name: imageId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_LikeResponseList'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Get image likes
       tags:
       - images
   /api/todos:
