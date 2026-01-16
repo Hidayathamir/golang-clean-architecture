@@ -12,12 +12,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
-func ModelUploadImageRequestToEntityImage(ctx context.Context, req *model.UploadImageRequest, image *entity.Image, url string) {
-	userAuth := ctxuserauth.Get(ctx)
-	image.UserID = userAuth.ID
-	image.URL = url
-}
-
 func ModelUploadImageRequestToModelS3UploadImageRequest(ctx context.Context, req *model.UploadImageRequest, s3UploadImgReq *model.S3UploadImageRequest) error {
 	timenow := time.Now().Unix()
 	userAuth := ctxuserauth.Get(ctx)
