@@ -23,6 +23,9 @@ var _ image.ImageUsecase = &ImageUsecaseMock{}
 //			CommentFunc: func(ctx context.Context, req *model.CommentImageRequest) error {
 //				panic("mock out the Comment method")
 //			},
+//			GetImageFunc: func(ctx context.Context, req *model.GetImageRequest) (*model.ImageResponse, error) {
+//				panic("mock out the GetImage method")
+//			},
 //			LikeFunc: func(ctx context.Context, req *model.LikeImageRequest) error {
 //				panic("mock out the Like method")
 //			},
@@ -39,6 +42,9 @@ type ImageUsecaseMock struct {
 	// CommentFunc mocks the Comment method.
 	CommentFunc func(ctx context.Context, req *model.CommentImageRequest) error
 
+	// GetImageFunc mocks the GetImage method.
+	GetImageFunc func(ctx context.Context, req *model.GetImageRequest) (*model.ImageResponse, error)
+
 	// LikeFunc mocks the Like method.
 	LikeFunc func(ctx context.Context, req *model.LikeImageRequest) error
 
@@ -53,6 +59,13 @@ type ImageUsecaseMock struct {
 			Ctx context.Context
 			// Req is the req argument value.
 			Req *model.CommentImageRequest
+		}
+		// GetImage holds details about calls to the GetImage method.
+		GetImage []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req *model.GetImageRequest
 		}
 		// Like holds details about calls to the Like method.
 		Like []struct {
@@ -69,9 +82,10 @@ type ImageUsecaseMock struct {
 			Req *model.UploadImageRequest
 		}
 	}
-	lockComment sync.RWMutex
-	lockLike    sync.RWMutex
-	lockUpload  sync.RWMutex
+	lockComment  sync.RWMutex
+	lockGetImage sync.RWMutex
+	lockLike     sync.RWMutex
+	lockUpload   sync.RWMutex
 }
 
 // Comment calls CommentFunc.
@@ -107,6 +121,42 @@ func (mock *ImageUsecaseMock) CommentCalls() []struct {
 	mock.lockComment.RLock()
 	calls = mock.calls.Comment
 	mock.lockComment.RUnlock()
+	return calls
+}
+
+// GetImage calls GetImageFunc.
+func (mock *ImageUsecaseMock) GetImage(ctx context.Context, req *model.GetImageRequest) (*model.ImageResponse, error) {
+	if mock.GetImageFunc == nil {
+		panic("ImageUsecaseMock.GetImageFunc: method is nil but ImageUsecase.GetImage was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req *model.GetImageRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockGetImage.Lock()
+	mock.calls.GetImage = append(mock.calls.GetImage, callInfo)
+	mock.lockGetImage.Unlock()
+	return mock.GetImageFunc(ctx, req)
+}
+
+// GetImageCalls gets all the calls that were made to GetImage.
+// Check the length with:
+//
+//	len(mockedImageUsecase.GetImageCalls())
+func (mock *ImageUsecaseMock) GetImageCalls() []struct {
+	Ctx context.Context
+	Req *model.GetImageRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req *model.GetImageRequest
+	}
+	mock.lockGetImage.RLock()
+	calls = mock.calls.GetImage
+	mock.lockGetImage.RUnlock()
 	return calls
 }
 

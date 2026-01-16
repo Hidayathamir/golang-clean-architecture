@@ -22,15 +22,15 @@ func NewFollowRepositoryMwLogger(next FollowRepository) *FollowRepositoryMwLogge
 	}
 }
 
-func (r *FollowRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, entity *entity.Follow) error {
+func (r *FollowRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, follow *entity.Follow) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := r.Next.Create(ctx, db, entity)
+	err := r.Next.Create(ctx, db, follow)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
-		"entity": entity,
+		"follow": follow,
 	}
 	x.LogMw(ctx, fields, err)
 

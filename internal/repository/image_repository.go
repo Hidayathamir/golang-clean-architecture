@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/column"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
@@ -13,6 +14,7 @@ import (
 
 type ImageRepository interface {
 	Create(ctx context.Context, db *gorm.DB, image *entity.Image) error
+	FindByID(ctx context.Context, db *gorm.DB, image *entity.Image, id int64) error
 }
 
 var _ ImageRepository = &ImageRepositoryImpl{}
@@ -30,6 +32,15 @@ func NewImageRepository(cfg *viper.Viper) *ImageRepositoryImpl {
 func (r *ImageRepositoryImpl) Create(ctx context.Context, db *gorm.DB, image *entity.Image) error {
 	err := db.Create(image).Error
 	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+	return nil
+}
+
+func (r *ImageRepositoryImpl) FindByID(ctx context.Context, db *gorm.DB, image *entity.Image, id int64) error {
+	err := db.Where(column.ID.Eq(id)).Take(image).Error
+	if err != nil {
+		err = errkit.NotFound(err)
 		return errkit.AddFuncName(err)
 	}
 	return nil

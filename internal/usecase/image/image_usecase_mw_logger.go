@@ -66,3 +66,19 @@ func (u *ImageUsecaseMwLogger) Upload(ctx context.Context, req *model.UploadImag
 
 	return res, err
 }
+
+func (u *ImageUsecaseMwLogger) GetImage(ctx context.Context, req *model.GetImageRequest) (*model.ImageResponse, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	res, err := u.Next.GetImage(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+		"res": res,
+	}
+	x.LogMw(ctx, fields, err)
+
+	return res, err
+}

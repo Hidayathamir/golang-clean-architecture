@@ -22,15 +22,15 @@ func NewCommentRepositoryMwLogger(next CommentRepository) *CommentRepositoryMwLo
 	}
 }
 
-func (r *CommentRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, entity *entity.Comment) error {
+func (r *CommentRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, comment *entity.Comment) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := r.Next.Create(ctx, db, entity)
+	err := r.Next.Create(ctx, db, comment)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
-		"entity": entity,
+		"comment": comment,
 	}
 	x.LogMw(ctx, fields, err)
 

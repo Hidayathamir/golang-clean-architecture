@@ -30,3 +30,7 @@ type CommentImageRequest struct {
 	ImageID int64  `json:"image_id"`
 	Comment string `json:"comment"`
 }
+
+type GetImageRequest struct {
+	ID int64
+}

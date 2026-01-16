@@ -24,6 +24,9 @@ var _ repository.ImageRepository = &ImageRepositoryMock{}
 //			CreateFunc: func(ctx context.Context, db *gorm.DB, image *entity.Image) error {
 //				panic("mock out the Create method")
 //			},
+//			FindByIDFunc: func(ctx context.Context, db *gorm.DB, image *entity.Image, id int64) error {
+//				panic("mock out the FindByID method")
+//			},
 //		}
 //
 //		// use mockedImageRepository in code that requires repository.ImageRepository
@@ -33,6 +36,9 @@ var _ repository.ImageRepository = &ImageRepositoryMock{}
 type ImageRepositoryMock struct {
 	// CreateFunc mocks the Create method.
 	CreateFunc func(ctx context.Context, db *gorm.DB, image *entity.Image) error
+
+	// FindByIDFunc mocks the FindByID method.
+	FindByIDFunc func(ctx context.Context, db *gorm.DB, image *entity.Image, id int64) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -45,8 +51,20 @@ type ImageRepositoryMock struct {
 			// Image is the image argument value.
 			Image *entity.Image
 		}
+		// FindByID holds details about calls to the FindByID method.
+		FindByID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
+			// Image is the image argument value.
+			Image *entity.Image
+			// ID is the id argument value.
+			ID int64
+		}
 	}
-	lockCreate sync.RWMutex
+	lockCreate   sync.RWMutex
+	lockFindByID sync.RWMutex
 }
 
 // Create calls CreateFunc.
@@ -86,5 +104,49 @@ func (mock *ImageRepositoryMock) CreateCalls() []struct {
 	mock.lockCreate.RLock()
 	calls = mock.calls.Create
 	mock.lockCreate.RUnlock()
+	return calls
+}
+
+// FindByID calls FindByIDFunc.
+func (mock *ImageRepositoryMock) FindByID(ctx context.Context, db *gorm.DB, image *entity.Image, id int64) error {
+	if mock.FindByIDFunc == nil {
+		panic("ImageRepositoryMock.FindByIDFunc: method is nil but ImageRepository.FindByID was just called")
+	}
+	callInfo := struct {
+		Ctx   context.Context
+		Db    *gorm.DB
+		Image *entity.Image
+		ID    int64
+	}{
+		Ctx:   ctx,
+		Db:    db,
+		Image: image,
+		ID:    id,
+	}
+	mock.lockFindByID.Lock()
+	mock.calls.FindByID = append(mock.calls.FindByID, callInfo)
+	mock.lockFindByID.Unlock()
+	return mock.FindByIDFunc(ctx, db, image, id)
+}
+
+// FindByIDCalls gets all the calls that were made to FindByID.
+// Check the length with:
+//
+//	len(mockedImageRepository.FindByIDCalls())
+func (mock *ImageRepositoryMock) FindByIDCalls() []struct {
+	Ctx   context.Context
+	Db    *gorm.DB
+	Image *entity.Image
+	ID    int64
+} {
+	var calls []struct {
+		Ctx   context.Context
+		Db    *gorm.DB
+		Image *entity.Image
+		ID    int64
+	}
+	mock.lockFindByID.RLock()
+	calls = mock.calls.FindByID
+	mock.lockFindByID.RUnlock()
 	return calls
 }

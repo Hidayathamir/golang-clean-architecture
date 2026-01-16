@@ -22,15 +22,31 @@ func NewImageRepositoryMwLogger(next ImageRepository) *ImageRepositoryMwLogger {
 	}
 }
 
-func (r *ImageRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, entity *entity.Image) error {
+func (r *ImageRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, image *entity.Image) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := r.Next.Create(ctx, db, entity)
+	err := r.Next.Create(ctx, db, image)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
-		"entity": entity,
+		"image": image,
+	}
+	x.LogMw(ctx, fields, err)
+
+	return err
+}
+
+func (r *ImageRepositoryMwLogger) FindByID(ctx context.Context, db *gorm.DB, image *entity.Image, id int64) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := r.Next.FindByID(ctx, db, image, id)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"image": image,
+		"id":    id,
 	}
 	x.LogMw(ctx, fields, err)
 

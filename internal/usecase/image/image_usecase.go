@@ -17,6 +17,7 @@ type ImageUsecase interface {
 	Upload(ctx context.Context, req *model.UploadImageRequest) (*model.ImageResponse, error)
 	Like(ctx context.Context, req *model.LikeImageRequest) error
 	Comment(ctx context.Context, req *model.CommentImageRequest) error
+	GetImage(ctx context.Context, req *model.GetImageRequest) (*model.ImageResponse, error)
 }
 
 var _ ImageUsecase = &ImageUsecaseImpl{}

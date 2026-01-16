@@ -22,15 +22,15 @@ func NewLikeRepositoryMwLogger(next LikeRepository) *LikeRepositoryMwLogger {
 	}
 }
 
-func (r *LikeRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, entity *entity.Like) error {
+func (r *LikeRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, like *entity.Like) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := r.Next.Create(ctx, db, entity)
+	err := r.Next.Create(ctx, db, like)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
-		"entity": entity,
+		"like": like,
 	}
 	x.LogMw(ctx, fields, err)
 
