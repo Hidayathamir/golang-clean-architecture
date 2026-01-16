@@ -28,10 +28,7 @@ func (u *ImageUsecaseImpl) Upload(ctx context.Context, req *model.UploadImageReq
 		return errkit.AddFuncName(err)
 	}
 
-	image := new(entity.Image)
-	userAuth := ctxuserauth.Get(ctx)
-	image.UserID = userAuth.ID
-	image.URL = url
+	image := &entity.Image{UserID: ctxuserauth.Get(ctx).ID, URL: url}
 
 	if err := u.ImageRepository.Create(ctx, u.DB, image); err != nil {
 		return errkit.AddFuncName(err)
