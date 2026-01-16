@@ -24,6 +24,17 @@ func NewImageController(cfg *viper.Viper, useCase image.ImageUsecase) *ImageCont
 	}
 }
 
+// Upload godoc
+//
+//	@Summary		Upload image
+//	@Description	Upload an image file
+//	@Tags			images
+//	@Accept			multipart/form-data
+//	@Produce		json
+//	@Param			image	formData	file	true	"Image to upload"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[string]
+//	@Router			/api/images [post]
 func (c *ImageController) Upload(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()

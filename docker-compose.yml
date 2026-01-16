@@ -111,7 +111,7 @@ services:
 
   akhq:
     image: tchiotludo/akhq:dev
-    container_name: akhq
+    container_name: akhq-clean-arch
     ports:
       - "8080:8080"
     environment:
@@ -155,7 +155,7 @@ services:
 
   zookeeper-1:
     <<: *signoz-zookeeper-defaults
-    container_name: signoz-zookeeper-1
+    container_name: signoz-zookeeper-clean-arch
     volumes:
       - signoz-zookeeper-1:/bitnami/zookeeper
     environment:
@@ -167,7 +167,7 @@ services:
 
   clickhouse:
     <<: *signoz-clickhouse-defaults
-    container_name: signoz-clickhouse
+    container_name: signoz-clickhouse-clean-arch
     volumes:
       - ./signoz/deploy/common/clickhouse/config.xml:/etc/clickhouse-server/config.xml
       - ./signoz/deploy/common/clickhouse/users.xml:/etc/clickhouse-server/users.xml

@@ -1,7 +1,9 @@
 package x
 
-func LogIfErr(err error) {
+import "context"
+
+func LogIfErr(ctx context.Context, err error) {
 	if err != nil {
-		Logger.Warn(err)
+		Logger.WithContext(ctx).WithError(err).Info("")
 	}
 }

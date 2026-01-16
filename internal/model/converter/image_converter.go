@@ -15,12 +15,12 @@ import (
 func ModelUploadImageRequestToModelS3UploadImageRequest(ctx context.Context, req *model.UploadImageRequest, s3UploadImgReq *model.S3UploadImageRequest) error {
 	timenow := time.Now().Unix()
 	userAuth := ctxuserauth.Get(ctx)
-	s3UploadImgReq.Key = fmt.Sprintf("%v_%v_%s", timenow, userAuth.ID, req.File.Filename)
+	s3UploadImgReq.Key = fmt.Sprintf("%v_%s_%s", timenow, userAuth.Username, req.File.Filename)
 	file, err := req.File.Open()
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
-	defer x.LogIfErr(file.Close())
+	defer x.LogIfErr(ctx, file.Close())
 	s3UploadImgReq.Body = file
 	return nil
 }

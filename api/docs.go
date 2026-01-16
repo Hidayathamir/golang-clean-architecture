@@ -388,6 +388,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/images": {
+            "post": {
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
+                ],
+                "description": "Upload an image file",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "images"
+                ],
+                "summary": "Upload image",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Image to upload",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/todos": {
             "get": {
                 "security": [
@@ -900,6 +937,26 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UserResponse"
+                },
+                "error_detail": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "error_message": {
+                    "type": "string"
+                },
+                "paging": {
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata"
+                }
+            }
+        },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "string"
                 },
                 "error_detail": {
                     "type": "array",

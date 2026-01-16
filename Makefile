@@ -28,6 +28,9 @@ migrate-new:
 docker-compose:
 	docker compose down && docker compose up
 
+docker-check:
+	docker ps --format "{{.Names}}\t{{.Status}}"
+
 #################################### 
 
 run-clean:

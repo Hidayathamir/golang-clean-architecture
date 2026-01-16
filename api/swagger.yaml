@@ -120,6 +120,19 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
     type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string:
+    properties:
+      data:
+        type: string
+      error_detail:
+        items:
+          type: string
+        type: array
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
+    type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.AddressResponse:
     properties:
       city:
@@ -560,6 +573,29 @@ paths:
       summary: Update address
       tags:
       - addresses
+  /api/images:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload an image file
+      parameters:
+      - description: Image to upload
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Upload image
+      tags:
+      - images
   /api/todos:
     get:
       description: List todos with optional filters

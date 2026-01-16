@@ -3,7 +3,7 @@ package model
 import "mime/multipart"
 
 type UploadImageRequest struct {
-	File *multipart.FileHeader
+	File *multipart.FileHeader `validate:"required"`
 }
 
 type LikeImageRequest struct {

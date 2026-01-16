@@ -47,6 +47,11 @@ func setupAuthRoute(router fiber.Router, controllers *config.Controllers) {
 		users.Get("/_current", controllers.UserController.Current)
 	}
 
+	images := router.Group("/images")
+	{
+		images.Post("", controllers.ImageController.Upload)
+	}
+
 	contacts := router.Group("/contacts")
 	{
 		contacts.Get("", controllers.ContactController.List)

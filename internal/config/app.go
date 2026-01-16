@@ -139,6 +139,7 @@ func SetupUsecases(
 
 type Controllers struct {
 	UserController    *http.UserController
+	ImageController   *http.ImageController
 	ContactController *http.ContactController
 	AddressController *http.AddressController
 	TodoController    *http.TodoController
@@ -146,12 +147,14 @@ type Controllers struct {
 
 func SetupControllers(viperConfig *viper.Viper, usecases *Usecases) *Controllers {
 	userController := http.NewUserController(viperConfig, usecases.UserUsecase)
+	imageController := http.NewImageController(viperConfig, usecases.ImageUsecase)
 	contactController := http.NewContactController(viperConfig, usecases.ContactUsecase)
 	addressController := http.NewAddressController(viperConfig, usecases.AddressUsecase)
 	todoController := http.NewTodoController(viperConfig, usecases.TodoUsecase)
 
 	return &Controllers{
 		UserController:    userController,
+		ImageController:   imageController,
 		ContactController: contactController,
 		AddressController: addressController,
 		TodoController:    todoController,
