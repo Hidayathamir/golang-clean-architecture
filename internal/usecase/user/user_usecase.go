@@ -30,7 +30,8 @@ type UserUsecaseImpl struct {
 	DB     *gorm.DB
 
 	// repository
-	UserRepository repository.UserRepository
+	UserRepository   repository.UserRepository
+	FollowRepository repository.FollowRepository
 
 	// producer
 	UserFollowedProducer messaging.UserFollowedProducer
@@ -46,6 +47,7 @@ func NewUserUsecase(
 
 	// repository
 	userRepository repository.UserRepository,
+	FollowRepository repository.FollowRepository,
 
 	// producer
 	userFollowedProducer messaging.UserFollowedProducer,
@@ -59,7 +61,8 @@ func NewUserUsecase(
 		DB:     db,
 
 		// repository
-		UserRepository: userRepository,
+		UserRepository:   userRepository,
+		FollowRepository: FollowRepository,
 
 		// producer
 		UserFollowedProducer: userFollowedProducer,

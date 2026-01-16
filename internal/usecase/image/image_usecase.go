@@ -26,7 +26,9 @@ type ImageUsecaseImpl struct {
 	DB     *gorm.DB
 
 	// repository
-	ImageRepository repository.ImageRepository
+	ImageRepository   repository.ImageRepository
+	LikeRepository    repository.LikeRepository
+	CommentRepository repository.CommentRepository
 
 	// producer
 	ImageUploadedProducer  messaging.ImageUploadedProducer
@@ -43,6 +45,8 @@ func NewImageUsecase(
 
 	// repository
 	ImageRepository repository.ImageRepository,
+	LikeRepository repository.LikeRepository,
+	CommentRepository repository.CommentRepository,
 
 	// producer
 	ImageUploadedProducer messaging.ImageUploadedProducer,
@@ -57,7 +61,9 @@ func NewImageUsecase(
 		DB:     DB,
 
 		// repository
-		ImageRepository: ImageRepository,
+		ImageRepository:   ImageRepository,
+		LikeRepository:    LikeRepository,
+		CommentRepository: CommentRepository,
 
 		// producer
 		ImageUploadedProducer:  ImageUploadedProducer,

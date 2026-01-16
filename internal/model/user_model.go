@@ -41,4 +41,5 @@ type GetUserRequest struct {
 }
 
 type FollowUserRequest struct {
+	FollowingID int64 `json:"following_id"`
 }

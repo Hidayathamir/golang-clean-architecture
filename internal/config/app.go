@@ -39,6 +39,18 @@ func SetupUsecases(
 	imageRepository = repository.NewImageRepository(viperConfig)
 	imageRepository = repository.NewImageRepositoryMwLogger(imageRepository)
 
+	var likeRepository repository.LikeRepository
+	likeRepository = repository.NewLikeRepository(viperConfig)
+	likeRepository = repository.NewLikeRepositoryMwLogger(likeRepository)
+
+	var commentRepository repository.CommentRepository
+	commentRepository = repository.NewCommentRepository(viperConfig)
+	commentRepository = repository.NewCommentRepositoryMwLogger(commentRepository)
+
+	var followRepository repository.FollowRepository
+	followRepository = repository.NewFollowRepository(viperConfig)
+	followRepository = repository.NewFollowRepositoryMwLogger(followRepository)
+
 	var contactRepository repository.ContactRepository
 	contactRepository = repository.NewContactRepository(viperConfig)
 	contactRepository = repository.NewContactRepositoryMwLogger(contactRepository)
@@ -95,11 +107,11 @@ func SetupUsecases(
 
 	// setup use cases
 	var userUsecase user.UserUsecase
-	userUsecase = user.NewUserUsecase(viperConfig, db, userRepository, userFollowedProducer, s3Client, slackClient)
+	userUsecase = user.NewUserUsecase(viperConfig, db, userRepository, followRepository, userFollowedProducer, s3Client, slackClient)
 	userUsecase = user.NewUserUsecaseMwLogger(userUsecase)
 
 	var imageUsecase image.ImageUsecase
-	imageUsecase = image.NewImageUsecase(viperConfig, db, imageRepository, imageUploadedProducer, imageLikedProducer, imageCommentedProducer, s3Client)
+	imageUsecase = image.NewImageUsecase(viperConfig, db, imageRepository, likeRepository, commentRepository, imageUploadedProducer, imageLikedProducer, imageCommentedProducer, s3Client)
 	imageUsecase = image.NewImageUsecaseMwLogger(imageUsecase)
 
 	var contactUsecase contact.ContactUsecase

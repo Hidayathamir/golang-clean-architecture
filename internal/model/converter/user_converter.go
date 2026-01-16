@@ -1,8 +1,11 @@
 package converter
 
 import (
+	"context"
+
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 )
 
 func ModelRegisterUserRequestToEntityUser(req *model.RegisterUserRequest, user *entity.User, password string) {
@@ -66,4 +69,19 @@ func EntityUserToModelUserAuth(user *entity.User, userAuth *model.UserAuth) {
 	userAuth.CreatedAt = user.CreatedAt
 	userAuth.UpdatedAt = user.UpdatedAt
 	userAuth.DeletedAt = user.DeletedAt
+}
+
+func ModelFollowUserRequestToEntityFollow(ctx context.Context, req *model.FollowUserRequest, follow *entity.Follow) {
+	userAuth := ctxuserauth.Get(ctx)
+	follow.FollowerID = userAuth.ID
+	follow.FollowingID = req.FollowingID
+}
+
+func EntityFollowToModelUserFollowedEvent(ctx context.Context, follow *entity.Follow, event *model.UserFollowedEvent) {
+	event.ID = follow.ID
+	event.FollowerID = follow.FollowerID
+	event.FollowingID = follow.FollowingID
+	event.CreatedAt = follow.CreatedAt
+	event.UpdatedAt = follow.UpdatedAt
+	event.DeletedAt = follow.DeletedAt
 }

@@ -18,13 +18,14 @@ func TestNewUserUsecase(t *testing.T) {
 	var Config = viper.New()
 
 	var UserRepository repository.UserRepository = &mock.UserRepositoryMock{}
+	var FollowRepository repository.FollowRepository = &mock.FollowRepositoryMock{}
 
 	var UserProducer messaging.UserFollowedProducer = &mock.UserFollowedProducerMock{}
 
 	var S3Client rest.S3Client = &mock.S3ClientMock{}
 	var SlackClient rest.SlackClient = &mock.SlackClientMock{}
 
-	u := user.NewUserUsecase(Config, DB, UserRepository, UserProducer, S3Client, SlackClient)
+	u := user.NewUserUsecase(Config, DB, UserRepository, FollowRepository, UserProducer, S3Client, SlackClient)
 
 	assert.NotEmpty(t, u)
 }
