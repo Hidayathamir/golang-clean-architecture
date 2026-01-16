@@ -3,6 +3,7 @@ package converter
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
@@ -15,7 +16,8 @@ import (
 func ModelUploadImageRequestToModelS3UploadImageRequest(ctx context.Context, req *model.UploadImageRequest, s3UploadImgReq *model.S3UploadImageRequest) error {
 	timenow := time.Now().Unix()
 	userAuth := ctxuserauth.Get(ctx)
-	s3UploadImgReq.Key = fmt.Sprintf("%v_%s_%s", timenow, userAuth.Username, req.File.Filename)
+	safeFilename := strings.ReplaceAll(req.File.Filename, " ", "_")
+	s3UploadImgReq.Key = fmt.Sprintf("%s/%v_%s", userAuth.Username, timenow, safeFilename)
 	file, err := req.File.Open()
 	if err != nil {
 		return errkit.AddFuncName(err)
