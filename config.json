@@ -2,13 +2,6 @@
   "app": {
     "name": "github.com/Hidayathamir/golang-clean-architecture"
   },
-  "web": {
-    "prefork": false,
-    "port": 3000
-  },
-  "log": {
-    "level": "trace"
-  },
   "auth": {
     "jwt": {
       "secret": "change-me",
@@ -16,10 +9,9 @@
       "expire_seconds": 3600
     }
   },
-  "telemetry": {
-    "otlp": {
-      "endpoint": "localhost:4317"
-    }
+  "aws": {
+    "region": "us-east-1",
+    "base_endpoint": "http://localhost:4566"
   },
   "database": {
     "migrations": "db/migrations",
@@ -49,5 +41,17 @@
     "producer": {
       "enabled": true
     }
+  },
+  "log": {
+    "level": "trace"
+  },
+  "telemetry": {
+    "otlp": {
+      "endpoint": "localhost:4317"
+    }
+  },
+  "web": {
+    "prefork": false,
+    "port": 3000
   }
 }

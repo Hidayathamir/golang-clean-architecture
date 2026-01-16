@@ -12,6 +12,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/todo"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/IBM/sarama"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gofiber/fiber/v2"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
@@ -29,6 +30,7 @@ func SetupUsecases(
 	viperConfig *viper.Viper,
 	db *gorm.DB,
 	producer sarama.SyncProducer,
+	awsS3Client *s3.Client,
 ) *Usecases {
 	// setup repositories
 	var userRepository repository.UserRepository
@@ -98,7 +100,7 @@ func SetupUsecases(
 	paymentClient = rest.NewPaymentClientMwLogger(paymentClient)
 
 	var s3Client rest.S3Client
-	s3Client = rest.NewS3Client(viperConfig)
+	s3Client = rest.NewS3Client(viperConfig, awsS3Client)
 	s3Client = rest.NewS3ClientMwLogger(s3Client)
 
 	var slackClient rest.SlackClient

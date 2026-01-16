@@ -19,9 +19,10 @@ func main() {
 	viperConfig := config.NewViper()
 	x.SetupAll(viperConfig)
 	db := config.NewDatabase(viperConfig)
+	s3Client := config.NewS3Client(viperConfig)
 	producer := config.NewKafkaProducer(viperConfig)
 
-	usecases := config.SetupUsecases(viperConfig, db, producer)
+	usecases := config.SetupUsecases(viperConfig, db, producer, s3Client)
 
 	stopTraceProvider, err := telemetry.InitTraceProvider(viperConfig)
 	panicIfErr(err)

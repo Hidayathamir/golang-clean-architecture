@@ -36,10 +36,12 @@ func TestMain(m *testing.M) {
 	viperConfig.Set(configkey.DatabaseMigrations, "../db/migrations")
 	config.Migrate(viperConfig)
 	db = config.NewDatabase(viperConfig)
+	// TODO: kayaknya perlu run s3 container
+	s3Client := config.NewS3Client(viperConfig)
 	kafkaContainer := newKafkaContainer(viperConfig)
 	producer := config.NewKafkaProducer(viperConfig)
 
-	usecases := config.SetupUsecases(viperConfig, db, producer)
+	usecases := config.SetupUsecases(viperConfig, db, producer, s3Client)
 	controllers := config.SetupControllers(viperConfig, usecases)
 	middlewares := config.SetupMiddlewares(usecases)
 

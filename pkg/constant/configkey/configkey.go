@@ -28,4 +28,7 @@ const (
 	AuthJWTSecret        = "auth.jwt.secret"
 	AuthJWTIssuer        = "auth.jwt.issuer"
 	AuthJWTExpireSeconds = "auth.jwt.expire_seconds"
+
+	AWSRegion       = "aws.region"
+	AWSBaseEndpoint = "aws.base_endpoint"
 )

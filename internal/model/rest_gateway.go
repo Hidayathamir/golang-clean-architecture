@@ -1,5 +1,7 @@
 package model
 
+import "io"
+
 type PaymentRefundRequest struct {
 	TransactionID string
 }
@@ -44,4 +46,9 @@ type SlackIsConnectedRequest struct{}
 
 type SlackIsConnectedResponse struct {
 	Connected bool
+}
+
+type S3UploadImageRequest struct {
+	Key  string
+	Body io.Reader
 }

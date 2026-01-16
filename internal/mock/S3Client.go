@@ -26,6 +26,9 @@ var _ rest.S3Client = &S3ClientMock{}
 //			DownloadFunc: func(ctx context.Context, req model.S3DownloadRequest) (model.S3DownloadResponse, error) {
 //				panic("mock out the Download method")
 //			},
+//			UploadImageFunc: func(ctx context.Context, req model.S3UploadImageRequest) error {
+//				panic("mock out the UploadImage method")
+//			},
 //		}
 //
 //		// use mockedS3Client in code that requires rest.S3Client
@@ -38,6 +41,9 @@ type S3ClientMock struct {
 
 	// DownloadFunc mocks the Download method.
 	DownloadFunc func(ctx context.Context, req model.S3DownloadRequest) (model.S3DownloadResponse, error)
+
+	// UploadImageFunc mocks the UploadImage method.
+	UploadImageFunc func(ctx context.Context, req model.S3UploadImageRequest) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -55,9 +61,17 @@ type S3ClientMock struct {
 			// Req is the req argument value.
 			Req model.S3DownloadRequest
 		}
+		// UploadImage holds details about calls to the UploadImage method.
+		UploadImage []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req model.S3UploadImageRequest
+		}
 	}
 	lockDeleteObject sync.RWMutex
 	lockDownload     sync.RWMutex
+	lockUploadImage  sync.RWMutex
 }
 
 // DeleteObject calls DeleteObjectFunc.
@@ -129,5 +143,41 @@ func (mock *S3ClientMock) DownloadCalls() []struct {
 	mock.lockDownload.RLock()
 	calls = mock.calls.Download
 	mock.lockDownload.RUnlock()
+	return calls
+}
+
+// UploadImage calls UploadImageFunc.
+func (mock *S3ClientMock) UploadImage(ctx context.Context, req model.S3UploadImageRequest) error {
+	if mock.UploadImageFunc == nil {
+		panic("S3ClientMock.UploadImageFunc: method is nil but S3Client.UploadImage was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req model.S3UploadImageRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockUploadImage.Lock()
+	mock.calls.UploadImage = append(mock.calls.UploadImage, callInfo)
+	mock.lockUploadImage.Unlock()
+	return mock.UploadImageFunc(ctx, req)
+}
+
+// UploadImageCalls gets all the calls that were made to UploadImage.
+// Check the length with:
+//
+//	len(mockedS3Client.UploadImageCalls())
+func (mock *S3ClientMock) UploadImageCalls() []struct {
+	Ctx context.Context
+	Req model.S3UploadImageRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req model.S3UploadImageRequest
+	}
+	mock.lockUploadImage.RLock()
+	calls = mock.calls.UploadImage
+	mock.lockUploadImage.RUnlock()
 	return calls
 }
