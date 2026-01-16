@@ -93,8 +93,8 @@ func TestUserUsecaseMwLogger_Verify(t *testing.T) {
 	u := &user.UserUsecaseMwLogger{
 		Next: Next,
 	}
-	Next.VerifyFunc = func(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error) {
-		return &model.Auth{ID: 1, Username: "user1"}, nil
+	Next.VerifyFunc = func(ctx context.Context, req *model.VerifyUserRequest) (*model.UserAuth, error) {
+		return &model.UserAuth{ID: 1, Username: "user1"}, nil
 	}
 	res, err := u.Verify(context.Background(), &model.VerifyUserRequest{})
 	assert.NotEmpty(t, res)

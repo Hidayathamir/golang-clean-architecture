@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/middleware"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/contact"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/gofiber/fiber/v2"
@@ -40,14 +40,14 @@ func (c *ContactController) Create(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	auth := middleware.GetUser(ctx)
+	userAuth := ctxuserauth.Get(ctx.UserContext())
 
 	req := new(model.CreateContactRequest)
 	if err := ctx.BodyParser(req); err != nil {
 		err = errkit.BadRequest(err)
 		return errkit.AddFuncName(err)
 	}
-	req.UserID = auth.ID
+	req.UserID = userAuth.ID
 
 	res, err := c.Usecase.Create(ctx.UserContext(), req)
 	if err != nil {
@@ -74,10 +74,10 @@ func (c *ContactController) List(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	auth := middleware.GetUser(ctx)
+	userAuth := ctxuserauth.Get(ctx.UserContext())
 
 	req := &model.SearchContactRequest{
-		UserID: auth.ID,
+		UserID: userAuth.ID,
 		Name:   ctx.Query("name", ""),
 		Email:  ctx.Query("email", ""),
 		Phone:  ctx.Query("phone", ""),
@@ -113,7 +113,7 @@ func (c *ContactController) Get(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	auth := middleware.GetUser(ctx)
+	userAuth := ctxuserauth.Get(ctx.UserContext())
 
 	contactID, err := strconv.ParseInt(ctx.Params("contactId"), 10, 64)
 	if err != nil {
@@ -122,7 +122,7 @@ func (c *ContactController) Get(ctx *fiber.Ctx) error {
 	}
 
 	req := &model.GetContactRequest{
-		UserID: auth.ID,
+		UserID: userAuth.ID,
 		ID:     contactID,
 	}
 
@@ -148,7 +148,7 @@ func (c *ContactController) Update(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	auth := middleware.GetUser(ctx)
+	userAuth := ctxuserauth.Get(ctx.UserContext())
 
 	req := new(model.UpdateContactRequest)
 	if err := ctx.BodyParser(req); err != nil {
@@ -156,7 +156,7 @@ func (c *ContactController) Update(ctx *fiber.Ctx) error {
 		return errkit.AddFuncName(err)
 	}
 
-	req.UserID = auth.ID
+	req.UserID = userAuth.ID
 
 	contactID, err := strconv.ParseInt(ctx.Params("contactId"), 10, 64)
 	if err != nil {
@@ -186,7 +186,7 @@ func (c *ContactController) Delete(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	auth := middleware.GetUser(ctx)
+	userAuth := ctxuserauth.Get(ctx.UserContext())
 
 	contactID, err := strconv.ParseInt(ctx.Params("contactId"), 10, 64)
 	if err != nil {
@@ -195,7 +195,7 @@ func (c *ContactController) Delete(ctx *fiber.Ctx) error {
 	}
 
 	req := &model.DeleteContactRequest{
-		UserID: auth.ID,
+		UserID: userAuth.ID,
 		ID:     contactID,
 	}
 

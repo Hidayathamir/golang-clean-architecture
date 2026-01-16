@@ -21,7 +21,7 @@ const (
 
 type User struct {
 	ID             int64          `gorm:"column:id;primaryKey"`
-	Username       string         `gorm:"column:username;uniqueIndex"`
+	Username       string         `gorm:"column:username"`
 	Password       string         `gorm:"column:password"`
 	Name           string         `gorm:"column:name"`
 	FollowerCount  int            `gorm:"column:follower_count"`

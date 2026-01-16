@@ -14,7 +14,7 @@ import (
 //go:generate moq -out=../../mock/UserUsecase.go -pkg=mock . UserUsecase
 
 type UserUsecase interface {
-	Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error)
+	Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.UserAuth, error)
 	Create(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error)
 	Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error)
 	Current(ctx context.Context, req *model.GetUserRequest) (*model.UserResponse, error)

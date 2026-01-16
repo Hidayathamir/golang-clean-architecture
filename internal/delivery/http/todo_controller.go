@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/middleware"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	todousecase "github.com/Hidayathamir/golang-clean-architecture/internal/usecase/todo"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/gofiber/fiber/v2"
@@ -40,7 +40,7 @@ func (c *TodoController) Create(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	auth := middleware.GetUser(ctx)
+	userAuth := ctxuserauth.Get(ctx.UserContext())
 
 	req := new(model.CreateTodoRequest)
 	if err := ctx.BodyParser(req); err != nil {
@@ -48,7 +48,7 @@ func (c *TodoController) Create(ctx *fiber.Ctx) error {
 		return errkit.AddFuncName(err)
 	}
 
-	req.UserID = auth.ID
+	req.UserID = userAuth.ID
 
 	res, err := c.Usecase.Create(ctx.UserContext(), req)
 	if err != nil {
@@ -74,7 +74,7 @@ func (c *TodoController) List(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	auth := middleware.GetUser(ctx)
+	userAuth := ctxuserauth.Get(ctx.UserContext())
 
 	var isCompleted *bool
 	if raw := ctx.Query("is_completed"); raw != "" {
@@ -87,7 +87,7 @@ func (c *TodoController) List(ctx *fiber.Ctx) error {
 	}
 
 	req := &model.ListTodoRequest{
-		UserID:      auth.ID,
+		UserID:      userAuth.ID,
 		Title:       ctx.Query("title", ""),
 		IsCompleted: isCompleted,
 		Page:        ctx.QueryInt("page", 1),
@@ -122,7 +122,7 @@ func (c *TodoController) Get(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	auth := middleware.GetUser(ctx)
+	userAuth := ctxuserauth.Get(ctx.UserContext())
 
 	todoID, err := strconv.ParseInt(ctx.Params("todoId"), 10, 64)
 	if err != nil {
@@ -131,7 +131,7 @@ func (c *TodoController) Get(ctx *fiber.Ctx) error {
 	}
 
 	req := &model.GetTodoRequest{
-		UserID: auth.ID,
+		UserID: userAuth.ID,
 		ID:     todoID,
 	}
 
@@ -157,7 +157,7 @@ func (c *TodoController) Update(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	auth := middleware.GetUser(ctx)
+	userAuth := ctxuserauth.Get(ctx.UserContext())
 
 	req := new(model.UpdateTodoRequest)
 	if err := ctx.BodyParser(req); err != nil {
@@ -171,7 +171,7 @@ func (c *TodoController) Update(ctx *fiber.Ctx) error {
 		return errkit.AddFuncName(err)
 	}
 
-	req.UserID = auth.ID
+	req.UserID = userAuth.ID
 	req.ID = todoID
 
 	res, err := c.Usecase.Update(ctx.UserContext(), req)
@@ -195,7 +195,7 @@ func (c *TodoController) Delete(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	auth := middleware.GetUser(ctx)
+	userAuth := ctxuserauth.Get(ctx.UserContext())
 
 	todoID, err := strconv.ParseInt(ctx.Params("todoId"), 10, 64)
 	if err != nil {
@@ -204,7 +204,7 @@ func (c *TodoController) Delete(ctx *fiber.Ctx) error {
 	}
 
 	req := &model.DeleteTodoRequest{
-		UserID: auth.ID,
+		UserID: userAuth.ID,
 		ID:     todoID,
 	}
 
@@ -228,7 +228,7 @@ func (c *TodoController) Complete(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	auth := middleware.GetUser(ctx)
+	userAuth := ctxuserauth.Get(ctx.UserContext())
 
 	todoID, err := strconv.ParseInt(ctx.Params("todoId"), 10, 64)
 	if err != nil {
@@ -237,7 +237,7 @@ func (c *TodoController) Complete(ctx *fiber.Ctx) error {
 	}
 
 	req := &model.CompleteTodoRequest{
-		UserID: auth.ID,
+		UserID: userAuth.ID,
 		ID:     todoID,
 	}
 

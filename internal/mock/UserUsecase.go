@@ -38,7 +38,7 @@ var _ user.UserUsecase = &UserUsecaseMock{}
 //			UpdateFunc: func(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error) {
 //				panic("mock out the Update method")
 //			},
-//			VerifyFunc: func(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error) {
+//			VerifyFunc: func(ctx context.Context, req *model.VerifyUserRequest) (*model.UserAuth, error) {
 //				panic("mock out the Verify method")
 //			},
 //		}
@@ -67,7 +67,7 @@ type UserUsecaseMock struct {
 	UpdateFunc func(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error)
 
 	// VerifyFunc mocks the Verify method.
-	VerifyFunc func(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error)
+	VerifyFunc func(ctx context.Context, req *model.VerifyUserRequest) (*model.UserAuth, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -347,7 +347,7 @@ func (mock *UserUsecaseMock) UpdateCalls() []struct {
 }
 
 // Verify calls VerifyFunc.
-func (mock *UserUsecaseMock) Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error) {
+func (mock *UserUsecaseMock) Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.UserAuth, error) {
 	if mock.VerifyFunc == nil {
 		panic("UserUsecaseMock.VerifyFunc: method is nil but UserUsecase.Verify was just called")
 	}

@@ -74,7 +74,7 @@ func TestUserUsecaseImpl_Verify_Success(t *testing.T) {
 	res, err := u.Verify(context.Background(), req)
 
 	require.NoError(t, err)
-	assert.Equal(t, &model.Auth{ID: 1}, res)
+	assert.Equal(t, &model.UserAuth{ID: 1}, res)
 }
 
 func TestUserUsecaseImpl_Verify_ValidateStruct(t *testing.T) {

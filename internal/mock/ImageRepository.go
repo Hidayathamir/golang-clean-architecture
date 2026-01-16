@@ -4,7 +4,11 @@
 package mock
 
 import (
+	"context"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
+	"gorm.io/gorm"
+	"sync"
 )
 
 // Ensure, that ImageRepositoryMock does implement repository.ImageRepository.
@@ -17,6 +21,9 @@ var _ repository.ImageRepository = &ImageRepositoryMock{}
 //
 //		// make and configure a mocked repository.ImageRepository
 //		mockedImageRepository := &ImageRepositoryMock{
+//			CreateFunc: func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Image) error {
+//				panic("mock out the Create method")
+//			},
 //		}
 //
 //		// use mockedImageRepository in code that requires repository.ImageRepository
@@ -24,7 +31,60 @@ var _ repository.ImageRepository = &ImageRepositoryMock{}
 //
 //	}
 type ImageRepositoryMock struct {
+	// CreateFunc mocks the Create method.
+	CreateFunc func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Image) error
+
 	// calls tracks calls to the methods.
 	calls struct {
+		// Create holds details about calls to the Create method.
+		Create []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
+			// EntityMoqParam is the entityMoqParam argument value.
+			EntityMoqParam *entity.Image
+		}
 	}
+	lockCreate sync.RWMutex
+}
+
+// Create calls CreateFunc.
+func (mock *ImageRepositoryMock) Create(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Image) error {
+	if mock.CreateFunc == nil {
+		panic("ImageRepositoryMock.CreateFunc: method is nil but ImageRepository.Create was just called")
+	}
+	callInfo := struct {
+		Ctx            context.Context
+		Db             *gorm.DB
+		EntityMoqParam *entity.Image
+	}{
+		Ctx:            ctx,
+		Db:             db,
+		EntityMoqParam: entityMoqParam,
+	}
+	mock.lockCreate.Lock()
+	mock.calls.Create = append(mock.calls.Create, callInfo)
+	mock.lockCreate.Unlock()
+	return mock.CreateFunc(ctx, db, entityMoqParam)
+}
+
+// CreateCalls gets all the calls that were made to Create.
+// Check the length with:
+//
+//	len(mockedImageRepository.CreateCalls())
+func (mock *ImageRepositoryMock) CreateCalls() []struct {
+	Ctx            context.Context
+	Db             *gorm.DB
+	EntityMoqParam *entity.Image
+} {
+	var calls []struct {
+		Ctx            context.Context
+		Db             *gorm.DB
+		EntityMoqParam *entity.Image
+	}
+	mock.lockCreate.RLock()
+	calls = mock.calls.Create
+	mock.lockCreate.RUnlock()
+	return calls
 }

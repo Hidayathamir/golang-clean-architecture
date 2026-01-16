@@ -53,11 +53,17 @@ func EntityUserToModelUserFollowedEvent(user *entity.User, event *model.UserFoll
 	event.UpdatedAt = user.UpdatedAt
 }
 
-func EntityUserToModelAuth(user *entity.User, auth *model.Auth) {
-	if user == nil || auth == nil {
+func EntityUserToModelUserAuth(user *entity.User, userAuth *model.UserAuth) {
+	if user == nil || userAuth == nil {
 		return
 	}
 
-	auth.ID = user.ID
-	auth.Username = user.Username
+	userAuth.ID = user.ID
+	userAuth.Username = user.Username
+	userAuth.Name = user.Name
+	userAuth.FollowerCount = user.FollowerCount
+	userAuth.FollowingCount = user.FollowingCount
+	userAuth.CreatedAt = user.CreatedAt
+	userAuth.UpdatedAt = user.UpdatedAt
+	userAuth.DeletedAt = user.DeletedAt
 }

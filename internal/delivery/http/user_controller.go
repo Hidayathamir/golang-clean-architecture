@@ -3,10 +3,10 @@ package http
 import (
 	"net/http"
 
-	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/middleware"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/gofiber/fiber/v2"
@@ -91,10 +91,10 @@ func (c *UserController) Current(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	auth := middleware.GetUser(ctx)
+	userAuth := ctxuserauth.Get(ctx.UserContext())
 
 	req := &model.GetUserRequest{
-		ID: auth.ID,
+		ID: userAuth.ID,
 	}
 
 	res, err := c.Usecase.Current(ctx.UserContext(), req)
@@ -117,10 +117,10 @@ func (c *UserController) Logout(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	auth := middleware.GetUser(ctx)
+	userAuth := ctxuserauth.Get(ctx.UserContext())
 
 	req := &model.LogoutUserRequest{
-		ID: auth.ID,
+		ID: userAuth.ID,
 	}
 
 	res, err := c.Usecase.Logout(ctx.UserContext(), req)
@@ -144,7 +144,7 @@ func (c *UserController) Update(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	auth := middleware.GetUser(ctx)
+	userAuth := ctxuserauth.Get(ctx.UserContext())
 
 	req := new(model.UpdateUserRequest)
 	if err := ctx.BodyParser(req); err != nil {
@@ -152,7 +152,7 @@ func (c *UserController) Update(ctx *fiber.Ctx) error {
 		return errkit.AddFuncName(err)
 	}
 
-	req.ID = auth.ID
+	req.ID = userAuth.ID
 	res, err := c.Usecase.Update(ctx.UserContext(), req)
 	if err != nil {
 		return errkit.AddFuncName(err)

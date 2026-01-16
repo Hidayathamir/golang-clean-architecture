@@ -116,7 +116,7 @@ func (u *UserUsecaseMwLogger) Update(ctx context.Context, req *model.UpdateUserR
 	return res, err
 }
 
-func (u *UserUsecaseMwLogger) Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error) {
+func (u *UserUsecaseMwLogger) Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.UserAuth, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
