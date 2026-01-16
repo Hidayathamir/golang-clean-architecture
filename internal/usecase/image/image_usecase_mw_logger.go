@@ -51,17 +51,18 @@ func (u *ImageUsecaseMwLogger) Like(ctx context.Context, req *model.LikeImageReq
 	return err
 }
 
-func (u *ImageUsecaseMwLogger) Upload(ctx context.Context, req *model.UploadImageRequest) error {
+func (u *ImageUsecaseMwLogger) Upload(ctx context.Context, req *model.UploadImageRequest) (*model.ImageResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := u.Next.Upload(ctx, req)
+	res, err := u.Next.Upload(ctx, req)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"req": req,
+		"res": res,
 	}
 	x.LogMw(ctx, fields, err)
 
-	return err
+	return res, err
 }

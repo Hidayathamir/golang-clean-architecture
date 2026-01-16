@@ -134,7 +134,7 @@ func TestLogin(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
-	responseBody := new(response.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[model.UserLoginResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 

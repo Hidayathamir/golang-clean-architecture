@@ -54,7 +54,6 @@ func TestUserUsecaseImpl_Create_Success(t *testing.T) {
 		ID:        0,
 		Username:  "user1",
 		Name:      "name1",
-		Token:     "",
 		CreatedAt: time.Time{},
 		UpdatedAt: time.Time{},
 	}

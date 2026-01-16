@@ -29,7 +29,7 @@ var _ user.UserUsecase = &UserUsecaseMock{}
 //			FollowFunc: func(ctx context.Context, req *model.FollowUserRequest) error {
 //				panic("mock out the Follow method")
 //			},
-//			LoginFunc: func(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error) {
+//			LoginFunc: func(ctx context.Context, req *model.LoginUserRequest) (*model.UserLoginResponse, error) {
 //				panic("mock out the Login method")
 //			},
 //			UpdateFunc: func(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error) {
@@ -55,7 +55,7 @@ type UserUsecaseMock struct {
 	FollowFunc func(ctx context.Context, req *model.FollowUserRequest) error
 
 	// LoginFunc mocks the Login method.
-	LoginFunc func(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error)
+	LoginFunc func(ctx context.Context, req *model.LoginUserRequest) (*model.UserLoginResponse, error)
 
 	// UpdateFunc mocks the Update method.
 	UpdateFunc func(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error)
@@ -225,7 +225,7 @@ func (mock *UserUsecaseMock) FollowCalls() []struct {
 }
 
 // Login calls LoginFunc.
-func (mock *UserUsecaseMock) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error) {
+func (mock *UserUsecaseMock) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserLoginResponse, error) {
 	if mock.LoginFunc == nil {
 		panic("UserUsecaseMock.LoginFunc: method is nil but UserUsecase.Login was just called")
 	}

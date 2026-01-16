@@ -58,7 +58,7 @@ func (c *UserController) Register(ctx *fiber.Ctx) error {
 //	@Description	Authenticate a user and return access token
 //	@Tags			users
 //	@Param			request	body		model.LoginUserRequest	true	"Login User Request"
-//	@Success		200		{object}	response.WebResponse[model.UserResponse]
+//	@Success		200		{object}	response.WebResponse[model.UserLoginResponse]
 //	@Router			/api/users/_login [post]
 func (c *UserController) Login(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)

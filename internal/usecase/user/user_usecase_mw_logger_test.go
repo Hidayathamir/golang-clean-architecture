@@ -51,8 +51,8 @@ func TestUserUsecaseMwLogger_Login(t *testing.T) {
 	u := &user.UserUsecaseMwLogger{
 		Next: Next,
 	}
-	Next.LoginFunc = func(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error) {
-		return &model.UserResponse{ID: 1, Username: "user1"}, nil
+	Next.LoginFunc = func(ctx context.Context, req *model.LoginUserRequest) (*model.UserLoginResponse, error) {
+		return &model.UserLoginResponse{ID: 1, Username: "user1"}, nil
 	}
 	res, err := u.Login(context.Background(), &model.LoginUserRequest{})
 	assert.NotEmpty(t, res)

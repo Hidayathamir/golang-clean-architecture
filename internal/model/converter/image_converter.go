@@ -69,3 +69,14 @@ func EntityCommentToModelImageCommentedEvent(ctx context.Context, comment *entit
 	event.UpdatedAt = comment.UpdatedAt
 	event.DeletedAt = comment.DeletedAt
 }
+
+func EntityImageToModelImageResponse(ctx context.Context, image *entity.Image, res *model.ImageResponse) {
+	res.ID = image.ID
+	res.UserID = image.UserID
+	res.URL = image.URL
+	res.LikeCount = image.LikeCount
+	res.CommentCount = image.CommentCount
+	res.CreatedAt = image.CreatedAt
+	res.UpdatedAt = image.UpdatedAt
+	res.DeletedAt = image.DeletedAt
+}

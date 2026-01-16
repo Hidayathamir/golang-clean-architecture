@@ -10,7 +10,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
-func (u *UserUsecaseImpl) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error) {
+func (u *UserUsecaseImpl) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserLoginResponse, error) {
 	if err := x.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
@@ -32,8 +32,8 @@ func (u *UserUsecaseImpl) Login(ctx context.Context, req *model.LoginUserRequest
 		return nil, errkit.AddFuncName(err)
 	}
 
-	res := new(model.UserResponse)
-	converter.EntityUserToModelUserResponse(user, res)
+	res := new(model.UserLoginResponse)
+	converter.EntityUserToModelUserLoginResponse(user, res)
 	res.Token = token
 
 	return res, nil

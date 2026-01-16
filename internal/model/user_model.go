@@ -6,7 +6,6 @@ type UserResponse struct {
 	ID        int64     `json:"id"`
 	Username  string    `json:"username"`
 	Name      string    `json:"name"`
-	Token     string    `json:"token"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -30,6 +29,15 @@ type UpdateUserRequest struct {
 type LoginUserRequest struct {
 	Username string `json:"username" validate:"required,max=100"`
 	Password string `json:"password" validate:"required,max=100"`
+}
+
+type UserLoginResponse struct {
+	ID        int64     `json:"id"`
+	Username  string    `json:"username"`
+	Name      string    `json:"name"`
+	Token     string    `json:"token"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type LogoutUserRequest struct {

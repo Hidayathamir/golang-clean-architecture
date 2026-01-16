@@ -68,7 +68,7 @@ func (u *UserUsecaseMwLogger) Current(ctx context.Context, req *model.GetUserReq
 	return res, err
 }
 
-func (u *UserUsecaseMwLogger) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error) {
+func (u *UserUsecaseMwLogger) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserLoginResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 

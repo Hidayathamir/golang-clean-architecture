@@ -26,7 +26,7 @@ var _ image.ImageUsecase = &ImageUsecaseMock{}
 //			LikeFunc: func(ctx context.Context, req *model.LikeImageRequest) error {
 //				panic("mock out the Like method")
 //			},
-//			UploadFunc: func(ctx context.Context, req *model.UploadImageRequest) error {
+//			UploadFunc: func(ctx context.Context, req *model.UploadImageRequest) (*model.ImageResponse, error) {
 //				panic("mock out the Upload method")
 //			},
 //		}
@@ -43,7 +43,7 @@ type ImageUsecaseMock struct {
 	LikeFunc func(ctx context.Context, req *model.LikeImageRequest) error
 
 	// UploadFunc mocks the Upload method.
-	UploadFunc func(ctx context.Context, req *model.UploadImageRequest) error
+	UploadFunc func(ctx context.Context, req *model.UploadImageRequest) (*model.ImageResponse, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -147,7 +147,7 @@ func (mock *ImageUsecaseMock) LikeCalls() []struct {
 }
 
 // Upload calls UploadFunc.
-func (mock *ImageUsecaseMock) Upload(ctx context.Context, req *model.UploadImageRequest) error {
+func (mock *ImageUsecaseMock) Upload(ctx context.Context, req *model.UploadImageRequest) (*model.ImageResponse, error) {
 	if mock.UploadFunc == nil {
 		panic("ImageUsecaseMock.UploadFunc: method is nil but ImageUsecase.Upload was just called")
 	}

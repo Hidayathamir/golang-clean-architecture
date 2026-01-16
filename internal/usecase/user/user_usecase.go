@@ -16,7 +16,7 @@ import (
 type UserUsecase interface {
 	Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.UserAuth, error)
 	Create(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error)
-	Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error)
+	Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserLoginResponse, error)
 	Current(ctx context.Context, req *model.GetUserRequest) (*model.UserResponse, error)
 	Update(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error)
 	Follow(ctx context.Context, req *model.FollowUserRequest) error

@@ -33,7 +33,7 @@ func NewImageController(cfg *viper.Viper, useCase image.ImageUsecase) *ImageCont
 //	@Produce		json
 //	@Param			image	formData	file	true	"Image to upload"
 //	@Security		SimpleApiKeyAuth
-//	@Success		200	{object}	response.WebResponse[string]
+//	@Success		200	{object}	response.WebResponse[model.ImageResponse]
 //	@Router			/api/images [post]
 func (c *ImageController) Upload(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
@@ -48,7 +48,26 @@ func (c *ImageController) Upload(ctx *fiber.Ctx) error {
 	req := new(model.UploadImageRequest)
 	req.File = file
 
-	err = c.Usecase.Upload(ctx.UserContext(), req)
+	res, err := c.Usecase.Upload(ctx.UserContext(), req)
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+
+	return response.Data(ctx, http.StatusOK, res)
+}
+
+func (c *ImageController) Like(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
+	req := new(model.LikeImageRequest)
+	err := ctx.BodyParser(req)
+	if err != nil {
+		err = errkit.BadRequest(err)
+		return errkit.AddFuncName(err)
+	}
+
+	err = c.Usecase.Like(ctx.UserContext(), req)
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}

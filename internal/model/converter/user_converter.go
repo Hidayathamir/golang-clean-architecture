@@ -40,6 +40,14 @@ func EntityUserToModelUserResponse(user *entity.User, res *model.UserResponse) {
 	res.UpdatedAt = user.UpdatedAt
 }
 
+func EntityUserToModelUserLoginResponse(user *entity.User, res *model.UserLoginResponse) {
+	res.ID = user.ID
+	res.Username = user.Username
+	res.Name = user.Name
+	res.CreatedAt = user.CreatedAt
+	res.UpdatedAt = user.UpdatedAt
+}
+
 func EntityUserToModelUserAuth(user *entity.User, userAuth *model.UserAuth) {
 	if user == nil || userAuth == nil {
 		return

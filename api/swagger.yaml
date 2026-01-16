@@ -79,6 +79,19 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
     type: object
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ImageResponse
+  : properties:
+      data:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.ImageResponse'
+      error_detail:
+        items:
+          type: string
+        type: array
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
+    type: object
   ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse
   : properties:
       data:
@@ -107,10 +120,10 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
     type: object
-  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserLoginResponse
   : properties:
       data:
-        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UserResponse'
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UserLoginResponse'
       error_detail:
         items:
           type: string
@@ -120,10 +133,10 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
     type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string:
-    properties:
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse
+  : properties:
       data:
-        type: string
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UserResponse'
       error_detail:
         items:
           type: string
@@ -218,6 +231,25 @@ definitions:
         type: string
     required:
     - title
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.ImageResponse:
+    properties:
+      comment_count:
+        type: integer
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      like_count:
+        type: integer
+      updated_at:
+        type: string
+      url:
+        type: string
+      user_id:
+        type: integer
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.LoginUserRequest:
     properties:
@@ -319,7 +351,7 @@ definitions:
         maxLength: 100
         type: string
     type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.UserResponse:
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.UserLoginResponse:
     properties:
       created_at:
         type: string
@@ -333,6 +365,27 @@ definitions:
         type: string
       username:
         type: string
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.UserResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
     type: object
 info:
   contact: {}
@@ -590,7 +643,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ImageResponse'
       security:
       - SimpleApiKeyAuth: []
       summary: Upload image
@@ -791,7 +844,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserLoginResponse'
       summary: Login user
       tags:
       - users
