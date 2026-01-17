@@ -864,6 +864,11 @@ const docTemplate = `{
         },
         "/api/users/_follow": {
             "post": {
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
+                ],
                 "description": "Follow a user",
                 "tags": [
                     "users"

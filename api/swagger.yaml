@@ -1027,6 +1027,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string'
+      security:
+      - SimpleApiKeyAuth: []
       summary: Follow user
       tags:
       - users

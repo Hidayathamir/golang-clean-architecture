@@ -140,6 +140,7 @@ func (c *UserController) Update(ctx *fiber.Ctx) error {
 //	@Summary		Follow user
 //	@Description	Follow a user
 //	@Tags			users
+//	@Security		SimpleApiKeyAuth
 //	@Param			request	body		model.FollowUserRequest	true	"Follow User Request"
 //	@Success		200		{object}	response.WebResponse[string]
 //	@Router			/api/users/_follow [post]
