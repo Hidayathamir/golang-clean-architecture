@@ -70,8 +70,9 @@ func ConsumeTopic(ctx context.Context, consumerGroup sarama.ConsumerGroup, topic
 	}()
 
 	<-ctx.Done()
-	x.Logger.Infof("Closing consumer group for topic: %s", topic)
+	x.Logger.Infof("Start closing consumer group for topic: %s", topic)
 	if err := consumerGroup.Close(); err != nil {
 		x.Logger.WithError(err).Error("Error closing consumer group")
 	}
+	x.Logger.Infof("Done closing consumer group for topic: %s", topic)
 }
