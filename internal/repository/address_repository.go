@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-//go:generate moq -out=../mock/AddressRepository.go -pkg=mock . AddressRepository
+//go:generate moq -out=../mock/MockRepositoryAddress.go -pkg=mock . AddressRepository
 
 type AddressRepository interface {
 	FindByIDAndContactID(ctx context.Context, db *gorm.DB, address *entity.Address, id int64, contactID int64) error

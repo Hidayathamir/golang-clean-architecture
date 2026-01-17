@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-//go:generate moq -out=../../mock/ImageProducer.go -pkg=mock . ImageProducer
+//go:generate moq -out=../../mock/MockProducerImage.go -pkg=mock . ImageProducer
 
 type ImageProducer interface {
 	SendImageUploaded(ctx context.Context, event *model.ImageUploadedEvent) error

@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-//go:generate moq -out=../../mock/SlackClient.go -pkg=mock . SlackClient
+//go:generate moq -out=../../mock/MockClientSlack.go -pkg=mock . SlackClient
 
 type SlackClient interface {
 	GetChannelList(ctx context.Context, req model.SlackGetChannelListRequest) (model.SlackGetChannelListResponse, error)

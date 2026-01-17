@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-//go:generate moq -out=../../mock/NotifProducer.go -pkg=mock . NotifProducer
+//go:generate moq -out=../../mock/MockProducerNotif.go -pkg=mock . NotifProducer
 
 type NotifProducer interface {
 	SendNotif(ctx context.Context, event *model.NotifEvent) error

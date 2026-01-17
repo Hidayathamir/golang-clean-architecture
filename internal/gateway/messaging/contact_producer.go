@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-//go:generate moq -out=../../mock/ContactProducer.go -pkg=mock . ContactProducer
+//go:generate moq -out=../../mock/MockProducerContact.go -pkg=mock . ContactProducer
 
 type ContactProducer interface {
 	Send(ctx context.Context, event *model.ContactEvent) error

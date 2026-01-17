@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-//go:generate moq -out=../../mock/S3Client.go -pkg=mock . S3Client
+//go:generate moq -out=../../mock/MockClientS3.go -pkg=mock . S3Client
 
 type S3Client interface {
 	UploadImage(ctx context.Context, req model.S3UploadImageRequest) (url string, err error)

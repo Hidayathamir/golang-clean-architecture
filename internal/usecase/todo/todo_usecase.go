@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-//go:generate moq -out=../../mock/TodoUsecase.go -pkg=mock . TodoUsecase
+//go:generate moq -out=../../mock/MockUsecaseTodo.go -pkg=mock . TodoUsecase
 
 type TodoUsecase interface {
 	Create(ctx context.Context, req *model.CreateTodoRequest) (*model.TodoResponse, error)

@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-//go:generate moq -out=../../mock/UserUsecase.go -pkg=mock . UserUsecase
+//go:generate moq -out=../../mock/MockUsecaseUser.go -pkg=mock . UserUsecase
 
 type UserUsecase interface {
 	Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.UserAuth, error)

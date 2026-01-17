@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-//go:generate moq -out=../../mock/ImageUsecase.go -pkg=mock . ImageUsecase
+//go:generate moq -out=../../mock/MockUsecaseImage.go -pkg=mock . ImageUsecase
 
 type ImageUsecase interface {
 	Upload(ctx context.Context, req *model.UploadImageRequest) (*model.ImageResponse, error)

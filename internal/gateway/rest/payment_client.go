@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-//go:generate moq -out=../../mock/PaymentClient.go -pkg=mock . PaymentClient
+//go:generate moq -out=../../mock/MockClientPayment.go -pkg=mock . PaymentClient
 
 type PaymentClient interface {
 	Refund(ctx context.Context, req model.PaymentRefundRequest) (model.PaymentRefundResponse, error)

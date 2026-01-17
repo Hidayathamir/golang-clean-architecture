@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-//go:generate moq -out=../../mock/NotifUsecase.go -pkg=mock . NotifUsecase
+//go:generate moq -out=../../mock/MockUsecaseNotif.go -pkg=mock . NotifUsecase
 
 type NotifUsecase interface {
 	Notify(ctx context.Context, req *model.NotifyRequest) error

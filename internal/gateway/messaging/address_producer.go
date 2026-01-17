@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-//go:generate moq -out=../../mock/AddressProducer.go -pkg=mock . AddressProducer
+//go:generate moq -out=../../mock/MockProducerAddress.go -pkg=mock . AddressProducer
 
 type AddressProducer interface {
 	Send(ctx context.Context, event *model.AddressEvent) error

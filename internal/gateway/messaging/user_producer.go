@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-//go:generate moq -out=../../mock/UserProducer.go -pkg=mock . UserProducer
+//go:generate moq -out=../../mock/MockProducerUser.go -pkg=mock . UserProducer
 
 type UserProducer interface {
 	SendUserFollowed(ctx context.Context, event *model.UserFollowedEvent) error

@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-//go:generate moq -out=../../mock/TodoProducer.go -pkg=mock . TodoProducer
+//go:generate moq -out=../../mock/MockProducerTodo.go -pkg=mock . TodoProducer
 
 type TodoProducer interface {
 	Send(ctx context.Context, event *model.TodoCompletedEvent) error

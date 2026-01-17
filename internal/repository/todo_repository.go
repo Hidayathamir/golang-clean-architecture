@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-//go:generate moq -out=../mock/TodoRepository.go -pkg=mock . TodoRepository
+//go:generate moq -out=../mock/MockRepositoryTodo.go -pkg=mock . TodoRepository
 
 type TodoRepository interface {
 	Create(ctx context.Context, db *gorm.DB, todo *entity.Todo) error
