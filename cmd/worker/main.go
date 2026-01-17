@@ -10,6 +10,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/messaging"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/consttopic"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/spf13/viper"
@@ -39,6 +40,9 @@ func main() {
 	go RunContactConsumer(ctx, viperConfig, usecases)
 	go RunAddressConsumer(ctx, viperConfig, usecases)
 	go RunTodoCommandConsumer(ctx, viperConfig, usecases)
+	go RunImageUploadedConsumer(ctx, viperConfig, usecases)
+	go RunImageLikedConsumer(ctx, viperConfig, usecases)
+	go RunImageCommentedConsumer(ctx, viperConfig, usecases)
 	go RunTodoCompletionConsumer(ctx, viperConfig)
 
 	terminateSignals := make(chan os.Signal, 1)
@@ -84,6 +88,27 @@ func RunTodoCompletionConsumer(ctx context.Context, viperConfig *viper.Viper) {
 	todoCompletionGroup := config.NewKafkaConsumerGroup(viperConfig)
 	completionHandler := messaging.NewTodoCompletionConsumer()
 	messaging.ConsumeTopic(ctx, todoCompletionGroup, "todos", completionHandler.Consume)
+}
+
+func RunImageUploadedConsumer(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
+	x.Logger.Info("setup consttopic.ImageUploaded consumer")
+	consumerGroup := config.NewKafkaConsumerGroup(viperConfig)
+	consumer := messaging.NewImageConsumer(usecases.ImageUsecase)
+	messaging.ConsumeTopic(ctx, consumerGroup, consttopic.ImageUploaded, consumer.ConsumeImageUploadedEvent)
+}
+
+func RunImageLikedConsumer(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
+	x.Logger.Info("setup consttopic.ImageLiked consumer")
+	consumerGroup := config.NewKafkaConsumerGroup(viperConfig)
+	consumer := messaging.NewImageConsumer(usecases.ImageUsecase)
+	messaging.ConsumeTopic(ctx, consumerGroup, consttopic.ImageLiked, consumer.ConsumeImageLikedEvent)
+}
+
+func RunImageCommentedConsumer(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
+	x.Logger.Info("setup consttopic.ImageCommented consumer")
+	consumerGroup := config.NewKafkaConsumerGroup(viperConfig)
+	consumer := messaging.NewImageConsumer(usecases.ImageUsecase)
+	messaging.ConsumeTopic(ctx, consumerGroup, consttopic.ImageCommented, consumer.ConsumeImageCommentedEvent)
 }
 
 func panicIfErr(err error) {

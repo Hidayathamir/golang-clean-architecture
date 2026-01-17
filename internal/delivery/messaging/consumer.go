@@ -14,6 +14,8 @@ type ConsumerGroupHandler struct {
 	Handler ConsumerHandler
 }
 
+var _ sarama.ConsumerGroupHandler = &ConsumerGroupHandler{}
+
 func (h *ConsumerGroupHandler) Setup(sarama.ConsumerGroupSession) error {
 	return nil
 }
