@@ -50,9 +50,16 @@ func main() {
 
 	s := <-terminateSignals
 	x.Logger.Info("Got one of stop signals, shutting down worker gracefully, SIGNAL NAME :", s)
-	cancel()
 
-	time.Sleep(5 * time.Second) // wait for all consumers to finish processing
+	x.Logger.Info("canceling")
+	cancel()
+	x.Logger.Info("canceled")
+
+	x.Logger.Info("wait for all consumer to finish processing, 5 second")
+	time.Sleep(5 * time.Second)
+	x.Logger.Info("done waiting")
+
+	x.Logger.Info("end process of worker")
 }
 
 func RunAddressConsumer(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
