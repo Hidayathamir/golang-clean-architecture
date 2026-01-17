@@ -17,12 +17,12 @@ import (
 func TestUserUsecaseImpl_Update_Success(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserFollowedProducerMock{}
+	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:                   gormDB,
-		Config:               viper.New(),
-		UserRepository:       UserRepository,
-		UserFollowedProducer: UserProducer,
+		DB:             gormDB,
+		Config:         viper.New(),
+		UserRepository: UserRepository,
+		UserProducer:   UserProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -41,7 +41,7 @@ func TestUserUsecaseImpl_Update_Success(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
+	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -60,12 +60,12 @@ func TestUserUsecaseImpl_Update_Success(t *testing.T) {
 func TestUserUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserFollowedProducerMock{}
+	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:                   gormDB,
-		Config:               viper.New(),
-		UserRepository:       UserRepository,
-		UserFollowedProducer: UserProducer,
+		DB:             gormDB,
+		Config:         viper.New(),
+		UserRepository: UserRepository,
+		UserProducer:   UserProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -82,7 +82,7 @@ func TestUserUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
+	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -103,12 +103,12 @@ func TestUserUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 func TestUserUsecaseImpl_Update_Fail_FindByID(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserFollowedProducerMock{}
+	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:                   gormDB,
-		Config:               viper.New(),
-		UserRepository:       UserRepository,
-		UserFollowedProducer: UserProducer,
+		DB:             gormDB,
+		Config:         viper.New(),
+		UserRepository: UserRepository,
+		UserProducer:   UserProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -125,7 +125,7 @@ func TestUserUsecaseImpl_Update_Fail_FindByID(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
+	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -145,12 +145,12 @@ func TestUserUsecaseImpl_Update_Fail_FindByID(t *testing.T) {
 func TestUserUsecaseImpl_Update_Fail_Update(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserFollowedProducerMock{}
+	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:                   gormDB,
-		Config:               viper.New(),
-		UserRepository:       UserRepository,
-		UserFollowedProducer: UserProducer,
+		DB:             gormDB,
+		Config:         viper.New(),
+		UserRepository: UserRepository,
+		UserProducer:   UserProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -167,7 +167,7 @@ func TestUserUsecaseImpl_Update_Fail_Update(t *testing.T) {
 		return assert.AnError
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
+	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -187,12 +187,12 @@ func TestUserUsecaseImpl_Update_Fail_Update(t *testing.T) {
 func TestUserUsecaseImpl_Update_Fail_Send(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserFollowedProducerMock{}
+	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
-		DB:                   gormDB,
-		Config:               viper.New(),
-		UserRepository:       UserRepository,
-		UserFollowedProducer: UserProducer,
+		DB:             gormDB,
+		Config:         viper.New(),
+		UserRepository: UserRepository,
+		UserProducer:   UserProducer,
 	}
 
 	// ------------------------------------------------------- //
@@ -209,7 +209,7 @@ func TestUserUsecaseImpl_Update_Fail_Send(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
+	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return assert.AnError
 	}
 

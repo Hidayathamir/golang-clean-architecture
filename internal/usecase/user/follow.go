@@ -27,7 +27,7 @@ func (u *UserUsecaseImpl) Follow(ctx context.Context, req *model.FollowUserReque
 	event := new(model.UserFollowedEvent)
 	converter.EntityFollowToModelUserFollowedEvent(ctx, follow, event)
 
-	if err := u.UserFollowedProducer.Send(ctx, event); err != nil {
+	if err := u.UserProducer.SendUserFollowed(ctx, event); err != nil {
 		return errkit.AddFuncName(err)
 	}
 

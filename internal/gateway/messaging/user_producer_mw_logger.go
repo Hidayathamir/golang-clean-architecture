@@ -9,23 +9,23 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var _ UserFollowedProducer = &UserFollowedProducerMwLogger{}
+var _ UserProducer = &UserProducerMwLogger{}
 
-type UserFollowedProducerMwLogger struct {
-	Next UserFollowedProducer
+type UserProducerMwLogger struct {
+	Next UserProducer
 }
 
-func NewUserFollowedProducerMwLogger(next UserFollowedProducer) *UserFollowedProducerMwLogger {
-	return &UserFollowedProducerMwLogger{
+func NewUserProducerMwLogger(next UserProducer) *UserProducerMwLogger {
+	return &UserProducerMwLogger{
 		Next: next,
 	}
 }
 
-func (p *UserFollowedProducerMwLogger) Send(ctx context.Context, event *model.UserFollowedEvent) error {
+func (p *UserProducerMwLogger) SendUserFollowed(ctx context.Context, event *model.UserFollowedEvent) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := p.Next.Send(ctx, event)
+	err := p.Next.SendUserFollowed(ctx, event)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{

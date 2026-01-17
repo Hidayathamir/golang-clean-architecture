@@ -13,29 +13,27 @@ import (
 	"github.com/spf13/viper"
 )
 
-//go:generate moq -out=../../mock/UserFollowedProducer.go -pkg=mock . UserFollowedProducer
+//go:generate moq -out=../../mock/UserProducer.go -pkg=mock . UserProducer
 
-type UserFollowedProducer interface {
-	Send(ctx context.Context, event *model.UserFollowedEvent) error
+type UserProducer interface {
+	SendUserFollowed(ctx context.Context, event *model.UserFollowedEvent) error
 }
 
-var _ UserFollowedProducer = &UserFollowedProducerImpl{}
+var _ UserProducer = &UserProducerImpl{}
 
-type UserFollowedProducerImpl struct {
+type UserProducerImpl struct {
 	Config   *viper.Viper
 	Producer sarama.SyncProducer
-	Topic    string
 }
 
-func NewUserFollowedProducer(cfg *viper.Viper, producer sarama.SyncProducer) *UserFollowedProducerImpl {
-	return &UserFollowedProducerImpl{
+func NewUserProducer(cfg *viper.Viper, producer sarama.SyncProducer) *UserProducerImpl {
+	return &UserProducerImpl{
 		Config:   cfg,
 		Producer: producer,
-		Topic:    consttopic.UserFollowed,
 	}
 }
 
-func (p *UserFollowedProducerImpl) Send(ctx context.Context, event *model.UserFollowedEvent) error {
+func (p *UserProducerImpl) SendUserFollowed(ctx context.Context, event *model.UserFollowedEvent) error {
 	if p.Producer == nil {
 		x.Logger.WithContext(ctx).Warn("Kafka producer is disabled")
 		return nil
@@ -47,7 +45,7 @@ func (p *UserFollowedProducerImpl) Send(ctx context.Context, event *model.UserFo
 	}
 
 	message := &sarama.ProducerMessage{
-		Topic: p.Topic,
+		Topic: consttopic.UserFollowed,
 		Key:   sarama.StringEncoder(event.GetID()),
 		Value: sarama.ByteEncoder(value),
 	}
@@ -59,7 +57,7 @@ func (p *UserFollowedProducerImpl) Send(ctx context.Context, event *model.UserFo
 		return errkit.AddFuncName(err)
 	}
 
-	x.Logger.WithContext(ctx).Debugf("Message sent to topic %s, partition %d, offset %d", p.Topic, partition, offset)
+	x.Logger.WithContext(ctx).Debugf("Message sent to topic %s, partition %d, offset %d", message.Topic, partition, offset)
 
 	return nil
 }

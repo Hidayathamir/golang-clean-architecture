@@ -33,7 +33,7 @@ type UserUsecaseImpl struct {
 	FollowRepository repository.FollowRepository
 
 	// producer
-	UserFollowedProducer messaging.UserFollowedProducer
+	UserProducer messaging.UserProducer
 
 	// client
 	S3Client    rest.S3Client
@@ -49,7 +49,7 @@ func NewUserUsecase(
 	FollowRepository repository.FollowRepository,
 
 	// producer
-	userFollowedProducer messaging.UserFollowedProducer,
+	userProducer messaging.UserProducer,
 
 	// client
 	s3Client rest.S3Client,
@@ -64,7 +64,7 @@ func NewUserUsecase(
 		FollowRepository: FollowRepository,
 
 		// producer
-		UserFollowedProducer: userFollowedProducer,
+		UserProducer: userProducer,
 
 		// client
 		S3Client:    s3Client,

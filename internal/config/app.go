@@ -68,9 +68,9 @@ func SetupUsecases(
 	todoRepository = repository.NewTodoRepositoryMwLogger(todoRepository)
 
 	// setup producer
-	var userFollowedProducer messaging.UserFollowedProducer
-	userFollowedProducer = messaging.NewUserFollowedProducer(viperConfig, producer)
-	userFollowedProducer = messaging.NewUserFollowedProducerMwLogger(userFollowedProducer)
+	var userProducer messaging.UserProducer
+	userProducer = messaging.NewUserProducer(viperConfig, producer)
+	userProducer = messaging.NewUserProducerMwLogger(userProducer)
 
 	var imageProducer messaging.ImageProducer
 	imageProducer = messaging.NewImageProducer(viperConfig, producer)
@@ -107,7 +107,7 @@ func SetupUsecases(
 
 	// setup use cases
 	var userUsecase user.UserUsecase
-	userUsecase = user.NewUserUsecase(viperConfig, db, userRepository, followRepository, userFollowedProducer, s3Client, slackClient)
+	userUsecase = user.NewUserUsecase(viperConfig, db, userRepository, followRepository, userProducer, s3Client, slackClient)
 	userUsecase = user.NewUserUsecaseMwLogger(userUsecase)
 
 	var imageUsecase image.ImageUsecase
