@@ -43,6 +43,7 @@ func main() {
 	go RunImageUploadedConsumer(ctx, viperConfig, usecases)
 	go RunImageLikedConsumer(ctx, viperConfig, usecases)
 	go RunImageCommentedConsumer(ctx, viperConfig, usecases)
+	go RunNotifConsumer(ctx, viperConfig, usecases)
 	go RunTodoCompletionConsumer(ctx, viperConfig)
 
 	terminateSignals := make(chan os.Signal, 1)
