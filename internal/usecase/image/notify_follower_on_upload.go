@@ -30,11 +30,12 @@ func (u *ImageUsecaseImpl) NotifyFollowerOnUpload(ctx context.Context, req *mode
 	}
 
 	for _, follow := range *followList {
-		err := u.NotifProducer.SendNotif(ctx, &model.NotifEvent{
+		event := &model.NotifEvent{
 			UserID:  follow.FollowerID,
 			Message: fmt.Sprintf("%s just upload an image", user.Name),
-		})
-		if err != nil {
+		}
+
+		if err := u.NotifProducer.SendNotif(ctx, event); err != nil {
 			return errkit.AddFuncName(err)
 		}
 	}

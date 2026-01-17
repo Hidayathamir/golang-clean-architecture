@@ -107,7 +107,7 @@ func SetupUsecases(
 
 	// setup use cases
 	var userUsecase user.UserUsecase
-	userUsecase = user.NewUserUsecase(viperConfig, db, userRepository, followRepository, userProducer, s3Client, slackClient)
+	userUsecase = user.NewUserUsecase(viperConfig, db, userRepository, followRepository, userProducer, notifProducer, s3Client, slackClient)
 	userUsecase = user.NewUserUsecaseMwLogger(userUsecase)
 
 	var imageUsecase image.ImageUsecase

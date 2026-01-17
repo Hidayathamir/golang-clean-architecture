@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type UserResponse struct {
 	ID        int64     `json:"id"`
@@ -50,4 +52,9 @@ type GetUserRequest struct {
 
 type FollowUserRequest struct {
 	FollowingID int64 `json:"following_id"`
+}
+
+type NotifyUserBeingFollowedRequest struct {
+	FollowerID  int64
+	FollowingID int64
 }

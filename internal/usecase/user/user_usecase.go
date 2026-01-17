@@ -20,6 +20,7 @@ type UserUsecase interface {
 	Current(ctx context.Context, req *model.GetUserRequest) (*model.UserResponse, error)
 	Update(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error)
 	Follow(ctx context.Context, req *model.FollowUserRequest) error
+	NotifyUserBeingFollowed(ctx context.Context, req *model.NotifyUserBeingFollowedRequest) error
 }
 
 var _ UserUsecase = &UserUsecaseImpl{}
@@ -33,7 +34,8 @@ type UserUsecaseImpl struct {
 	FollowRepository repository.FollowRepository
 
 	// producer
-	UserProducer messaging.UserProducer
+	UserProducer  messaging.UserProducer
+	NotifProducer messaging.NotifProducer
 
 	// client
 	S3Client    rest.S3Client
@@ -50,6 +52,7 @@ func NewUserUsecase(
 
 	// producer
 	userProducer messaging.UserProducer,
+	NotifProducer messaging.NotifProducer,
 
 	// client
 	s3Client rest.S3Client,
@@ -64,7 +67,8 @@ func NewUserUsecase(
 		FollowRepository: FollowRepository,
 
 		// producer
-		UserProducer: userProducer,
+		UserProducer:  userProducer,
+		NotifProducer: NotifProducer,
 
 		// client
 		S3Client:    s3Client,

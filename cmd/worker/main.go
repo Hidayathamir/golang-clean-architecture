@@ -36,15 +36,11 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	x.Logger.Info("Starting worker service")
-	go RunUserConsumer(ctx, viperConfig, usecases)
-	go RunContactConsumer(ctx, viperConfig, usecases)
-	go RunAddressConsumer(ctx, viperConfig, usecases)
-	go RunTodoCommandConsumer(ctx, viperConfig, usecases)
+	go RunUserFollowedConsumer(ctx, viperConfig, usecases)
 	go RunImageUploadedConsumer(ctx, viperConfig, usecases)
 	go RunImageLikedConsumer(ctx, viperConfig, usecases)
 	go RunImageCommentedConsumer(ctx, viperConfig, usecases)
 	go RunNotifConsumer(ctx, viperConfig, usecases)
-	go RunTodoCompletionConsumer(ctx, viperConfig)
 
 	terminateSignals := make(chan os.Signal, 1)
 	signal.Notify(terminateSignals, syscall.SIGINT, syscall.SIGTERM)
@@ -77,11 +73,11 @@ func RunContactConsumer(ctx context.Context, viperConfig *viper.Viper, usecases 
 	messaging.ConsumeTopic(ctx, contactConsumerGroup, "contacts", contactHandler.Consume)
 }
 
-func RunUserConsumer(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
-	x.Logger.Info("setup user consumer")
-	userConsumerGroup := config.NewKafkaConsumerGroup(viperConfig)
-	userHandler := messaging.NewUserConsumer(usecases.UserUsecase)
-	messaging.ConsumeTopic(ctx, userConsumerGroup, "users", userHandler.Consume)
+func RunUserFollowedConsumer(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
+	x.Logger.Info("setup consttopic.UserFollowed consumer")
+	consumerGroup := config.NewKafkaConsumerGroup(viperConfig)
+	consumer := messaging.NewUserConsumer(usecases.UserUsecase)
+	messaging.ConsumeTopic(ctx, consumerGroup, consttopic.UserFollowed, consumer.ConsumeUserFollowedEvent)
 }
 
 func RunTodoCommandConsumer(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {

@@ -77,3 +77,8 @@ func EntityFollowToModelUserFollowedEvent(ctx context.Context, follow *entity.Fo
 	event.UpdatedAt = follow.UpdatedAt
 	event.DeletedAt = follow.DeletedAt
 }
+
+func ModelUserFollowedEventToModelNotifyUserBeingFollowedRequest(ctx context.Context, event *model.UserFollowedEvent, req *model.NotifyUserBeingFollowedRequest) {
+	req.FollowerID = event.FollowerID
+	req.FollowingID = event.FollowingID
+}

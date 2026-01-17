@@ -21,11 +21,12 @@ func TestNewUserUsecase(t *testing.T) {
 	var FollowRepository repository.FollowRepository = &mock.FollowRepositoryMock{}
 
 	var UserProducer messaging.UserProducer = &mock.UserProducerMock{}
+	var NotifProducer messaging.NotifProducer = &mock.NotifProducerMock{}
 
 	var S3Client rest.S3Client = &mock.S3ClientMock{}
 	var SlackClient rest.SlackClient = &mock.SlackClientMock{}
 
-	u := user.NewUserUsecase(Config, DB, UserRepository, FollowRepository, UserProducer, S3Client, SlackClient)
+	u := user.NewUserUsecase(Config, DB, UserRepository, FollowRepository, UserProducer, NotifProducer, S3Client, SlackClient)
 
 	assert.NotEmpty(t, u)
 }

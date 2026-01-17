@@ -4,12 +4,11 @@ import (
 	"encoding/json"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/model/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/IBM/sarama"
-	"github.com/sirupsen/logrus"
 )
 
 type UserConsumer struct {
@@ -22,20 +21,21 @@ func NewUserConsumer(usecase user.UserUsecase) *UserConsumer {
 	}
 }
 
-func (c UserConsumer) Consume(message *sarama.ConsumerMessage) error {
+func (c UserConsumer) ConsumeUserFollowedEvent(message *sarama.ConsumerMessage) error {
 	ctx, span := telemetry.StartConsumer(message)
 	defer span.End()
 
-	UserFollowedEvent := new(model.UserFollowedEvent)
-	if err := json.Unmarshal(message.Value, UserFollowedEvent); err != nil {
-		x.Logger.WithContext(ctx).WithError(err).Error("error unmarshalling User event")
+	event := new(model.UserFollowedEvent)
+	if err := json.Unmarshal(message.Value, event); err != nil {
 		return errkit.AddFuncName(err)
 	}
 
-	// TODO process event
-	x.Logger.WithContext(ctx).WithFields(logrus.Fields{
-		"event":     UserFollowedEvent,
-		"partition": message.Partition,
-	}).Info("Received topic users")
+	req := new(model.NotifyUserBeingFollowedRequest)
+	converter.ModelUserFollowedEventToModelNotifyUserBeingFollowedRequest(ctx, event, req)
+
+	if err := c.Usecase.NotifyUserBeingFollowed(ctx, req); err != nil {
+		return errkit.AddFuncName(err)
+	}
+
 	return nil
 }

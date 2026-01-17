@@ -115,3 +115,18 @@ func (u *UserUsecaseMwLogger) Verify(ctx context.Context, req *model.VerifyUserR
 
 	return res, err
 }
+
+func (u *UserUsecaseMwLogger) NotifyUserBeingFollowed(ctx context.Context, req *model.NotifyUserBeingFollowedRequest) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := u.Next.NotifyUserBeingFollowed(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+	}
+	x.LogMw(ctx, fields, err)
+
+	return err
+}

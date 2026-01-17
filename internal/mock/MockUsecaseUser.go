@@ -32,6 +32,9 @@ var _ user.UserUsecase = &UserUsecaseMock{}
 //			LoginFunc: func(ctx context.Context, req *model.LoginUserRequest) (*model.UserLoginResponse, error) {
 //				panic("mock out the Login method")
 //			},
+//			NotifyUserBeingFollowedFunc: func(ctx context.Context, req *model.NotifyUserBeingFollowedRequest) error {
+//				panic("mock out the NotifyUserBeingFollowed method")
+//			},
 //			UpdateFunc: func(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error) {
 //				panic("mock out the Update method")
 //			},
@@ -56,6 +59,9 @@ type UserUsecaseMock struct {
 
 	// LoginFunc mocks the Login method.
 	LoginFunc func(ctx context.Context, req *model.LoginUserRequest) (*model.UserLoginResponse, error)
+
+	// NotifyUserBeingFollowedFunc mocks the NotifyUserBeingFollowed method.
+	NotifyUserBeingFollowedFunc func(ctx context.Context, req *model.NotifyUserBeingFollowedRequest) error
 
 	// UpdateFunc mocks the Update method.
 	UpdateFunc func(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error)
@@ -93,6 +99,13 @@ type UserUsecaseMock struct {
 			// Req is the req argument value.
 			Req *model.LoginUserRequest
 		}
+		// NotifyUserBeingFollowed holds details about calls to the NotifyUserBeingFollowed method.
+		NotifyUserBeingFollowed []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req *model.NotifyUserBeingFollowedRequest
+		}
 		// Update holds details about calls to the Update method.
 		Update []struct {
 			// Ctx is the ctx argument value.
@@ -108,12 +121,13 @@ type UserUsecaseMock struct {
 			Req *model.VerifyUserRequest
 		}
 	}
-	lockCreate  sync.RWMutex
-	lockCurrent sync.RWMutex
-	lockFollow  sync.RWMutex
-	lockLogin   sync.RWMutex
-	lockUpdate  sync.RWMutex
-	lockVerify  sync.RWMutex
+	lockCreate                  sync.RWMutex
+	lockCurrent                 sync.RWMutex
+	lockFollow                  sync.RWMutex
+	lockLogin                   sync.RWMutex
+	lockNotifyUserBeingFollowed sync.RWMutex
+	lockUpdate                  sync.RWMutex
+	lockVerify                  sync.RWMutex
 }
 
 // Create calls CreateFunc.
@@ -257,6 +271,42 @@ func (mock *UserUsecaseMock) LoginCalls() []struct {
 	mock.lockLogin.RLock()
 	calls = mock.calls.Login
 	mock.lockLogin.RUnlock()
+	return calls
+}
+
+// NotifyUserBeingFollowed calls NotifyUserBeingFollowedFunc.
+func (mock *UserUsecaseMock) NotifyUserBeingFollowed(ctx context.Context, req *model.NotifyUserBeingFollowedRequest) error {
+	if mock.NotifyUserBeingFollowedFunc == nil {
+		panic("UserUsecaseMock.NotifyUserBeingFollowedFunc: method is nil but UserUsecase.NotifyUserBeingFollowed was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req *model.NotifyUserBeingFollowedRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockNotifyUserBeingFollowed.Lock()
+	mock.calls.NotifyUserBeingFollowed = append(mock.calls.NotifyUserBeingFollowed, callInfo)
+	mock.lockNotifyUserBeingFollowed.Unlock()
+	return mock.NotifyUserBeingFollowedFunc(ctx, req)
+}
+
+// NotifyUserBeingFollowedCalls gets all the calls that were made to NotifyUserBeingFollowed.
+// Check the length with:
+//
+//	len(mockedUserUsecase.NotifyUserBeingFollowedCalls())
+func (mock *UserUsecaseMock) NotifyUserBeingFollowedCalls() []struct {
+	Ctx context.Context
+	Req *model.NotifyUserBeingFollowedRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req *model.NotifyUserBeingFollowedRequest
+	}
+	mock.lockNotifyUserBeingFollowed.RLock()
+	calls = mock.calls.NotifyUserBeingFollowed
+	mock.lockNotifyUserBeingFollowed.RUnlock()
 	return calls
 }
 
