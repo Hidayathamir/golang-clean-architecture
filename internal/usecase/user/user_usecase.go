@@ -38,8 +38,7 @@ type UserUsecaseImpl struct {
 	NotifProducer messaging.NotifProducer
 
 	// client
-	S3Client    rest.S3Client
-	SlackClient rest.SlackClient
+	S3Client rest.S3Client
 }
 
 func NewUserUsecase(
@@ -56,7 +55,6 @@ func NewUserUsecase(
 
 	// client
 	s3Client rest.S3Client,
-	slackClient rest.SlackClient,
 ) *UserUsecaseImpl {
 	return &UserUsecaseImpl{
 		Config: cfg,
@@ -71,7 +69,6 @@ func NewUserUsecase(
 		NotifProducer: NotifProducer,
 
 		// client
-		S3Client:    s3Client,
-		SlackClient: slackClient,
+		S3Client: s3Client,
 	}
 }

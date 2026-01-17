@@ -9,11 +9,9 @@ import (
 	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/messaging/route"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
-	"github.com/spf13/viper"
 )
 
 func main() {
@@ -57,34 +55,6 @@ func main() {
 	x.Logger.Info("done waiting")
 
 	x.Logger.Info("end process of worker")
-}
-
-func RunAddressConsumer(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
-	x.Logger.Info("setup address consumer")
-	addressConsumerGroup := config.NewKafkaConsumerGroup(viperConfig)
-	addressHandler := messaging.NewAddressConsumer(usecases.AddressUsecase)
-	messaging.ConsumeTopic(ctx, addressConsumerGroup, "addresses", addressHandler.Consume)
-}
-
-func RunContactConsumer(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
-	x.Logger.Info("setup contact consumer")
-	contactConsumerGroup := config.NewKafkaConsumerGroup(viperConfig)
-	contactHandler := messaging.NewContactConsumer(usecases.ContactUsecase)
-	messaging.ConsumeTopic(ctx, contactConsumerGroup, "contacts", contactHandler.Consume)
-}
-
-func RunTodoCommandConsumer(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
-	x.Logger.Info("setup todo command consumer")
-	todoCommandGroup := config.NewKafkaConsumerGroup(viperConfig)
-	commandHandler := messaging.NewTodoCommandConsumer(usecases.TodoUsecase)
-	messaging.ConsumeTopic(ctx, todoCommandGroup, "todo-commands", commandHandler.Consume)
-}
-
-func RunTodoCompletionConsumer(ctx context.Context, viperConfig *viper.Viper) {
-	x.Logger.Info("setup todo completion consumer")
-	todoCompletionGroup := config.NewKafkaConsumerGroup(viperConfig)
-	completionHandler := messaging.NewTodoCompletionConsumer()
-	messaging.ConsumeTopic(ctx, todoCompletionGroup, "todos", completionHandler.Consume)
 }
 
 func panicIfErr(err error) {

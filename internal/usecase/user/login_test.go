@@ -20,13 +20,12 @@ import (
 	"gorm.io/gorm"
 )
 
-func newLoginUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepositoryMock, *mock.UserProducerMock, *mock.SlackClientMock) {
+func newLoginUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepositoryMock, *mock.UserProducerMock) {
 	t.Helper()
 
 	gormDB, _ := newFakeDB(t)
 	repo := &mock.UserRepositoryMock{}
 	producer := &mock.UserProducerMock{}
-	slack := &mock.SlackClientMock{}
 
 	cfg := viper.New()
 	cfg.Set(configkey.AuthJWTSecret, "test-secret")
@@ -38,14 +37,13 @@ func newLoginUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepositoryM
 		DB:             gormDB,
 		UserRepository: repo,
 		UserProducer:   producer,
-		SlackClient:    slack,
 	}
 
-	return u, repo, producer, slack
+	return u, repo, producer
 }
 
 func TestUserUsecaseImpl_Login_Success(t *testing.T) {
-	u, repo, producer, slack := newLoginUsecase(t)
+	u, repo, producer := newLoginUsecase(t)
 
 	req := &model.LoginUserRequest{
 		Username: "user1",
@@ -59,10 +57,6 @@ func TestUserUsecaseImpl_Login_Success(t *testing.T) {
 		entityMoqParam.ID = 123
 		entityMoqParam.Username = username
 		return nil
-	}
-
-	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
-		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
 	producer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
@@ -87,7 +81,7 @@ func TestUserUsecaseImpl_Login_Success(t *testing.T) {
 }
 
 func TestUserUsecaseImpl_Login_Fail_ValidateStruct(t *testing.T) {
-	u, repo, producer, slack := newLoginUsecase(t)
+	u, repo, producer := newLoginUsecase(t)
 
 	req := &model.LoginUserRequest{
 		Username: "",
@@ -103,10 +97,6 @@ func TestUserUsecaseImpl_Login_Fail_ValidateStruct(t *testing.T) {
 		return nil
 	}
 
-	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
-		return model.SlackIsConnectedResponse{Connected: true}, nil
-	}
-
 	producer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
@@ -120,7 +110,7 @@ func TestUserUsecaseImpl_Login_Fail_ValidateStruct(t *testing.T) {
 }
 
 func TestUserUsecaseImpl_Login_Fail_FindByUsername(t *testing.T) {
-	u, repo, producer, slack := newLoginUsecase(t)
+	u, repo, producer := newLoginUsecase(t)
 
 	req := &model.LoginUserRequest{
 		Username: "user1",
@@ -129,10 +119,6 @@ func TestUserUsecaseImpl_Login_Fail_FindByUsername(t *testing.T) {
 
 	repo.FindByUsernameFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, username string) error {
 		return assert.AnError
-	}
-
-	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
-		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
 	producer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
@@ -147,7 +133,7 @@ func TestUserUsecaseImpl_Login_Fail_FindByUsername(t *testing.T) {
 }
 
 func TestUserUsecaseImpl_Login_Fail_CompareHashAndPassword(t *testing.T) {
-	u, repo, producer, slack := newLoginUsecase(t)
+	u, repo, producer := newLoginUsecase(t)
 
 	req := &model.LoginUserRequest{
 		Username: "user1",
@@ -163,10 +149,6 @@ func TestUserUsecaseImpl_Login_Fail_CompareHashAndPassword(t *testing.T) {
 		return nil
 	}
 
-	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
-		return model.SlackIsConnectedResponse{Connected: true}, nil
-	}
-
 	producer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
@@ -178,7 +160,7 @@ func TestUserUsecaseImpl_Login_Fail_CompareHashAndPassword(t *testing.T) {
 }
 
 func TestUserUsecaseImpl_Login_Fail_IsConnected(t *testing.T) {
-	u, repo, producer, slack := newLoginUsecase(t)
+	u, repo, producer := newLoginUsecase(t)
 
 	req := &model.LoginUserRequest{
 		Username: "user1",
@@ -192,10 +174,6 @@ func TestUserUsecaseImpl_Login_Fail_IsConnected(t *testing.T) {
 		entityMoqParam.ID = 123
 		entityMoqParam.Username = username
 		return nil
-	}
-
-	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
-		return model.SlackIsConnectedResponse{Connected: false}, assert.AnError
 	}
 
 	producer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
@@ -210,7 +188,7 @@ func TestUserUsecaseImpl_Login_Fail_IsConnected(t *testing.T) {
 }
 
 func TestUserUsecaseImpl_Login_Fail_Send(t *testing.T) {
-	u, repo, producer, slack := newLoginUsecase(t)
+	u, repo, producer := newLoginUsecase(t)
 
 	req := &model.LoginUserRequest{
 		Username: "user1",
@@ -224,10 +202,6 @@ func TestUserUsecaseImpl_Login_Fail_Send(t *testing.T) {
 		entityMoqParam.ID = 123
 		entityMoqParam.Username = username
 		return nil
-	}
-
-	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
-		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
 	producer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
@@ -245,7 +219,6 @@ func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	repo := &mock.UserRepositoryMock{}
 	producer := &mock.UserProducerMock{}
-	slack := &mock.SlackClientMock{}
 
 	cfg := viper.New()
 	cfg.Set(configkey.AuthJWTIssuer, "test-issuer")
@@ -256,7 +229,6 @@ func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 		DB:             gormDB,
 		UserRepository: repo,
 		UserProducer:   producer,
-		SlackClient:    slack,
 	}
 
 	req := &model.LoginUserRequest{
@@ -271,10 +243,6 @@ func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 		entityMoqParam.ID = 123
 		entityMoqParam.Username = username
 		return nil
-	}
-
-	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
-		return model.SlackIsConnectedResponse{Connected: true}, nil
 	}
 
 	producer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {

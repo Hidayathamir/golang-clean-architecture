@@ -55,32 +55,4 @@ func setupAuthRoute(router fiber.Router, controllers *config.Controllers) {
 		images.Get("/:imageId/likes", controllers.ImageController.GetLike)
 		images.Get("/:imageId/comments", controllers.ImageController.GetComment)
 	}
-
-	contacts := router.Group("/contacts")
-	{
-		contacts.Get("", controllers.ContactController.List)
-		contacts.Post("", controllers.ContactController.Create)
-		contacts.Put("/:contactId", controllers.ContactController.Update)
-		contacts.Get("/:contactId", controllers.ContactController.Get)
-		contacts.Delete("/:contactId", controllers.ContactController.Delete)
-	}
-
-	addresses := contacts.Group("/:contactId/addresses")
-	{
-		addresses.Get("", controllers.AddressController.List)
-		addresses.Post("", controllers.AddressController.Create)
-		addresses.Put("/:addressId", controllers.AddressController.Update)
-		addresses.Get("/:addressId", controllers.AddressController.Get)
-		addresses.Delete("/:addressId", controllers.AddressController.Delete)
-	}
-
-	todos := router.Group("/todos")
-	{
-		todos.Post("", controllers.TodoController.Create)
-		todos.Get("", controllers.TodoController.List)
-		todos.Get("/:todoId", controllers.TodoController.Get)
-		todos.Put("/:todoId", controllers.TodoController.Update)
-		todos.Delete("/:todoId", controllers.TodoController.Delete)
-		todos.Patch("/:todoId/_complete", controllers.TodoController.Complete)
-	}
 }
