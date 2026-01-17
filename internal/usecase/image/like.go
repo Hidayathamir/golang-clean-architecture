@@ -27,7 +27,7 @@ func (u *ImageUsecaseImpl) Like(ctx context.Context, req *model.LikeImageRequest
 	event := new(model.ImageLikedEvent)
 	converter.EntityLikeToModelImageLikedEvent(ctx, like, event)
 
-	if err := u.ImageLikedProducer.Send(ctx, event); err != nil {
+	if err := u.ImageProducer.SendImageLiked(ctx, event); err != nil {
 		return errkit.AddFuncName(err)
 	}
 

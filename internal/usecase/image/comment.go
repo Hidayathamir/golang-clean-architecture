@@ -27,7 +27,7 @@ func (u *ImageUsecaseImpl) Comment(ctx context.Context, req *model.CommentImageR
 	event := new(model.ImageCommentedEvent)
 	converter.EntityCommentToModelImageCommentedEvent(ctx, comment, event)
 
-	if err := u.ImageCommentedProducer.Send(ctx, event); err != nil {
+	if err := u.ImageProducer.SendImageCommented(ctx, event); err != nil {
 		return errkit.AddFuncName(err)
 	}
 

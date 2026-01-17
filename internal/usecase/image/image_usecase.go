@@ -34,9 +34,7 @@ type ImageUsecaseImpl struct {
 	CommentRepository repository.CommentRepository
 
 	// producer
-	ImageUploadedProducer  messaging.ImageUploadedProducer
-	ImageLikedProducer     messaging.ImageLikedProducer
-	ImageCommentedProducer messaging.ImageCommentedProducer
+	ImageProducer messaging.ImageProducer
 
 	// client
 	S3Client rest.S3Client
@@ -52,9 +50,7 @@ func NewImageUsecase(
 	CommentRepository repository.CommentRepository,
 
 	// producer
-	ImageUploadedProducer messaging.ImageUploadedProducer,
-	ImageLikedProducer messaging.ImageLikedProducer,
-	ImageCommentedProducer messaging.ImageCommentedProducer,
+	ImageProducer messaging.ImageProducer,
 
 	// client
 	S3Client rest.S3Client,
@@ -69,9 +65,7 @@ func NewImageUsecase(
 		CommentRepository: CommentRepository,
 
 		// producer
-		ImageUploadedProducer:  ImageUploadedProducer,
-		ImageLikedProducer:     ImageLikedProducer,
-		ImageCommentedProducer: ImageCommentedProducer,
+		ImageProducer: ImageProducer,
 
 		// client
 		S3Client: S3Client,

@@ -37,7 +37,7 @@ func (u *ImageUsecaseImpl) Upload(ctx context.Context, req *model.UploadImageReq
 	event := new(model.ImageUploadedEvent)
 	converter.EntityImageToModelImageUploadedEvent(ctx, image, event)
 
-	if err := u.ImageUploadedProducer.Send(ctx, event); err != nil {
+	if err := u.ImageProducer.SendImageUploaded(ctx, event); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 

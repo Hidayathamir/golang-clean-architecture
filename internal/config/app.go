@@ -70,17 +70,9 @@ func SetupUsecases(
 	userFollowedProducer = messaging.NewUserFollowedProducer(viperConfig, producer)
 	userFollowedProducer = messaging.NewUserFollowedProducerMwLogger(userFollowedProducer)
 
-	var imageUploadedProducer messaging.ImageUploadedProducer
-	imageUploadedProducer = messaging.NewImageUploadedProducer(viperConfig, producer)
-	imageUploadedProducer = messaging.NewImageUploadedProducerMwLogger(imageUploadedProducer)
-
-	var imageLikedProducer messaging.ImageLikedProducer
-	imageLikedProducer = messaging.NewImageLikedProducer(viperConfig, producer)
-	imageLikedProducer = messaging.NewImageLikedProducerMwLogger(imageLikedProducer)
-
-	var imageCommentedProducer messaging.ImageCommentedProducer
-	imageCommentedProducer = messaging.NewImageCommentedProducer(viperConfig, producer)
-	imageCommentedProducer = messaging.NewImageCommentedProducerMwLogger(imageCommentedProducer)
+	var imageProducer messaging.ImageProducer
+	imageProducer = messaging.NewImageProducer(viperConfig, producer)
+	imageProducer = messaging.NewImageProducerMwLogger(imageProducer)
 
 	var contactProducer messaging.ContactProducer
 	contactProducer = messaging.NewContactProducer(viperConfig, producer)
@@ -113,7 +105,7 @@ func SetupUsecases(
 	userUsecase = user.NewUserUsecaseMwLogger(userUsecase)
 
 	var imageUsecase image.ImageUsecase
-	imageUsecase = image.NewImageUsecase(viperConfig, db, imageRepository, likeRepository, commentRepository, imageUploadedProducer, imageLikedProducer, imageCommentedProducer, s3Client)
+	imageUsecase = image.NewImageUsecase(viperConfig, db, imageRepository, likeRepository, commentRepository, imageProducer, s3Client)
 	imageUsecase = image.NewImageUsecaseMwLogger(imageUsecase)
 
 	var contactUsecase contact.ContactUsecase
