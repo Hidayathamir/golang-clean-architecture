@@ -37,7 +37,7 @@ func NewUserFollowedProducer(cfg *viper.Viper, producer sarama.SyncProducer) *Us
 
 func (p *UserFollowedProducerImpl) Send(ctx context.Context, event *model.UserFollowedEvent) error {
 	if p.Producer == nil {
-		x.Logger.Warn("Kafka producer is disabled")
+		x.Logger.WithContext(ctx).Warn("Kafka producer is disabled")
 		return nil
 	}
 
@@ -59,7 +59,7 @@ func (p *UserFollowedProducerImpl) Send(ctx context.Context, event *model.UserFo
 		return errkit.AddFuncName(err)
 	}
 
-	x.Logger.Debugf("Message sent to topic %s, partition %d, offset %d", p.Topic, partition, offset)
+	x.Logger.WithContext(ctx).Debugf("Message sent to topic %s, partition %d, offset %d", p.Topic, partition, offset)
 
 	return nil
 }

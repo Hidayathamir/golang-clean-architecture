@@ -852,6 +852,34 @@
                 }
             }
         },
+        "/api/users/_follow": {
+            "post": {
+                "description": "Follow a user",
+                "tags": [
+                    "users"
+                ],
+                "summary": "Follow user",
+                "parameters": [
+                    {
+                        "description": "Follow User Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.FollowUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/users/_login": {
             "post": {
                 "description": "Authenticate a user and return access token",
@@ -1334,6 +1362,14 @@
                 "title": {
                     "type": "string",
                     "maxLength": 200
+                }
+            }
+        },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.FollowUserRequest": {
+            "type": "object",
+            "properties": {
+                "following_id": {
+                    "type": "integer"
                 }
             }
         },

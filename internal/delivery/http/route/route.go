@@ -44,6 +44,7 @@ func setupAuthRoute(router fiber.Router, controllers *config.Controllers) {
 	{
 		users.Patch("/_current", controllers.UserController.Update)
 		users.Get("/_current", controllers.UserController.Current)
+		users.Post("/_current", controllers.UserController.Follow)
 	}
 
 	images := router.Group("/images")

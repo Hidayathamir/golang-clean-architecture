@@ -35,7 +35,7 @@ func NewNotifProducer(cfg *viper.Viper, producer sarama.SyncProducer) *NotifProd
 
 func (p *NotifProducerImpl) SendNotif(ctx context.Context, event *model.NotifEvent) error {
 	if p.Producer == nil {
-		x.Logger.Warn("Kafka producer is disabled")
+		x.Logger.WithContext(ctx).Warn("Kafka producer is disabled")
 		return nil
 	}
 
@@ -56,7 +56,7 @@ func (p *NotifProducerImpl) SendNotif(ctx context.Context, event *model.NotifEve
 		return errkit.AddFuncName(err)
 	}
 
-	x.Logger.Debugf("Message sent to topic %s, partition %d, offset %d", message.Topic, partition, offset)
+	x.Logger.WithContext(ctx).Debugf("Message sent to topic %s, partition %d, offset %d", message.Topic, partition, offset)
 
 	return nil
 }

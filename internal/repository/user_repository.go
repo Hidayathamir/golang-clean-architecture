@@ -33,7 +33,7 @@ func NewUserRepository(cfg *viper.Viper) *UserRepositoryImpl {
 }
 
 func (r *UserRepositoryImpl) Create(ctx context.Context, db *gorm.DB, user *entity.User) error {
-	err := db.Create(user).Error
+	err := db.WithContext(ctx).Create(user).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
@@ -41,7 +41,7 @@ func (r *UserRepositoryImpl) Create(ctx context.Context, db *gorm.DB, user *enti
 }
 
 func (r *UserRepositoryImpl) Update(ctx context.Context, db *gorm.DB, user *entity.User) error {
-	err := db.Save(user).Error
+	err := db.WithContext(ctx).Save(user).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
@@ -49,7 +49,7 @@ func (r *UserRepositoryImpl) Update(ctx context.Context, db *gorm.DB, user *enti
 }
 
 func (r *UserRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, user *entity.User) error {
-	err := db.Delete(user).Error
+	err := db.WithContext(ctx).Delete(user).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
@@ -58,7 +58,7 @@ func (r *UserRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, user *enti
 
 func (r *UserRepositoryImpl) CountByUsername(ctx context.Context, db *gorm.DB, username string) (int64, error) {
 	var total int64
-	err := db.Model(new(entity.User)).Where(column.Username.Eq(username)).Count(&total).Error
+	err := db.WithContext(ctx).Model(new(entity.User)).Where(column.Username.Eq(username)).Count(&total).Error
 	if err != nil {
 		return 0, errkit.AddFuncName(err)
 	}
@@ -66,7 +66,7 @@ func (r *UserRepositoryImpl) CountByUsername(ctx context.Context, db *gorm.DB, u
 }
 
 func (r *UserRepositoryImpl) FindByID(ctx context.Context, db *gorm.DB, user *entity.User, id int64) error {
-	err := db.Where(column.ID.Eq(id)).Take(user).Error
+	err := db.WithContext(ctx).Where(column.ID.Eq(id)).Take(user).Error
 	if err != nil {
 		err = errkit.NotFound(err)
 		return errkit.AddFuncName(err)
@@ -75,7 +75,7 @@ func (r *UserRepositoryImpl) FindByID(ctx context.Context, db *gorm.DB, user *en
 }
 
 func (r *UserRepositoryImpl) FindByUsername(ctx context.Context, db *gorm.DB, user *entity.User, username string) error {
-	err := db.Where(column.Username.Eq(username)).Take(user).Error
+	err := db.WithContext(ctx).Where(column.Username.Eq(username)).Take(user).Error
 	if err != nil {
 		err = errkit.NotFound(err)
 		return errkit.AddFuncName(err)

@@ -299,6 +299,11 @@ definitions:
     required:
     - title
     type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.FollowUserRequest:
+    properties:
+      following_id:
+        type: integer
+    type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.ImageResponse:
     properties:
       comment_count:
@@ -1005,6 +1010,24 @@ paths:
       security:
       - SimpleApiKeyAuth: []
       summary: Update user
+      tags:
+      - users
+  /api/users/_follow:
+    post:
+      description: Follow a user
+      parameters:
+      - description: Follow User Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.FollowUserRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string'
+      summary: Follow user
       tags:
       - users
   /api/users/_login:

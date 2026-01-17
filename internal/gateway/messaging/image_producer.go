@@ -37,7 +37,7 @@ func NewImageProducer(cfg *viper.Viper, producer sarama.SyncProducer) *ImageProd
 
 func (p *ImageProducerImpl) SendImageUploaded(ctx context.Context, event *model.ImageUploadedEvent) error {
 	if p.Producer == nil {
-		x.Logger.Warn("Kafka producer is disabled")
+		x.Logger.WithContext(ctx).Warn("Kafka producer is disabled")
 		return nil
 	}
 
@@ -58,14 +58,14 @@ func (p *ImageProducerImpl) SendImageUploaded(ctx context.Context, event *model.
 		return errkit.AddFuncName(err)
 	}
 
-	x.Logger.Debugf("Message sent to topic %s, partition %d, offset %d", message.Topic, partition, offset)
+	x.Logger.WithContext(ctx).Debugf("Message sent to topic %s, partition %d, offset %d", message.Topic, partition, offset)
 
 	return nil
 }
 
 func (p *ImageProducerImpl) SendImageLiked(ctx context.Context, event *model.ImageLikedEvent) error {
 	if p.Producer == nil {
-		x.Logger.Warn("Kafka producer is disabled")
+		x.Logger.WithContext(ctx).Warn("Kafka producer is disabled")
 		return nil
 	}
 
@@ -86,14 +86,14 @@ func (p *ImageProducerImpl) SendImageLiked(ctx context.Context, event *model.Ima
 		return errkit.AddFuncName(err)
 	}
 
-	x.Logger.Debugf("Message sent to topic %s, partition %d, offset %d", message.Topic, partition, offset)
+	x.Logger.WithContext(ctx).Debugf("Message sent to topic %s, partition %d, offset %d", message.Topic, partition, offset)
 
 	return nil
 }
 
 func (p *ImageProducerImpl) SendImageCommented(ctx context.Context, event *model.ImageCommentedEvent) error {
 	if p.Producer == nil {
-		x.Logger.Warn("Kafka producer is disabled")
+		x.Logger.WithContext(ctx).Warn("Kafka producer is disabled")
 		return nil
 	}
 
@@ -114,7 +114,7 @@ func (p *ImageProducerImpl) SendImageCommented(ctx context.Context, event *model
 		return errkit.AddFuncName(err)
 	}
 
-	x.Logger.Debugf("Message sent to topic %s, partition %d, offset %d", message.Topic, partition, offset)
+	x.Logger.WithContext(ctx).Debugf("Message sent to topic %s, partition %d, offset %d", message.Topic, partition, offset)
 
 	return nil
 }

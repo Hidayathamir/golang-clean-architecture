@@ -30,7 +30,7 @@ func NewLikeRepository(cfg *viper.Viper) *LikeRepositoryImpl {
 }
 
 func (r *LikeRepositoryImpl) Create(ctx context.Context, db *gorm.DB, like *entity.Like) error {
-	err := db.Create(like).Error
+	err := db.WithContext(ctx).Create(like).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
@@ -38,7 +38,7 @@ func (r *LikeRepositoryImpl) Create(ctx context.Context, db *gorm.DB, like *enti
 }
 
 func (r *LikeRepositoryImpl) FindByImageID(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64) error {
-	err := db.Where(column.ImageID.Eq(imageID)).Find(likeList).Error
+	err := db.WithContext(ctx).Where(column.ImageID.Eq(imageID)).Find(likeList).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}

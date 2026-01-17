@@ -134,3 +134,30 @@ func (c *UserController) Update(ctx *fiber.Ctx) error {
 
 	return response.Data(ctx, http.StatusOK, res)
 }
+
+// Follow godoc
+//
+//	@Summary		Follow user
+//	@Description	Follow a user
+//	@Tags			users
+//	@Param			request	body		model.FollowUserRequest	true	"Follow User Request"
+//	@Success		200		{object}	response.WebResponse[string]
+//	@Router			/api/users/_follow [post]
+func (c *UserController) Follow(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
+	req := new(model.FollowUserRequest)
+	err := ctx.BodyParser(req)
+	if err != nil {
+		err = errkit.BadRequest(err)
+		return errkit.AddFuncName(err)
+	}
+
+	err = c.Usecase.Follow(ctx.UserContext(), req)
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+
+	return response.Data(ctx, http.StatusOK, "ok")
+}

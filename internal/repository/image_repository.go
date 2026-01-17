@@ -30,7 +30,7 @@ func NewImageRepository(cfg *viper.Viper) *ImageRepositoryImpl {
 }
 
 func (r *ImageRepositoryImpl) Create(ctx context.Context, db *gorm.DB, image *entity.Image) error {
-	err := db.Create(image).Error
+	err := db.WithContext(ctx).Create(image).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
@@ -38,7 +38,7 @@ func (r *ImageRepositoryImpl) Create(ctx context.Context, db *gorm.DB, image *en
 }
 
 func (r *ImageRepositoryImpl) FindByID(ctx context.Context, db *gorm.DB, image *entity.Image, id int64) error {
-	err := db.Where(column.ID.Eq(id)).Take(image).Error
+	err := db.WithContext(ctx).Where(column.ID.Eq(id)).Take(image).Error
 	if err != nil {
 		err = errkit.NotFound(err)
 		return errkit.AddFuncName(err)

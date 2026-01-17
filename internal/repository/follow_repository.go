@@ -30,7 +30,7 @@ func NewFollowRepository(cfg *viper.Viper) *FollowRepositoryImpl {
 }
 
 func (r *FollowRepositoryImpl) Create(ctx context.Context, db *gorm.DB, follow *entity.Follow) error {
-	err := db.Create(follow).Error
+	err := db.WithContext(ctx).Create(follow).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
@@ -38,7 +38,7 @@ func (r *FollowRepositoryImpl) Create(ctx context.Context, db *gorm.DB, follow *
 }
 
 func (r *FollowRepositoryImpl) FindByFollowingID(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followingID int64) error {
-	err := db.Where(column.FollowingID.Eq(followingID)).Find(followList).Error
+	err := db.WithContext(ctx).Where(column.FollowingID.Eq(followingID)).Find(followList).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
