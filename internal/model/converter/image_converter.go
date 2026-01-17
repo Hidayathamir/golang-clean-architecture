@@ -90,11 +90,11 @@ func EntityLikeToModelLikeResponse(ctx context.Context, like *entity.Like, res *
 	res.DeletedAt = like.DeletedAt
 }
 
-func EntityLikeListToModelLikeResponseList(ctx context.Context, likeList entity.LikeList, res model.LikeResponseList) {
-	for _, like := range likeList {
+func EntityLikeListToModelLikeResponseList(ctx context.Context, likeList *entity.LikeList, res *model.LikeResponseList) {
+	for _, like := range *likeList {
 		r := model.LikeResponse{}
 		EntityLikeToModelLikeResponse(ctx, &like, &r)
-		res = append(res, r)
+		*res = append(*res, r)
 	}
 }
 
@@ -108,10 +108,10 @@ func EntityCommentToModelCommentResponse(ctx context.Context, comment *entity.Co
 	res.DeletedAt = comment.DeletedAt
 }
 
-func EntityCommentListToModelCommentResponseList(ctx context.Context, commentList entity.CommentList, res model.CommentResponseList) {
-	for _, comment := range commentList {
+func EntityCommentListToModelCommentResponseList(ctx context.Context, commentList *entity.CommentList, res *model.CommentResponseList) {
+	for _, comment := range *commentList {
 		r := model.CommentResponse{}
 		EntityCommentToModelCommentResponse(ctx, &comment, &r)
-		res = append(res, r)
+		*res = append(*res, r)
 	}
 }

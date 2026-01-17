@@ -24,7 +24,7 @@ var _ repository.CommentRepository = &CommentRepositoryMock{}
 //			CreateFunc: func(ctx context.Context, db *gorm.DB, comment *entity.Comment) error {
 //				panic("mock out the Create method")
 //			},
-//			FindByImageIDFunc: func(ctx context.Context, db *gorm.DB, commentList entity.CommentList, imageID int64) error {
+//			FindByImageIDFunc: func(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64) error {
 //				panic("mock out the FindByImageID method")
 //			},
 //		}
@@ -38,7 +38,7 @@ type CommentRepositoryMock struct {
 	CreateFunc func(ctx context.Context, db *gorm.DB, comment *entity.Comment) error
 
 	// FindByImageIDFunc mocks the FindByImageID method.
-	FindByImageIDFunc func(ctx context.Context, db *gorm.DB, commentList entity.CommentList, imageID int64) error
+	FindByImageIDFunc func(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -58,7 +58,7 @@ type CommentRepositoryMock struct {
 			// Db is the db argument value.
 			Db *gorm.DB
 			// CommentList is the commentList argument value.
-			CommentList entity.CommentList
+			CommentList *entity.CommentList
 			// ImageID is the imageID argument value.
 			ImageID int64
 		}
@@ -108,14 +108,14 @@ func (mock *CommentRepositoryMock) CreateCalls() []struct {
 }
 
 // FindByImageID calls FindByImageIDFunc.
-func (mock *CommentRepositoryMock) FindByImageID(ctx context.Context, db *gorm.DB, commentList entity.CommentList, imageID int64) error {
+func (mock *CommentRepositoryMock) FindByImageID(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64) error {
 	if mock.FindByImageIDFunc == nil {
 		panic("CommentRepositoryMock.FindByImageIDFunc: method is nil but CommentRepository.FindByImageID was just called")
 	}
 	callInfo := struct {
 		Ctx         context.Context
 		Db          *gorm.DB
-		CommentList entity.CommentList
+		CommentList *entity.CommentList
 		ImageID     int64
 	}{
 		Ctx:         ctx,
@@ -136,13 +136,13 @@ func (mock *CommentRepositoryMock) FindByImageID(ctx context.Context, db *gorm.D
 func (mock *CommentRepositoryMock) FindByImageIDCalls() []struct {
 	Ctx         context.Context
 	Db          *gorm.DB
-	CommentList entity.CommentList
+	CommentList *entity.CommentList
 	ImageID     int64
 } {
 	var calls []struct {
 		Ctx         context.Context
 		Db          *gorm.DB
-		CommentList entity.CommentList
+		CommentList *entity.CommentList
 		ImageID     int64
 	}
 	mock.lockFindByImageID.RLock()

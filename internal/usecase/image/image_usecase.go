@@ -18,8 +18,8 @@ type ImageUsecase interface {
 	Like(ctx context.Context, req *model.LikeImageRequest) error
 	Comment(ctx context.Context, req *model.CommentImageRequest) error
 	GetImage(ctx context.Context, req *model.GetImageRequest) (*model.ImageResponse, error)
-	GetLike(ctx context.Context, req *model.GetLikeRequest) (model.LikeResponseList, error)
-	GetComment(ctx context.Context, req *model.GetCommentRequest) (model.CommentResponseList, error)
+	GetLike(ctx context.Context, req *model.GetLikeRequest) (*model.LikeResponseList, error)
+	GetComment(ctx context.Context, req *model.GetCommentRequest) (*model.CommentResponseList, error)
 }
 
 var _ ImageUsecase = &ImageUsecaseImpl{}

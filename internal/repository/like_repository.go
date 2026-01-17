@@ -14,7 +14,7 @@ import (
 
 type LikeRepository interface {
 	Create(ctx context.Context, db *gorm.DB, like *entity.Like) error
-	FindByImageID(ctx context.Context, db *gorm.DB, likeList entity.LikeList, imageID int64) error
+	FindByImageID(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64) error
 }
 
 var _ LikeRepository = &LikeRepositoryImpl{}
@@ -37,7 +37,8 @@ func (r *LikeRepositoryImpl) Create(ctx context.Context, db *gorm.DB, like *enti
 	return nil
 }
 
-func (r *LikeRepositoryImpl) FindByImageID(ctx context.Context, db *gorm.DB, likeList entity.LikeList, imageID int64) error {
+// TODO: TERNYATA, SLICE ITU KALAU GA POINTER GA BISA DI TAMBAH, BISANYA DI EDIT EXISTING DATA, FIX UNTUK LIKE AND COMMENT NYA
+func (r *LikeRepositoryImpl) FindByImageID(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64) error {
 	err := db.Where(column.ImageID.Eq(imageID)).Find(likeList).Error
 	if err != nil {
 		return errkit.AddFuncName(err)

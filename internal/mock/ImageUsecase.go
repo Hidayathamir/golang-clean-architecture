@@ -23,13 +23,13 @@ var _ image.ImageUsecase = &ImageUsecaseMock{}
 //			CommentFunc: func(ctx context.Context, req *model.CommentImageRequest) error {
 //				panic("mock out the Comment method")
 //			},
-//			GetCommentFunc: func(ctx context.Context, req *model.GetCommentRequest) (model.CommentResponseList, error) {
+//			GetCommentFunc: func(ctx context.Context, req *model.GetCommentRequest) (*model.CommentResponseList, error) {
 //				panic("mock out the GetComment method")
 //			},
 //			GetImageFunc: func(ctx context.Context, req *model.GetImageRequest) (*model.ImageResponse, error) {
 //				panic("mock out the GetImage method")
 //			},
-//			GetLikeFunc: func(ctx context.Context, req *model.GetLikeRequest) (model.LikeResponseList, error) {
+//			GetLikeFunc: func(ctx context.Context, req *model.GetLikeRequest) (*model.LikeResponseList, error) {
 //				panic("mock out the GetLike method")
 //			},
 //			LikeFunc: func(ctx context.Context, req *model.LikeImageRequest) error {
@@ -49,13 +49,13 @@ type ImageUsecaseMock struct {
 	CommentFunc func(ctx context.Context, req *model.CommentImageRequest) error
 
 	// GetCommentFunc mocks the GetComment method.
-	GetCommentFunc func(ctx context.Context, req *model.GetCommentRequest) (model.CommentResponseList, error)
+	GetCommentFunc func(ctx context.Context, req *model.GetCommentRequest) (*model.CommentResponseList, error)
 
 	// GetImageFunc mocks the GetImage method.
 	GetImageFunc func(ctx context.Context, req *model.GetImageRequest) (*model.ImageResponse, error)
 
 	// GetLikeFunc mocks the GetLike method.
-	GetLikeFunc func(ctx context.Context, req *model.GetLikeRequest) (model.LikeResponseList, error)
+	GetLikeFunc func(ctx context.Context, req *model.GetLikeRequest) (*model.LikeResponseList, error)
 
 	// LikeFunc mocks the Like method.
 	LikeFunc func(ctx context.Context, req *model.LikeImageRequest) error
@@ -153,7 +153,7 @@ func (mock *ImageUsecaseMock) CommentCalls() []struct {
 }
 
 // GetComment calls GetCommentFunc.
-func (mock *ImageUsecaseMock) GetComment(ctx context.Context, req *model.GetCommentRequest) (model.CommentResponseList, error) {
+func (mock *ImageUsecaseMock) GetComment(ctx context.Context, req *model.GetCommentRequest) (*model.CommentResponseList, error) {
 	if mock.GetCommentFunc == nil {
 		panic("ImageUsecaseMock.GetCommentFunc: method is nil but ImageUsecase.GetComment was just called")
 	}
@@ -225,7 +225,7 @@ func (mock *ImageUsecaseMock) GetImageCalls() []struct {
 }
 
 // GetLike calls GetLikeFunc.
-func (mock *ImageUsecaseMock) GetLike(ctx context.Context, req *model.GetLikeRequest) (model.LikeResponseList, error) {
+func (mock *ImageUsecaseMock) GetLike(ctx context.Context, req *model.GetLikeRequest) (*model.LikeResponseList, error) {
 	if mock.GetLikeFunc == nil {
 		panic("ImageUsecaseMock.GetLikeFunc: method is nil but ImageUsecase.GetLike was just called")
 	}

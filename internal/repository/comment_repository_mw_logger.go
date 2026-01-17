@@ -37,7 +37,7 @@ func (r *CommentRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, com
 	return err
 }
 
-func (r *CommentRepositoryMwLogger) FindByImageID(ctx context.Context, db *gorm.DB, commentList entity.CommentList, imageID int64) error {
+func (r *CommentRepositoryMwLogger) FindByImageID(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -45,8 +45,8 @@ func (r *CommentRepositoryMwLogger) FindByImageID(ctx context.Context, db *gorm.
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
-		"len(commentList)": len(commentList),
-		"imageID":          imageID,
+		"len(*commentList)": len(*commentList),
+		"imageID":           imageID,
 	}
 	x.LogMw(ctx, fields, err)
 

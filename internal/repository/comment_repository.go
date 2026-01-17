@@ -14,7 +14,7 @@ import (
 
 type CommentRepository interface {
 	Create(ctx context.Context, db *gorm.DB, comment *entity.Comment) error
-	FindByImageID(ctx context.Context, db *gorm.DB, commentList entity.CommentList, imageID int64) error
+	FindByImageID(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64) error
 }
 
 var _ CommentRepository = &CommentRepositoryImpl{}
@@ -37,7 +37,7 @@ func (r *CommentRepositoryImpl) Create(ctx context.Context, db *gorm.DB, comment
 	return nil
 }
 
-func (r *CommentRepositoryImpl) FindByImageID(ctx context.Context, db *gorm.DB, commentList entity.CommentList, imageID int64) error {
+func (r *CommentRepositoryImpl) FindByImageID(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64) error {
 	err := db.Where(column.ImageID.Eq(imageID)).Find(commentList).Error
 	if err != nil {
 		return errkit.AddFuncName(err)

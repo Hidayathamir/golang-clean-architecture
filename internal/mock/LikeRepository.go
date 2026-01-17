@@ -24,7 +24,7 @@ var _ repository.LikeRepository = &LikeRepositoryMock{}
 //			CreateFunc: func(ctx context.Context, db *gorm.DB, like *entity.Like) error {
 //				panic("mock out the Create method")
 //			},
-//			FindByImageIDFunc: func(ctx context.Context, db *gorm.DB, likeList entity.LikeList, imageID int64) error {
+//			FindByImageIDFunc: func(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64) error {
 //				panic("mock out the FindByImageID method")
 //			},
 //		}
@@ -38,7 +38,7 @@ type LikeRepositoryMock struct {
 	CreateFunc func(ctx context.Context, db *gorm.DB, like *entity.Like) error
 
 	// FindByImageIDFunc mocks the FindByImageID method.
-	FindByImageIDFunc func(ctx context.Context, db *gorm.DB, likeList entity.LikeList, imageID int64) error
+	FindByImageIDFunc func(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -58,7 +58,7 @@ type LikeRepositoryMock struct {
 			// Db is the db argument value.
 			Db *gorm.DB
 			// LikeList is the likeList argument value.
-			LikeList entity.LikeList
+			LikeList *entity.LikeList
 			// ImageID is the imageID argument value.
 			ImageID int64
 		}
@@ -108,14 +108,14 @@ func (mock *LikeRepositoryMock) CreateCalls() []struct {
 }
 
 // FindByImageID calls FindByImageIDFunc.
-func (mock *LikeRepositoryMock) FindByImageID(ctx context.Context, db *gorm.DB, likeList entity.LikeList, imageID int64) error {
+func (mock *LikeRepositoryMock) FindByImageID(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64) error {
 	if mock.FindByImageIDFunc == nil {
 		panic("LikeRepositoryMock.FindByImageIDFunc: method is nil but LikeRepository.FindByImageID was just called")
 	}
 	callInfo := struct {
 		Ctx      context.Context
 		Db       *gorm.DB
-		LikeList entity.LikeList
+		LikeList *entity.LikeList
 		ImageID  int64
 	}{
 		Ctx:      ctx,
@@ -136,13 +136,13 @@ func (mock *LikeRepositoryMock) FindByImageID(ctx context.Context, db *gorm.DB, 
 func (mock *LikeRepositoryMock) FindByImageIDCalls() []struct {
 	Ctx      context.Context
 	Db       *gorm.DB
-	LikeList entity.LikeList
+	LikeList *entity.LikeList
 	ImageID  int64
 } {
 	var calls []struct {
 		Ctx      context.Context
 		Db       *gorm.DB
-		LikeList entity.LikeList
+		LikeList *entity.LikeList
 		ImageID  int64
 	}
 	mock.lockFindByImageID.RLock()

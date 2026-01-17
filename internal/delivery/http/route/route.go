@@ -51,8 +51,8 @@ func setupAuthRoute(router fiber.Router, controllers *config.Controllers) {
 		images.Post("", controllers.ImageController.Upload)
 		images.Post("/_like", controllers.ImageController.Like)
 		images.Post("/_comment", controllers.ImageController.Comment)
-		images.Get("/:imageId/likes", controllers.ImageController.Like)
-		images.Get("/:imageId/comments", controllers.ImageController.Comment)
+		images.Get("/:imageId/likes", controllers.ImageController.GetLike)
+		images.Get("/:imageId/comments", controllers.ImageController.GetComment)
 	}
 
 	contacts := router.Group("/contacts")
