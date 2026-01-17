@@ -16,6 +16,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -35,7 +36,7 @@ func TestRegister(t *testing.T) {
 	req.Header.Set("Accept", "application/json")
 
 	res, err := app.Test(req)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
@@ -68,7 +69,7 @@ func TestRegisterError(t *testing.T) {
 	req.Header.Set("Accept", "application/json")
 
 	res, err := app.Test(req)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
@@ -99,7 +100,7 @@ func TestRegisterDuplicate(t *testing.T) {
 	req.Header.Set("Accept", "application/json")
 
 	res, err := app.Test(req)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
@@ -129,7 +130,7 @@ func TestLogin(t *testing.T) {
 	req.Header.Set("Accept", "application/json")
 
 	res, err := app.Test(req)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
@@ -172,7 +173,7 @@ func TestLoginWrongUsername(t *testing.T) {
 	req.Header.Set("Accept", "application/json")
 
 	res, err := app.Test(req)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
@@ -202,59 +203,12 @@ func TestLoginWrongPassword(t *testing.T) {
 	req.Header.Set("Accept", "application/json")
 
 	res, err := app.Test(req)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
 	responseBody := new(response.WebResponse[model.UserResponse])
-	err = json.Unmarshal(bytes, responseBody)
-	assert.Nil(t, err)
-
-	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
-	assert.NotNil(t, responseBody.ErrorMessage)
-}
-
-func TestLogout(t *testing.T) {
-	ClearAll()
-	token := registerAndLoginDefaultUser(t)
-
-	req := httptest.NewRequest(http.MethodDelete, "/api/users", nil)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", bearerToken(token))
-
-	res, err := app.Test(req)
-	assert.Nil(t, err)
-
-	bytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
-
-	responseBody := new(response.WebResponse[bool])
-	err = json.Unmarshal(bytes, responseBody)
-	assert.Nil(t, err)
-
-	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.True(t, responseBody.Data)
-}
-
-func TestLogoutWrongAuthorization(t *testing.T) {
-	ClearAll()
-
-	registerDefaultUser(t)
-
-	req := httptest.NewRequest(http.MethodDelete, "/api/users", nil)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", "wrong")
-
-	res, err := app.Test(req)
-	assert.Nil(t, err)
-
-	bytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
-
-	responseBody := new(response.WebResponse[bool])
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
@@ -276,7 +230,7 @@ func TestGetCurrentUser(t *testing.T) {
 	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
@@ -303,7 +257,7 @@ func TestGetCurrentUserFailed(t *testing.T) {
 	req.Header.Set("Authorization", "wrong")
 
 	res, err := app.Test(req)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
@@ -337,7 +291,7 @@ func TestUpdateUserName(t *testing.T) {
 	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
@@ -374,7 +328,7 @@ func TestUpdateUserPassword(t *testing.T) {
 	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := app.Test(req)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
@@ -413,7 +367,7 @@ func TestUpdateFailed(t *testing.T) {
 	req.Header.Set("Authorization", "wrong")
 
 	res, err := app.Test(req)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)

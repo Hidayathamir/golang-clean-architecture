@@ -21,14 +21,14 @@ This repo is a reusable Golang clean architecture template. The `architecture.pn
 - `pkg/`: Shared utilities (logging, errors, middleware primitives) that remain framework-agnostic.
 - `db/migrations`: Timestamped SQL files consumed by `cmd/migrate`.
 - `api/`: Generated Swagger specs and client/server stubs. Never edit by hand.
-- `integrationtest/`: Black-box scenarios that boot real adapters via docker-compose.
+- `test/integrationtest/`: Black-box scenarios that boot real adapters via docker-compose.
 - `signoz/`: Docker-compose fragments and dashboards for observability lab environments.
 - Root docs & helpers: `README.md`, `run_app.md` (step-by-step runbook), `README_my_note.md` (author notes), `Makefile`, `.env` samples under `config/` when present.
 
 ## 3. Build, Run, and Tooling Commands
 - `make run`, `make run-worker`, `make migrate`: Start the web app, workers, and schema migrations respectively.
 - `make go-test`: Run unit tests under `internal/...`.
-- `make go-integration-test`: Execute integration scenarios in `integrationtest/...`.
+- `make go-integration-test`: Execute integration scenarios in `test/integrationtest/...`.
 - `make run-clean`: Run lint, code generation, Swagger refresh, and boot sequence.
 - `make docker-compose`: Reset local dependencies (Postgres, Kafka, Signoz, etc.).
 - `make format`: gofmt + golangci-lint formatting sweep.

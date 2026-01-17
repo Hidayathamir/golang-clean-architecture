@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"errors"
+	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/column"
@@ -35,6 +37,9 @@ func NewUserRepository(cfg *viper.Viper) *UserRepositoryImpl {
 func (r *UserRepositoryImpl) Create(ctx context.Context, db *gorm.DB, user *entity.User) error {
 	err := db.WithContext(ctx).Create(user).Error
 	if err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			err = errkit.SetHTTPError(err, http.StatusConflict)
+		}
 		return errkit.AddFuncName(err)
 	}
 	return nil

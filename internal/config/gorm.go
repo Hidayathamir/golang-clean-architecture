@@ -31,7 +31,10 @@ func NewDatabase(viperConfig *viper.Viper) *gorm.DB {
 	var db *gorm.DB
 	var err error
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
-		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: &gormLogger{}})
+		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+			Logger:         &gormLogger{},
+			TranslateError: true,
+		})
 		if err == nil {
 			break
 		}

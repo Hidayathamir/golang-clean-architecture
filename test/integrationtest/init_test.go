@@ -33,7 +33,7 @@ func TestMain(m *testing.M) {
 	x.SetupAll(viperConfig)
 	app = config.NewFiber(viperConfig)
 	postgresContainer := newPostgresContainer(viperConfig)
-	viperConfig.Set(configkey.DatabaseMigrations, "../db/migrations")
+	viperConfig.Set(configkey.DatabaseMigrations, "../../db/migrations")
 	config.Migrate(viperConfig)
 	db = config.NewDatabase(viperConfig)
 	// TODO: kayaknya perlu run s3 container
