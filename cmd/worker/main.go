@@ -118,6 +118,13 @@ func RunImageCommentedConsumer(ctx context.Context, viperConfig *viper.Viper, us
 	messaging.ConsumeTopic(ctx, consumerGroup, consttopic.ImageCommented, consumer.ConsumeImageCommentedEvent)
 }
 
+func RunNotifConsumer(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
+	x.Logger.Info("setup consttopic.ImageCommented consumer")
+	consumerGroup := config.NewKafkaConsumerGroup(viperConfig)
+	consumer := messaging.NewNotifConsumer(usecases.NotifUsecase)
+	messaging.ConsumeTopic(ctx, consumerGroup, consttopic.Notif, consumer.ConsumeNotifEvent)
+}
+
 func panicIfErr(err error) {
 	if err != nil {
 		log.Panic(err)

@@ -9,6 +9,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/address"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/contact"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/image"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/notif"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/todo"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/IBM/sarama"
@@ -21,6 +22,7 @@ import (
 type Usecases struct {
 	UserUsecase    user.UserUsecase
 	ImageUsecase   image.ImageUsecase
+	NotifUsecase   notif.NotifUsecase
 	ContactUsecase contact.ContactUsecase
 	AddressUsecase address.AddressUsecase
 	TodoUsecase    todo.TodoUsecase
@@ -112,6 +114,10 @@ func SetupUsecases(
 	imageUsecase = image.NewImageUsecase(viperConfig, db, imageRepository, likeRepository, commentRepository, followRepository, userRepository, imageProducer, notifProducer, s3Client)
 	imageUsecase = image.NewImageUsecaseMwLogger(imageUsecase)
 
+	var notifUsecase notif.NotifUsecase
+	notifUsecase = notif.NewNotifUsecase(viperConfig, db)
+	notifUsecase = notif.NewNotifUsecaseMwLogger(notifUsecase)
+
 	var contactUsecase contact.ContactUsecase
 	contactUsecase = contact.NewContactUsecase(viperConfig, db, contactRepository, contactProducer, slackClient)
 	contactUsecase = contact.NewContactUsecaseMwLogger(contactUsecase)
@@ -127,6 +133,7 @@ func SetupUsecases(
 	return &Usecases{
 		UserUsecase:    userUsecase,
 		ImageUsecase:   imageUsecase,
+		NotifUsecase:   notifUsecase,
 		ContactUsecase: contactUsecase,
 		AddressUsecase: addressUsecase,
 		TodoUsecase:    todoUsecase,
