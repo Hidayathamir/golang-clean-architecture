@@ -33,10 +33,10 @@ func main() {
 	x.SetupAll(viperConfig)
 	db := config.NewDatabase(viperConfig)
 	s3Client := config.NewS3Client(viperConfig)
-	app := config.NewFiber(viperConfig)
 	producer := config.NewKafkaProducer(viperConfig)
 
 	usecases := config.SetupUsecases(viperConfig, db, producer, s3Client)
+
 	controllers := config.SetupControllers(viperConfig, usecases)
 	middlewares := config.SetupMiddlewares(usecases)
 
@@ -48,6 +48,7 @@ func main() {
 	panicIfErr(err)
 	defer stopLogProvider()
 
+	app := config.NewFiber(viperConfig)
 	route.Setup(app, controllers, middlewares)
 
 	runHTTPServer(viperConfig, app)
