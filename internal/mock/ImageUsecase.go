@@ -35,6 +35,9 @@ var _ image.ImageUsecase = &ImageUsecaseMock{}
 //			LikeFunc: func(ctx context.Context, req *model.LikeImageRequest) error {
 //				panic("mock out the Like method")
 //			},
+//			NotifyFollowerOnUploadFunc: func(ctx context.Context, req *model.NotifyFollowerOnUploadRequest) error {
+//				panic("mock out the NotifyFollowerOnUpload method")
+//			},
 //			UploadFunc: func(ctx context.Context, req *model.UploadImageRequest) (*model.ImageResponse, error) {
 //				panic("mock out the Upload method")
 //			},
@@ -59,6 +62,9 @@ type ImageUsecaseMock struct {
 
 	// LikeFunc mocks the Like method.
 	LikeFunc func(ctx context.Context, req *model.LikeImageRequest) error
+
+	// NotifyFollowerOnUploadFunc mocks the NotifyFollowerOnUpload method.
+	NotifyFollowerOnUploadFunc func(ctx context.Context, req *model.NotifyFollowerOnUploadRequest) error
 
 	// UploadFunc mocks the Upload method.
 	UploadFunc func(ctx context.Context, req *model.UploadImageRequest) (*model.ImageResponse, error)
@@ -100,6 +106,13 @@ type ImageUsecaseMock struct {
 			// Req is the req argument value.
 			Req *model.LikeImageRequest
 		}
+		// NotifyFollowerOnUpload holds details about calls to the NotifyFollowerOnUpload method.
+		NotifyFollowerOnUpload []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req *model.NotifyFollowerOnUploadRequest
+		}
 		// Upload holds details about calls to the Upload method.
 		Upload []struct {
 			// Ctx is the ctx argument value.
@@ -108,12 +121,13 @@ type ImageUsecaseMock struct {
 			Req *model.UploadImageRequest
 		}
 	}
-	lockComment    sync.RWMutex
-	lockGetComment sync.RWMutex
-	lockGetImage   sync.RWMutex
-	lockGetLike    sync.RWMutex
-	lockLike       sync.RWMutex
-	lockUpload     sync.RWMutex
+	lockComment                sync.RWMutex
+	lockGetComment             sync.RWMutex
+	lockGetImage               sync.RWMutex
+	lockGetLike                sync.RWMutex
+	lockLike                   sync.RWMutex
+	lockNotifyFollowerOnUpload sync.RWMutex
+	lockUpload                 sync.RWMutex
 }
 
 // Comment calls CommentFunc.
@@ -293,6 +307,42 @@ func (mock *ImageUsecaseMock) LikeCalls() []struct {
 	mock.lockLike.RLock()
 	calls = mock.calls.Like
 	mock.lockLike.RUnlock()
+	return calls
+}
+
+// NotifyFollowerOnUpload calls NotifyFollowerOnUploadFunc.
+func (mock *ImageUsecaseMock) NotifyFollowerOnUpload(ctx context.Context, req *model.NotifyFollowerOnUploadRequest) error {
+	if mock.NotifyFollowerOnUploadFunc == nil {
+		panic("ImageUsecaseMock.NotifyFollowerOnUploadFunc: method is nil but ImageUsecase.NotifyFollowerOnUpload was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req *model.NotifyFollowerOnUploadRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockNotifyFollowerOnUpload.Lock()
+	mock.calls.NotifyFollowerOnUpload = append(mock.calls.NotifyFollowerOnUpload, callInfo)
+	mock.lockNotifyFollowerOnUpload.Unlock()
+	return mock.NotifyFollowerOnUploadFunc(ctx, req)
+}
+
+// NotifyFollowerOnUploadCalls gets all the calls that were made to NotifyFollowerOnUpload.
+// Check the length with:
+//
+//	len(mockedImageUsecase.NotifyFollowerOnUploadCalls())
+func (mock *ImageUsecaseMock) NotifyFollowerOnUploadCalls() []struct {
+	Ctx context.Context
+	Req *model.NotifyFollowerOnUploadRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req *model.NotifyFollowerOnUploadRequest
+	}
+	mock.lockNotifyFollowerOnUpload.RLock()
+	calls = mock.calls.NotifyFollowerOnUpload
+	mock.lockNotifyFollowerOnUpload.RUnlock()
 	return calls
 }
 

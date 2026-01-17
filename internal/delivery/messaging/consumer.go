@@ -53,7 +53,7 @@ func ConsumeTopic(ctx context.Context, consumerGroup sarama.ConsumerGroup, topic
 	go func() {
 		for {
 			if err := consumerGroup.Consume(ctx, []string{topic}, consumerHandler); err != nil {
-				x.Logger.WithError(err).Error("Error from consumer")
+				x.Logger.WithContext(ctx).WithError(err).Error("Error from consumer")
 			}
 
 			if ctx.Err() != nil {

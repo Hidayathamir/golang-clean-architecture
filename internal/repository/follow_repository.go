@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/column"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
@@ -13,6 +14,7 @@ import (
 
 type FollowRepository interface {
 	Create(ctx context.Context, db *gorm.DB, follow *entity.Follow) error
+	FindByFollowingID(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followingID int64) error
 }
 
 var _ FollowRepository = &FollowRepositoryImpl{}
@@ -29,6 +31,14 @@ func NewFollowRepository(cfg *viper.Viper) *FollowRepositoryImpl {
 
 func (r *FollowRepositoryImpl) Create(ctx context.Context, db *gorm.DB, follow *entity.Follow) error {
 	err := db.Create(follow).Error
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+	return nil
+}
+
+func (r *FollowRepositoryImpl) FindByFollowingID(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followingID int64) error {
+	err := db.Where(column.FollowingID.Eq(followingID)).Find(followList).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}

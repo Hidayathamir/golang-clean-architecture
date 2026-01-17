@@ -114,3 +114,18 @@ func (u *ImageUsecaseMwLogger) GetLike(ctx context.Context, req *model.GetLikeRe
 
 	return res, err
 }
+
+func (u *ImageUsecaseMwLogger) NotifyFollowerOnUpload(ctx context.Context, req *model.NotifyFollowerOnUploadRequest) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := u.Next.NotifyFollowerOnUpload(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+	}
+	x.LogMw(ctx, fields, err)
+
+	return err
+}

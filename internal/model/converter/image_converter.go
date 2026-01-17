@@ -115,3 +115,8 @@ func EntityCommentListToModelCommentResponseList(ctx context.Context, commentLis
 		*res = append(*res, r)
 	}
 }
+
+func ModelImageUploadedEventToModelNotifyFollowerOnUploadRequest(ctx context.Context, event *model.ImageUploadedEvent, req *model.NotifyFollowerOnUploadRequest) {
+	req.UserID = event.UserID
+	req.URL = event.URL
+}

@@ -74,6 +74,10 @@ func SetupUsecases(
 	imageProducer = messaging.NewImageProducer(viperConfig, producer)
 	imageProducer = messaging.NewImageProducerMwLogger(imageProducer)
 
+	var notifProducer messaging.NotifProducer
+	notifProducer = messaging.NewNotifProducer(viperConfig, producer)
+	notifProducer = messaging.NewNotifProducerMwLogger(notifProducer)
+
 	var contactProducer messaging.ContactProducer
 	contactProducer = messaging.NewContactProducer(viperConfig, producer)
 	contactProducer = messaging.NewContactProducerMwLogger(contactProducer)
@@ -105,7 +109,7 @@ func SetupUsecases(
 	userUsecase = user.NewUserUsecaseMwLogger(userUsecase)
 
 	var imageUsecase image.ImageUsecase
-	imageUsecase = image.NewImageUsecase(viperConfig, db, imageRepository, likeRepository, commentRepository, imageProducer, s3Client)
+	imageUsecase = image.NewImageUsecase(viperConfig, db, imageRepository, likeRepository, commentRepository, followRepository, userRepository, imageProducer, notifProducer, s3Client)
 	imageUsecase = image.NewImageUsecaseMwLogger(imageUsecase)
 
 	var contactUsecase contact.ContactUsecase

@@ -6,4 +6,6 @@ const (
 	ImageCommented = "image.commented"
 
 	UserFollowed = "user.followed"
+
+	Notif = "notif"
 )

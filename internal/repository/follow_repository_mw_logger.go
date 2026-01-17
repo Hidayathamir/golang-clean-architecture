@@ -36,3 +36,19 @@ func (r *FollowRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, foll
 
 	return err
 }
+
+func (r *FollowRepositoryMwLogger) FindByFollowingID(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followingID int64) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := r.Next.FindByFollowingID(ctx, db, followList, followingID)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"len(*followList)": len(*followList),
+		"followingID":      followingID,
+	}
+	x.LogMw(ctx, fields, err)
+
+	return err
+}

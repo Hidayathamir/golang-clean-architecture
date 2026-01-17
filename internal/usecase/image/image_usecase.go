@@ -20,6 +20,7 @@ type ImageUsecase interface {
 	GetImage(ctx context.Context, req *model.GetImageRequest) (*model.ImageResponse, error)
 	GetLike(ctx context.Context, req *model.GetLikeRequest) (*model.LikeResponseList, error)
 	GetComment(ctx context.Context, req *model.GetCommentRequest) (*model.CommentResponseList, error)
+	NotifyFollowerOnUpload(ctx context.Context, req *model.NotifyFollowerOnUploadRequest) error
 }
 
 var _ ImageUsecase = &ImageUsecaseImpl{}
@@ -32,9 +33,12 @@ type ImageUsecaseImpl struct {
 	ImageRepository   repository.ImageRepository
 	LikeRepository    repository.LikeRepository
 	CommentRepository repository.CommentRepository
+	FollowRepository  repository.FollowRepository
+	UserRepository    repository.UserRepository
 
 	// producer
 	ImageProducer messaging.ImageProducer
+	NotifProducer messaging.NotifProducer
 
 	// client
 	S3Client rest.S3Client
@@ -48,9 +52,12 @@ func NewImageUsecase(
 	ImageRepository repository.ImageRepository,
 	LikeRepository repository.LikeRepository,
 	CommentRepository repository.CommentRepository,
+	FollowRepository repository.FollowRepository,
+	UserRepository repository.UserRepository,
 
 	// producer
 	ImageProducer messaging.ImageProducer,
+	NotifProducer messaging.NotifProducer,
 
 	// client
 	S3Client rest.S3Client,
@@ -63,9 +70,12 @@ func NewImageUsecase(
 		ImageRepository:   ImageRepository,
 		LikeRepository:    LikeRepository,
 		CommentRepository: CommentRepository,
+		FollowRepository:  FollowRepository,
+		UserRepository:    UserRepository,
 
 		// producer
 		ImageProducer: ImageProducer,
+		NotifProducer: NotifProducer,
 
 		// client
 		S3Client: S3Client,

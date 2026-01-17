@@ -65,3 +65,8 @@ type GetLikeRequest struct {
 type GetCommentRequest struct {
 	ImageID int64
 }
+
+type NotifyFollowerOnUploadRequest struct {
+	UserID int64
+	URL    string
+}
