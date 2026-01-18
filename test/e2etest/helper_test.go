@@ -1,6 +1,7 @@
 package e2etest
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -176,6 +177,28 @@ func checkFollow(t *testing.T, followerID, followingID int64) {
 	require.Nil(t, err)
 	require.Equal(t, followerID, follow.FollowerID)
 	require.Equal(t, followingID, follow.FollowingID)
+}
+
+func commentImage(t *testing.T, token string, imageID int64, comment string) {
+	t.Helper()
+
+	reqBody := model.CommentImageRequest{
+		ImageID: imageID,
+		Comment: comment,
+	}
+	bodyJson, err := json.Marshal(reqBody)
+	require.Nil(t, err)
+
+	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/images/_comment", bytes.NewReader(bodyJson))
+	require.Nil(t, err)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", bearerToken(token))
+
+	res, err := http.DefaultClient.Do(req)
+	require.Nil(t, err)
+	defer res.Body.Close()
+
+	require.Equal(t, http.StatusOK, res.StatusCode)
 }
 
 func ClearAll() {
