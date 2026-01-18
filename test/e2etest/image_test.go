@@ -219,3 +219,48 @@ func TestGetComments(t *testing.T) {
 	assert.NotEmpty(t, respBody.Data)
 	assert.Equal(t, "Wow", respBody.Data[0].Comment)
 }
+
+func TestImageFlow(t *testing.T) {
+	ClearAll()
+
+	// Register Users
+	token1 := registerAndLoginUser(t, "user1", "password", "User One")
+	token2 := registerAndLoginUser(t, "user2", "password", "User Two")
+	token3 := registerAndLoginUser(t, "user3", "password", "User Three")
+
+	// Get User 1 ID
+	user1 := new(entity.User)
+	err := db.Where("username = ?", "user1").First(user1).Error
+	assert.Nil(t, err)
+
+	// User 2 follows User 1
+	reqBodyFollow := model.FollowUserRequest{
+		FollowingID: user1.ID,
+	}
+	bodyJsonFollow, err := json.Marshal(reqBodyFollow)
+	assert.Nil(t, err)
+
+	reqFollow2, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users/_follow", bytes.NewReader(bodyJsonFollow))
+	require.Nil(t, err)
+	reqFollow2.Header.Set("Content-Type", "application/json")
+	reqFollow2.Header.Set("Authorization", bearerToken(token2))
+
+	resFollow2, err := http.DefaultClient.Do(reqFollow2)
+	require.Nil(t, err)
+	resFollow2.Body.Close()
+	assert.Equal(t, http.StatusOK, resFollow2.StatusCode)
+
+	// User 3 follows User 1
+	reqFollow3, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users/_follow", bytes.NewReader(bodyJsonFollow))
+	require.Nil(t, err)
+	reqFollow3.Header.Set("Content-Type", "application/json")
+	reqFollow3.Header.Set("Authorization", bearerToken(token3))
+
+	resFollow3, err := http.DefaultClient.Do(reqFollow3)
+	require.Nil(t, err)
+	resFollow3.Body.Close()
+	assert.Equal(t, http.StatusOK, resFollow3.StatusCode)
+
+	// User 1 uploads image
+	uploadImage(t, token1)
+}
