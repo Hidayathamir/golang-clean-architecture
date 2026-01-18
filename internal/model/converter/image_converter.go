@@ -2,6 +2,7 @@ package converter
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -11,6 +12,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/IBM/sarama"
 )
 
 func ModelUploadImageRequestToModelS3UploadImageRequest(ctx context.Context, req *model.UploadImageRequest, s3UploadImgReq *model.S3UploadImageRequest) error {
@@ -119,4 +121,29 @@ func EntityCommentListToModelCommentResponseList(ctx context.Context, commentLis
 func ModelImageUploadedEventToModelNotifyFollowerOnUploadRequest(ctx context.Context, event *model.ImageUploadedEvent, req *model.NotifyFollowerOnUploadRequest) {
 	req.UserID = event.UserID
 	req.URL = event.URL
+}
+
+func ModelImageCommentedEventToModelNotifyUserImageCommentedRequest(ctx context.Context, event *model.ImageCommentedEvent, req *model.NotifyUserImageCommentedRequest) {
+	req.ImageID = event.ImageID
+	req.CommenterUserID = event.UserID
+}
+
+func SaramaConsumerMessageListToModelBatchUpdateImageCommentCountRequest(ctx context.Context, messages []*sarama.ConsumerMessage, req *model.BatchUpdateImageCommentCountRequest) {
+	mapCounter := make(map[int64]int)
+	for _, message := range messages {
+		event := new(model.ImageCommentedEvent)
+		if err := json.Unmarshal(message.Value, event); err != nil {
+			x.Logger.WithContext(ctx).WithError(err).Warn("Failed to unmarshal image commented event")
+			continue
+		}
+		mapCounter[event.ImageID]++
+	}
+
+	for imageID, count := range mapCounter {
+		object := model.ImageIncreaseCommentCount{
+			ImageID: imageID,
+			Count:   count,
+		}
+		req.ImageIncreaseCommentCountList = append(req.ImageIncreaseCommentCountList, object)
+	}
 }

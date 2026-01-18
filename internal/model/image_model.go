@@ -70,3 +70,19 @@ type NotifyFollowerOnUploadRequest struct {
 	UserID int64
 	URL    string
 }
+
+type NotifyUserImageCommentedRequest struct {
+	ImageID         int64
+	CommenterUserID int64
+}
+
+type BatchUpdateImageCommentCountRequest struct {
+	ImageIncreaseCommentCountList ImageIncreaseCommentCountList
+}
+
+type ImageIncreaseCommentCount struct {
+	ImageID int64
+	Count   int
+}
+
+type ImageIncreaseCommentCountList []ImageIncreaseCommentCount

@@ -44,7 +44,8 @@ func main() {
 	go route.ConsumeUserFollowedEventForUpdateCount(ctx, viperConfig, usecases)
 	go route.SetupImageUploadedConsumer(ctx, viperConfig, usecases)
 	go route.SetupImageLikedConsumer(ctx, viperConfig, usecases)
-	go route.SetupImageCommentedConsumer(ctx, viperConfig, usecases)
+	go route.ConsumeImageCommentedEventForNotification(ctx, viperConfig, usecases)
+	go route.ConsumeImageCommentedEventForUpdateCount(ctx, viperConfig, usecases)
 	go route.SetupNotifConsumer(ctx, viperConfig, usecases)
 
 	terminateSignals := make(chan os.Signal, 1)

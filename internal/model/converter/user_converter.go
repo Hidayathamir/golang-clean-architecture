@@ -93,7 +93,7 @@ func SaramaConsumerMessageListToModelBatchUpdateUserFollowStatsRequest(ctx conte
 	for _, message := range messages {
 		event := new(model.UserFollowedEvent)
 		if err := json.Unmarshal(message.Value, event); err != nil {
-			x.Logger.WithContext(ctx).WithError(err).Error("Failed to unmarshal user followed event")
+			x.Logger.WithContext(ctx).WithError(err).Warn("Failed to unmarshal user followed event")
 			continue
 		}
 		userFollowerCounts[event.FollowingID]++

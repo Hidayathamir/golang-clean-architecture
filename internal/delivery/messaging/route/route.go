@@ -40,11 +40,18 @@ func SetupImageLikedConsumer(ctx context.Context, viperConfig *viper.Viper, usec
 	messaging.ConsumeTopic(ctx, consumerGroup, topic.ImageLiked, consumer.ConsumeImageLikedEvent)
 }
 
-func SetupImageCommentedConsumer(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
-	x.Logger.Info("setup consumer.ConsumeImageCommentedEvent")
+func ConsumeImageCommentedEventForNotification(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
+	x.Logger.Info("setup consumer.ConsumeImageCommentedEventForNotification")
 	consumerGroup := config.NewKafkaConsumerGroup(viperConfig, consumergroup.ImageCommentedGroup1)
 	consumer := messaging.NewImageConsumer(usecases.ImageUsecase)
-	messaging.ConsumeTopic(ctx, consumerGroup, topic.ImageCommented, consumer.ConsumeImageCommentedEvent)
+	messaging.ConsumeTopic(ctx, consumerGroup, topic.ImageCommented, consumer.ConsumeImageCommentedEventForNotification)
+}
+
+func ConsumeImageCommentedEventForUpdateCount(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
+	x.Logger.Info("setup consumer.ConsumeImageCommentedEventForUpdateCount")
+	consumerGroup := config.NewKafkaConsumerGroup(viperConfig, consumergroup.ImageCommentedGroup2)
+	consumer := messaging.NewImageConsumer(usecases.ImageUsecase)
+	messaging.ConsumeTopicBatch(ctx, consumerGroup, topic.ImageCommented, consumer.ConsumeImageCommentedEventForUpdateCount, 10, 18*time.Second)
 }
 
 func SetupNotifConsumer(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {

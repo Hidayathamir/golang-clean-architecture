@@ -21,6 +21,8 @@ type ImageUsecase interface {
 	GetLike(ctx context.Context, req *model.GetLikeRequest) (*model.LikeResponseList, error)
 	GetComment(ctx context.Context, req *model.GetCommentRequest) (*model.CommentResponseList, error)
 	NotifyFollowerOnUpload(ctx context.Context, req *model.NotifyFollowerOnUploadRequest) error
+	NotifyUserImageCommented(ctx context.Context, req *model.NotifyUserImageCommentedRequest) error
+	BatchUpdateImageCommentCount(ctx context.Context, req *model.BatchUpdateImageCommentCountRequest) error
 }
 
 var _ ImageUsecase = &ImageUsecaseImpl{}

@@ -61,7 +61,7 @@ func (c *ImageConsumer) ConsumeImageLikedEvent(message *sarama.ConsumerMessage) 
 	return nil
 }
 
-func (c *ImageConsumer) ConsumeImageCommentedEvent(message *sarama.ConsumerMessage) error {
+func (c *ImageConsumer) ConsumeImageCommentedEventForNotification(message *sarama.ConsumerMessage) error {
 	ctx, span := telemetry.StartConsumer(message)
 	defer span.End()
 
@@ -71,11 +71,26 @@ func (c *ImageConsumer) ConsumeImageCommentedEvent(message *sarama.ConsumerMessa
 		return errkit.AddFuncName(err)
 	}
 
-	// TODO process event
-	x.Logger.WithContext(ctx).WithFields(logrus.Fields{
-		"event":     event,
-		"partition": message.Partition,
-	}).Info("")
+	req := new(model.NotifyUserImageCommentedRequest)
+	converter.ModelImageCommentedEventToModelNotifyUserImageCommentedRequest(ctx, event, req)
+
+	if err := c.Usecase.NotifyUserImageCommented(ctx, req); err != nil {
+		return errkit.AddFuncName(err)
+	}
+
+	return nil
+}
+
+func (c *ImageConsumer) ConsumeImageCommentedEventForUpdateCount(messages []*sarama.ConsumerMessage) error {
+	ctx, span := telemetry.StartNew()
+	defer span.End()
+
+	req := new(model.BatchUpdateImageCommentCountRequest)
+	converter.SaramaConsumerMessageListToModelBatchUpdateImageCommentCountRequest(ctx, messages, req)
+
+	if err := c.Usecase.BatchUpdateImageCommentCount(ctx, req); err != nil {
+		return errkit.AddFuncName(err)
+	}
 
 	return nil
 }

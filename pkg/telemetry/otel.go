@@ -28,6 +28,10 @@ func StartConsumer(message *sarama.ConsumerMessage) (context.Context, trace.Span
 	return tracer.Start(ctx, caller.FuncName(caller.WithSkip(1)))
 }
 
+func StartNew() (context.Context, trace.Span) {
+	return tracer.Start(context.Background(), caller.FuncName(caller.WithSkip(1)))
+}
+
 func ExtractCtxFromConsumerMessage(message *sarama.ConsumerMessage) context.Context {
 	carrier := otelsarama.NewConsumerMessageCarrier(message)
 

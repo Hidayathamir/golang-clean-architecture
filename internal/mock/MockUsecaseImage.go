@@ -20,6 +20,9 @@ var _ image.ImageUsecase = &ImageUsecaseMock{}
 //
 //		// make and configure a mocked image.ImageUsecase
 //		mockedImageUsecase := &ImageUsecaseMock{
+//			BatchUpdateImageCommentCountFunc: func(ctx context.Context, req *model.BatchUpdateImageCommentCountRequest) error {
+//				panic("mock out the BatchUpdateImageCommentCount method")
+//			},
 //			CommentFunc: func(ctx context.Context, req *model.CommentImageRequest) error {
 //				panic("mock out the Comment method")
 //			},
@@ -38,6 +41,9 @@ var _ image.ImageUsecase = &ImageUsecaseMock{}
 //			NotifyFollowerOnUploadFunc: func(ctx context.Context, req *model.NotifyFollowerOnUploadRequest) error {
 //				panic("mock out the NotifyFollowerOnUpload method")
 //			},
+//			NotifyUserImageCommentedFunc: func(ctx context.Context, req *model.NotifyUserImageCommentedRequest) error {
+//				panic("mock out the NotifyUserImageCommented method")
+//			},
 //			UploadFunc: func(ctx context.Context, req *model.UploadImageRequest) (*model.ImageResponse, error) {
 //				panic("mock out the Upload method")
 //			},
@@ -48,6 +54,9 @@ var _ image.ImageUsecase = &ImageUsecaseMock{}
 //
 //	}
 type ImageUsecaseMock struct {
+	// BatchUpdateImageCommentCountFunc mocks the BatchUpdateImageCommentCount method.
+	BatchUpdateImageCommentCountFunc func(ctx context.Context, req *model.BatchUpdateImageCommentCountRequest) error
+
 	// CommentFunc mocks the Comment method.
 	CommentFunc func(ctx context.Context, req *model.CommentImageRequest) error
 
@@ -66,11 +75,21 @@ type ImageUsecaseMock struct {
 	// NotifyFollowerOnUploadFunc mocks the NotifyFollowerOnUpload method.
 	NotifyFollowerOnUploadFunc func(ctx context.Context, req *model.NotifyFollowerOnUploadRequest) error
 
+	// NotifyUserImageCommentedFunc mocks the NotifyUserImageCommented method.
+	NotifyUserImageCommentedFunc func(ctx context.Context, req *model.NotifyUserImageCommentedRequest) error
+
 	// UploadFunc mocks the Upload method.
 	UploadFunc func(ctx context.Context, req *model.UploadImageRequest) (*model.ImageResponse, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
+		// BatchUpdateImageCommentCount holds details about calls to the BatchUpdateImageCommentCount method.
+		BatchUpdateImageCommentCount []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req *model.BatchUpdateImageCommentCountRequest
+		}
 		// Comment holds details about calls to the Comment method.
 		Comment []struct {
 			// Ctx is the ctx argument value.
@@ -113,6 +132,13 @@ type ImageUsecaseMock struct {
 			// Req is the req argument value.
 			Req *model.NotifyFollowerOnUploadRequest
 		}
+		// NotifyUserImageCommented holds details about calls to the NotifyUserImageCommented method.
+		NotifyUserImageCommented []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req *model.NotifyUserImageCommentedRequest
+		}
 		// Upload holds details about calls to the Upload method.
 		Upload []struct {
 			// Ctx is the ctx argument value.
@@ -121,13 +147,51 @@ type ImageUsecaseMock struct {
 			Req *model.UploadImageRequest
 		}
 	}
-	lockComment                sync.RWMutex
-	lockGetComment             sync.RWMutex
-	lockGetImage               sync.RWMutex
-	lockGetLike                sync.RWMutex
-	lockLike                   sync.RWMutex
-	lockNotifyFollowerOnUpload sync.RWMutex
-	lockUpload                 sync.RWMutex
+	lockBatchUpdateImageCommentCount sync.RWMutex
+	lockComment                      sync.RWMutex
+	lockGetComment                   sync.RWMutex
+	lockGetImage                     sync.RWMutex
+	lockGetLike                      sync.RWMutex
+	lockLike                         sync.RWMutex
+	lockNotifyFollowerOnUpload       sync.RWMutex
+	lockNotifyUserImageCommented     sync.RWMutex
+	lockUpload                       sync.RWMutex
+}
+
+// BatchUpdateImageCommentCount calls BatchUpdateImageCommentCountFunc.
+func (mock *ImageUsecaseMock) BatchUpdateImageCommentCount(ctx context.Context, req *model.BatchUpdateImageCommentCountRequest) error {
+	if mock.BatchUpdateImageCommentCountFunc == nil {
+		panic("ImageUsecaseMock.BatchUpdateImageCommentCountFunc: method is nil but ImageUsecase.BatchUpdateImageCommentCount was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req *model.BatchUpdateImageCommentCountRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockBatchUpdateImageCommentCount.Lock()
+	mock.calls.BatchUpdateImageCommentCount = append(mock.calls.BatchUpdateImageCommentCount, callInfo)
+	mock.lockBatchUpdateImageCommentCount.Unlock()
+	return mock.BatchUpdateImageCommentCountFunc(ctx, req)
+}
+
+// BatchUpdateImageCommentCountCalls gets all the calls that were made to BatchUpdateImageCommentCount.
+// Check the length with:
+//
+//	len(mockedImageUsecase.BatchUpdateImageCommentCountCalls())
+func (mock *ImageUsecaseMock) BatchUpdateImageCommentCountCalls() []struct {
+	Ctx context.Context
+	Req *model.BatchUpdateImageCommentCountRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req *model.BatchUpdateImageCommentCountRequest
+	}
+	mock.lockBatchUpdateImageCommentCount.RLock()
+	calls = mock.calls.BatchUpdateImageCommentCount
+	mock.lockBatchUpdateImageCommentCount.RUnlock()
+	return calls
 }
 
 // Comment calls CommentFunc.
@@ -343,6 +407,42 @@ func (mock *ImageUsecaseMock) NotifyFollowerOnUploadCalls() []struct {
 	mock.lockNotifyFollowerOnUpload.RLock()
 	calls = mock.calls.NotifyFollowerOnUpload
 	mock.lockNotifyFollowerOnUpload.RUnlock()
+	return calls
+}
+
+// NotifyUserImageCommented calls NotifyUserImageCommentedFunc.
+func (mock *ImageUsecaseMock) NotifyUserImageCommented(ctx context.Context, req *model.NotifyUserImageCommentedRequest) error {
+	if mock.NotifyUserImageCommentedFunc == nil {
+		panic("ImageUsecaseMock.NotifyUserImageCommentedFunc: method is nil but ImageUsecase.NotifyUserImageCommented was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req *model.NotifyUserImageCommentedRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockNotifyUserImageCommented.Lock()
+	mock.calls.NotifyUserImageCommented = append(mock.calls.NotifyUserImageCommented, callInfo)
+	mock.lockNotifyUserImageCommented.Unlock()
+	return mock.NotifyUserImageCommentedFunc(ctx, req)
+}
+
+// NotifyUserImageCommentedCalls gets all the calls that were made to NotifyUserImageCommented.
+// Check the length with:
+//
+//	len(mockedImageUsecase.NotifyUserImageCommentedCalls())
+func (mock *ImageUsecaseMock) NotifyUserImageCommentedCalls() []struct {
+	Ctx context.Context
+	Req *model.NotifyUserImageCommentedRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req *model.NotifyUserImageCommentedRequest
+	}
+	mock.lockNotifyUserImageCommented.RLock()
+	calls = mock.calls.NotifyUserImageCommented
+	mock.lockNotifyUserImageCommented.RUnlock()
 	return calls
 }
 
