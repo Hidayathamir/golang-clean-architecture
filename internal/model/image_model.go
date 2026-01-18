@@ -86,3 +86,19 @@ type ImageIncreaseCommentCount struct {
 }
 
 type ImageIncreaseCommentCountList []ImageIncreaseCommentCount
+
+type NotifyUserImageLikedRequest struct {
+	ImageID     int64
+	LikerUserID int64
+}
+
+type BatchUpdateImageLikeCountRequest struct {
+	ImageIncreaseLikeCountList ImageIncreaseLikeCountList
+}
+
+type ImageIncreaseLikeCount struct {
+	ImageID int64
+	Count   int
+}
+
+type ImageIncreaseLikeCountList []ImageIncreaseLikeCount

@@ -68,3 +68,19 @@ func (r *ImageRepositoryMwLogger) IncrementCommentCountByID(ctx context.Context,
 
 	return err
 }
+
+func (r *ImageRepositoryMwLogger) IncrementLikeCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := r.Next.IncrementLikeCountByID(ctx, db, id, count)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"id":    id,
+		"count": count,
+	}
+	x.LogMw(ctx, fields, err)
+
+	return err
+}

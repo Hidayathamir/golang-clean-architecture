@@ -147,3 +147,28 @@ func SaramaConsumerMessageListToModelBatchUpdateImageCommentCountRequest(ctx con
 		req.ImageIncreaseCommentCountList = append(req.ImageIncreaseCommentCountList, object)
 	}
 }
+
+func ModelImageLikedEventToModelNotifyUserImageLikedRequest(ctx context.Context, event *model.ImageLikedEvent, req *model.NotifyUserImageLikedRequest) {
+	req.ImageID = event.ImageID
+	req.LikerUserID = event.UserID
+}
+
+func SaramaConsumerMessageListToModelBatchUpdateImageLikeCountRequest(ctx context.Context, messages []*sarama.ConsumerMessage, req *model.BatchUpdateImageLikeCountRequest) {
+	mapCounter := make(map[int64]int)
+	for _, message := range messages {
+		event := new(model.ImageLikedEvent)
+		if err := json.Unmarshal(message.Value, event); err != nil {
+			x.Logger.WithContext(ctx).WithError(err).Warn("Failed to unmarshal image liked event")
+			continue
+		}
+		mapCounter[event.ImageID]++
+	}
+
+	for imageID, count := range mapCounter {
+		object := model.ImageIncreaseLikeCount{
+			ImageID: imageID,
+			Count:   count,
+		}
+		req.ImageIncreaseLikeCountList = append(req.ImageIncreaseLikeCountList, object)
+	}
+}

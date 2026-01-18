@@ -159,3 +159,33 @@ func (u *ImageUsecaseMwLogger) BatchUpdateImageCommentCount(ctx context.Context,
 
 	return err
 }
+
+func (u *ImageUsecaseMwLogger) NotifyUserImageLiked(ctx context.Context, req *model.NotifyUserImageLikedRequest) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := u.Next.NotifyUserImageLiked(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+	}
+	x.LogMw(ctx, fields, err)
+
+	return err
+}
+
+func (u *ImageUsecaseMwLogger) BatchUpdateImageLikeCount(ctx context.Context, req *model.BatchUpdateImageLikeCountRequest) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := u.Next.BatchUpdateImageLikeCount(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+	}
+	x.LogMw(ctx, fields, err)
+
+	return err
+}

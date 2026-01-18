@@ -30,6 +30,9 @@ var _ repository.ImageRepository = &ImageRepositoryMock{}
 //			IncrementCommentCountByIDFunc: func(ctx context.Context, db *gorm.DB, id int64, count int) error {
 //				panic("mock out the IncrementCommentCountByID method")
 //			},
+//			IncrementLikeCountByIDFunc: func(ctx context.Context, db *gorm.DB, id int64, count int) error {
+//				panic("mock out the IncrementLikeCountByID method")
+//			},
 //		}
 //
 //		// use mockedImageRepository in code that requires repository.ImageRepository
@@ -45,6 +48,9 @@ type ImageRepositoryMock struct {
 
 	// IncrementCommentCountByIDFunc mocks the IncrementCommentCountByID method.
 	IncrementCommentCountByIDFunc func(ctx context.Context, db *gorm.DB, id int64, count int) error
+
+	// IncrementLikeCountByIDFunc mocks the IncrementLikeCountByID method.
+	IncrementLikeCountByIDFunc func(ctx context.Context, db *gorm.DB, id int64, count int) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -79,10 +85,22 @@ type ImageRepositoryMock struct {
 			// Count is the count argument value.
 			Count int
 		}
+		// IncrementLikeCountByID holds details about calls to the IncrementLikeCountByID method.
+		IncrementLikeCountByID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
+			// ID is the id argument value.
+			ID int64
+			// Count is the count argument value.
+			Count int
+		}
 	}
 	lockCreate                    sync.RWMutex
 	lockFindByID                  sync.RWMutex
 	lockIncrementCommentCountByID sync.RWMutex
+	lockIncrementLikeCountByID    sync.RWMutex
 }
 
 // Create calls CreateFunc.
@@ -210,5 +228,49 @@ func (mock *ImageRepositoryMock) IncrementCommentCountByIDCalls() []struct {
 	mock.lockIncrementCommentCountByID.RLock()
 	calls = mock.calls.IncrementCommentCountByID
 	mock.lockIncrementCommentCountByID.RUnlock()
+	return calls
+}
+
+// IncrementLikeCountByID calls IncrementLikeCountByIDFunc.
+func (mock *ImageRepositoryMock) IncrementLikeCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error {
+	if mock.IncrementLikeCountByIDFunc == nil {
+		panic("ImageRepositoryMock.IncrementLikeCountByIDFunc: method is nil but ImageRepository.IncrementLikeCountByID was just called")
+	}
+	callInfo := struct {
+		Ctx   context.Context
+		Db    *gorm.DB
+		ID    int64
+		Count int
+	}{
+		Ctx:   ctx,
+		Db:    db,
+		ID:    id,
+		Count: count,
+	}
+	mock.lockIncrementLikeCountByID.Lock()
+	mock.calls.IncrementLikeCountByID = append(mock.calls.IncrementLikeCountByID, callInfo)
+	mock.lockIncrementLikeCountByID.Unlock()
+	return mock.IncrementLikeCountByIDFunc(ctx, db, id, count)
+}
+
+// IncrementLikeCountByIDCalls gets all the calls that were made to IncrementLikeCountByID.
+// Check the length with:
+//
+//	len(mockedImageRepository.IncrementLikeCountByIDCalls())
+func (mock *ImageRepositoryMock) IncrementLikeCountByIDCalls() []struct {
+	Ctx   context.Context
+	Db    *gorm.DB
+	ID    int64
+	Count int
+} {
+	var calls []struct {
+		Ctx   context.Context
+		Db    *gorm.DB
+		ID    int64
+		Count int
+	}
+	mock.lockIncrementLikeCountByID.RLock()
+	calls = mock.calls.IncrementLikeCountByID
+	mock.lockIncrementLikeCountByID.RUnlock()
 	return calls
 }

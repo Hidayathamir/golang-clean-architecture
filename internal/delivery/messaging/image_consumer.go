@@ -10,7 +10,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/IBM/sarama"
-	"github.com/sirupsen/logrus"
 )
 
 type ImageConsumer struct {
@@ -44,7 +43,7 @@ func (c *ImageConsumer) ConsumeImageUploadedEvent(message *sarama.ConsumerMessag
 	return nil
 }
 
-func (c *ImageConsumer) ConsumeImageLikedEvent(message *sarama.ConsumerMessage) error {
+func (c *ImageConsumer) ConsumeImageLikedEventForNotification(message *sarama.ConsumerMessage) error {
 	ctx, span := telemetry.StartConsumer(message)
 	defer span.End()
 
@@ -54,11 +53,28 @@ func (c *ImageConsumer) ConsumeImageLikedEvent(message *sarama.ConsumerMessage) 
 		return errkit.AddFuncName(err)
 	}
 
-	// TODO process event
-	x.Logger.WithContext(ctx).WithFields(logrus.Fields{
-		"event":     event,
-		"partition": message.Partition,
-	}).Info()
+	req := new(model.NotifyUserImageLikedRequest)
+	converter.ModelImageLikedEventToModelNotifyUserImageLikedRequest(ctx, event, req)
+
+	if err := c.Usecase.NotifyUserImageLiked(ctx, req); err != nil {
+		x.Logger.WithContext(ctx).WithError(err).Error()
+		return errkit.AddFuncName(err)
+	}
+
+	return nil
+}
+
+func (c *ImageConsumer) ConsumeImageLikedEventForUpdateCount(messages []*sarama.ConsumerMessage) error {
+	ctx, span := telemetry.StartNew()
+	defer span.End()
+
+	req := new(model.BatchUpdateImageLikeCountRequest)
+	converter.SaramaConsumerMessageListToModelBatchUpdateImageLikeCountRequest(ctx, messages, req)
+
+	if err := c.Usecase.BatchUpdateImageLikeCount(ctx, req); err != nil {
+		x.Logger.WithContext(ctx).WithError(err).Error()
+		return errkit.AddFuncName(err)
+	}
 
 	return nil
 }

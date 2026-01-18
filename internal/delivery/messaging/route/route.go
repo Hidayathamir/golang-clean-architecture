@@ -33,11 +33,18 @@ func SetupImageUploadedConsumer(ctx context.Context, viperConfig *viper.Viper, u
 	messaging.ConsumeTopic(ctx, consumerGroup, topic.ImageUploaded, consumer.ConsumeImageUploadedEvent)
 }
 
-func SetupImageLikedConsumer(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
-	x.Logger.Info("setup consumer.ConsumeImageLikedEvent")
+func ConsumeImageLikedEventForNotification(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
+	x.Logger.Info("setup consumer.ConsumeImageLikedEventForNotification")
 	consumerGroup := config.NewKafkaConsumerGroup(viperConfig, consumergroup.ImageLikedGroup1)
 	consumer := messaging.NewImageConsumer(usecases.ImageUsecase)
-	messaging.ConsumeTopic(ctx, consumerGroup, topic.ImageLiked, consumer.ConsumeImageLikedEvent)
+	messaging.ConsumeTopic(ctx, consumerGroup, topic.ImageLiked, consumer.ConsumeImageLikedEventForNotification)
+}
+
+func ConsumeImageLikedEventForUpdateCount(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
+	x.Logger.Info("setup consumer.ConsumeImageLikedEventForUpdateCount")
+	consumerGroup := config.NewKafkaConsumerGroup(viperConfig, consumergroup.ImageLikedGroup2)
+	consumer := messaging.NewImageConsumer(usecases.ImageUsecase)
+	messaging.ConsumeTopicBatch(ctx, consumerGroup, topic.ImageLiked, consumer.ConsumeImageLikedEventForUpdateCount, 10, 10*time.Second)
 }
 
 func ConsumeImageCommentedEventForNotification(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {

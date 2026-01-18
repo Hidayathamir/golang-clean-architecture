@@ -23,6 +23,8 @@ type ImageUsecase interface {
 	NotifyFollowerOnUpload(ctx context.Context, req *model.NotifyFollowerOnUploadRequest) error
 	NotifyUserImageCommented(ctx context.Context, req *model.NotifyUserImageCommentedRequest) error
 	BatchUpdateImageCommentCount(ctx context.Context, req *model.BatchUpdateImageCommentCountRequest) error
+	NotifyUserImageLiked(ctx context.Context, req *model.NotifyUserImageLikedRequest) error
+	BatchUpdateImageLikeCount(ctx context.Context, req *model.BatchUpdateImageLikeCountRequest) error
 }
 
 var _ ImageUsecase = &ImageUsecaseImpl{}

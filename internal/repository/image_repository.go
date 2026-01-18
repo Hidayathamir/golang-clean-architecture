@@ -17,6 +17,7 @@ type ImageRepository interface {
 	Create(ctx context.Context, db *gorm.DB, image *entity.Image) error
 	FindByID(ctx context.Context, db *gorm.DB, image *entity.Image, id int64) error
 	IncrementCommentCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error
+	IncrementLikeCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error
 }
 
 var _ ImageRepository = &ImageRepositoryImpl{}
@@ -54,6 +55,19 @@ func (r *ImageRepositoryImpl) IncrementCommentCountByID(ctx context.Context, db 
 		Where(column.ID.Eq(id)).
 		Updates(map[string]any{
 			column.CommentCount.Str(): gorm.Expr(column.CommentCount.Plus(count)),
+		}).Error
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+	return nil
+}
+
+func (r *ImageRepositoryImpl) IncrementLikeCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error {
+	err := db.WithContext(ctx).
+		Table(table.Image).
+		Where(column.ID.Eq(id)).
+		Updates(map[string]any{
+			column.LikeCount.Str(): gorm.Expr(column.LikeCount.Plus(count)),
 		}).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
