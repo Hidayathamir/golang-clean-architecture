@@ -12,7 +12,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -37,26 +37,26 @@ func registerUser(t *testing.T, username, password, name string) {
 	}
 
 	bodyJSON, err := json.Marshal(requestBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/users", strings.NewReader(string(bodyJSON)))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 
 	res, err := app.Test(req)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	defer func() { _ = res.Body.Close() }()
 
 	bytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.Equal(t, requestBody.Username, responseBody.Data.Username)
+	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, requestBody.Username, responseBody.Data.Username)
 }
 
 func loginDefaultUser(t *testing.T) string {
@@ -74,26 +74,26 @@ func loginUser(t *testing.T, username, password string) string {
 	}
 
 	bodyJSON, err := json.Marshal(requestBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/users/_login", strings.NewReader(string(bodyJSON)))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 
 	res, err := app.Test(req)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	defer func() { _ = res.Body.Close() }()
 
 	bytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	responseBody := new(response.WebResponse[model.UserLoginResponse])
 	err = json.Unmarshal(bytes, responseBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.NotEmpty(t, responseBody.Data.Token)
+	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.NotEmpty(t, responseBody.Data.Token)
 
 	return responseBody.Data.Token
 }
@@ -138,6 +138,6 @@ func ClearUsers() {
 func GetFirstUser(t *testing.T) *entity.User {
 	user := new(entity.User)
 	err := db.First(user).Error
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	return user
 }

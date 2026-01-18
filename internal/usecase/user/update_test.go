@@ -11,6 +11,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 )
 
@@ -53,8 +54,8 @@ func TestUserUsecaseImpl_Update_Success(t *testing.T) {
 
 	var expected = &model.UserResponse{Name: "name1"}
 
-	assert.Equal(t, expected, res)
-	assert.Nil(t, err)
+	require.Equal(t, expected, res)
+	require.Nil(t, err)
 }
 
 func TestUserUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
@@ -94,10 +95,10 @@ func TestUserUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 
 	var expected *model.UserResponse
 
-	assert.Equal(t, expected, res)
-	assert.NotNil(t, err)
+	require.Equal(t, expected, res)
+	require.NotNil(t, err)
 	var verrs validator.ValidationErrors
-	assert.ErrorAs(t, err, &verrs)
+	require.ErrorAs(t, err, &verrs)
 }
 
 func TestUserUsecaseImpl_Update_Fail_FindByID(t *testing.T) {
@@ -137,9 +138,9 @@ func TestUserUsecaseImpl_Update_Fail_FindByID(t *testing.T) {
 
 	var expected *model.UserResponse
 
-	assert.Equal(t, expected, res)
-	assert.NotNil(t, err)
-	assert.ErrorIs(t, err, assert.AnError)
+	require.Equal(t, expected, res)
+	require.NotNil(t, err)
+	require.ErrorIs(t, err, assert.AnError)
 }
 
 func TestUserUsecaseImpl_Update_Fail_Update(t *testing.T) {
@@ -179,9 +180,9 @@ func TestUserUsecaseImpl_Update_Fail_Update(t *testing.T) {
 
 	var expected *model.UserResponse
 
-	assert.Equal(t, expected, res)
-	assert.NotNil(t, err)
-	assert.ErrorIs(t, err, assert.AnError)
+	require.Equal(t, expected, res)
+	require.NotNil(t, err)
+	require.ErrorIs(t, err, assert.AnError)
 }
 
 func TestUserUsecaseImpl_Update_Fail_Send(t *testing.T) {
@@ -221,7 +222,7 @@ func TestUserUsecaseImpl_Update_Fail_Send(t *testing.T) {
 
 	var expected *model.UserResponse
 
-	assert.Equal(t, expected, res)
-	assert.NotNil(t, err)
-	assert.ErrorIs(t, err, assert.AnError)
+	require.Equal(t, expected, res)
+	require.NotNil(t, err)
+	require.ErrorIs(t, err, assert.AnError)
 }

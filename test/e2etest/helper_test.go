@@ -11,7 +11,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -37,7 +36,7 @@ func registerUser(t *testing.T, username, password, name string) {
 	}
 
 	bodyJSON, err := json.Marshal(requestBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users", strings.NewReader(string(bodyJSON)))
 	require.Nil(t, err)
@@ -45,19 +44,19 @@ func registerUser(t *testing.T, username, password, name string) {
 	req.Header.Set("Accept", "application/json")
 
 	res, err := http.DefaultClient.Do(req)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	defer func() { _ = res.Body.Close() }()
 
 	bytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.Equal(t, requestBody.Username, responseBody.Data.Username)
+	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, requestBody.Username, responseBody.Data.Username)
 }
 
 func loginDefaultUser(t *testing.T) string {
@@ -75,7 +74,7 @@ func loginUser(t *testing.T, username, password string) string {
 	}
 
 	bodyJSON, err := json.Marshal(requestBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users/_login", strings.NewReader(string(bodyJSON)))
 	require.Nil(t, err)
@@ -83,19 +82,19 @@ func loginUser(t *testing.T, username, password string) string {
 	req.Header.Set("Accept", "application/json")
 
 	res, err := http.DefaultClient.Do(req)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	defer func() { _ = res.Body.Close() }()
 
 	bytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	responseBody := new(response.WebResponse[model.UserLoginResponse])
 	err = json.Unmarshal(bytes, responseBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.NotEmpty(t, responseBody.Data.Token)
+	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.NotEmpty(t, responseBody.Data.Token)
 
 	return responseBody.Data.Token
 }
@@ -124,6 +123,46 @@ func loginAndGetDefaultUser(t *testing.T) (string, *entity.User) {
 	token := registerAndLoginDefaultUser(t)
 	user := GetFirstUser(t)
 	return token, user
+}
+
+func followUser(t *testing.T, token string, followingID int64) {
+	t.Helper()
+
+	requestBody := model.FollowUserRequest{
+		FollowingID: followingID,
+	}
+	bodyJson, err := json.Marshal(requestBody)
+	require.Nil(t, err)
+
+	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users/_follow", strings.NewReader(string(bodyJson)))
+	require.Nil(t, err)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", bearerToken(token))
+
+	res, err := http.DefaultClient.Do(req)
+	require.Nil(t, err)
+	defer res.Body.Close()
+
+	require.Equal(t, http.StatusOK, res.StatusCode)
+
+	bytes, err := io.ReadAll(res.Body)
+	require.Nil(t, err)
+
+	responseBody := new(response.WebResponse[string])
+	err = json.Unmarshal(bytes, responseBody)
+	require.Nil(t, err)
+	require.Equal(t, "ok", responseBody.Data)
+}
+
+func checkFollow(t *testing.T, followerID, followingID int64) {
+	t.Helper()
+
+	follow := new(entity.Follow)
+	err := db.Where("follower_id = ? AND following_id = ?", followerID, followingID).First(follow).Error
+	require.Nil(t, err)
+	require.Equal(t, followerID, follow.FollowerID)
+	require.Equal(t, followingID, follow.FollowingID)
 }
 
 func ClearAll() {
@@ -164,6 +203,6 @@ func ClearComments() {
 func GetFirstUser(t *testing.T) *entity.User {
 	user := new(entity.User)
 	err := db.First(user).Error
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	return user
 }

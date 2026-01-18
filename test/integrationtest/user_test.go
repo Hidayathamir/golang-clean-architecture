@@ -15,7 +15,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -29,7 +28,7 @@ func TestRegister(t *testing.T) {
 	}
 
 	bodyJson, err := json.Marshal(requestBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/users", strings.NewReader(string(bodyJson)))
 	req.Header.Set("Content-Type", "application/json")
@@ -39,18 +38,18 @@ func TestRegister(t *testing.T) {
 	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.Equal(t, requestBody.Username, responseBody.Data.Username)
-	assert.True(t, responseBody.Data.ID > 0)
-	assert.Equal(t, requestBody.Name, responseBody.Data.Name)
-	assert.NotNil(t, responseBody.Data.CreatedAt)
-	assert.NotNil(t, responseBody.Data.UpdatedAt)
+	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, requestBody.Username, responseBody.Data.Username)
+	require.True(t, responseBody.Data.ID > 0)
+	require.Equal(t, requestBody.Name, responseBody.Data.Name)
+	require.NotNil(t, responseBody.Data.CreatedAt)
+	require.NotNil(t, responseBody.Data.UpdatedAt)
 }
 
 func TestRegisterError(t *testing.T) {
@@ -62,7 +61,7 @@ func TestRegisterError(t *testing.T) {
 	}
 
 	bodyJson, err := json.Marshal(requestBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/users", strings.NewReader(string(bodyJson)))
 	req.Header.Set("Content-Type", "application/json")
@@ -72,14 +71,14 @@ func TestRegisterError(t *testing.T) {
 	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
-	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
-	assert.NotNil(t, responseBody.ErrorMessage)
+	require.Equal(t, http.StatusBadRequest, res.StatusCode)
+	require.NotNil(t, responseBody.ErrorMessage)
 }
 
 func TestRegisterDuplicate(t *testing.T) {
@@ -93,7 +92,7 @@ func TestRegisterDuplicate(t *testing.T) {
 	}
 
 	bodyJson, err := json.Marshal(requestBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/users", strings.NewReader(string(bodyJson)))
 	req.Header.Set("Content-Type", "application/json")
@@ -103,14 +102,14 @@ func TestRegisterDuplicate(t *testing.T) {
 	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
-	assert.Equal(t, http.StatusConflict, res.StatusCode)
-	assert.NotNil(t, responseBody.ErrorMessage)
+	require.Equal(t, http.StatusConflict, res.StatusCode)
+	require.NotNil(t, responseBody.ErrorMessage)
 }
 
 func TestLogin(t *testing.T) {
@@ -123,7 +122,7 @@ func TestLogin(t *testing.T) {
 	}
 
 	bodyJson, err := json.Marshal(requestBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/users/_login", strings.NewReader(string(bodyJson)))
 	req.Header.Set("Content-Type", "application/json")
@@ -133,27 +132,27 @@ func TestLogin(t *testing.T) {
 	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	responseBody := new(response.WebResponse[model.UserLoginResponse])
 	err = json.Unmarshal(bytes, responseBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.NotEmpty(t, responseBody.Data.Token)
+	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.NotEmpty(t, responseBody.Data.Token)
 
 	claims := &jwt.RegisteredClaims{}
 	token, err := jwt.ParseWithClaims(responseBody.Data.Token, claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(viperConfig.GetString(configkey.AuthJWTSecret)), nil
 	})
-	assert.Nil(t, err)
-	assert.True(t, token.Valid)
+	require.Nil(t, err)
+	require.True(t, token.Valid)
 	user := new(entity.User)
 	err = db.Where("username = ?", requestBody.Username).First(user).Error
-	assert.Nil(t, err)
-	assert.Equal(t, strconv.FormatInt(user.ID, 10), claims.Subject)
-	assert.Equal(t, viperConfig.GetString(configkey.AuthJWTIssuer), claims.Issuer)
-	assert.NotNil(t, claims.ExpiresAt)
+	require.Nil(t, err)
+	require.Equal(t, strconv.FormatInt(user.ID, 10), claims.Subject)
+	require.Equal(t, viperConfig.GetString(configkey.AuthJWTIssuer), claims.Issuer)
+	require.NotNil(t, claims.ExpiresAt)
 }
 
 func TestLoginWrongUsername(t *testing.T) {
@@ -166,7 +165,7 @@ func TestLoginWrongUsername(t *testing.T) {
 	}
 
 	bodyJson, err := json.Marshal(requestBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/users/_login", strings.NewReader(string(bodyJson)))
 	req.Header.Set("Content-Type", "application/json")
@@ -176,14 +175,14 @@ func TestLoginWrongUsername(t *testing.T) {
 	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
-	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
-	assert.NotNil(t, responseBody.ErrorMessage)
+	require.Equal(t, http.StatusUnauthorized, res.StatusCode)
+	require.NotNil(t, responseBody.ErrorMessage)
 }
 
 func TestLoginWrongPassword(t *testing.T) {
@@ -196,7 +195,7 @@ func TestLoginWrongPassword(t *testing.T) {
 	}
 
 	bodyJson, err := json.Marshal(requestBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/users/_login", strings.NewReader(string(bodyJson)))
 	req.Header.Set("Content-Type", "application/json")
@@ -206,14 +205,14 @@ func TestLoginWrongPassword(t *testing.T) {
 	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
-	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
-	assert.NotNil(t, responseBody.ErrorMessage)
+	require.Equal(t, http.StatusUnauthorized, res.StatusCode)
+	require.NotNil(t, responseBody.ErrorMessage)
 }
 
 func TestGetCurrentUser(t *testing.T) {
@@ -222,7 +221,7 @@ func TestGetCurrentUser(t *testing.T) {
 
 	user := new(entity.User)
 	err := db.Where("username = ?", "khannedy").First(user).Error
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/users/_current", nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -233,17 +232,17 @@ func TestGetCurrentUser(t *testing.T) {
 	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.Equal(t, user.ID, responseBody.Data.ID)
-	assert.Equal(t, user.Name, responseBody.Data.Name)
-	assert.Equal(t, user.CreatedAt, responseBody.Data.CreatedAt)
-	assert.Equal(t, user.UpdatedAt, responseBody.Data.UpdatedAt)
+	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, user.ID, responseBody.Data.ID)
+	require.Equal(t, user.Name, responseBody.Data.Name)
+	require.Equal(t, user.CreatedAt, responseBody.Data.CreatedAt)
+	require.Equal(t, user.UpdatedAt, responseBody.Data.UpdatedAt)
 }
 
 func TestGetCurrentUserFailed(t *testing.T) {
@@ -260,14 +259,14 @@ func TestGetCurrentUserFailed(t *testing.T) {
 	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
-	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
-	assert.NotNil(t, responseBody.ErrorMessage)
+	require.Equal(t, http.StatusUnauthorized, res.StatusCode)
+	require.NotNil(t, responseBody.ErrorMessage)
 }
 
 func TestUpdateUserName(t *testing.T) {
@@ -276,14 +275,14 @@ func TestUpdateUserName(t *testing.T) {
 
 	user := new(entity.User)
 	err := db.Where("username = ?", "khannedy").First(user).Error
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	requestBody := model.UpdateUserRequest{
 		Name: "Eko Kurniawan Khannedy",
 	}
 
 	bodyJson, err := json.Marshal(requestBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	req := httptest.NewRequest(http.MethodPatch, "/api/users/_current", strings.NewReader(string(bodyJson)))
 	req.Header.Set("Content-Type", "application/json")
@@ -294,17 +293,17 @@ func TestUpdateUserName(t *testing.T) {
 	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.Equal(t, user.ID, responseBody.Data.ID)
-	assert.Equal(t, requestBody.Name, responseBody.Data.Name)
-	assert.NotNil(t, responseBody.Data.CreatedAt)
-	assert.NotNil(t, responseBody.Data.UpdatedAt)
+	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, user.ID, responseBody.Data.ID)
+	require.Equal(t, requestBody.Name, responseBody.Data.Name)
+	require.NotNil(t, responseBody.Data.CreatedAt)
+	require.NotNil(t, responseBody.Data.UpdatedAt)
 }
 
 func TestUpdateUserPassword(t *testing.T) {
@@ -313,14 +312,14 @@ func TestUpdateUserPassword(t *testing.T) {
 
 	user := new(entity.User)
 	err := db.Where("username = ?", "khannedy").First(user).Error
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	requestBody := model.UpdateUserRequest{
 		Password: "rahasialagi",
 	}
 
 	bodyJson, err := json.Marshal(requestBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	req := httptest.NewRequest(http.MethodPatch, "/api/users/_current", strings.NewReader(string(bodyJson)))
 	req.Header.Set("Content-Type", "application/json")
@@ -331,23 +330,23 @@ func TestUpdateUserPassword(t *testing.T) {
 	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.Equal(t, user.ID, responseBody.Data.ID)
-	assert.NotNil(t, responseBody.Data.CreatedAt)
-	assert.NotNil(t, responseBody.Data.UpdatedAt)
+	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, user.ID, responseBody.Data.ID)
+	require.NotNil(t, responseBody.Data.CreatedAt)
+	require.NotNil(t, responseBody.Data.UpdatedAt)
 
 	user = new(entity.User)
 	err = db.Where("username = ?", "khannedy").First(user).Error
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(requestBody.Password))
-	assert.Nil(t, err)
+	require.Nil(t, err)
 }
 
 func TestUpdateFailed(t *testing.T) {
@@ -359,7 +358,7 @@ func TestUpdateFailed(t *testing.T) {
 	}
 
 	bodyJson, err := json.Marshal(requestBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	req := httptest.NewRequest(http.MethodPatch, "/api/users/_current", strings.NewReader(string(bodyJson)))
 	req.Header.Set("Content-Type", "application/json")
@@ -370,12 +369,12 @@ func TestUpdateFailed(t *testing.T) {
 	require.Nil(t, err)
 
 	bytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	responseBody := new(response.WebResponse[model.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
-	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
-	assert.NotNil(t, responseBody.ErrorMessage)
+	require.Equal(t, http.StatusUnauthorized, res.StatusCode)
+	require.NotNil(t, responseBody.ErrorMessage)
 }

@@ -9,12 +9,12 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewUserUsecaseMwLogger(t *testing.T) {
 	u := user.NewUserUsecaseMwLogger(&mock.UserUsecaseMock{})
-	assert.NotEmpty(t, u)
+	require.NotEmpty(t, u)
 }
 
 func TestUserUsecaseMwLogger_Create(t *testing.T) {
@@ -27,8 +27,8 @@ func TestUserUsecaseMwLogger_Create(t *testing.T) {
 		return &model.UserResponse{ID: 1, Username: "user1"}, nil
 	}
 	res, err := u.Create(context.Background(), &model.RegisterUserRequest{})
-	assert.NotEmpty(t, res)
-	assert.Nil(t, err)
+	require.NotEmpty(t, res)
+	require.Nil(t, err)
 }
 
 func TestUserUsecaseMwLogger_Current(t *testing.T) {
@@ -41,8 +41,8 @@ func TestUserUsecaseMwLogger_Current(t *testing.T) {
 		return &model.UserResponse{ID: 1, Username: "user1"}, nil
 	}
 	res, err := u.Current(context.Background(), &model.GetUserRequest{})
-	assert.NotEmpty(t, res)
-	assert.Nil(t, err)
+	require.NotEmpty(t, res)
+	require.Nil(t, err)
 }
 
 func TestUserUsecaseMwLogger_Login(t *testing.T) {
@@ -55,8 +55,8 @@ func TestUserUsecaseMwLogger_Login(t *testing.T) {
 		return &model.UserLoginResponse{ID: 1, Username: "user1"}, nil
 	}
 	res, err := u.Login(context.Background(), &model.LoginUserRequest{})
-	assert.NotEmpty(t, res)
-	assert.Nil(t, err)
+	require.NotEmpty(t, res)
+	require.Nil(t, err)
 }
 
 func TestUserUsecaseMwLogger_Update(t *testing.T) {
@@ -69,8 +69,8 @@ func TestUserUsecaseMwLogger_Update(t *testing.T) {
 		return &model.UserResponse{ID: 1, Username: "user1"}, nil
 	}
 	res, err := u.Update(context.Background(), &model.UpdateUserRequest{})
-	assert.NotEmpty(t, res)
-	assert.Nil(t, err)
+	require.NotEmpty(t, res)
+	require.Nil(t, err)
 }
 
 func TestUserUsecaseMwLogger_Verify(t *testing.T) {
@@ -83,6 +83,6 @@ func TestUserUsecaseMwLogger_Verify(t *testing.T) {
 		return &model.UserAuth{ID: 1, Username: "user1"}, nil
 	}
 	res, err := u.Verify(context.Background(), &model.VerifyUserRequest{})
-	assert.NotEmpty(t, res)
-	assert.Nil(t, err)
+	require.NotEmpty(t, res)
+	require.Nil(t, err)
 }

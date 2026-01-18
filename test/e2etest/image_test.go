@@ -12,7 +12,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -21,9 +20,9 @@ func uploadImage(t *testing.T, token string) int64 {
 	body := new(bytes.Buffer)
 	writer := multipart.NewWriter(body)
 	part, err := writer.CreateFormFile("image", "test.jpg")
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	_, err = part.Write([]byte("dummy image content"))
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	writer.Close()
 
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/images", body)
@@ -35,14 +34,14 @@ func uploadImage(t *testing.T, token string) int64 {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, res.StatusCode)
 
 	bytesBody, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	responseBody := new(response.WebResponse[model.ImageResponse])
 	err = json.Unmarshal(bytesBody, responseBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	return responseBody.Data.ID
 }
@@ -54,9 +53,9 @@ func TestUploadImage(t *testing.T) {
 	body := new(bytes.Buffer)
 	writer := multipart.NewWriter(body)
 	part, err := writer.CreateFormFile("image", "test.jpg")
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	_, err = part.Write([]byte("dummy image content"))
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	writer.Close()
 
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/images", body)
@@ -68,22 +67,22 @@ func TestUploadImage(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, res.StatusCode)
 
 	bytesBody, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	responseBody := new(response.WebResponse[model.ImageResponse])
 	err = json.Unmarshal(bytesBody, responseBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
-	assert.NotZero(t, responseBody.Data.ID)
-	assert.NotEmpty(t, responseBody.Data.URL)
+	require.NotZero(t, responseBody.Data.ID)
+	require.NotEmpty(t, responseBody.Data.URL)
 
 	var count int64
 	err = db.Model(&entity.Image{}).Where("id = ?", responseBody.Data.ID).Count(&count).Error
-	assert.Nil(t, err)
-	assert.Equal(t, int64(1), count)
+	require.Nil(t, err)
+	require.Equal(t, int64(1), count)
 }
 
 func TestLikeImage(t *testing.T) {
@@ -95,7 +94,7 @@ func TestLikeImage(t *testing.T) {
 		ImageID: imageID,
 	}
 	bodyJson, err := json.Marshal(reqBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/images/_like", bytes.NewReader(bodyJson))
 	require.Nil(t, err)
@@ -106,12 +105,12 @@ func TestLikeImage(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, res.StatusCode)
 
 	var count int64
 	err = db.Model(&entity.Like{}).Where("image_id = ?", imageID).Count(&count).Error
-	assert.Nil(t, err)
-	assert.Equal(t, int64(1), count)
+	require.Nil(t, err)
+	require.Equal(t, int64(1), count)
 }
 
 func TestCommentImage(t *testing.T) {
@@ -124,7 +123,7 @@ func TestCommentImage(t *testing.T) {
 		Comment: "Nice!",
 	}
 	bodyJson, err := json.Marshal(reqBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/images/_comment", bytes.NewReader(bodyJson))
 	require.Nil(t, err)
@@ -135,12 +134,12 @@ func TestCommentImage(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, res.StatusCode)
 
 	var count int64
 	err = db.Model(&entity.Comment{}).Where("image_id = ? AND comment = ?", imageID, "Nice!").Count(&count).Error
-	assert.Nil(t, err)
-	assert.Equal(t, int64(1), count)
+	require.Nil(t, err)
+	require.Equal(t, int64(1), count)
 }
 
 func TestGetLikes(t *testing.T) {
@@ -153,13 +152,13 @@ func TestGetLikes(t *testing.T) {
 		ImageID: imageID,
 	}
 	bodyJson, err := json.Marshal(reqBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	reqLike, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/images/_like", bytes.NewReader(bodyJson))
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	reqLike.Header.Set("Content-Type", "application/json")
 	reqLike.Header.Set("Authorization", bearerToken(token))
 	resLike, err := http.DefaultClient.Do(reqLike)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	resLike.Body.Close()
 
 	// Get Likes
@@ -172,13 +171,13 @@ func TestGetLikes(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, res.StatusCode)
 
 	respBody := new(response.WebResponse[model.LikeResponseList])
 	err = json.NewDecoder(res.Body).Decode(respBody)
-	assert.Nil(t, err)
-	assert.NotEmpty(t, respBody.Data)
-	assert.Equal(t, imageID, respBody.Data[0].ImageID)
+	require.Nil(t, err)
+	require.NotEmpty(t, respBody.Data)
+	require.Equal(t, imageID, respBody.Data[0].ImageID)
 }
 
 func TestGetComments(t *testing.T) {
@@ -192,13 +191,13 @@ func TestGetComments(t *testing.T) {
 		Comment: "Wow",
 	}
 	bodyJson, err := json.Marshal(reqBody)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	reqComm, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/images/_comment", bytes.NewReader(bodyJson))
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	reqComm.Header.Set("Content-Type", "application/json")
 	reqComm.Header.Set("Authorization", bearerToken(token))
 	resComm, err := http.DefaultClient.Do(reqComm)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	resComm.Body.Close()
 
 	// Get Comments
@@ -211,13 +210,13 @@ func TestGetComments(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, res.StatusCode)
 
 	respBody := new(response.WebResponse[model.CommentResponseList])
 	err = json.NewDecoder(res.Body).Decode(respBody)
-	assert.Nil(t, err)
-	assert.NotEmpty(t, respBody.Data)
-	assert.Equal(t, "Wow", respBody.Data[0].Comment)
+	require.Nil(t, err)
+	require.NotEmpty(t, respBody.Data)
+	require.Equal(t, "Wow", respBody.Data[0].Comment)
 }
 
 func TestImageFlow(t *testing.T) {
@@ -231,14 +230,14 @@ func TestImageFlow(t *testing.T) {
 	// Get User 1 ID
 	user1 := new(entity.User)
 	err := db.Where("username = ?", "user1").First(user1).Error
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	// User 2 follows User 1
 	reqBodyFollow := model.FollowUserRequest{
 		FollowingID: user1.ID,
 	}
 	bodyJsonFollow, err := json.Marshal(reqBodyFollow)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	reqFollow2, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users/_follow", bytes.NewReader(bodyJsonFollow))
 	require.Nil(t, err)
@@ -248,7 +247,7 @@ func TestImageFlow(t *testing.T) {
 	resFollow2, err := http.DefaultClient.Do(reqFollow2)
 	require.Nil(t, err)
 	resFollow2.Body.Close()
-	assert.Equal(t, http.StatusOK, resFollow2.StatusCode)
+	require.Equal(t, http.StatusOK, resFollow2.StatusCode)
 
 	// User 3 follows User 1
 	reqFollow3, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users/_follow", bytes.NewReader(bodyJsonFollow))
@@ -259,7 +258,7 @@ func TestImageFlow(t *testing.T) {
 	resFollow3, err := http.DefaultClient.Do(reqFollow3)
 	require.Nil(t, err)
 	resFollow3.Body.Close()
-	assert.Equal(t, http.StatusOK, resFollow3.StatusCode)
+	require.Equal(t, http.StatusOK, resFollow3.StatusCode)
 
 	// User 1 uploads image
 	uploadImage(t, token1)

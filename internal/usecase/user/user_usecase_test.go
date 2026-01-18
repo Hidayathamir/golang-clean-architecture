@@ -9,7 +9,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/spf13/viper"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewUserUsecase(t *testing.T) {
@@ -27,5 +27,5 @@ func TestNewUserUsecase(t *testing.T) {
 
 	u := user.NewUserUsecase(Config, DB, UserRepository, FollowRepository, UserProducer, NotifProducer, S3Client)
 
-	assert.NotEmpty(t, u)
+	require.NotEmpty(t, u)
 }

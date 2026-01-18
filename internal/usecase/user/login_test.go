@@ -66,16 +66,16 @@ func TestUserUsecaseImpl_Login_Success(t *testing.T) {
 	res, err := u.Login(context.Background(), req)
 	require.NoError(t, err)
 	require.NotNil(t, res)
-	assert.NotEmpty(t, res.Token)
+	require.NotEmpty(t, res.Token)
 
 	claims := &jwt.RegisteredClaims{}
 	token, err := jwt.ParseWithClaims(res.Token, claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(u.Config.GetString(configkey.AuthJWTSecret)), nil
 	})
 	require.NoError(t, err)
-	assert.True(t, token.Valid)
-	assert.Equal(t, "123", claims.Subject)
-	assert.Equal(t, u.Config.GetString(configkey.AuthJWTIssuer), claims.Issuer)
+	require.True(t, token.Valid)
+	require.Equal(t, "123", claims.Subject)
+	require.Equal(t, u.Config.GetString(configkey.AuthJWTIssuer), claims.Issuer)
 	require.NotNil(t, claims.ExpiresAt)
 	assert.WithinDuration(t, time.Now().Add(time.Minute), claims.ExpiresAt.Time, time.Minute)
 }
@@ -103,10 +103,10 @@ func TestUserUsecaseImpl_Login_Fail_ValidateStruct(t *testing.T) {
 
 	res, err := u.Login(context.Background(), req)
 
-	assert.Nil(t, res)
-	assert.NotNil(t, err)
+	require.Nil(t, res)
+	require.NotNil(t, err)
 	var verrs validator.ValidationErrors
-	assert.ErrorAs(t, err, &verrs)
+	require.ErrorAs(t, err, &verrs)
 }
 
 func TestUserUsecaseImpl_Login_Fail_FindByUsername(t *testing.T) {
@@ -127,9 +127,9 @@ func TestUserUsecaseImpl_Login_Fail_FindByUsername(t *testing.T) {
 
 	res, err := u.Login(context.Background(), req)
 
-	assert.Nil(t, res)
-	assert.NotNil(t, err)
-	assert.ErrorIs(t, err, assert.AnError)
+	require.Nil(t, res)
+	require.NotNil(t, err)
+	require.ErrorIs(t, err, assert.AnError)
 }
 
 func TestUserUsecaseImpl_Login_Fail_CompareHashAndPassword(t *testing.T) {
@@ -155,8 +155,8 @@ func TestUserUsecaseImpl_Login_Fail_CompareHashAndPassword(t *testing.T) {
 
 	res, err := u.Login(context.Background(), req)
 
-	assert.Nil(t, res)
-	assert.NotNil(t, err)
+	require.Nil(t, res)
+	require.NotNil(t, err)
 }
 
 func TestUserUsecaseImpl_Login_Fail_IsConnected(t *testing.T) {
@@ -182,9 +182,9 @@ func TestUserUsecaseImpl_Login_Fail_IsConnected(t *testing.T) {
 
 	res, err := u.Login(context.Background(), req)
 
-	assert.Nil(t, res)
-	assert.NotNil(t, err)
-	assert.ErrorIs(t, err, assert.AnError)
+	require.Nil(t, res)
+	require.NotNil(t, err)
+	require.ErrorIs(t, err, assert.AnError)
 }
 
 func TestUserUsecaseImpl_Login_Fail_Send(t *testing.T) {
@@ -210,9 +210,9 @@ func TestUserUsecaseImpl_Login_Fail_Send(t *testing.T) {
 
 	res, err := u.Login(context.Background(), req)
 
-	assert.Nil(t, res)
-	assert.NotNil(t, err)
-	assert.ErrorIs(t, err, assert.AnError)
+	require.Nil(t, res)
+	require.NotNil(t, err)
+	require.ErrorIs(t, err, assert.AnError)
 }
 
 func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
@@ -251,6 +251,6 @@ func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 
 	res, err := u.Login(context.Background(), req)
 
-	assert.Nil(t, res)
-	assert.NotNil(t, err)
+	require.Nil(t, res)
+	require.NotNil(t, err)
 }

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSetMessage(t *testing.T) {
@@ -16,9 +16,9 @@ func TestSetMessage(t *testing.T) {
 
 	httpErr := GetHTTPError(err)
 
-	assert.Equal(t, http.StatusBadRequest, httpErr.HTTPCode)
-	assert.Equal(t, "custom message", httpErr.Message)
-	assert.ErrorIs(t, err, baseErr)
+	require.Equal(t, http.StatusBadRequest, httpErr.HTTPCode)
+	require.Equal(t, "custom message", httpErr.Message)
+	require.ErrorIs(t, err, baseErr)
 }
 
 func TestSetCode(t *testing.T) {
@@ -30,9 +30,9 @@ func TestSetCode(t *testing.T) {
 
 	httpErr := GetHTTPError(err)
 
-	assert.Equal(t, http.StatusConflict, httpErr.HTTPCode)
-	assert.Equal(t, "custom message", httpErr.Message)
-	assert.ErrorIs(t, err, baseErr)
+	require.Equal(t, http.StatusConflict, httpErr.HTTPCode)
+	require.Equal(t, "custom message", httpErr.Message)
+	require.ErrorIs(t, err, baseErr)
 }
 
 func TestLoadErrAsHTTPError_1(t *testing.T) {
@@ -44,7 +44,7 @@ func TestLoadErrAsHTTPError_1(t *testing.T) {
 
 	httpErr := GetHTTPError(err)
 
-	assert.Equal(t, "Unauthorized", httpErr.Message)
+	require.Equal(t, "Unauthorized", httpErr.Message)
 }
 
 func TestLoadErrAsHTTPError_2(t *testing.T) {
@@ -55,7 +55,7 @@ func TestLoadErrAsHTTPError_2(t *testing.T) {
 
 	httpErr := GetHTTPError(err)
 
-	assert.Equal(t, "internal server error", httpErr.Message)
+	require.Equal(t, "internal server error", httpErr.Message)
 }
 
 func TestLoadErrAsHTTPError_3(t *testing.T) {
@@ -68,7 +68,7 @@ func TestLoadErrAsHTTPError_3(t *testing.T) {
 
 	httpErr := GetHTTPError(err)
 
-	assert.Equal(t, "Internal Server Error", httpErr.Message)
+	require.Equal(t, "Internal Server Error", httpErr.Message)
 }
 
 func TestLoadErrAsHTTPError_4(t *testing.T) {
@@ -82,7 +82,7 @@ func TestLoadErrAsHTTPError_4(t *testing.T) {
 
 	httpErr := GetHTTPError(err)
 
-	assert.Equal(t, "Unauthorized", httpErr.Message)
+	require.Equal(t, "Unauthorized", httpErr.Message)
 }
 
 func TestLoadErrAsHTTPError_5(t *testing.T) {
@@ -93,7 +93,7 @@ func TestLoadErrAsHTTPError_5(t *testing.T) {
 
 	httpErr := GetHTTPError(err)
 
-	assert.Equal(t, "unauthorized", httpErr.Message)
+	require.Equal(t, "unauthorized", httpErr.Message)
 }
 
 func TestLoadErrAsHTTPError_6(t *testing.T) {
@@ -101,7 +101,7 @@ func TestLoadErrAsHTTPError_6(t *testing.T) {
 
 	httpErr := GetHTTPError(err)
 
-	assert.Equal(t, "internal server error", httpErr.Message)
+	require.Equal(t, "internal server error", httpErr.Message)
 }
 
 func TestLoadErrAsHTTPError_7(t *testing.T) {
@@ -114,5 +114,5 @@ func TestLoadErrAsHTTPError_7(t *testing.T) {
 
 	httpErr := GetHTTPError(err)
 
-	assert.Equal(t, "unauthorized", httpErr.Message)
+	require.Equal(t, "unauthorized", httpErr.Message)
 }
