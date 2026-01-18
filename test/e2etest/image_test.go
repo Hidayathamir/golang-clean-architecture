@@ -48,8 +48,11 @@ func uploadImage(t *testing.T, token string) int64 {
 
 func TestUploadImage(t *testing.T) {
 	ClearAll()
+
+	// Register and login user
 	token := registerAndLoginDefaultUser(t)
 
+	// Prepare image upload request
 	body := new(bytes.Buffer)
 	writer := multipart.NewWriter(body)
 	part, err := writer.CreateFormFile("image", "test.jpg")
@@ -58,6 +61,7 @@ func TestUploadImage(t *testing.T) {
 	require.Nil(t, err)
 	writer.Close()
 
+	// Send upload request
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/images", body)
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -67,8 +71,10 @@ func TestUploadImage(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
+	// Verify response status code
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
+	// Verify response body
 	bytesBody, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
@@ -79,6 +85,7 @@ func TestUploadImage(t *testing.T) {
 	require.NotZero(t, responseBody.Data.ID)
 	require.NotEmpty(t, responseBody.Data.URL)
 
+	// Verify database record
 	var count int64
 	err = db.Model(&entity.Image{}).Where("id = ?", responseBody.Data.ID).Count(&count).Error
 	require.Nil(t, err)
@@ -87,15 +94,21 @@ func TestUploadImage(t *testing.T) {
 
 func TestLikeImage(t *testing.T) {
 	ClearAll()
+
+	// Register and login user
 	token := registerAndLoginDefaultUser(t)
+
+	// Upload image first
 	imageID := uploadImage(t, token)
 
+	// Prepare like request
 	reqBody := model.LikeImageRequest{
 		ImageID: imageID,
 	}
 	bodyJson, err := json.Marshal(reqBody)
 	require.Nil(t, err)
 
+	// Send like request
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/images/_like", bytes.NewReader(bodyJson))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
@@ -105,8 +118,10 @@ func TestLikeImage(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
+	// Verify response status code
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
+	// Verify database record
 	var count int64
 	err = db.Model(&entity.Like{}).Where("image_id = ?", imageID).Count(&count).Error
 	require.Nil(t, err)
@@ -115,9 +130,14 @@ func TestLikeImage(t *testing.T) {
 
 func TestCommentImage(t *testing.T) {
 	ClearAll()
+
+	// Register and login user
 	token := registerAndLoginDefaultUser(t)
+
+	// Upload image first
 	imageID := uploadImage(t, token)
 
+	// Prepare comment request
 	reqBody := model.CommentImageRequest{
 		ImageID: imageID,
 		Comment: "Nice!",
@@ -125,6 +145,7 @@ func TestCommentImage(t *testing.T) {
 	bodyJson, err := json.Marshal(reqBody)
 	require.Nil(t, err)
 
+	// Send comment request
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/images/_comment", bytes.NewReader(bodyJson))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
@@ -134,8 +155,10 @@ func TestCommentImage(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
+	// Verify response status code
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
+	// Verify database record
 	var count int64
 	err = db.Model(&entity.Comment{}).Where("image_id = ? AND comment = ?", imageID, "Nice!").Count(&count).Error
 	require.Nil(t, err)
@@ -144,7 +167,11 @@ func TestCommentImage(t *testing.T) {
 
 func TestGetLikes(t *testing.T) {
 	ClearAll()
+
+	// Register and login user
 	token := registerAndLoginDefaultUser(t)
+
+	// Upload image first
 	imageID := uploadImage(t, token)
 
 	// Like it first
@@ -161,7 +188,7 @@ func TestGetLikes(t *testing.T) {
 	require.Nil(t, err)
 	resLike.Body.Close()
 
-	// Get Likes
+	// Send get likes request
 	url := fmt.Sprintf("http://127.0.0.1:3000/api/images/%d/likes", imageID)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	require.Nil(t, err)
@@ -171,8 +198,10 @@ func TestGetLikes(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
+	// Verify response status code
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
+	// Verify response body
 	respBody := new(response.WebResponse[model.LikeResponseList])
 	err = json.NewDecoder(res.Body).Decode(respBody)
 	require.Nil(t, err)
@@ -182,7 +211,11 @@ func TestGetLikes(t *testing.T) {
 
 func TestGetComments(t *testing.T) {
 	ClearAll()
+
+	// Register and login user
 	token := registerAndLoginDefaultUser(t)
+
+	// Upload image first
 	imageID := uploadImage(t, token)
 
 	// Comment first
@@ -200,7 +233,7 @@ func TestGetComments(t *testing.T) {
 	require.Nil(t, err)
 	resComm.Body.Close()
 
-	// Get Comments
+	// Send get comments request
 	url := fmt.Sprintf("http://127.0.0.1:3000/api/images/%d/comments", imageID)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	require.Nil(t, err)
@@ -210,8 +243,10 @@ func TestGetComments(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
+	// Verify response status code
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
+	// Verify response body
 	respBody := new(response.WebResponse[model.CommentResponseList])
 	err = json.NewDecoder(res.Body).Decode(respBody)
 	require.Nil(t, err)
@@ -222,7 +257,7 @@ func TestGetComments(t *testing.T) {
 func TestImageFlow(t *testing.T) {
 	ClearAll()
 
-	// Register Users
+	// Register multiple users
 	token1 := registerAndLoginUser(t, "user1", "password", "User One")
 	token2 := registerAndLoginUser(t, "user2", "password", "User Two")
 	token3 := registerAndLoginUser(t, "user3", "password", "User Three")

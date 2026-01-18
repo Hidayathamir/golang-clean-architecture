@@ -26,9 +26,11 @@ func registerDefaultUser(t *testing.T) {
 	registerUser(t, defaultUsername, defaultUserPassword, defaultUserName)
 }
 
+// registerUser performs an HTTP request to register a new user.
 func registerUser(t *testing.T, username, password, name string) {
 	t.Helper()
 
+	// Prepare registration request body
 	requestBody := model.RegisterUserRequest{
 		Username: username,
 		Password: password,
@@ -38,6 +40,7 @@ func registerUser(t *testing.T, username, password, name string) {
 	bodyJSON, err := json.Marshal(requestBody)
 	require.Nil(t, err)
 
+	// Create and send POST /api/users request
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users", strings.NewReader(string(bodyJSON)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
@@ -48,6 +51,7 @@ func registerUser(t *testing.T, username, password, name string) {
 
 	defer func() { _ = res.Body.Close() }()
 
+	// Verify status code and response data
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
@@ -65,9 +69,11 @@ func loginDefaultUser(t *testing.T) string {
 	return loginUser(t, defaultUsername, defaultUserPassword)
 }
 
+// loginUser performs an HTTP request to login a user and returns the JWT token.
 func loginUser(t *testing.T, username, password string) string {
 	t.Helper()
 
+	// Prepare login request body
 	requestBody := model.LoginUserRequest{
 		Username: username,
 		Password: password,
@@ -76,6 +82,7 @@ func loginUser(t *testing.T, username, password string) string {
 	bodyJSON, err := json.Marshal(requestBody)
 	require.Nil(t, err)
 
+	// Create and send POST /api/users/_login request
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users/_login", strings.NewReader(string(bodyJSON)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
@@ -86,6 +93,7 @@ func loginUser(t *testing.T, username, password string) string {
 
 	defer func() { _ = res.Body.Close() }()
 
+	// Verify status code and retrieve token
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
@@ -125,15 +133,18 @@ func loginAndGetDefaultUser(t *testing.T) (string, *entity.User) {
 	return token, user
 }
 
+// followUser performs an HTTP request to follow another user.
 func followUser(t *testing.T, token string, followingID int64) {
 	t.Helper()
 
+	// Prepare follow request body
 	requestBody := model.FollowUserRequest{
 		FollowingID: followingID,
 	}
 	bodyJson, err := json.Marshal(requestBody)
 	require.Nil(t, err)
 
+	// Create and send POST /api/users/_follow request with Authorization header
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users/_follow", strings.NewReader(string(bodyJson)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
@@ -144,6 +155,7 @@ func followUser(t *testing.T, token string, followingID int64) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
+	// Verify status code and response data
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
 	bytes, err := io.ReadAll(res.Body)
@@ -155,6 +167,7 @@ func followUser(t *testing.T, token string, followingID int64) {
 	require.Equal(t, "ok", responseBody.Data)
 }
 
+// checkFollow verifies the existence of a follow relationship in the database.
 func checkFollow(t *testing.T, followerID, followingID int64) {
 	t.Helper()
 

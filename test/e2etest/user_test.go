@@ -20,6 +20,8 @@ import (
 
 func TestRegister(t *testing.T) {
 	ClearAll()
+
+	// Prepare registration request
 	requestBody := model.RegisterUserRequest{
 		Username: "khannedy",
 		Password: "rahasia",
@@ -29,6 +31,7 @@ func TestRegister(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	require.Nil(t, err)
 
+	// Send registration request
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users", strings.NewReader(string(bodyJson)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
@@ -38,8 +41,10 @@ func TestRegister(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
+	// Verify response status code
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
+	// Verify response body
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
@@ -56,6 +61,8 @@ func TestRegister(t *testing.T) {
 
 func TestRegisterError(t *testing.T) {
 	ClearAll()
+
+	// Prepare invalid registration request (empty fields)
 	requestBody := model.RegisterUserRequest{
 		Username: "",
 		Password: "",
@@ -65,6 +72,7 @@ func TestRegisterError(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	require.Nil(t, err)
 
+	// Send registration request
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users", strings.NewReader(string(bodyJson)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
@@ -74,8 +82,10 @@ func TestRegisterError(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
+	// Verify status code is Bad Request
 	require.Equal(t, http.StatusBadRequest, res.StatusCode)
 
+	// Verify error message exists in response
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
@@ -88,8 +98,11 @@ func TestRegisterError(t *testing.T) {
 
 func TestRegisterDuplicate(t *testing.T) {
 	ClearAll()
+
+	// Register user first
 	registerDefaultUser(t)
 
+	// Try to register the same user again
 	requestBody := model.RegisterUserRequest{
 		Username: "khannedy",
 		Password: "rahasia",
@@ -108,8 +121,10 @@ func TestRegisterDuplicate(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
+	// Verify status code is Conflict
 	require.Equal(t, http.StatusConflict, res.StatusCode)
 
+	// Verify error message exists in response
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
@@ -122,8 +137,11 @@ func TestRegisterDuplicate(t *testing.T) {
 
 func TestLogin(t *testing.T) {
 	ClearAll()
+
+	// Register user first
 	registerDefaultUser(t)
 
+	// Prepare login request
 	requestBody := model.LoginUserRequest{
 		Username: "khannedy",
 		Password: "rahasia",
@@ -132,6 +150,7 @@ func TestLogin(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	require.Nil(t, err)
 
+	// Send login request
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users/_login", strings.NewReader(string(bodyJson)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
@@ -141,8 +160,10 @@ func TestLogin(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
+	// Verify status code is OK
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
+	// Verify response body contains token
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
@@ -152,12 +173,15 @@ func TestLogin(t *testing.T) {
 
 	require.NotEmpty(t, responseBody.Data.Token)
 
+	// Verify JWT token claims
 	claims := &jwt.RegisteredClaims{}
 	token, err := jwt.ParseWithClaims(responseBody.Data.Token, claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(viperConfig.GetString(configkey.AuthJWTSecret)), nil
 	})
 	require.Nil(t, err)
 	require.True(t, token.Valid)
+
+	// Verify user data matches token subject
 	user := new(entity.User)
 	err = db.Where("username = ?", requestBody.Username).First(user).Error
 	require.Nil(t, err)
@@ -168,8 +192,11 @@ func TestLogin(t *testing.T) {
 
 func TestLoginWrongUsername(t *testing.T) {
 	ClearAll()
+
+	// Register user first
 	registerDefaultUser(t)
 
+	// Prepare login request with wrong username
 	requestBody := model.LoginUserRequest{
 		Username: "wrong",
 		Password: "rahasia",
@@ -178,6 +205,7 @@ func TestLoginWrongUsername(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	require.Nil(t, err)
 
+	// Send login request
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users/_login", strings.NewReader(string(bodyJson)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
@@ -187,8 +215,10 @@ func TestLoginWrongUsername(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
+	// Verify status code is Unauthorized
 	require.Equal(t, http.StatusUnauthorized, res.StatusCode)
 
+	// Verify error message exists
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
@@ -201,8 +231,11 @@ func TestLoginWrongUsername(t *testing.T) {
 
 func TestLoginWrongPassword(t *testing.T) {
 	ClearAll()
+
+	// Register user first
 	registerDefaultUser(t)
 
+	// Prepare login request with wrong password
 	requestBody := model.LoginUserRequest{
 		Username: "khannedy",
 		Password: "wrong",
@@ -211,6 +244,7 @@ func TestLoginWrongPassword(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	require.Nil(t, err)
 
+	// Send login request
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users/_login", strings.NewReader(string(bodyJson)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
@@ -220,8 +254,10 @@ func TestLoginWrongPassword(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
+	// Verify status code is Unauthorized
 	require.Equal(t, http.StatusUnauthorized, res.StatusCode)
 
+	// Verify error message exists
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
@@ -234,12 +270,16 @@ func TestLoginWrongPassword(t *testing.T) {
 
 func TestGetCurrentUser(t *testing.T) {
 	ClearAll()
+
+	// Register and login user
 	token := registerAndLoginDefaultUser(t)
 
+	// Get user data from database for comparison
 	user := new(entity.User)
 	err := db.Where("username = ?", "khannedy").First(user).Error
 	require.Nil(t, err)
 
+	// Send get current user request
 	req, err := http.NewRequest(http.MethodGet, "http://127.0.0.1:3000/api/users/_current", nil)
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
@@ -250,8 +290,10 @@ func TestGetCurrentUser(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
+	// Verify status code is OK
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
+	// Verify response body matches database record
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
@@ -268,8 +310,10 @@ func TestGetCurrentUser(t *testing.T) {
 func TestGetCurrentUserFailed(t *testing.T) {
 	ClearAll()
 
+	// Register user
 	registerDefaultUser(t)
 
+	// Send get current user request with invalid authorization
 	req, err := http.NewRequest(http.MethodGet, "http://127.0.0.1:3000/api/users/_current", nil)
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
@@ -280,8 +324,10 @@ func TestGetCurrentUserFailed(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
+	// Verify status code is Unauthorized
 	require.Equal(t, http.StatusUnauthorized, res.StatusCode)
 
+	// Verify error message exists
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
@@ -294,12 +340,16 @@ func TestGetCurrentUserFailed(t *testing.T) {
 
 func TestUpdateUserName(t *testing.T) {
 	ClearAll()
+
+	// Register and login user
 	token := registerAndLoginDefaultUser(t)
 
+	// Get user data from database
 	user := new(entity.User)
 	err := db.Where("username = ?", "khannedy").First(user).Error
 	require.Nil(t, err)
 
+	// Prepare update request (name change)
 	requestBody := model.UpdateUserRequest{
 		Name: "Eko Kurniawan Khannedy",
 	}
@@ -307,6 +357,7 @@ func TestUpdateUserName(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	require.Nil(t, err)
 
+	// Send update request
 	req, err := http.NewRequest(http.MethodPatch, "http://127.0.0.1:3000/api/users/_current", strings.NewReader(string(bodyJson)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
@@ -317,8 +368,10 @@ func TestUpdateUserName(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
+	// Verify status code is OK
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
+	// Verify response body matches update request
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
@@ -334,12 +387,16 @@ func TestUpdateUserName(t *testing.T) {
 
 func TestUpdateUserPassword(t *testing.T) {
 	ClearAll()
+
+	// Register and login user
 	token := registerAndLoginDefaultUser(t)
 
+	// Get user data from database
 	user := new(entity.User)
 	err := db.Where("username = ?", "khannedy").First(user).Error
 	require.Nil(t, err)
 
+	// Prepare update request (password change)
 	requestBody := model.UpdateUserRequest{
 		Password: "rahasialagi",
 	}
@@ -347,6 +404,7 @@ func TestUpdateUserPassword(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	require.Nil(t, err)
 
+	// Send update request
 	req, err := http.NewRequest(http.MethodPatch, "http://127.0.0.1:3000/api/users/_current", strings.NewReader(string(bodyJson)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
@@ -357,8 +415,10 @@ func TestUpdateUserPassword(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
+	// Verify status code is OK
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
+	// Verify response body
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
@@ -370,6 +430,7 @@ func TestUpdateUserPassword(t *testing.T) {
 	require.NotNil(t, responseBody.Data.CreatedAt)
 	require.NotNil(t, responseBody.Data.UpdatedAt)
 
+	// Verify new password is correctly hashed and stored in database
 	user = new(entity.User)
 	err = db.Where("username = ?", "khannedy").First(user).Error
 	require.Nil(t, err)
@@ -380,8 +441,11 @@ func TestUpdateUserPassword(t *testing.T) {
 
 func TestUpdateFailed(t *testing.T) {
 	ClearAll()
+
+	// Register user
 	registerDefaultUser(t)
 
+	// Prepare update request
 	requestBody := model.UpdateUserRequest{
 		Password: "rahasialagi",
 	}
@@ -389,6 +453,7 @@ func TestUpdateFailed(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	require.Nil(t, err)
 
+	// Send update request with invalid authorization
 	req, err := http.NewRequest(http.MethodPatch, "http://127.0.0.1:3000/api/users/_current", strings.NewReader(string(bodyJson)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
@@ -399,8 +464,10 @@ func TestUpdateFailed(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
+	// Verify status code is Unauthorized
 	require.Equal(t, http.StatusUnauthorized, res.StatusCode)
 
+	// Verify error message exists
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
@@ -413,6 +480,8 @@ func TestUpdateFailed(t *testing.T) {
 
 func TestFollowUser(t *testing.T) {
 	ClearAll()
+
+	// Register and login follower user
 	token := registerAndLoginDefaultUser(t)
 
 	// Register user to be followed
@@ -423,12 +492,14 @@ func TestFollowUser(t *testing.T) {
 	err := db.Where("username = ?", followingUsername).First(followingUser).Error
 	require.Nil(t, err)
 
+	// Prepare follow request
 	requestBody := model.FollowUserRequest{
 		FollowingID: followingUser.ID,
 	}
 	bodyJson, err := json.Marshal(requestBody)
 	require.Nil(t, err)
 
+	// Send follow request
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users/_follow", strings.NewReader(string(bodyJson)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
@@ -439,8 +510,10 @@ func TestFollowUser(t *testing.T) {
 	require.Nil(t, err)
 	defer res.Body.Close()
 
+	// Verify status code is OK
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
+	// Verify response body
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
@@ -449,6 +522,7 @@ func TestFollowUser(t *testing.T) {
 	require.Nil(t, err)
 	require.Equal(t, "ok", responseBody.Data)
 
+	// Verify follow relationship in database
 	followerUser := new(entity.User)
 	err = db.Where("username = ?", defaultUsername).First(followerUser).Error
 	require.Nil(t, err)
@@ -461,7 +535,7 @@ func TestFollowUser(t *testing.T) {
 func TestUserFollowScenario(t *testing.T) {
 	ClearAll()
 
-	// Register and login users
+	// Register and login multiple users
 	tokenA := registerAndLoginUser(t, "user_a", "password", "User A")
 	tokenB := registerAndLoginUser(t, "user_b", "password", "User B")
 	tokenC := registerAndLoginUser(t, "user_c", "password", "User C")
@@ -488,14 +562,15 @@ func TestUserFollowScenario(t *testing.T) {
 	// 3. User B follows User A
 	followUser(t, tokenB, userA.ID)
 
-	// Verify Database
+	// Verify follow relationships in Database
 	checkFollow(t, userA.ID, userB.ID)
 	checkFollow(t, userC.ID, userB.ID)
 	checkFollow(t, userB.ID, userA.ID)
 
-	// need to wait for topic to be consume
+	// Wait for async background jobs (Kafka consumers) to update follower/following counts
 	time.Sleep(5 * time.Second)
 
+	// Verify follower/following counts for each user
 	err = db.Where("username = ?", "user_a").First(userA).Error
 	require.Nil(t, err)
 	require.Equal(t, 1, userA.FollowerCount)
