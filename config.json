@@ -30,9 +30,6 @@
     "bootstrap": {
       "servers": "localhost:9093"
     },
-    "group": {
-      "id": "github.com/Hidayathamir/golang-clean-architecture"
-    },
     "auto": {
       "offset": {
         "reset": "earliest"

@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
@@ -491,6 +492,9 @@ func TestUserFollowScenario(t *testing.T) {
 	checkFollow(t, userA.ID, userB.ID)
 	checkFollow(t, userC.ID, userB.ID)
 	checkFollow(t, userB.ID, userA.ID)
+
+	// need to wait for topic to be consume
+	time.Sleep(5 * time.Second)
 
 	err = db.Where("username = ?", "user_a").First(userA).Error
 	require.Nil(t, err)
