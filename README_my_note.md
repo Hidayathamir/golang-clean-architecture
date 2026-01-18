@@ -60,8 +60,7 @@ This project is forked from [khannedy/golang-clean-architecture](https://github.
      ```
 
 4. **Testing**
-   - **Interface-first design for easy mocking** — see [address usecase interface](internal/usecase/address/address_usecase.go). Generate mock with `make generate`.
-   - **Unit test examples** — see [usecase/address tests](internal/usecase/address).
-   - **Integration tests with containerized DB** — see setup in [test/init_test.go](test/init_test.go).
-
----
+     - **Interface-first design for easy mocking** — see [address usecase interface](internal/usecase/address/address_usecase.go). Generate mock with `make generate`.
+     - **Unit test examples** — see [usecase/address tests](internal/usecase/address).
+   
+   ---

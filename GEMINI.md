@@ -21,14 +21,12 @@ This repo is a reusable Golang clean architecture template. The `architecture.pn
 - `pkg/`: Shared utilities (logging, errors, middleware primitives) that remain framework-agnostic.
 - `db/migrations`: Timestamped SQL files consumed by `cmd/migrate`.
 - `api/`: Generated Swagger specs and client/server stubs. Never edit by hand.
-- `test/integrationtest/`: Black-box scenarios that boot real adapters via docker-compose.
 - `signoz/`: Docker-compose fragments and dashboards for observability lab environments.
 - Root docs & helpers: `README.md`, `run_app.md` (step-by-step runbook), `README_my_note.md` (author notes), `Makefile`, `.env` samples under `config/` when present.
 
 ## 3. Build, Run, and Tooling Commands
 - `make run`, `make run-worker`, `make migrate`: Start the web app, workers, and schema migrations respectively.
 - `make go-test`: Run unit tests under `internal/...`.
-- `make go-integration-test`: Execute integration scenarios in `test/integrationtest/...`.
 - `make run-clean`: Run lint, code generation, Swagger refresh, and boot sequence.
 - `make docker-compose`: Reset local dependencies (Postgres, Kafka, Signoz, etc.).
 - `make format`: gofmt + golangci-lint formatting sweep.
@@ -44,7 +42,7 @@ This repo is a reusable Golang clean architecture template. The `architecture.pn
 ## 5. Testing Guidance
 - Prefer table-driven tests co-located with code using `_test.go` suffix and descriptive names like `TestUserRepository_FindByID`.
 - Cover new use cases, repositories, and gateways; update fixtures when schemas evolve.
-- Run both `make go-test` and `make go-integration-test` before opening a PR to ensure unit + integration coverage.
+- Run `make go-test` before opening a PR to ensure unit coverage.
 
 ## 6. Environment & Configuration
 - Use `make docker-compose` after checkout or schema changes to ensure Postgres/Kafka/Signoz stacks match expectations.

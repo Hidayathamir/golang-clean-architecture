@@ -9,9 +9,6 @@ run-worker:
 go-test:
 	go test -count=1 -v ./internal/...
 
-go-integration-test:
-	go test -count=1 -v ./test/integrationtest/...
-
 go-e2e-test:
 	go test -count=1 -v ./test/e2etest/...
 
