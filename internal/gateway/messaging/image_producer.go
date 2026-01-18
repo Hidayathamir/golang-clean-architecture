@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/consttopic"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/topic"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
@@ -47,7 +47,7 @@ func (p *ImageProducerImpl) SendImageUploaded(ctx context.Context, event *model.
 	}
 
 	message := &sarama.ProducerMessage{
-		Topic: consttopic.ImageUploaded,
+		Topic: topic.ImageUploaded,
 		Value: sarama.ByteEncoder(value),
 	}
 
@@ -75,7 +75,7 @@ func (p *ImageProducerImpl) SendImageLiked(ctx context.Context, event *model.Ima
 	}
 
 	message := &sarama.ProducerMessage{
-		Topic: consttopic.ImageLiked,
+		Topic: topic.ImageLiked,
 		Value: sarama.ByteEncoder(value),
 	}
 
@@ -103,7 +103,7 @@ func (p *ImageProducerImpl) SendImageCommented(ctx context.Context, event *model
 	}
 
 	message := &sarama.ProducerMessage{
-		Topic: consttopic.ImageCommented,
+		Topic: topic.ImageCommented,
 		Value: sarama.ByteEncoder(value),
 	}
 

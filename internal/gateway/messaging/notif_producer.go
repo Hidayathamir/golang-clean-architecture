@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/consttopic"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/topic"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
@@ -45,7 +45,7 @@ func (p *NotifProducerImpl) SendNotif(ctx context.Context, event *model.NotifEve
 	}
 
 	message := &sarama.ProducerMessage{
-		Topic: consttopic.Notif,
+		Topic: topic.Notif,
 		Value: sarama.ByteEncoder(value),
 	}
 

@@ -1,4 +1,4 @@
-package consttopic
+package topic
 
 const (
 	ImageUploaded  = "image.uploaded"

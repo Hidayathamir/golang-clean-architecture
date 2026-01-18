@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/consttopic"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/topic"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
@@ -45,7 +45,7 @@ func (p *UserProducerImpl) SendUserFollowed(ctx context.Context, event *model.Us
 	}
 
 	message := &sarama.ProducerMessage{
-		Topic: consttopic.UserFollowed,
+		Topic: topic.UserFollowed,
 		Key:   sarama.StringEncoder(event.GetID()),
 		Value: sarama.ByteEncoder(value),
 	}
