@@ -2,10 +2,13 @@ package converter
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/IBM/sarama"
 )
 
 func ModelRegisterUserRequestToEntityUser(req *model.RegisterUserRequest, user *entity.User, password string) {
@@ -81,4 +84,36 @@ func EntityFollowToModelUserFollowedEvent(ctx context.Context, follow *entity.Fo
 func ModelUserFollowedEventToModelNotifyUserBeingFollowedRequest(ctx context.Context, event *model.UserFollowedEvent, req *model.NotifyUserBeingFollowedRequest) {
 	req.FollowerID = event.FollowerID
 	req.FollowingID = event.FollowingID
+}
+
+func SaramaConsumerMessageListToModelBatchUpdateUserFollowStatsRequest(ctx context.Context, messages []*sarama.ConsumerMessage, req *model.BatchUpdateUserFollowStatsRequest) {
+	userFollowerCounts := make(map[int64]int)
+	userFollowingCounts := make(map[int64]int)
+
+	for _, message := range messages {
+		event := new(model.UserFollowedEvent)
+		if err := json.Unmarshal(message.Value, event); err != nil {
+			x.Logger.WithContext(ctx).WithError(err).Error("Failed to unmarshal user followed event")
+			continue
+		}
+		userFollowerCounts[event.FollowingID]++
+		userFollowingCounts[event.FollowerID]++
+	}
+
+	allUserIDs := make(map[int64]struct{})
+	for id := range userFollowerCounts {
+		allUserIDs[id] = struct{}{}
+	}
+	for id := range userFollowingCounts {
+		allUserIDs[id] = struct{}{}
+	}
+
+	for id := range allUserIDs {
+		object := model.UserIncreaseFollowerFollowingCount{
+			UserID:         id,
+			FollowerCount:  userFollowerCounts[id],
+			FollowingCount: userFollowingCounts[id],
+		}
+		req.UserIncreaseFollowerFollowingCountList = append(req.UserIncreaseFollowerFollowingCountList, object)
+	}
 }

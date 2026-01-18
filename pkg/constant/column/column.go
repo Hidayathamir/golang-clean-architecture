@@ -2,8 +2,16 @@ package column
 
 type Column string
 
+func (c Column) Str() string {
+	return string(c)
+}
+
 func (c Column) Eq(value any) (string, any) {
 	return string(c) + " = ?", value
+}
+
+func (c Column) Plus(value any) (string, any) {
+	return string(c) + " + ?", value
 }
 
 const (

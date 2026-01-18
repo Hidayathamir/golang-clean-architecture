@@ -58,3 +58,27 @@ type NotifyUserBeingFollowedRequest struct {
 	FollowerID  int64
 	FollowingID int64
 }
+
+type BatchUpdateUserFollowStatsRequest struct {
+	UserIncreaseFollowerFollowingCountList UserIncreaseFollowerFollowingCountList
+}
+
+type UserIncreaseFollowerFollowingCount struct {
+	UserID         int64
+	FollowerCount  int
+	FollowingCount int
+}
+
+func (u UserIncreaseFollowerFollowingCount) HasFollowerCount() bool {
+	return u.FollowerCount > 0
+}
+
+func (u UserIncreaseFollowerFollowingCount) HasFollowingCount() bool {
+	return u.FollowingCount > 0
+}
+
+func (u UserIncreaseFollowerFollowingCount) HasFollowerCountAndFollowingCount() bool {
+	return u.HasFollowerCount() && u.HasFollowingCount()
+}
+
+type UserIncreaseFollowerFollowingCountList []UserIncreaseFollowerFollowingCount

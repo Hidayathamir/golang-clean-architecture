@@ -20,6 +20,9 @@ var _ user.UserUsecase = &UserUsecaseMock{}
 //
 //		// make and configure a mocked user.UserUsecase
 //		mockedUserUsecase := &UserUsecaseMock{
+//			BatchUpdateUserFollowStatsFunc: func(ctx context.Context, req *model.BatchUpdateUserFollowStatsRequest) error {
+//				panic("mock out the BatchUpdateUserFollowStats method")
+//			},
 //			CreateFunc: func(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error) {
 //				panic("mock out the Create method")
 //			},
@@ -48,6 +51,9 @@ var _ user.UserUsecase = &UserUsecaseMock{}
 //
 //	}
 type UserUsecaseMock struct {
+	// BatchUpdateUserFollowStatsFunc mocks the BatchUpdateUserFollowStats method.
+	BatchUpdateUserFollowStatsFunc func(ctx context.Context, req *model.BatchUpdateUserFollowStatsRequest) error
+
 	// CreateFunc mocks the Create method.
 	CreateFunc func(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error)
 
@@ -71,6 +77,13 @@ type UserUsecaseMock struct {
 
 	// calls tracks calls to the methods.
 	calls struct {
+		// BatchUpdateUserFollowStats holds details about calls to the BatchUpdateUserFollowStats method.
+		BatchUpdateUserFollowStats []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req *model.BatchUpdateUserFollowStatsRequest
+		}
 		// Create holds details about calls to the Create method.
 		Create []struct {
 			// Ctx is the ctx argument value.
@@ -121,13 +134,50 @@ type UserUsecaseMock struct {
 			Req *model.VerifyUserRequest
 		}
 	}
-	lockCreate                  sync.RWMutex
-	lockCurrent                 sync.RWMutex
-	lockFollow                  sync.RWMutex
-	lockLogin                   sync.RWMutex
-	lockNotifyUserBeingFollowed sync.RWMutex
-	lockUpdate                  sync.RWMutex
-	lockVerify                  sync.RWMutex
+	lockBatchUpdateUserFollowStats sync.RWMutex
+	lockCreate                     sync.RWMutex
+	lockCurrent                    sync.RWMutex
+	lockFollow                     sync.RWMutex
+	lockLogin                      sync.RWMutex
+	lockNotifyUserBeingFollowed    sync.RWMutex
+	lockUpdate                     sync.RWMutex
+	lockVerify                     sync.RWMutex
+}
+
+// BatchUpdateUserFollowStats calls BatchUpdateUserFollowStatsFunc.
+func (mock *UserUsecaseMock) BatchUpdateUserFollowStats(ctx context.Context, req *model.BatchUpdateUserFollowStatsRequest) error {
+	if mock.BatchUpdateUserFollowStatsFunc == nil {
+		panic("UserUsecaseMock.BatchUpdateUserFollowStatsFunc: method is nil but UserUsecase.BatchUpdateUserFollowStats was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req *model.BatchUpdateUserFollowStatsRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockBatchUpdateUserFollowStats.Lock()
+	mock.calls.BatchUpdateUserFollowStats = append(mock.calls.BatchUpdateUserFollowStats, callInfo)
+	mock.lockBatchUpdateUserFollowStats.Unlock()
+	return mock.BatchUpdateUserFollowStatsFunc(ctx, req)
+}
+
+// BatchUpdateUserFollowStatsCalls gets all the calls that were made to BatchUpdateUserFollowStats.
+// Check the length with:
+//
+//	len(mockedUserUsecase.BatchUpdateUserFollowStatsCalls())
+func (mock *UserUsecaseMock) BatchUpdateUserFollowStatsCalls() []struct {
+	Ctx context.Context
+	Req *model.BatchUpdateUserFollowStatsRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req *model.BatchUpdateUserFollowStatsRequest
+	}
+	mock.lockBatchUpdateUserFollowStats.RLock()
+	calls = mock.calls.BatchUpdateUserFollowStats
+	mock.lockBatchUpdateUserFollowStats.RUnlock()
+	return calls
 }
 
 // Create calls CreateFunc.

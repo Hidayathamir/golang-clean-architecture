@@ -21,6 +21,7 @@ type UserUsecase interface {
 	Update(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error)
 	Follow(ctx context.Context, req *model.FollowUserRequest) error
 	NotifyUserBeingFollowed(ctx context.Context, req *model.NotifyUserBeingFollowedRequest) error
+	BatchUpdateUserFollowStats(ctx context.Context, req *model.BatchUpdateUserFollowStatsRequest) error
 }
 
 var _ UserUsecase = &UserUsecaseImpl{}

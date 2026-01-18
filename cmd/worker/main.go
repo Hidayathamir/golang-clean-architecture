@@ -40,7 +40,8 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	x.Logger.Info("Starting worker service")
-	go route.SetupUserFollowedConsumer(ctx, viperConfig, usecases)
+	go route.ConsumeUserFollowedEventForNotification(ctx, viperConfig, usecases)
+	go route.ConsumeUserFollowedEventForUpdateCount(ctx, viperConfig, usecases)
 	go route.SetupImageUploadedConsumer(ctx, viperConfig, usecases)
 	go route.SetupImageLikedConsumer(ctx, viperConfig, usecases)
 	go route.SetupImageCommentedConsumer(ctx, viperConfig, usecases)

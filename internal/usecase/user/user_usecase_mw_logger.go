@@ -130,3 +130,18 @@ func (u *UserUsecaseMwLogger) NotifyUserBeingFollowed(ctx context.Context, req *
 
 	return err
 }
+
+func (u *UserUsecaseMwLogger) BatchUpdateUserFollowStats(ctx context.Context, req *model.BatchUpdateUserFollowStatsRequest) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := u.Next.BatchUpdateUserFollowStats(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+	}
+	x.LogMw(ctx, fields, err)
+
+	return err
+}

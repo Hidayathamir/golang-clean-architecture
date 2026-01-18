@@ -43,7 +43,7 @@ clean:
 	make generate && make swag && make format && echo "done"
 
 format:
-	golangci-lint run ./... --fix
+	golangci-lint run ./... --fix --tests=false
 
 generate:
 	rm -rf internal/mock &&	go generate ./internal/...

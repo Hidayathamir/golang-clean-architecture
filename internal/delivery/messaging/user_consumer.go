@@ -1,6 +1,7 @@
 package messaging
 
 import (
+	"context"
 	"encoding/json"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
@@ -34,6 +35,17 @@ func (c UserConsumer) ConsumeUserFollowedEventForNotification(message *sarama.Co
 	converter.ModelUserFollowedEventToModelNotifyUserBeingFollowedRequest(ctx, event, req)
 
 	if err := c.Usecase.NotifyUserBeingFollowed(ctx, req); err != nil {
+		return errkit.AddFuncName(err)
+	}
+
+	return nil
+}
+
+func (c UserConsumer) ConsumeUserFollowedEventForUpdateCount(messages []*sarama.ConsumerMessage) error {
+	req := new(model.BatchUpdateUserFollowStatsRequest)
+	converter.SaramaConsumerMessageListToModelBatchUpdateUserFollowStatsRequest(context.Background(), messages, req)
+
+	if err := c.Usecase.BatchUpdateUserFollowStats(context.Background(), req); err != nil {
 		return errkit.AddFuncName(err)
 	}
 
