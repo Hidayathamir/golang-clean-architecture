@@ -217,12 +217,9 @@ services:
     container_name: signoz-otel-collector
     command:
       - --config=/etc/otel-collector-config.yaml
-      - --manager-config=/etc/manager-config.yaml
-      - --copy-path=/var/tmp/collector-config.yaml
       - --feature-gates=-pkg.translator.prometheus.NormalizeName
     volumes:
       - ./signoz/deploy/docker/otel-collector-config.yaml:/etc/otel-collector-config.yaml
-      - ./signoz/deploy/common/signoz/otel-collector-opamp-config.yaml:/etc/manager-config.yaml
     environment:
       - OTEL_RESOURCE_ATTRIBUTES=host.name=signoz-host,os.type=linux
       - LOW_CARDINAL_EXCEPTION_GROUPING=false
