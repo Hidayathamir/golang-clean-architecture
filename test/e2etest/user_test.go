@@ -36,7 +36,7 @@ func TestRegister(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer func() { _ = res.Body.Close() }()
+	defer res.Body.Close()
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 
@@ -72,7 +72,7 @@ func TestRegisterError(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer func() { _ = res.Body.Close() }()
+	defer res.Body.Close()
 
 	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
 
@@ -106,7 +106,7 @@ func TestRegisterDuplicate(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer func() { _ = res.Body.Close() }()
+	defer res.Body.Close()
 
 	assert.Equal(t, http.StatusConflict, res.StatusCode)
 
@@ -139,7 +139,7 @@ func TestLogin(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer func() { _ = res.Body.Close() }()
+	defer res.Body.Close()
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 
@@ -185,7 +185,7 @@ func TestLoginWrongUsername(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer func() { _ = res.Body.Close() }()
+	defer res.Body.Close()
 
 	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
 
@@ -218,7 +218,7 @@ func TestLoginWrongPassword(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer func() { _ = res.Body.Close() }()
+	defer res.Body.Close()
 
 	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
 
@@ -248,7 +248,7 @@ func TestGetCurrentUser(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer func() { _ = res.Body.Close() }()
+	defer res.Body.Close()
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 
@@ -278,7 +278,7 @@ func TestGetCurrentUserFailed(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer func() { _ = res.Body.Close() }()
+	defer res.Body.Close()
 
 	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
 
@@ -315,7 +315,7 @@ func TestUpdateUserName(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer func() { _ = res.Body.Close() }()
+	defer res.Body.Close()
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 
@@ -355,7 +355,7 @@ func TestUpdateUserPassword(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer func() { _ = res.Body.Close() }()
+	defer res.Body.Close()
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 
@@ -397,7 +397,7 @@ func TestUpdateFailed(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer func() { _ = res.Body.Close() }()
+	defer res.Body.Close()
 
 	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
 
@@ -437,7 +437,7 @@ func TestFollowUser(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer func() { _ = res.Body.Close() }()
+	defer res.Body.Close()
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 

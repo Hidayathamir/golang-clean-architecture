@@ -127,6 +127,9 @@ func loginAndGetDefaultUser(t *testing.T) (string, *entity.User) {
 }
 
 func ClearAll() {
+	ClearComments()
+	ClearLikes()
+	ClearImages()
 	ClearUsers()
 }
 
@@ -134,6 +137,27 @@ func ClearUsers() {
 	err := db.Unscoped().Where("id is not null").Delete(&entity.User{}).Error
 	if err != nil {
 		x.Logger.Panicf("Failed clear user data : %+v", err)
+	}
+}
+
+func ClearImages() {
+	err := db.Unscoped().Where("id is not null").Delete(&entity.Image{}).Error
+	if err != nil {
+		x.Logger.Panicf("Failed clear image data : %+v", err)
+	}
+}
+
+func ClearLikes() {
+	err := db.Unscoped().Where("id is not null").Delete(&entity.Like{}).Error
+	if err != nil {
+		x.Logger.Panicf("Failed clear like data : %+v", err)
+	}
+}
+
+func ClearComments() {
+	err := db.Unscoped().Where("id is not null").Delete(&entity.Comment{}).Error
+	if err != nil {
+		x.Logger.Panicf("Failed clear comment data : %+v", err)
 	}
 }
 
