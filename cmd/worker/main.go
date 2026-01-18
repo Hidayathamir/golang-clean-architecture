@@ -10,8 +10,12 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/messaging/route"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/sdk/trace"
 )
 
 func main() {
@@ -26,6 +30,8 @@ func main() {
 	stopTraceProvider, err := telemetry.InitTraceProvider(viperConfig)
 	panicIfErr(err)
 	defer stopTraceProvider()
+
+	validateAbleToExportSpan()
 
 	stopLogProvider, err := telemetry.InitLogProvider(viperConfig)
 	panicIfErr(err)
@@ -55,6 +61,25 @@ func main() {
 	x.Logger.Info("done waiting")
 
 	x.Logger.Info("end process of worker")
+}
+
+func validateAbleToExportSpan() {
+	tracer := otel.Tracer("manual-validation-worker")
+	_, span := tracer.Start(context.Background(), "startup-check-worker")
+	span.SetAttributes(attribute.String("check", "success"))
+	span.End()
+
+	flushCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if tp, ok := otel.GetTracerProvider().(*trace.TracerProvider); ok {
+		err := tp.ForceFlush(flushCtx)
+		if err != nil {
+			err = errkit.SetMessage(err, "error export span, wait a little longer, or check is the collector ready")
+			x.Logger.WithError(err).Panic("")
+		}
+		x.Logger.Info("Successfully sent manual trace for worker")
+	}
 }
 
 func panicIfErr(err error) {
