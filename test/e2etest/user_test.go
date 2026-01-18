@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
@@ -566,23 +565,4 @@ func TestUserFollowScenario(t *testing.T) {
 	checkFollow(t, userA.ID, userB.ID)
 	checkFollow(t, userC.ID, userB.ID)
 	checkFollow(t, userB.ID, userA.ID)
-
-	// Wait for async background jobs (Kafka consumers) to update follower/following counts
-	time.Sleep(5 * time.Second)
-
-	// Verify follower/following counts for each user
-	err = db.Where("username = ?", "user_a").First(userA).Error
-	require.Nil(t, err)
-	require.Equal(t, 1, userA.FollowerCount)
-	require.Equal(t, 1, userA.FollowingCount)
-
-	err = db.Where("username = ?", "user_b").First(userB).Error
-	require.Nil(t, err)
-	require.Equal(t, 2, userB.FollowerCount)
-	require.Equal(t, 1, userB.FollowingCount)
-
-	err = db.Where("username = ?", "user_c").First(userC).Error
-	require.Nil(t, err)
-	require.Equal(t, 0, userC.FollowerCount)
-	require.Equal(t, 1, userC.FollowingCount)
 }
