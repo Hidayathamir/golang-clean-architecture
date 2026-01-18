@@ -29,13 +29,16 @@ func TestRegister(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req, err := http.NewRequest(http.MethodPost, "http://localhost:3000/api/users", strings.NewReader(string(bodyJson)))
+	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users", strings.NewReader(string(bodyJson)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
+	defer func() { _ = res.Body.Close() }()
+
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
@@ -44,7 +47,6 @@ func TestRegister(t *testing.T) {
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, requestBody.Username, responseBody.Data.Username)
 	assert.True(t, responseBody.Data.ID > 0)
 	assert.Equal(t, requestBody.Name, responseBody.Data.Name)
@@ -63,13 +65,16 @@ func TestRegisterError(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req, err := http.NewRequest(http.MethodPost, "http://localhost:3000/api/users", strings.NewReader(string(bodyJson)))
+	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users", strings.NewReader(string(bodyJson)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
+	defer func() { _ = res.Body.Close() }()
+
+	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
@@ -78,7 +83,6 @@ func TestRegisterError(t *testing.T) {
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
 	assert.NotNil(t, responseBody.ErrorMessage)
 }
 
@@ -95,13 +99,16 @@ func TestRegisterDuplicate(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req, err := http.NewRequest(http.MethodPost, "http://localhost:3000/api/users", strings.NewReader(string(bodyJson)))
+	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users", strings.NewReader(string(bodyJson)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
+	defer func() { _ = res.Body.Close() }()
+
+	assert.Equal(t, http.StatusConflict, res.StatusCode)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
@@ -110,7 +117,6 @@ func TestRegisterDuplicate(t *testing.T) {
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusConflict, res.StatusCode)
 	assert.NotNil(t, responseBody.ErrorMessage)
 }
 
@@ -126,13 +132,16 @@ func TestLogin(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req, err := http.NewRequest(http.MethodPost, "http://localhost:3000/api/users/_login", strings.NewReader(string(bodyJson)))
+	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users/_login", strings.NewReader(string(bodyJson)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
+	defer func() { _ = res.Body.Close() }()
+
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
@@ -141,7 +150,6 @@ func TestLogin(t *testing.T) {
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.NotEmpty(t, responseBody.Data.Token)
 
 	claims := &jwt.RegisteredClaims{}
@@ -170,13 +178,16 @@ func TestLoginWrongUsername(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req, err := http.NewRequest(http.MethodPost, "http://localhost:3000/api/users/_login", strings.NewReader(string(bodyJson)))
+	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users/_login", strings.NewReader(string(bodyJson)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
+	defer func() { _ = res.Body.Close() }()
+
+	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
@@ -185,7 +196,6 @@ func TestLoginWrongUsername(t *testing.T) {
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
 	assert.NotNil(t, responseBody.ErrorMessage)
 }
 
@@ -201,13 +211,16 @@ func TestLoginWrongPassword(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req, err := http.NewRequest(http.MethodPost, "http://localhost:3000/api/users/_login", strings.NewReader(string(bodyJson)))
+	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users/_login", strings.NewReader(string(bodyJson)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
+	defer func() { _ = res.Body.Close() }()
+
+	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
@@ -216,7 +229,6 @@ func TestLoginWrongPassword(t *testing.T) {
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
 	assert.NotNil(t, responseBody.ErrorMessage)
 }
 
@@ -228,7 +240,7 @@ func TestGetCurrentUser(t *testing.T) {
 	err := db.Where("username = ?", "khannedy").First(user).Error
 	assert.Nil(t, err)
 
-	req, err := http.NewRequest(http.MethodGet, "http://localhost:3000/api/users/_current", nil)
+	req, err := http.NewRequest(http.MethodGet, "http://127.0.0.1:3000/api/users/_current", nil)
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
@@ -236,6 +248,9 @@ func TestGetCurrentUser(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
+	defer func() { _ = res.Body.Close() }()
+
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
@@ -244,7 +259,6 @@ func TestGetCurrentUser(t *testing.T) {
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, user.ID, responseBody.Data.ID)
 	assert.Equal(t, user.Name, responseBody.Data.Name)
 	assert.Equal(t, user.CreatedAt, responseBody.Data.CreatedAt)
@@ -256,7 +270,7 @@ func TestGetCurrentUserFailed(t *testing.T) {
 
 	registerDefaultUser(t)
 
-	req, err := http.NewRequest(http.MethodGet, "http://localhost:3000/api/users/_current", nil)
+	req, err := http.NewRequest(http.MethodGet, "http://127.0.0.1:3000/api/users/_current", nil)
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
@@ -264,6 +278,9 @@ func TestGetCurrentUserFailed(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
+	defer func() { _ = res.Body.Close() }()
+
+	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
@@ -272,7 +289,6 @@ func TestGetCurrentUserFailed(t *testing.T) {
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
 	assert.NotNil(t, responseBody.ErrorMessage)
 }
 
@@ -291,7 +307,7 @@ func TestUpdateUserName(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req, err := http.NewRequest(http.MethodPatch, "http://localhost:3000/api/users/_current", strings.NewReader(string(bodyJson)))
+	req, err := http.NewRequest(http.MethodPatch, "http://127.0.0.1:3000/api/users/_current", strings.NewReader(string(bodyJson)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
@@ -299,6 +315,9 @@ func TestUpdateUserName(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
+	defer func() { _ = res.Body.Close() }()
+
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
@@ -307,7 +326,6 @@ func TestUpdateUserName(t *testing.T) {
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, user.ID, responseBody.Data.ID)
 	assert.Equal(t, requestBody.Name, responseBody.Data.Name)
 	assert.NotNil(t, responseBody.Data.CreatedAt)
@@ -329,7 +347,7 @@ func TestUpdateUserPassword(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req, err := http.NewRequest(http.MethodPatch, "http://localhost:3000/api/users/_current", strings.NewReader(string(bodyJson)))
+	req, err := http.NewRequest(http.MethodPatch, "http://127.0.0.1:3000/api/users/_current", strings.NewReader(string(bodyJson)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
@@ -337,6 +355,9 @@ func TestUpdateUserPassword(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
+	defer func() { _ = res.Body.Close() }()
+
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
@@ -345,7 +366,6 @@ func TestUpdateUserPassword(t *testing.T) {
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, user.ID, responseBody.Data.ID)
 	assert.NotNil(t, responseBody.Data.CreatedAt)
 	assert.NotNil(t, responseBody.Data.UpdatedAt)
@@ -369,7 +389,7 @@ func TestUpdateFailed(t *testing.T) {
 	bodyJson, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req, err := http.NewRequest(http.MethodPatch, "http://localhost:3000/api/users/_current", strings.NewReader(string(bodyJson)))
+	req, err := http.NewRequest(http.MethodPatch, "http://127.0.0.1:3000/api/users/_current", strings.NewReader(string(bodyJson)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
@@ -377,6 +397,9 @@ func TestUpdateFailed(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
+	defer func() { _ = res.Body.Close() }()
+
+	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
 
 	bytes, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
@@ -385,6 +408,52 @@ func TestUpdateFailed(t *testing.T) {
 	err = json.Unmarshal(bytes, responseBody)
 	assert.Nil(t, err)
 
-	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
 	assert.NotNil(t, responseBody.ErrorMessage)
+}
+
+func TestFollowUser(t *testing.T) {
+	ClearAll()
+	token := registerAndLoginDefaultUser(t)
+
+	// Register user to be followed
+	followingUsername := "johndoe"
+	registerUser(t, followingUsername, "rahasia", "John Doe")
+
+	followingUser := new(entity.User)
+	err := db.Where("username = ?", followingUsername).First(followingUser).Error
+	assert.Nil(t, err)
+
+	requestBody := model.FollowUserRequest{
+		FollowingID: followingUser.ID,
+	}
+	bodyJson, err := json.Marshal(requestBody)
+	assert.Nil(t, err)
+
+	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users/_follow", strings.NewReader(string(bodyJson)))
+	require.Nil(t, err)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", bearerToken(token))
+
+	res, err := http.DefaultClient.Do(req)
+	require.Nil(t, err)
+	defer func() { _ = res.Body.Close() }()
+
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+
+	bytes, err := io.ReadAll(res.Body)
+	assert.Nil(t, err)
+
+	responseBody := new(response.WebResponse[string])
+	err = json.Unmarshal(bytes, responseBody)
+	assert.Nil(t, err)
+	assert.Equal(t, "ok", responseBody.Data)
+
+	followerUser := new(entity.User)
+	err = db.Where("username = ?", defaultUsername).First(followerUser).Error
+	assert.Nil(t, err)
+
+	follow := new(entity.Follow)
+	err = db.Where("follower_id = ? AND following_id = ?", followerUser.ID, followingUser.ID).First(follow).Error
+	assert.Nil(t, err)
 }

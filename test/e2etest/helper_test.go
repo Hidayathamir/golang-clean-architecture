@@ -39,7 +39,7 @@ func registerUser(t *testing.T, username, password, name string) {
 	bodyJSON, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req, err := http.NewRequest(http.MethodPost, "http://localhost:3000/api/users", strings.NewReader(string(bodyJSON)))
+	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users", strings.NewReader(string(bodyJSON)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
@@ -77,7 +77,7 @@ func loginUser(t *testing.T, username, password string) string {
 	bodyJSON, err := json.Marshal(requestBody)
 	assert.Nil(t, err)
 
-	req, err := http.NewRequest(http.MethodPost, "http://localhost:3000/api/users/_login", strings.NewReader(string(bodyJSON)))
+	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/users/_login", strings.NewReader(string(bodyJSON)))
 	require.Nil(t, err)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
@@ -107,24 +107,24 @@ func registerAndLoginDefaultUser(t *testing.T) string {
 	return loginDefaultUser(t)
 }
 
-// func registerAndLoginUser(t *testing.T, username, password, name string) string {
-// 	t.Helper()
+func registerAndLoginUser(t *testing.T, username, password, name string) string {
+	t.Helper()
 
-// 	registerUser(t, username, password, name)
-// 	return loginUser(t, username, password)
-// }
+	registerUser(t, username, password, name)
+	return loginUser(t, username, password)
+}
 
 func bearerToken(token string) string {
 	return "Bearer " + token
 }
 
-// func loginAndGetDefaultUser(t *testing.T) (string, *entity.User) {
-// 	t.Helper()
+func loginAndGetDefaultUser(t *testing.T) (string, *entity.User) {
+	t.Helper()
 
-// 	token := registerAndLoginDefaultUser(t)
-// 	user := GetFirstUser(t)
-// 	return token, user
-// }
+	token := registerAndLoginDefaultUser(t)
+	user := GetFirstUser(t)
+	return token, user
+}
 
 func ClearAll() {
 	ClearUsers()
