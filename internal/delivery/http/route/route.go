@@ -42,36 +42,17 @@ func setupGuestRoute(router fiber.Router, controllers *config.Controllers) {
 func setupAuthRoute(router fiber.Router, controllers *config.Controllers) {
 	users := router.Group("/users")
 	{
-		users.Delete("", controllers.UserController.Logout)
 		users.Patch("/_current", controllers.UserController.Update)
 		users.Get("/_current", controllers.UserController.Current)
+		users.Post("/_follow", controllers.UserController.Follow)
 	}
 
-	contacts := router.Group("/contacts")
+	images := router.Group("/images")
 	{
-		contacts.Get("", controllers.ContactController.List)
-		contacts.Post("", controllers.ContactController.Create)
-		contacts.Put("/:contactId", controllers.ContactController.Update)
-		contacts.Get("/:contactId", controllers.ContactController.Get)
-		contacts.Delete("/:contactId", controllers.ContactController.Delete)
-	}
-
-	addresses := contacts.Group("/:contactId/addresses")
-	{
-		addresses.Get("", controllers.AddressController.List)
-		addresses.Post("", controllers.AddressController.Create)
-		addresses.Put("/:addressId", controllers.AddressController.Update)
-		addresses.Get("/:addressId", controllers.AddressController.Get)
-		addresses.Delete("/:addressId", controllers.AddressController.Delete)
-	}
-
-	todos := router.Group("/todos")
-	{
-		todos.Post("", controllers.TodoController.Create)
-		todos.Get("", controllers.TodoController.List)
-		todos.Get("/:todoId", controllers.TodoController.Get)
-		todos.Put("/:todoId", controllers.TodoController.Update)
-		todos.Delete("/:todoId", controllers.TodoController.Delete)
-		todos.Patch("/:todoId/_complete", controllers.TodoController.Complete)
+		images.Post("", controllers.ImageController.Upload)
+		images.Post("/_like", controllers.ImageController.Like)
+		images.Post("/_comment", controllers.ImageController.Comment)
+		images.Get("/:imageId/likes", controllers.ImageController.GetLike)
+		images.Get("/:imageId/comments", controllers.ImageController.GetComment)
 	}
 }

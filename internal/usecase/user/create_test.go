@@ -11,6 +11,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 )
 
@@ -40,7 +41,7 @@ func TestUserUsecaseImpl_Create_Success(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -54,13 +55,12 @@ func TestUserUsecaseImpl_Create_Success(t *testing.T) {
 		ID:        0,
 		Username:  "user1",
 		Name:      "name1",
-		Token:     "",
 		CreatedAt: time.Time{},
 		UpdatedAt: time.Time{},
 	}
 
-	assert.Equal(t, expected, res)
-	assert.Nil(t, err)
+	require.Equal(t, expected, res)
+	require.Nil(t, err)
 }
 
 func TestUserUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
@@ -89,7 +89,7 @@ func TestUserUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -101,96 +101,10 @@ func TestUserUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 
 	var expected *model.UserResponse
 
-	assert.Equal(t, expected, res)
-	assert.NotNil(t, err)
+	require.Equal(t, expected, res)
+	require.NotNil(t, err)
 	var verrs validator.ValidationErrors
-	assert.ErrorAs(t, err, &verrs)
-}
-
-func TestUserUsecaseImpl_Create_Fail_CountByUsername(t *testing.T) {
-	gormDB, _ := newFakeDB(t)
-	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserProducerMock{}
-	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
-	}
-
-	// ------------------------------------------------------- //
-
-	req := &model.RegisterUserRequest{
-		Username: "user1",
-		Password: "pw1",
-		Name:     "name1",
-	}
-
-	UserRepository.CountByUsernameFunc = func(ctx context.Context, db *gorm.DB, username string) (int64, error) {
-		return 0, assert.AnError
-	}
-
-	UserRepository.CreateFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User) error {
-		return nil
-	}
-
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
-		return nil
-	}
-
-	// ------------------------------------------------------- //
-
-	res, err := u.Create(context.Background(), req)
-
-	// ------------------------------------------------------- //
-
-	var expected *model.UserResponse
-
-	assert.Equal(t, expected, res)
-	assert.NotNil(t, err)
-	assert.ErrorIs(t, err, assert.AnError)
-}
-
-func TestUserUsecaseImpl_Create_Fail_UserAlreadyExists(t *testing.T) {
-	gormDB, _ := newFakeDB(t)
-	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserProducerMock{}
-	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
-	}
-
-	// ------------------------------------------------------- //
-
-	req := &model.RegisterUserRequest{
-		Username: "user1",
-		Password: "pw1",
-		Name:     "name1",
-	}
-
-	UserRepository.CountByUsernameFunc = func(ctx context.Context, db *gorm.DB, username string) (int64, error) {
-		return 1, nil
-	}
-
-	UserRepository.CreateFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User) error {
-		return nil
-	}
-
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
-		return nil
-	}
-
-	// ------------------------------------------------------- //
-
-	res, err := u.Create(context.Background(), req)
-
-	// ------------------------------------------------------- //
-
-	var expected *model.UserResponse
-
-	assert.Equal(t, expected, res)
-	assert.NotNil(t, err)
-	assert.ErrorContains(t, err, "already exists")
+	require.ErrorAs(t, err, &verrs)
 }
 
 func TestUserUsecaseImpl_Create_Fail_Create(t *testing.T) {
@@ -211,58 +125,7 @@ func TestUserUsecaseImpl_Create_Fail_Create(t *testing.T) {
 		Name:     "name1",
 	}
 
-	UserRepository.CountByUsernameFunc = func(ctx context.Context, db *gorm.DB, id string) (int64, error) {
-		return 0, nil
-	}
-
 	UserRepository.CreateFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User) error {
-		return assert.AnError
-	}
-
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
-		return nil
-	}
-
-	// ------------------------------------------------------- //
-
-	res, err := u.Create(context.Background(), req)
-
-	// ------------------------------------------------------- //
-
-	var expected *model.UserResponse
-
-	assert.Equal(t, expected, res)
-	assert.NotNil(t, err)
-	assert.ErrorIs(t, err, assert.AnError)
-}
-
-func TestUserUsecaseImpl_Create_Fail_Send(t *testing.T) {
-	gormDB, _ := newFakeDB(t)
-	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserProducerMock{}
-	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
-	}
-
-	// ------------------------------------------------------- //
-
-	req := &model.RegisterUserRequest{
-		Username: "user1",
-		Password: "pw1",
-		Name:     "name1",
-	}
-
-	UserRepository.CountByUsernameFunc = func(ctx context.Context, db *gorm.DB, username string) (int64, error) {
-		return 0, nil
-	}
-
-	UserRepository.CreateFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User) error {
-		return nil
-	}
-
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
 		return assert.AnError
 	}
 
@@ -274,7 +137,7 @@ func TestUserUsecaseImpl_Create_Fail_Send(t *testing.T) {
 
 	var expected *model.UserResponse
 
-	assert.Equal(t, expected, res)
-	assert.NotNil(t, err)
-	assert.ErrorIs(t, err, assert.AnError)
+	require.Equal(t, expected, res)
+	require.NotNil(t, err)
+	require.ErrorIs(t, err, assert.AnError)
 }

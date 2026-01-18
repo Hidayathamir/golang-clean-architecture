@@ -111,7 +111,7 @@ services:
 
   akhq:
     image: tchiotludo/akhq:dev
-    container_name: akhq
+    container_name: akhq-clean-arch
     ports:
       - "8080:8080"
     environment:
@@ -123,6 +123,17 @@ services:
                 bootstrap.servers: "kafka:29092"
     depends_on:
       - kafka
+
+  localstack:
+    image: localstack/localstack:4.12.0
+    container_name: localstack-clean-arch
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - DEFAULT_REGION=us-east-1
+    volumes:
+      - ./scripts/localstack:/etc/localstack/init/ready.d
 
   init-clickhouse:
     <<: *signoz-common
@@ -146,7 +157,7 @@ services:
 
   zookeeper-1:
     <<: *signoz-zookeeper-defaults
-    container_name: signoz-zookeeper-1
+    container_name: signoz-zookeeper-clean-arch
     volumes:
       - signoz-zookeeper-1:/bitnami/zookeeper
     environment:
@@ -158,7 +169,7 @@ services:
 
   clickhouse:
     <<: *signoz-clickhouse-defaults
-    container_name: signoz-clickhouse
+    container_name: signoz-clickhouse-clean-arch
     volumes:
       - ./signoz/deploy/common/clickhouse/config.xml:/etc/clickhouse-server/config.xml
       - ./signoz/deploy/common/clickhouse/users.xml:/etc/clickhouse-server/users.xml
@@ -206,12 +217,9 @@ services:
     container_name: signoz-otel-collector
     command:
       - --config=/etc/otel-collector-config.yaml
-      - --manager-config=/etc/manager-config.yaml
-      - --copy-path=/var/tmp/collector-config.yaml
       - --feature-gates=-pkg.translator.prometheus.NormalizeName
     volumes:
       - ./signoz/deploy/docker/otel-collector-config.yaml:/etc/otel-collector-config.yaml
-      - ./signoz/deploy/common/signoz/otel-collector-opamp-config.yaml:/etc/manager-config.yaml
     environment:
       - OTEL_RESOURCE_ATTRIBUTES=host.name=signoz-host,os.type=linux
       - LOW_CARDINAL_EXCEPTION_GROUPING=false

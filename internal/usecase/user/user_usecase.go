@@ -11,15 +11,17 @@ import (
 	"gorm.io/gorm"
 )
 
-//go:generate moq -out=../../mock/UserUsecase.go -pkg=mock . UserUsecase
+//go:generate moq -out=../../mock/MockUsecaseUser.go -pkg=mock . UserUsecase
 
 type UserUsecase interface {
-	Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error)
+	Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.UserAuth, error)
 	Create(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error)
-	Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error)
+	Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserLoginResponse, error)
 	Current(ctx context.Context, req *model.GetUserRequest) (*model.UserResponse, error)
-	Logout(ctx context.Context, req *model.LogoutUserRequest) (bool, error)
 	Update(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error)
+	Follow(ctx context.Context, req *model.FollowUserRequest) error
+	NotifyUserBeingFollowed(ctx context.Context, req *model.NotifyUserBeingFollowedRequest) error
+	BatchUpdateUserFollowStats(ctx context.Context, req *model.BatchUpdateUserFollowStatsRequest) error
 }
 
 var _ UserUsecase = &UserUsecaseImpl{}
@@ -29,14 +31,15 @@ type UserUsecaseImpl struct {
 	DB     *gorm.DB
 
 	// repository
-	UserRepository repository.UserRepository
+	UserRepository   repository.UserRepository
+	FollowRepository repository.FollowRepository
 
 	// producer
-	UserProducer messaging.UserProducer
+	UserProducer  messaging.UserProducer
+	NotifProducer messaging.NotifProducer
 
 	// client
-	S3Client    rest.S3Client
-	SlackClient rest.SlackClient
+	S3Client rest.S3Client
 }
 
 func NewUserUsecase(
@@ -45,26 +48,28 @@ func NewUserUsecase(
 
 	// repository
 	userRepository repository.UserRepository,
+	FollowRepository repository.FollowRepository,
 
 	// producer
 	userProducer messaging.UserProducer,
+	NotifProducer messaging.NotifProducer,
 
 	// client
 	s3Client rest.S3Client,
-	slackClient rest.SlackClient,
 ) *UserUsecaseImpl {
 	return &UserUsecaseImpl{
 		Config: cfg,
 		DB:     db,
 
 		// repository
-		UserRepository: userRepository,
+		UserRepository:   userRepository,
+		FollowRepository: FollowRepository,
 
 		// producer
-		UserProducer: userProducer,
+		UserProducer:  userProducer,
+		NotifProducer: NotifProducer,
 
 		// client
-		S3Client:    s3Client,
-		SlackClient: slackClient,
+		S3Client: s3Client,
 	}
 }

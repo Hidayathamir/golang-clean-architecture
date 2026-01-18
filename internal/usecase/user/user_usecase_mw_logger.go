@@ -21,6 +21,21 @@ func NewUserUsecaseMwLogger(next UserUsecase) *UserUsecaseMwLogger {
 	}
 }
 
+func (u *UserUsecaseMwLogger) Follow(ctx context.Context, req *model.FollowUserRequest) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := u.Next.Follow(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+	}
+	x.LogMw(ctx, fields, err)
+
+	return err
+}
+
 func (u *UserUsecaseMwLogger) Create(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
@@ -53,27 +68,11 @@ func (u *UserUsecaseMwLogger) Current(ctx context.Context, req *model.GetUserReq
 	return res, err
 }
 
-func (u *UserUsecaseMwLogger) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error) {
+func (u *UserUsecaseMwLogger) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserLoginResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
 	res, err := u.Next.Login(ctx, req)
-	telemetry.RecordError(span, err)
-
-	fields := logrus.Fields{
-		"req": req,
-		"res": res,
-	}
-	x.LogMw(ctx, fields, err)
-
-	return res, err
-}
-
-func (u *UserUsecaseMwLogger) Logout(ctx context.Context, req *model.LogoutUserRequest) (bool, error) {
-	ctx, span := telemetry.Start(ctx)
-	defer span.End()
-
-	res, err := u.Next.Logout(ctx, req)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
@@ -101,7 +100,7 @@ func (u *UserUsecaseMwLogger) Update(ctx context.Context, req *model.UpdateUserR
 	return res, err
 }
 
-func (u *UserUsecaseMwLogger) Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error) {
+func (u *UserUsecaseMwLogger) Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.UserAuth, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -115,4 +114,34 @@ func (u *UserUsecaseMwLogger) Verify(ctx context.Context, req *model.VerifyUserR
 	x.LogMw(ctx, fields, err)
 
 	return res, err
+}
+
+func (u *UserUsecaseMwLogger) NotifyUserBeingFollowed(ctx context.Context, req *model.NotifyUserBeingFollowedRequest) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := u.Next.NotifyUserBeingFollowed(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+	}
+	x.LogMw(ctx, fields, err)
+
+	return err
+}
+
+func (u *UserUsecaseMwLogger) BatchUpdateUserFollowStats(ctx context.Context, req *model.BatchUpdateUserFollowStatsRequest) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := u.Next.BatchUpdateUserFollowStats(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+	}
+	x.LogMw(ctx, fields, err)
+
+	return err
 }

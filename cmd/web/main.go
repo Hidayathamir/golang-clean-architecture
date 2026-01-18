@@ -7,15 +7,19 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-
-	"github.com/gofiber/fiber/v2"
-	"github.com/spf13/viper"
+	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/route"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/gofiber/fiber/v2"
+	"github.com/spf13/viper"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/sdk/trace"
 )
 
 // General API Info
@@ -32,10 +36,11 @@ func main() {
 	viperConfig := config.NewViper()
 	x.SetupAll(viperConfig)
 	db := config.NewDatabase(viperConfig)
-	app := config.NewFiber(viperConfig)
+	s3Client := config.NewS3Client(viperConfig)
 	producer := config.NewKafkaProducer(viperConfig)
 
-	usecases := config.SetupUsecases(viperConfig, db, producer)
+	usecases := config.SetupUsecases(viperConfig, db, producer, s3Client)
+
 	controllers := config.SetupControllers(viperConfig, usecases)
 	middlewares := config.SetupMiddlewares(usecases)
 
@@ -43,10 +48,13 @@ func main() {
 	panicIfErr(err)
 	defer stopTraceProvider()
 
+	validateAbleToExportSpan()
+
 	stopLogProvider, err := telemetry.InitLogProvider(viperConfig)
 	panicIfErr(err)
 	defer stopLogProvider()
 
+	app := config.NewFiber(viperConfig)
 	route.Setup(app, controllers, middlewares)
 
 	runHTTPServer(viperConfig, app)
@@ -67,6 +75,25 @@ func runHTTPServer(viperConfig *viper.Viper, app *fiber.App) {
 	fmt.Printf("Go to swagger http://localhost:%s/swagger\n", webPort)
 	err := app.Listen(":" + webPort) // Start the HTTP server and block until app shutdown.
 	panicIfErr(err)
+}
+
+func validateAbleToExportSpan() {
+	tracer := otel.Tracer("manual-validation-web")
+	_, span := tracer.Start(context.Background(), "startup-check-web")
+	span.SetAttributes(attribute.String("check", "success"))
+	span.End()
+
+	flushCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if tp, ok := otel.GetTracerProvider().(*trace.TracerProvider); ok {
+		err := tp.ForceFlush(flushCtx)
+		if err != nil {
+			err = errkit.SetMessage(err, "error export span, wait a little longer, or check is the collector ready")
+			x.Logger.WithError(err).Panic()
+		}
+		x.Logger.Info("Successfully sent manual trace for web")
+	}
 }
 
 func panicIfErr(err error) {

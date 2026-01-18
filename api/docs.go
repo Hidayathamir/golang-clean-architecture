@@ -15,247 +15,69 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/contacts": {
-            "get": {
-                "security": [
-                    {
-                        "SimpleApiKeyAuth": []
-                    }
-                ],
-                "description": "Search and list contacts with filters and pagination",
-                "tags": [
-                    "contacts"
-                ],
-                "summary": "List contacts",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Filter by name",
-                        "name": "name",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by email",
-                        "name": "email",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by phone",
-                        "name": "phone",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "Page size",
-                        "name": "size",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponseList"
-                        }
-                    }
-                }
-            },
+        "/api/images": {
             "post": {
                 "security": [
                     {
                         "SimpleApiKeyAuth": []
                     }
                 ],
-                "description": "Create a new contact",
-                "tags": [
-                    "contacts"
+                "description": "Upload an image file",
+                "consumes": [
+                    "multipart/form-data"
                 ],
-                "summary": "Create contact",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "images"
+                ],
+                "summary": "Upload image",
                 "parameters": [
                     {
-                        "description": "Create Contact Request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.CreateContactRequest"
-                        }
+                        "type": "file",
+                        "description": "Image to upload",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ImageResponse"
                         }
                     }
                 }
             }
         },
-        "/api/contacts/{contactId}": {
-            "get": {
-                "security": [
-                    {
-                        "SimpleApiKeyAuth": []
-                    }
-                ],
-                "description": "Get a specific contact by ID",
-                "tags": [
-                    "contacts"
-                ],
-                "summary": "Get contact",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Contact ID",
-                        "name": "contactId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponse"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "SimpleApiKeyAuth": []
-                    }
-                ],
-                "description": "Update an existing contact by ID",
-                "tags": [
-                    "contacts"
-                ],
-                "summary": "Update contact",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Contact ID",
-                        "name": "contactId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Update Contact Request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateContactRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "SimpleApiKeyAuth": []
-                    }
-                ],
-                "description": "Delete a contact by ID",
-                "tags": [
-                    "contacts"
-                ],
-                "summary": "Delete contact",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Contact ID",
-                        "name": "contactId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-bool"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/contacts/{contactId}/addresses": {
-            "get": {
-                "security": [
-                    {
-                        "SimpleApiKeyAuth": []
-                    }
-                ],
-                "description": "Get all addresses for a contact",
-                "tags": [
-                    "addresses"
-                ],
-                "summary": "List addresses",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Contact ID",
-                        "name": "contactId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponseList"
-                        }
-                    }
-                }
-            },
+        "/api/images/_comment": {
             "post": {
                 "security": [
                     {
                         "SimpleApiKeyAuth": []
                     }
                 ],
-                "description": "Create a new address for a contact",
-                "tags": [
-                    "addresses"
+                "description": "Comment an image",
+                "consumes": [
+                    "application/json"
                 ],
-                "summary": "Create address",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "images"
+                ],
+                "summary": "Comment image",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Contact ID",
-                        "name": "contactId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Create Address Request",
+                        "description": "Comment Image Request",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.CreateAddressRequest"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentImageRequest"
                         }
                     }
                 ],
@@ -263,199 +85,38 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string"
                         }
                     }
                 }
             }
         },
-        "/api/contacts/{contactId}/addresses/{addressId}": {
-            "get": {
-                "security": [
-                    {
-                        "SimpleApiKeyAuth": []
-                    }
-                ],
-                "description": "Get a specific address by ID",
-                "tags": [
-                    "addresses"
-                ],
-                "summary": "Get address",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Contact ID",
-                        "name": "contactId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Address ID",
-                        "name": "addressId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponse"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "SimpleApiKeyAuth": []
-                    }
-                ],
-                "description": "Update an existing address by ID",
-                "tags": [
-                    "addresses"
-                ],
-                "summary": "Update address",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Contact ID",
-                        "name": "contactId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Address ID",
-                        "name": "addressId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Update Address Request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateAddressRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "SimpleApiKeyAuth": []
-                    }
-                ],
-                "description": "Delete an address by ID",
-                "tags": [
-                    "addresses"
-                ],
-                "summary": "Delete address",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Contact ID",
-                        "name": "contactId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Address ID",
-                        "name": "addressId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-bool"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/todos": {
-            "get": {
-                "security": [
-                    {
-                        "SimpleApiKeyAuth": []
-                    }
-                ],
-                "description": "List todos with optional filters",
-                "tags": [
-                    "todos"
-                ],
-                "summary": "List todos",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Filter by title",
-                        "name": "title",
-                        "in": "query"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Filter by completion state",
-                        "name": "is_completed",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "Page size",
-                        "name": "size",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponseList"
-                        }
-                    }
-                }
-            },
+        "/api/images/_like": {
             "post": {
                 "security": [
                     {
                         "SimpleApiKeyAuth": []
                     }
                 ],
-                "description": "Create a new todo",
-                "tags": [
-                    "todos"
+                "description": "Like an image",
+                "consumes": [
+                    "application/json"
                 ],
-                "summary": "Create todo",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "images"
+                ],
+                "summary": "Like image",
                 "parameters": [
                     {
-                        "description": "Create Todo Request",
+                        "description": "Like Image Request",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.CreateTodoRequest"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeImageRequest"
                         }
                     }
                 ],
@@ -463,29 +124,32 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string"
                         }
                     }
                 }
             }
         },
-        "/api/todos/{todoId}": {
+        "/api/images/{imageId}/comments": {
             "get": {
                 "security": [
                     {
                         "SimpleApiKeyAuth": []
                     }
                 ],
-                "description": "Get todo by ID",
-                "tags": [
-                    "todos"
+                "description": "Get list of comments for an image",
+                "produces": [
+                    "application/json"
                 ],
-                "summary": "Get todo",
+                "tags": [
+                    "images"
+                ],
+                "summary": "Get image comments",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Todo ID",
-                        "name": "todoId",
+                        "description": "Image ID",
+                        "name": "imageId",
                         "in": "path",
                         "required": true
                     }
@@ -494,96 +158,32 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "SimpleApiKeyAuth": []
-                    }
-                ],
-                "description": "Update todo attributes",
-                "tags": [
-                    "todos"
-                ],
-                "summary": "Update todo",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Todo ID",
-                        "name": "todoId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Update Todo Request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateTodoRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "SimpleApiKeyAuth": []
-                    }
-                ],
-                "description": "Delete todo by ID",
-                "tags": [
-                    "todos"
-                ],
-                "summary": "Delete todo",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Todo ID",
-                        "name": "todoId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-bool"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_CommentResponseList"
                         }
                     }
                 }
             }
         },
-        "/api/todos/{todoId}/_complete": {
-            "patch": {
+        "/api/images/{imageId}/likes": {
+            "get": {
                 "security": [
                     {
                         "SimpleApiKeyAuth": []
                     }
                 ],
-                "description": "Mark todo as completed and emit event",
-                "tags": [
-                    "todos"
+                "description": "Get list of likes for an image",
+                "produces": [
+                    "application/json"
                 ],
-                "summary": "Complete todo",
+                "tags": [
+                    "images"
+                ],
+                "summary": "Get image likes",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Todo ID",
-                        "name": "todoId",
+                        "description": "Image ID",
+                        "name": "imageId",
                         "in": "path",
                         "required": true
                     }
@@ -592,7 +192,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_LikeResponseList"
                         }
                     }
                 }
@@ -621,26 +221,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "SimpleApiKeyAuth": []
-                    }
-                ],
-                "description": "Logout the current authenticated user",
-                "tags": [
-                    "users"
-                ],
-                "summary": "Logout user",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-bool"
                         }
                     }
                 }
@@ -699,6 +279,39 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/users/_follow": {
+            "post": {
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
+                ],
+                "description": "Follow a user",
+                "tags": [
+                    "users"
+                ],
+                "summary": "Follow user",
+                "parameters": [
+                    {
+                        "description": "Follow User Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.FollowUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/users/_login": {
             "post": {
                 "description": "Authenticate a user and return access token",
@@ -721,7 +334,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserLoginResponse"
                         }
                     }
                 }
@@ -746,53 +359,13 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-bool": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "type": "boolean"
-                },
-                "error_detail": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "error_message": {
-                    "type": "string"
-                },
-                "paging": {
-                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata"
-                }
-            }
-        },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.AddressResponse"
-                },
-                "error_detail": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "error_message": {
-                    "type": "string"
-                },
-                "paging": {
-                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata"
-                }
-            }
-        },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponseList": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_CommentResponseList": {
             "type": "object",
             "properties": {
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.AddressResponse"
+                        "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentResponse"
                     }
                 },
                 "error_detail": {
@@ -809,11 +382,11 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponse": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ImageResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.ContactResponse"
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.ImageResponse"
                 },
                 "error_detail": {
                     "type": "array",
@@ -829,13 +402,13 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponseList": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_LikeResponseList": {
             "type": "object",
             "properties": {
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.ContactResponse"
+                        "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeResponse"
                     }
                 },
                 "error_detail": {
@@ -852,34 +425,11 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserLoginResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.TodoResponse"
-                },
-                "error_detail": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "error_message": {
-                    "type": "string"
-                },
-                "paging": {
-                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata"
-                }
-            }
-        },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponseList": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.TodoResponse"
-                    }
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UserLoginResponse"
                 },
                 "error_detail": {
                     "type": "array",
@@ -915,129 +465,128 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.AddressResponse": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string": {
             "type": "object",
             "properties": {
-                "city": {
+                "data": {
                     "type": "string"
                 },
-                "country": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "postal_code": {
-                    "type": "string"
-                },
-                "province": {
-                    "type": "string"
-                },
-                "street": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "integer"
-                }
-            }
-        },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.ContactResponse": {
-            "type": "object",
-            "properties": {
-                "addresses": {
+                "error_detail": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.AddressResponse"
+                        "type": "string"
                     }
                 },
-                "created_at": {
+                "error_message": {
+                    "type": "string"
+                },
+                "paging": {
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata"
+                }
+            }
+        },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentImageRequest": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "image_id": {
                     "type": "integer"
-                },
-                "email": {
+                }
+            }
+        },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentResponse": {
+            "type": "object",
+            "properties": {
+                "comment": {
                     "type": "string"
                 },
-                "first_name": {
+                "created_at": {
                     "type": "string"
+                },
+                "deleted_at": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "last_name": {
-                    "type": "string"
-                },
-                "phone": {
-                    "type": "string"
+                "image_id": {
+                    "type": "integer"
                 },
                 "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
                     "type": "integer"
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.CreateAddressRequest": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.FollowUserRequest": {
             "type": "object",
             "properties": {
-                "city": {
-                    "type": "string",
-                    "maxLength": 255
-                },
-                "country": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "postal_code": {
-                    "type": "string",
-                    "maxLength": 10
-                },
-                "province": {
-                    "type": "string",
-                    "maxLength": 255
-                },
-                "street": {
-                    "type": "string",
-                    "maxLength": 255
+                "following_id": {
+                    "type": "integer"
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.CreateContactRequest": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.ImageResponse": {
             "type": "object",
-            "required": [
-                "first_name"
-            ],
             "properties": {
-                "email": {
-                    "type": "string",
-                    "maxLength": 200
+                "comment_count": {
+                    "type": "integer"
                 },
-                "first_name": {
-                    "type": "string",
-                    "maxLength": 100
+                "created_at": {
+                    "type": "string"
                 },
-                "last_name": {
-                    "type": "string",
-                    "maxLength": 100
+                "deleted_at": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
                 },
-                "phone": {
-                    "type": "string",
-                    "maxLength": 20
+                "id": {
+                    "type": "integer"
+                },
+                "like_count": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.CreateTodoRequest": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeImageRequest": {
             "type": "object",
-            "required": [
-                "title"
-            ],
             "properties": {
-                "description": {
-                    "type": "string",
-                    "maxLength": 1000
+                "image_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
                 },
-                "title": {
-                    "type": "string",
-                    "maxLength": 200
+                "deleted_at": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image_id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -1080,97 +629,6 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.TodoResponse": {
-            "type": "object",
-            "properties": {
-                "completed_at": {
-                    "type": "integer"
-                },
-                "created_at": {
-                    "type": "integer"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "is_completed": {
-                    "type": "boolean"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "integer"
-                }
-            }
-        },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateAddressRequest": {
-            "type": "object",
-            "properties": {
-                "city": {
-                    "type": "string",
-                    "maxLength": 255
-                },
-                "country": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "postal_code": {
-                    "type": "string",
-                    "maxLength": 10
-                },
-                "province": {
-                    "type": "string",
-                    "maxLength": 255
-                },
-                "street": {
-                    "type": "string",
-                    "maxLength": 255
-                }
-            }
-        },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateContactRequest": {
-            "type": "object",
-            "required": [
-                "first_name"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string",
-                    "maxLength": 200
-                },
-                "first_name": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "last_name": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "phone": {
-                    "type": "string",
-                    "maxLength": 20
-                }
-            }
-        },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateTodoRequest": {
-            "type": "object",
-            "required": [
-                "title"
-            ],
-            "properties": {
-                "description": {
-                    "type": "string",
-                    "maxLength": 1000
-                },
-                "title": {
-                    "type": "string",
-                    "maxLength": 200
-                }
-            }
-        },
         "github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateUserRequest": {
             "type": "object",
             "properties": {
@@ -1184,11 +642,11 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.UserResponse": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.UserLoginResponse": {
             "type": "object",
             "properties": {
                 "created_at": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "id": {
                     "type": "integer"
@@ -1200,10 +658,42 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_model.UserResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "gorm.DeletedAt": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if Time is not NULL",
+                    "type": "boolean"
                 }
             }
         }

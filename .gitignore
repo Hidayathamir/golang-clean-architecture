@@ -3,3 +3,4 @@ data/
 out.txt
 signoz/deploy/common/clickhouse/user_scripts/histogramQuantile
 .gocache/
+log/

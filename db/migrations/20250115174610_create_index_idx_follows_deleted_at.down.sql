@@ -1,0 +1,1 @@
+drop index idx_follows_deleted_at;

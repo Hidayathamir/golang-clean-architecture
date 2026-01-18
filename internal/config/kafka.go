@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func NewKafkaConsumerGroup(config *viper.Viper) sarama.ConsumerGroup {
+func NewKafkaConsumerGroup(config *viper.Viper, groupID string) sarama.ConsumerGroup {
 	saramaConfig := sarama.NewConfig()
 	saramaConfig.Consumer.Return.Errors = true
 
@@ -22,7 +22,6 @@ func NewKafkaConsumerGroup(config *viper.Viper) sarama.ConsumerGroup {
 	}
 
 	brokers := strings.Split(config.GetString(configkey.KafkaBootstrapServers), ",")
-	groupID := config.GetString(configkey.KafkaGroupId)
 
 	consumerGroup, err := sarama.NewConsumerGroup(brokers, groupID, saramaConfig)
 	if err != nil {

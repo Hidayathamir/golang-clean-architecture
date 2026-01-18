@@ -19,7 +19,6 @@ const (
 	DatabasePoolLifetime = "database.pool.lifetime"
 
 	KafkaBootstrapServers = "kafka.bootstrap.servers"
-	KafkaGroupId          = "kafka.group.id"
 	KafkaAutoOffsetReset  = "kafka.auto.offset.reset"
 	KafkaProducerEnabled  = "kafka.producer.enabled"
 
@@ -28,4 +27,7 @@ const (
 	AuthJWTSecret        = "auth.jwt.secret"
 	AuthJWTIssuer        = "auth.jwt.issuer"
 	AuthJWTExpireSeconds = "auth.jwt.expire_seconds"
+
+	AWSRegion       = "aws.region"
+	AWSBaseEndpoint = "aws.base_endpoint"
 )

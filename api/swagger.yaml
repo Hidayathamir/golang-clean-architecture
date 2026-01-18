@@ -10,37 +10,11 @@ definitions:
       total_page:
         type: integer
     type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-bool:
-    properties:
-      data:
-        type: boolean
-      error_detail:
-        items:
-          type: string
-        type: array
-      error_message:
-        type: string
-      paging:
-        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
-    type: object
-  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponse
-  : properties:
-      data:
-        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.AddressResponse'
-      error_detail:
-        items:
-          type: string
-        type: array
-      error_message:
-        type: string
-      paging:
-        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
-    type: object
-  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponseList
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_CommentResponseList
   : properties:
       data:
         items:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.AddressResponse'
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentResponse'
         type: array
       error_detail:
         items:
@@ -51,10 +25,10 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
     type: object
-  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponse
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ImageResponse
   : properties:
       data:
-        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.ContactResponse'
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.ImageResponse'
       error_detail:
         items:
           type: string
@@ -64,11 +38,11 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
     type: object
-  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponseList
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_LikeResponseList
   : properties:
       data:
         items:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.ContactResponse'
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeResponse'
         type: array
       error_detail:
         items:
@@ -79,25 +53,10 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
     type: object
-  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserLoginResponse
   : properties:
       data:
-        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.TodoResponse'
-      error_detail:
-        items:
-          type: string
-        type: array
-      error_message:
-        type: string
-      paging:
-        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
-    type: object
-  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponseList
-  : properties:
-      data:
-        items:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.TodoResponse'
-        type: array
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UserLoginResponse'
       error_detail:
         items:
           type: string
@@ -120,91 +79,86 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
     type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.AddressResponse:
+  github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string:
     properties:
-      city:
+      data:
         type: string
-      country:
-        type: string
-      created_at:
-        type: integer
-      id:
-        type: integer
-      postal_code:
-        type: string
-      province:
-        type: string
-      street:
-        type: string
-      updated_at:
-        type: integer
-    type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.ContactResponse:
-    properties:
-      addresses:
+      error_detail:
         items:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.AddressResponse'
+          type: string
         type: array
-      created_at:
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentImageRequest:
+    properties:
+      comment:
+        type: string
+      image_id:
         type: integer
-      email:
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentResponse:
+    properties:
+      comment:
         type: string
-      first_name:
+      created_at:
         type: string
+      deleted_at:
+        $ref: '#/definitions/gorm.DeletedAt'
       id:
         type: integer
-      last_name:
-        type: string
-      phone:
-        type: string
+      image_id:
+        type: integer
       updated_at:
+        type: string
+      user_id:
         type: integer
     type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.CreateAddressRequest:
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.FollowUserRequest:
     properties:
-      city:
-        maxLength: 255
-        type: string
-      country:
-        maxLength: 100
-        type: string
-      postal_code:
-        maxLength: 10
-        type: string
-      province:
-        maxLength: 255
-        type: string
-      street:
-        maxLength: 255
-        type: string
+      following_id:
+        type: integer
     type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.CreateContactRequest:
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.ImageResponse:
     properties:
-      email:
-        maxLength: 200
+      comment_count:
+        type: integer
+      created_at:
         type: string
-      first_name:
-        maxLength: 100
+      deleted_at:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      like_count:
+        type: integer
+      updated_at:
         type: string
-      last_name:
-        maxLength: 100
+      url:
         type: string
-      phone:
-        maxLength: 20
-        type: string
-    required:
-    - first_name
+      user_id:
+        type: integer
     type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.CreateTodoRequest:
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeImageRequest:
     properties:
-      description:
-        maxLength: 1000
+      image_id:
+        type: integer
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeResponse:
+    properties:
+      created_at:
         type: string
-      title:
-        maxLength: 200
+      deleted_at:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      image_id:
+        type: integer
+      updated_at:
         type: string
-    required:
-    - title
+      user_id:
+        type: integer
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.LoginUserRequest:
     properties:
@@ -234,69 +188,6 @@ definitions:
     - password
     - username
     type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.TodoResponse:
-    properties:
-      completed_at:
-        type: integer
-      created_at:
-        type: integer
-      description:
-        type: string
-      id:
-        type: integer
-      is_completed:
-        type: boolean
-      title:
-        type: string
-      updated_at:
-        type: integer
-    type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateAddressRequest:
-    properties:
-      city:
-        maxLength: 255
-        type: string
-      country:
-        maxLength: 100
-        type: string
-      postal_code:
-        maxLength: 10
-        type: string
-      province:
-        maxLength: 255
-        type: string
-      street:
-        maxLength: 255
-        type: string
-    type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateContactRequest:
-    properties:
-      email:
-        maxLength: 200
-        type: string
-      first_name:
-        maxLength: 100
-        type: string
-      last_name:
-        maxLength: 100
-        type: string
-      phone:
-        maxLength: 20
-        type: string
-    required:
-    - first_name
-    type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateTodoRequest:
-    properties:
-      description:
-        maxLength: 1000
-        type: string
-      title:
-        maxLength: 200
-        type: string
-    required:
-    - title
-    type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateUserRequest:
     properties:
       name:
@@ -306,10 +197,10 @@ definitions:
         maxLength: 100
         type: string
     type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.UserResponse:
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.UserLoginResponse:
     properties:
       created_at:
-        type: integer
+        type: string
       id:
         type: integer
       name:
@@ -317,393 +208,149 @@ definitions:
       token:
         type: string
       updated_at:
-        type: integer
+        type: string
       username:
         type: string
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_model.UserResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
     type: object
 info:
   contact: {}
   title: Golang Clean Architecture
 paths:
-  /api/contacts:
-    get:
-      description: Search and list contacts with filters and pagination
-      parameters:
-      - description: Filter by name
-        in: query
-        name: name
-        type: string
-      - description: Filter by email
-        in: query
-        name: email
-        type: string
-      - description: Filter by phone
-        in: query
-        name: phone
-        type: string
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 10
-        description: Page size
-        in: query
-        name: size
-        type: integer
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponseList'
-      security:
-      - SimpleApiKeyAuth: []
-      summary: List contacts
-      tags:
-      - contacts
+  /api/images:
     post:
-      description: Create a new contact
+      consumes:
+      - multipart/form-data
+      description: Upload an image file
       parameters:
-      - description: Create Contact Request
-        in: body
-        name: request
+      - description: Image to upload
+        in: formData
+        name: image
         required: true
-        schema:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.CreateContactRequest'
+        type: file
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponse'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ImageResponse'
       security:
       - SimpleApiKeyAuth: []
-      summary: Create contact
+      summary: Upload image
       tags:
-      - contacts
-  /api/contacts/{contactId}:
-    delete:
-      description: Delete a contact by ID
-      parameters:
-      - description: Contact ID
-        in: path
-        name: contactId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-bool'
-      security:
-      - SimpleApiKeyAuth: []
-      summary: Delete contact
-      tags:
-      - contacts
-    get:
-      description: Get a specific contact by ID
-      parameters:
-      - description: Contact ID
-        in: path
-        name: contactId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponse'
-      security:
-      - SimpleApiKeyAuth: []
-      summary: Get contact
-      tags:
-      - contacts
-    put:
-      description: Update an existing contact by ID
-      parameters:
-      - description: Contact ID
-        in: path
-        name: contactId
-        required: true
-        type: string
-      - description: Update Contact Request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateContactRequest'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ContactResponse'
-      security:
-      - SimpleApiKeyAuth: []
-      summary: Update contact
-      tags:
-      - contacts
-  /api/contacts/{contactId}/addresses:
-    get:
-      description: Get all addresses for a contact
-      parameters:
-      - description: Contact ID
-        in: path
-        name: contactId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponseList'
-      security:
-      - SimpleApiKeyAuth: []
-      summary: List addresses
-      tags:
-      - addresses
+      - images
+  /api/images/_comment:
     post:
-      description: Create a new address for a contact
+      consumes:
+      - application/json
+      description: Comment an image
       parameters:
-      - description: Contact ID
-        in: path
-        name: contactId
-        required: true
-        type: string
-      - description: Create Address Request
+      - description: Comment Image Request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.CreateAddressRequest'
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentImageRequest'
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponse'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string'
       security:
       - SimpleApiKeyAuth: []
-      summary: Create address
+      summary: Comment image
       tags:
-      - addresses
-  /api/contacts/{contactId}/addresses/{addressId}:
-    delete:
-      description: Delete an address by ID
-      parameters:
-      - description: Contact ID
-        in: path
-        name: contactId
-        required: true
-        type: string
-      - description: Address ID
-        in: path
-        name: addressId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-bool'
-      security:
-      - SimpleApiKeyAuth: []
-      summary: Delete address
-      tags:
-      - addresses
-    get:
-      description: Get a specific address by ID
-      parameters:
-      - description: Contact ID
-        in: path
-        name: contactId
-        required: true
-        type: string
-      - description: Address ID
-        in: path
-        name: addressId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponse'
-      security:
-      - SimpleApiKeyAuth: []
-      summary: Get address
-      tags:
-      - addresses
-    put:
-      description: Update an existing address by ID
-      parameters:
-      - description: Contact ID
-        in: path
-        name: contactId
-        required: true
-        type: string
-      - description: Address ID
-        in: path
-        name: addressId
-        required: true
-        type: string
-      - description: Update Address Request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateAddressRequest'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_AddressResponse'
-      security:
-      - SimpleApiKeyAuth: []
-      summary: Update address
-      tags:
-      - addresses
-  /api/todos:
-    get:
-      description: List todos with optional filters
-      parameters:
-      - description: Filter by title
-        in: query
-        name: title
-        type: string
-      - description: Filter by completion state
-        in: query
-        name: is_completed
-        type: boolean
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 10
-        description: Page size
-        in: query
-        name: size
-        type: integer
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponseList'
-      security:
-      - SimpleApiKeyAuth: []
-      summary: List todos
-      tags:
-      - todos
+      - images
+  /api/images/_like:
     post:
-      description: Create a new todo
+      consumes:
+      - application/json
+      description: Like an image
       parameters:
-      - description: Create Todo Request
+      - description: Like Image Request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.CreateTodoRequest'
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeImageRequest'
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string'
       security:
       - SimpleApiKeyAuth: []
-      summary: Create todo
+      summary: Like image
       tags:
-      - todos
-  /api/todos/{todoId}:
-    delete:
-      description: Delete todo by ID
-      parameters:
-      - description: Todo ID
-        in: path
-        name: todoId
-        required: true
-        type: integer
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-bool'
-      security:
-      - SimpleApiKeyAuth: []
-      summary: Delete todo
-      tags:
-      - todos
+      - images
+  /api/images/{imageId}/comments:
     get:
-      description: Get todo by ID
+      description: Get list of comments for an image
       parameters:
-      - description: Todo ID
+      - description: Image ID
         in: path
-        name: todoId
+        name: imageId
         required: true
         type: integer
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_CommentResponseList'
       security:
       - SimpleApiKeyAuth: []
-      summary: Get todo
+      summary: Get image comments
       tags:
-      - todos
-    put:
-      description: Update todo attributes
+      - images
+  /api/images/{imageId}/likes:
+    get:
+      description: Get list of likes for an image
       parameters:
-      - description: Todo ID
+      - description: Image ID
         in: path
-        name: todoId
+        name: imageId
         required: true
         type: integer
-      - description: Update Todo Request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateTodoRequest'
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_LikeResponseList'
       security:
       - SimpleApiKeyAuth: []
-      summary: Update todo
+      summary: Get image likes
       tags:
-      - todos
-  /api/todos/{todoId}/_complete:
-    patch:
-      description: Mark todo as completed and emit event
-      parameters:
-      - description: Todo ID
-        in: path
-        name: todoId
-        required: true
-        type: integer
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_TodoResponse'
-      security:
-      - SimpleApiKeyAuth: []
-      summary: Complete todo
-      tags:
-      - todos
+      - images
   /api/users:
-    delete:
-      description: Logout the current authenticated user
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-bool'
-      security:
-      - SimpleApiKeyAuth: []
-      summary: Logout user
-      tags:
-      - users
     post:
       description: Register a new user account
       parameters:
@@ -753,6 +400,26 @@ paths:
       summary: Update user
       tags:
       - users
+  /api/users/_follow:
+    post:
+      description: Follow a user
+      parameters:
+      - description: Follow User Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.FollowUserRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-string'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Follow user
+      tags:
+      - users
   /api/users/_login:
     post:
       description: Authenticate a user and return access token
@@ -767,7 +434,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserLoginResponse'
       summary: Login user
       tags:
       - users

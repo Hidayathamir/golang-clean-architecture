@@ -1,12 +1,13 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type UserResponse struct {
 	ID        int64     `json:"id"`
 	Username  string    `json:"username"`
 	Name      string    `json:"name"`
-	Token     string    `json:"token"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -32,6 +33,15 @@ type LoginUserRequest struct {
 	Password string `json:"password" validate:"required,max=100"`
 }
 
+type UserLoginResponse struct {
+	ID        int64     `json:"id"`
+	Username  string    `json:"username"`
+	Name      string    `json:"name"`
+	Token     string    `json:"token"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
 type LogoutUserRequest struct {
 	ID int64 `json:"id" validate:"required"`
 }
@@ -39,3 +49,36 @@ type LogoutUserRequest struct {
 type GetUserRequest struct {
 	ID int64 `json:"id" validate:"required"`
 }
+
+type FollowUserRequest struct {
+	FollowingID int64 `json:"following_id"`
+}
+
+type NotifyUserBeingFollowedRequest struct {
+	FollowerID  int64
+	FollowingID int64
+}
+
+type BatchUpdateUserFollowStatsRequest struct {
+	UserIncreaseFollowerFollowingCountList UserIncreaseFollowerFollowingCountList
+}
+
+type UserIncreaseFollowerFollowingCount struct {
+	UserID         int64
+	FollowerCount  int
+	FollowingCount int
+}
+
+func (u UserIncreaseFollowerFollowingCount) HasFollowerCount() bool {
+	return u.FollowerCount > 0
+}
+
+func (u UserIncreaseFollowerFollowingCount) HasFollowingCount() bool {
+	return u.FollowingCount > 0
+}
+
+func (u UserIncreaseFollowerFollowingCount) HasFollowerCountAndFollowingCount() bool {
+	return u.HasFollowerCount() && u.HasFollowingCount()
+}
+
+type UserIncreaseFollowerFollowingCountList []UserIncreaseFollowerFollowingCount

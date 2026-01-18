@@ -1,8 +1,18 @@
 package model
 
-type Auth struct {
-	// Login user id
-	ID int64
-	// Username associated with the authenticated user
-	Username string
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
+
+type UserAuth struct {
+	ID             int64
+	Username       string
+	Name           string
+	FollowerCount  int
+	FollowingCount int
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	DeletedAt      gorm.DeletedAt
 }

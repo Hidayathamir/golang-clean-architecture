@@ -9,8 +9,8 @@ run-worker:
 go-test:
 	go test -count=1 -v ./internal/...
 
-go-integration-test:
-	go test -count=1 -v ./integrationtest/...
+go-e2e-test:
+	go test -count=1 -v ./test/e2etest/...
 
 test:
 	go test -count=1 ./...
@@ -26,7 +26,10 @@ migrate-new:
 #################################### 
 
 docker-compose:
-	docker compose down && docker compose up
+	docker compose down -v && docker compose up
+
+docker-validate:
+	docker ps --format "{{.Names}}\t{{.Status}}"
 
 #################################### 
 
@@ -34,13 +37,13 @@ run-clean:
 	make clean && make run
 
 clean:
-	make generate && make swag && make format
+	make generate && make swag && make format && echo "done"
 
 format:
-	golangci-lint run ./... --fix
+	golangci-lint run ./... --fix --tests=false
 
 generate:
-	go generate ./internal/...
+	rm -rf internal/mock &&	go generate ./internal/...
 
 swag:
 	swag fmt --exclude ./internal/mock && swag init --parseDependency --parseInternal --generalInfo ./cmd/web/main.go --output ./api/

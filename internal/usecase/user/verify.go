@@ -10,7 +10,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
-func (u *UserUsecaseImpl) Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.Auth, error) {
+func (u *UserUsecaseImpl) Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.UserAuth, error) {
 	err := x.Validate.Struct(req)
 	if err != nil {
 		err = errkit.BadRequest(err)
@@ -27,8 +27,8 @@ func (u *UserUsecaseImpl) Verify(ctx context.Context, req *model.VerifyUserReque
 		return nil, errkit.AddFuncName(err)
 	}
 
-	auth := new(model.Auth)
-	converter.EntityUserToModelAuth(user, auth)
+	userAuth := new(model.UserAuth)
+	converter.EntityUserToModelUserAuth(user, userAuth)
 
-	return auth, nil
+	return userAuth, nil
 }

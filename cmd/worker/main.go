@@ -9,23 +9,29 @@ import (
 	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/messaging"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/messaging/route"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
-	"github.com/spf13/viper"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/sdk/trace"
 )
 
 func main() {
 	viperConfig := config.NewViper()
 	x.SetupAll(viperConfig)
 	db := config.NewDatabase(viperConfig)
+	s3Client := config.NewS3Client(viperConfig)
 	producer := config.NewKafkaProducer(viperConfig)
 
-	usecases := config.SetupUsecases(viperConfig, db, producer)
+	usecases := config.SetupUsecases(viperConfig, db, producer, s3Client)
 
 	stopTraceProvider, err := telemetry.InitTraceProvider(viperConfig)
 	panicIfErr(err)
 	defer stopTraceProvider()
+
+	validateAbleToExportSpan()
 
 	stopLogProvider, err := telemetry.InitLogProvider(viperConfig)
 	panicIfErr(err)
@@ -34,55 +40,49 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	x.Logger.Info("Starting worker service")
-	go RunUserConsumer(ctx, viperConfig, usecases)
-	go RunContactConsumer(ctx, viperConfig, usecases)
-	go RunAddressConsumer(ctx, viperConfig, usecases)
-	go RunTodoCommandConsumer(ctx, viperConfig, usecases)
-	go RunTodoCompletionConsumer(ctx, viperConfig)
+	go route.ConsumeUserFollowedEventForNotification(ctx, viperConfig, usecases)
+	go route.ConsumeUserFollowedEventForUpdateCount(ctx, viperConfig, usecases)
+	go route.SetupImageUploadedConsumer(ctx, viperConfig, usecases)
+	go route.ConsumeImageLikedEventForNotification(ctx, viperConfig, usecases)
+	go route.ConsumeImageLikedEventForUpdateCount(ctx, viperConfig, usecases)
+	go route.ConsumeImageCommentedEventForNotification(ctx, viperConfig, usecases)
+	go route.ConsumeImageCommentedEventForUpdateCount(ctx, viperConfig, usecases)
+	go route.SetupNotifConsumer(ctx, viperConfig, usecases)
 
 	terminateSignals := make(chan os.Signal, 1)
 	signal.Notify(terminateSignals, syscall.SIGINT, syscall.SIGTERM)
 
 	s := <-terminateSignals
 	x.Logger.Info("Got one of stop signals, shutting down worker gracefully, SIGNAL NAME :", s)
+
+	x.Logger.Info("canceling")
 	cancel()
+	x.Logger.Info("canceled")
 
-	time.Sleep(5 * time.Second) // wait for all consumers to finish processing
+	x.Logger.Info("wait for all consumer to finish processing, 5 second")
+	time.Sleep(5 * time.Second)
+	x.Logger.Info("done waiting")
+
+	x.Logger.Info("end process of worker")
 }
 
-func RunAddressConsumer(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
-	x.Logger.Info("setup address consumer")
-	addressConsumerGroup := config.NewKafkaConsumerGroup(viperConfig)
-	addressHandler := messaging.NewAddressConsumer(usecases.AddressUsecase)
-	messaging.ConsumeTopic(ctx, addressConsumerGroup, "addresses", addressHandler.Consume)
-}
+func validateAbleToExportSpan() {
+	tracer := otel.Tracer("manual-validation-worker")
+	_, span := tracer.Start(context.Background(), "startup-check-worker")
+	span.SetAttributes(attribute.String("check", "success"))
+	span.End()
 
-func RunContactConsumer(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
-	x.Logger.Info("setup contact consumer")
-	contactConsumerGroup := config.NewKafkaConsumerGroup(viperConfig)
-	contactHandler := messaging.NewContactConsumer(usecases.ContactUsecase)
-	messaging.ConsumeTopic(ctx, contactConsumerGroup, "contacts", contactHandler.Consume)
-}
+	flushCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-func RunUserConsumer(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
-	x.Logger.Info("setup user consumer")
-	userConsumerGroup := config.NewKafkaConsumerGroup(viperConfig)
-	userHandler := messaging.NewUserConsumer(usecases.UserUsecase)
-	messaging.ConsumeTopic(ctx, userConsumerGroup, "users", userHandler.Consume)
-}
-
-func RunTodoCommandConsumer(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
-	x.Logger.Info("setup todo command consumer")
-	todoCommandGroup := config.NewKafkaConsumerGroup(viperConfig)
-	commandHandler := messaging.NewTodoCommandConsumer(usecases.TodoUsecase)
-	messaging.ConsumeTopic(ctx, todoCommandGroup, "todo-commands", commandHandler.Consume)
-}
-
-func RunTodoCompletionConsumer(ctx context.Context, viperConfig *viper.Viper) {
-	x.Logger.Info("setup todo completion consumer")
-	todoCompletionGroup := config.NewKafkaConsumerGroup(viperConfig)
-	completionHandler := messaging.NewTodoCompletionConsumer()
-	messaging.ConsumeTopic(ctx, todoCompletionGroup, "todos", completionHandler.Consume)
+	if tp, ok := otel.GetTracerProvider().(*trace.TracerProvider); ok {
+		err := tp.ForceFlush(flushCtx)
+		if err != nil {
+			err = errkit.SetMessage(err, "error export span, wait a little longer, or check is the collector ready")
+			x.Logger.WithError(err).Panic()
+		}
+		x.Logger.Info("Successfully sent manual trace for worker")
+	}
 }
 
 func panicIfErr(err error) {

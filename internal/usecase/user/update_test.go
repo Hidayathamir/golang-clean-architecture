@@ -11,6 +11,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 )
 
@@ -41,7 +42,7 @@ func TestUserUsecaseImpl_Update_Success(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -53,8 +54,8 @@ func TestUserUsecaseImpl_Update_Success(t *testing.T) {
 
 	var expected = &model.UserResponse{Name: "name1"}
 
-	assert.Equal(t, expected, res)
-	assert.Nil(t, err)
+	require.Equal(t, expected, res)
+	require.Nil(t, err)
 }
 
 func TestUserUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
@@ -82,7 +83,7 @@ func TestUserUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -94,10 +95,10 @@ func TestUserUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 
 	var expected *model.UserResponse
 
-	assert.Equal(t, expected, res)
-	assert.NotNil(t, err)
+	require.Equal(t, expected, res)
+	require.NotNil(t, err)
 	var verrs validator.ValidationErrors
-	assert.ErrorAs(t, err, &verrs)
+	require.ErrorAs(t, err, &verrs)
 }
 
 func TestUserUsecaseImpl_Update_Fail_FindByID(t *testing.T) {
@@ -125,7 +126,7 @@ func TestUserUsecaseImpl_Update_Fail_FindByID(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -137,9 +138,9 @@ func TestUserUsecaseImpl_Update_Fail_FindByID(t *testing.T) {
 
 	var expected *model.UserResponse
 
-	assert.Equal(t, expected, res)
-	assert.NotNil(t, err)
-	assert.ErrorIs(t, err, assert.AnError)
+	require.Equal(t, expected, res)
+	require.NotNil(t, err)
+	require.ErrorIs(t, err, assert.AnError)
 }
 
 func TestUserUsecaseImpl_Update_Fail_Update(t *testing.T) {
@@ -167,7 +168,7 @@ func TestUserUsecaseImpl_Update_Fail_Update(t *testing.T) {
 		return assert.AnError
 	}
 
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -179,49 +180,9 @@ func TestUserUsecaseImpl_Update_Fail_Update(t *testing.T) {
 
 	var expected *model.UserResponse
 
-	assert.Equal(t, expected, res)
-	assert.NotNil(t, err)
-	assert.ErrorIs(t, err, assert.AnError)
+	require.Equal(t, expected, res)
+	require.NotNil(t, err)
+	require.ErrorIs(t, err, assert.AnError)
 }
 
-func TestUserUsecaseImpl_Update_Fail_Send(t *testing.T) {
-	gormDB, _ := newFakeDB(t)
-	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserProducerMock{}
-	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Config:         viper.New(),
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
-	}
 
-	// ------------------------------------------------------- //
-
-	req := &model.UpdateUserRequest{
-		ID: 1,
-	}
-
-	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id int64) error {
-		return nil
-	}
-
-	UserRepository.UpdateFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User) error {
-		return nil
-	}
-
-	UserProducer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
-		return assert.AnError
-	}
-
-	// ------------------------------------------------------- //
-
-	res, err := u.Update(context.Background(), req)
-
-	// ------------------------------------------------------- //
-
-	var expected *model.UserResponse
-
-	assert.Equal(t, expected, res)
-	assert.NotNil(t, err)
-	assert.ErrorIs(t, err, assert.AnError)
-}

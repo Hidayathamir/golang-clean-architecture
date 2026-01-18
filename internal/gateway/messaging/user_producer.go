@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/topic"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
@@ -12,10 +13,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-//go:generate moq -out=../../mock/UserProducer.go -pkg=mock . UserProducer
+//go:generate moq -out=../../mock/MockProducerUser.go -pkg=mock . UserProducer
 
 type UserProducer interface {
-	Send(ctx context.Context, event *model.UserEvent) error
+	SendUserFollowed(ctx context.Context, event *model.UserFollowedEvent) error
 }
 
 var _ UserProducer = &UserProducerImpl{}
@@ -23,20 +24,18 @@ var _ UserProducer = &UserProducerImpl{}
 type UserProducerImpl struct {
 	Config   *viper.Viper
 	Producer sarama.SyncProducer
-	Topic    string
 }
 
 func NewUserProducer(cfg *viper.Viper, producer sarama.SyncProducer) *UserProducerImpl {
 	return &UserProducerImpl{
 		Config:   cfg,
 		Producer: producer,
-		Topic:    "users",
 	}
 }
 
-func (p *UserProducerImpl) Send(ctx context.Context, event *model.UserEvent) error {
+func (p *UserProducerImpl) SendUserFollowed(ctx context.Context, event *model.UserFollowedEvent) error {
 	if p.Producer == nil {
-		x.Logger.Warn("Kafka producer is disabled")
+		x.Logger.WithContext(ctx).Warn("Kafka producer is disabled")
 		return nil
 	}
 
@@ -46,7 +45,7 @@ func (p *UserProducerImpl) Send(ctx context.Context, event *model.UserEvent) err
 	}
 
 	message := &sarama.ProducerMessage{
-		Topic: p.Topic,
+		Topic: topic.UserFollowed,
 		Key:   sarama.StringEncoder(event.GetID()),
 		Value: sarama.ByteEncoder(value),
 	}
@@ -58,6 +57,7 @@ func (p *UserProducerImpl) Send(ctx context.Context, event *model.UserEvent) err
 		return errkit.AddFuncName(err)
 	}
 
-	x.Logger.Debugf("Message sent to topic %s, partition %d, offset %d", p.Topic, partition, offset)
+	x.Logger.WithContext(ctx).Debugf("Message sent to topic %s, partition %d, offset %d", message.Topic, partition, offset)
+
 	return nil
 }

@@ -21,6 +21,22 @@ func NewS3ClientMwLogger(next S3Client) *S3ClientMwLogger {
 	}
 }
 
+func (c *S3ClientMwLogger) UploadImage(ctx context.Context, req model.S3UploadImageRequest) (url string, err error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	url, err = c.Next.UploadImage(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"key": req.Key,
+		"url": url,
+	}
+	x.LogMw(ctx, fields, err)
+
+	return url, err
+}
+
 func (c *S3ClientMwLogger) Download(ctx context.Context, req model.S3DownloadRequest) (model.S3DownloadResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()

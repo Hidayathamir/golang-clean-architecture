@@ -1,0 +1,1 @@
+drop index idx_likes_deleted_at;

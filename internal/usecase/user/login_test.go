@@ -20,13 +20,12 @@ import (
 	"gorm.io/gorm"
 )
 
-func newLoginUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepositoryMock, *mock.UserProducerMock, *mock.SlackClientMock) {
+func newLoginUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepositoryMock, *mock.UserProducerMock) {
 	t.Helper()
 
 	gormDB, _ := newFakeDB(t)
 	repo := &mock.UserRepositoryMock{}
 	producer := &mock.UserProducerMock{}
-	slack := &mock.SlackClientMock{}
 
 	cfg := viper.New()
 	cfg.Set(configkey.AuthJWTSecret, "test-secret")
@@ -38,14 +37,13 @@ func newLoginUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepositoryM
 		DB:             gormDB,
 		UserRepository: repo,
 		UserProducer:   producer,
-		SlackClient:    slack,
 	}
 
-	return u, repo, producer, slack
+	return u, repo, producer
 }
 
 func TestUserUsecaseImpl_Login_Success(t *testing.T) {
-	u, repo, producer, slack := newLoginUsecase(t)
+	u, repo, producer := newLoginUsecase(t)
 
 	req := &model.LoginUserRequest{
 		Username: "user1",
@@ -61,33 +59,29 @@ func TestUserUsecaseImpl_Login_Success(t *testing.T) {
 		return nil
 	}
 
-	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
-		return model.SlackIsConnectedResponse{Connected: true}, nil
-	}
-
-	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	producer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
 	res, err := u.Login(context.Background(), req)
 	require.NoError(t, err)
 	require.NotNil(t, res)
-	assert.NotEmpty(t, res.Token)
+	require.NotEmpty(t, res.Token)
 
 	claims := &jwt.RegisteredClaims{}
 	token, err := jwt.ParseWithClaims(res.Token, claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(u.Config.GetString(configkey.AuthJWTSecret)), nil
 	})
 	require.NoError(t, err)
-	assert.True(t, token.Valid)
-	assert.Equal(t, "123", claims.Subject)
-	assert.Equal(t, u.Config.GetString(configkey.AuthJWTIssuer), claims.Issuer)
+	require.True(t, token.Valid)
+	require.Equal(t, "123", claims.Subject)
+	require.Equal(t, u.Config.GetString(configkey.AuthJWTIssuer), claims.Issuer)
 	require.NotNil(t, claims.ExpiresAt)
 	assert.WithinDuration(t, time.Now().Add(time.Minute), claims.ExpiresAt.Time, time.Minute)
 }
 
 func TestUserUsecaseImpl_Login_Fail_ValidateStruct(t *testing.T) {
-	u, repo, producer, slack := newLoginUsecase(t)
+	u, repo, producer := newLoginUsecase(t)
 
 	req := &model.LoginUserRequest{
 		Username: "",
@@ -103,24 +97,20 @@ func TestUserUsecaseImpl_Login_Fail_ValidateStruct(t *testing.T) {
 		return nil
 	}
 
-	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
-		return model.SlackIsConnectedResponse{Connected: true}, nil
-	}
-
-	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	producer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
 	res, err := u.Login(context.Background(), req)
 
-	assert.Nil(t, res)
-	assert.NotNil(t, err)
+	require.Nil(t, res)
+	require.NotNil(t, err)
 	var verrs validator.ValidationErrors
-	assert.ErrorAs(t, err, &verrs)
+	require.ErrorAs(t, err, &verrs)
 }
 
 func TestUserUsecaseImpl_Login_Fail_FindByUsername(t *testing.T) {
-	u, repo, producer, slack := newLoginUsecase(t)
+	u, repo, producer := newLoginUsecase(t)
 
 	req := &model.LoginUserRequest{
 		Username: "user1",
@@ -131,23 +121,19 @@ func TestUserUsecaseImpl_Login_Fail_FindByUsername(t *testing.T) {
 		return assert.AnError
 	}
 
-	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
-		return model.SlackIsConnectedResponse{Connected: true}, nil
-	}
-
-	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	producer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
 	res, err := u.Login(context.Background(), req)
 
-	assert.Nil(t, res)
-	assert.NotNil(t, err)
-	assert.ErrorIs(t, err, assert.AnError)
+	require.Nil(t, res)
+	require.NotNil(t, err)
+	require.ErrorIs(t, err, assert.AnError)
 }
 
 func TestUserUsecaseImpl_Login_Fail_CompareHashAndPassword(t *testing.T) {
-	u, repo, producer, slack := newLoginUsecase(t)
+	u, repo, producer := newLoginUsecase(t)
 
 	req := &model.LoginUserRequest{
 		Username: "user1",
@@ -163,89 +149,22 @@ func TestUserUsecaseImpl_Login_Fail_CompareHashAndPassword(t *testing.T) {
 		return nil
 	}
 
-	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
-		return model.SlackIsConnectedResponse{Connected: true}, nil
-	}
-
-	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	producer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
 	res, err := u.Login(context.Background(), req)
 
-	assert.Nil(t, res)
-	assert.NotNil(t, err)
+	require.Nil(t, res)
+	require.NotNil(t, err)
 }
 
-func TestUserUsecaseImpl_Login_Fail_IsConnected(t *testing.T) {
-	u, repo, producer, slack := newLoginUsecase(t)
 
-	req := &model.LoginUserRequest{
-		Username: "user1",
-		Password: "password1",
-	}
-
-	repo.FindByUsernameFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, username string) error {
-		pw, err := bcrypt.GenerateFromPassword([]byte("password1"), bcrypt.DefaultCost)
-		require.NoError(t, err)
-		entityMoqParam.Password = string(pw)
-		entityMoqParam.ID = 123
-		entityMoqParam.Username = username
-		return nil
-	}
-
-	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
-		return model.SlackIsConnectedResponse{Connected: false}, assert.AnError
-	}
-
-	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
-		return nil
-	}
-
-	res, err := u.Login(context.Background(), req)
-
-	assert.Nil(t, res)
-	assert.NotNil(t, err)
-	assert.ErrorIs(t, err, assert.AnError)
-}
-
-func TestUserUsecaseImpl_Login_Fail_Send(t *testing.T) {
-	u, repo, producer, slack := newLoginUsecase(t)
-
-	req := &model.LoginUserRequest{
-		Username: "user1",
-		Password: "password1",
-	}
-
-	repo.FindByUsernameFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, username string) error {
-		pw, err := bcrypt.GenerateFromPassword([]byte("password1"), bcrypt.DefaultCost)
-		require.NoError(t, err)
-		entityMoqParam.Password = string(pw)
-		entityMoqParam.ID = 123
-		entityMoqParam.Username = username
-		return nil
-	}
-
-	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
-		return model.SlackIsConnectedResponse{Connected: true}, nil
-	}
-
-	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
-		return assert.AnError
-	}
-
-	res, err := u.Login(context.Background(), req)
-
-	assert.Nil(t, res)
-	assert.NotNil(t, err)
-	assert.ErrorIs(t, err, assert.AnError)
-}
 
 func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	repo := &mock.UserRepositoryMock{}
 	producer := &mock.UserProducerMock{}
-	slack := &mock.SlackClientMock{}
 
 	cfg := viper.New()
 	cfg.Set(configkey.AuthJWTIssuer, "test-issuer")
@@ -256,7 +175,6 @@ func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 		DB:             gormDB,
 		UserRepository: repo,
 		UserProducer:   producer,
-		SlackClient:    slack,
 	}
 
 	req := &model.LoginUserRequest{
@@ -273,16 +191,12 @@ func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 		return nil
 	}
 
-	slack.IsConnectedFunc = func(ctx context.Context, req model.SlackIsConnectedRequest) (model.SlackIsConnectedResponse, error) {
-		return model.SlackIsConnectedResponse{Connected: true}, nil
-	}
-
-	producer.SendFunc = func(ctx context.Context, event *model.UserEvent) error {
+	producer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
 		return nil
 	}
 
 	res, err := u.Login(context.Background(), req)
 
-	assert.Nil(t, res)
-	assert.NotNil(t, err)
+	require.Nil(t, res)
+	require.NotNil(t, err)
 }

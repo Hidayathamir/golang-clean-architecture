@@ -3,12 +3,13 @@ package http
 import (
 	"net/http"
 
-	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/middleware"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/gofiber/fiber/v2"
 	"github.com/spf13/viper"
 )
@@ -41,11 +42,13 @@ func (c *UserController) Register(ctx *fiber.Ctx) error {
 	err := ctx.BodyParser(req)
 	if err != nil {
 		err = errkit.BadRequest(err)
+		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
 	res, err := c.Usecase.Create(ctx.UserContext(), req)
 	if err != nil {
+		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
@@ -58,7 +61,7 @@ func (c *UserController) Register(ctx *fiber.Ctx) error {
 //	@Description	Authenticate a user and return access token
 //	@Tags			users
 //	@Param			request	body		model.LoginUserRequest	true	"Login User Request"
-//	@Success		200		{object}	response.WebResponse[model.UserResponse]
+//	@Success		200		{object}	response.WebResponse[model.UserLoginResponse]
 //	@Router			/api/users/_login [post]
 func (c *UserController) Login(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
@@ -68,11 +71,13 @@ func (c *UserController) Login(ctx *fiber.Ctx) error {
 	err := ctx.BodyParser(req)
 	if err != nil {
 		err = errkit.BadRequest(err)
+		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
 	res, err := c.Usecase.Login(ctx.UserContext(), req)
 	if err != nil {
+		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
@@ -91,40 +96,15 @@ func (c *UserController) Current(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	auth := middleware.GetUser(ctx)
+	userAuth := ctxuserauth.Get(ctx.UserContext())
 
 	req := &model.GetUserRequest{
-		ID: auth.ID,
+		ID: userAuth.ID,
 	}
 
 	res, err := c.Usecase.Current(ctx.UserContext(), req)
 	if err != nil {
-		return errkit.AddFuncName(err)
-	}
-
-	return response.Data(ctx, http.StatusOK, res)
-}
-
-// Logout godoc
-//
-//	@Summary		Logout user
-//	@Description	Logout the current authenticated user
-//	@Tags			users
-//	@Security		SimpleApiKeyAuth
-//	@Success		200	{object}	response.WebResponse[bool]
-//	@Router			/api/users [delete]
-func (c *UserController) Logout(ctx *fiber.Ctx) error {
-	span := telemetry.StartController(ctx)
-	defer span.End()
-
-	auth := middleware.GetUser(ctx)
-
-	req := &model.LogoutUserRequest{
-		ID: auth.ID,
-	}
-
-	res, err := c.Usecase.Logout(ctx.UserContext(), req)
-	if err != nil {
+		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
@@ -144,19 +124,51 @@ func (c *UserController) Update(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	auth := middleware.GetUser(ctx)
+	userAuth := ctxuserauth.Get(ctx.UserContext())
 
 	req := new(model.UpdateUserRequest)
 	if err := ctx.BodyParser(req); err != nil {
 		err = errkit.BadRequest(err)
+		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
-	req.ID = auth.ID
+	req.ID = userAuth.ID
 	res, err := c.Usecase.Update(ctx.UserContext(), req)
 	if err != nil {
+		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
+}
+
+// Follow godoc
+//
+//	@Summary		Follow user
+//	@Description	Follow a user
+//	@Tags			users
+//	@Security		SimpleApiKeyAuth
+//	@Param			request	body		model.FollowUserRequest	true	"Follow User Request"
+//	@Success		200		{object}	response.WebResponse[string]
+//	@Router			/api/users/_follow [post]
+func (c *UserController) Follow(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
+	req := new(model.FollowUserRequest)
+	err := ctx.BodyParser(req)
+	if err != nil {
+		err = errkit.BadRequest(err)
+		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err)
+	}
+
+	err = c.Usecase.Follow(ctx.UserContext(), req)
+	if err != nil {
+		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err)
+	}
+
+	return response.Data(ctx, http.StatusOK, "ok")
 }
