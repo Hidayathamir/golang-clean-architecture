@@ -53,7 +53,7 @@ func (r *ImageRepositoryImpl) IncrementCommentCountByID(ctx context.Context, db 
 		Table(table.Image).
 		Where(column.ID.Eq(id)).
 		Updates(map[string]any{
-			column.CommentCount.Str(): gorm.Expr(column.Comment.Plus(count)),
+			column.CommentCount.Str(): gorm.Expr(column.CommentCount.Plus(count)),
 		}).Error
 	if err != nil {
 		return errkit.AddFuncName(err)

@@ -30,7 +30,7 @@ func NewCommentRepository(cfg *viper.Viper) *CommentRepositoryImpl {
 }
 
 func (r *CommentRepositoryImpl) Create(ctx context.Context, db *gorm.DB, comment *entity.Comment) error {
-	err := db.Create(comment).Error
+	err := db.WithContext(ctx).Create(comment).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
@@ -38,7 +38,7 @@ func (r *CommentRepositoryImpl) Create(ctx context.Context, db *gorm.DB, comment
 }
 
 func (r *CommentRepositoryImpl) FindByImageID(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64) error {
-	err := db.Where(column.ImageID.Eq(imageID)).Find(commentList).Error
+	err := db.WithContext(ctx).Where(column.ImageID.Eq(imageID)).Find(commentList).Error
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
