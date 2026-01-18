@@ -93,7 +93,7 @@ func (r *UserRepositoryImpl) FindByUsername(ctx context.Context, db *gorm.DB, us
 }
 
 func (r *UserRepositoryImpl) IncrementFollowerCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error {
-	err := db.
+	err := db.WithContext(ctx).
 		Table(table.User).
 		Where(column.ID.Eq(id)).
 		Updates(map[string]any{
@@ -106,7 +106,7 @@ func (r *UserRepositoryImpl) IncrementFollowerCountByID(ctx context.Context, db 
 }
 
 func (r *UserRepositoryImpl) IncrementFollowingCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error {
-	err := db.
+	err := db.WithContext(ctx).
 		Table(table.User).
 		Where(column.ID.Eq(id)).
 		Updates(map[string]any{
@@ -119,7 +119,7 @@ func (r *UserRepositoryImpl) IncrementFollowingCountByID(ctx context.Context, db
 }
 
 func (r *UserRepositoryImpl) IncrementFollowerCountAndFollowingCountByID(ctx context.Context, db *gorm.DB, id int64, followerCount int, followingCount int) error {
-	err := db.
+	err := db.WithContext(ctx).
 		Table(table.User).
 		Where(column.ID.Eq(id)).
 		Updates(map[string]any{
