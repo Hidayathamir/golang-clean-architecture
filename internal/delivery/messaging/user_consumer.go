@@ -21,7 +21,7 @@ func NewUserConsumer(usecase user.UserUsecase) *UserConsumer {
 	}
 }
 
-func (c UserConsumer) ConsumeUserFollowedEvent(message *sarama.ConsumerMessage) error {
+func (c UserConsumer) ConsumeUserFollowedEventForNotification(message *sarama.ConsumerMessage) error {
 	ctx, span := telemetry.StartConsumer(message)
 	defer span.End()
 

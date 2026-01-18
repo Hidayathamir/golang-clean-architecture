@@ -14,7 +14,7 @@ func SetupUserFollowedConsumer(ctx context.Context, viperConfig *viper.Viper, us
 	x.Logger.Info("setup consttopic.UserFollowed consumer")
 	consumerGroup := config.NewKafkaConsumerGroup(viperConfig)
 	consumer := messaging.NewUserConsumer(usecases.UserUsecase)
-	messaging.ConsumeTopic(ctx, consumerGroup, consttopic.UserFollowed, consumer.ConsumeUserFollowedEvent)
+	messaging.ConsumeTopic(ctx, consumerGroup, consttopic.UserFollowed, consumer.ConsumeUserFollowedEventForNotification)
 }
 
 func SetupImageUploadedConsumer(ctx context.Context, viperConfig *viper.Viper, usecases *config.Usecases) {
