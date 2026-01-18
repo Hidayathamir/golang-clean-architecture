@@ -21,7 +21,7 @@ func NewNotifConsumer(usecase notif.NotifUsecase) *NotifConsumer {
 	}
 }
 
-func (c NotifConsumer) ConsumeNotifEvent(message *sarama.ConsumerMessage) error {
+func (c *NotifConsumer) ConsumeNotifEvent(message *sarama.ConsumerMessage) error {
 	ctx, span := telemetry.StartConsumer(message)
 	defer span.End()
 

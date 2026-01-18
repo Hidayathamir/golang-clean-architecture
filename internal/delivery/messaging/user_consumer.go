@@ -22,7 +22,7 @@ func NewUserConsumer(usecase user.UserUsecase) *UserConsumer {
 	}
 }
 
-func (c UserConsumer) ConsumeUserFollowedEventForNotification(message *sarama.ConsumerMessage) error {
+func (c *UserConsumer) ConsumeUserFollowedEventForNotification(message *sarama.ConsumerMessage) error {
 	ctx, span := telemetry.StartConsumer(message)
 	defer span.End()
 
@@ -41,7 +41,7 @@ func (c UserConsumer) ConsumeUserFollowedEventForNotification(message *sarama.Co
 	return nil
 }
 
-func (c UserConsumer) ConsumeUserFollowedEventForUpdateCount(messages []*sarama.ConsumerMessage) error {
+func (c *UserConsumer) ConsumeUserFollowedEventForUpdateCount(messages []*sarama.ConsumerMessage) error {
 	req := new(model.BatchUpdateUserFollowStatsRequest)
 	converter.SaramaConsumerMessageListToModelBatchUpdateUserFollowStatsRequest(context.Background(), messages, req)
 

@@ -23,7 +23,7 @@ func NewImageConsumer(usecase image.ImageUsecase) *ImageConsumer {
 	}
 }
 
-func (c ImageConsumer) ConsumeImageUploadedEvent(message *sarama.ConsumerMessage) error {
+func (c *ImageConsumer) ConsumeImageUploadedEvent(message *sarama.ConsumerMessage) error {
 	ctx, span := telemetry.StartConsumer(message)
 	defer span.End()
 
@@ -42,7 +42,7 @@ func (c ImageConsumer) ConsumeImageUploadedEvent(message *sarama.ConsumerMessage
 	return nil
 }
 
-func (c ImageConsumer) ConsumeImageLikedEvent(message *sarama.ConsumerMessage) error {
+func (c *ImageConsumer) ConsumeImageLikedEvent(message *sarama.ConsumerMessage) error {
 	ctx, span := telemetry.StartConsumer(message)
 	defer span.End()
 
@@ -61,7 +61,7 @@ func (c ImageConsumer) ConsumeImageLikedEvent(message *sarama.ConsumerMessage) e
 	return nil
 }
 
-func (c ImageConsumer) ConsumeImageCommentedEvent(message *sarama.ConsumerMessage) error {
+func (c *ImageConsumer) ConsumeImageCommentedEvent(message *sarama.ConsumerMessage) error {
 	ctx, span := telemetry.StartConsumer(message)
 	defer span.End()
 
