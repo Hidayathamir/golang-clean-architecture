@@ -45,8 +45,8 @@ func (r *FollowRepositoryMwLogger) FindByFollowingID(ctx context.Context, db *go
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
-		"len(*followList)": len(*followList),
-		"followingID":      followingID,
+		"followList":  followList,
+		"followingID": followingID,
 	}
 	x.LogMw(ctx, fields, err)
 

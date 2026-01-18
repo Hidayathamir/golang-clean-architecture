@@ -45,8 +45,8 @@ func (r *LikeRepositoryMwLogger) FindByImageID(ctx context.Context, db *gorm.DB,
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
-		"len(*likeList)": len(*likeList),
-		"imageID":        imageID,
+		"likeList": likeList,
+		"imageID":  imageID,
 	}
 	x.LogMw(ctx, fields, err)
 

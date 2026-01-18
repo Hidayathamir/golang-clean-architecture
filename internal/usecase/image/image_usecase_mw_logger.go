@@ -91,8 +91,8 @@ func (u *ImageUsecaseMwLogger) GetComment(ctx context.Context, req *model.GetCom
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
-		"req":      req,
-		"len(res)": len(*res),
+		"req": req,
+		"res": res,
 	}
 	x.LogMw(ctx, fields, err)
 
@@ -107,8 +107,8 @@ func (u *ImageUsecaseMwLogger) GetLike(ctx context.Context, req *model.GetLikeRe
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
-		"req":      req,
-		"len(res)": len(*res),
+		"req": req,
+		"res": res,
 	}
 	x.LogMw(ctx, fields, err)
 
