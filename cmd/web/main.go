@@ -90,7 +90,7 @@ func validateAbleToExportSpan() {
 		err := tp.ForceFlush(flushCtx)
 		if err != nil {
 			err = errkit.SetMessage(err, "error export span, wait a little longer, or check is the collector ready")
-			x.Logger.WithError(err).Panic("")
+			x.Logger.WithError(err).Panic()
 		}
 		x.Logger.Info("Successfully sent manual trace for web")
 	}

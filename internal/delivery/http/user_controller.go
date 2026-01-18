@@ -9,6 +9,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/gofiber/fiber/v2"
 	"github.com/spf13/viper"
 )
@@ -41,11 +42,13 @@ func (c *UserController) Register(ctx *fiber.Ctx) error {
 	err := ctx.BodyParser(req)
 	if err != nil {
 		err = errkit.BadRequest(err)
+		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
 	res, err := c.Usecase.Create(ctx.UserContext(), req)
 	if err != nil {
+		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
@@ -68,11 +71,13 @@ func (c *UserController) Login(ctx *fiber.Ctx) error {
 	err := ctx.BodyParser(req)
 	if err != nil {
 		err = errkit.BadRequest(err)
+		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
 	res, err := c.Usecase.Login(ctx.UserContext(), req)
 	if err != nil {
+		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
@@ -99,6 +104,7 @@ func (c *UserController) Current(ctx *fiber.Ctx) error {
 
 	res, err := c.Usecase.Current(ctx.UserContext(), req)
 	if err != nil {
+		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
@@ -123,12 +129,14 @@ func (c *UserController) Update(ctx *fiber.Ctx) error {
 	req := new(model.UpdateUserRequest)
 	if err := ctx.BodyParser(req); err != nil {
 		err = errkit.BadRequest(err)
+		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
 	req.ID = userAuth.ID
 	res, err := c.Usecase.Update(ctx.UserContext(), req)
 	if err != nil {
+		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
@@ -152,11 +160,13 @@ func (c *UserController) Follow(ctx *fiber.Ctx) error {
 	err := ctx.BodyParser(req)
 	if err != nil {
 		err = errkit.BadRequest(err)
+		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
 	err = c.Usecase.Follow(ctx.UserContext(), req)
 	if err != nil {
+		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 

@@ -29,6 +29,7 @@ func (c *ImageConsumer) ConsumeImageUploadedEvent(message *sarama.ConsumerMessag
 
 	event := new(model.ImageUploadedEvent)
 	if err := json.Unmarshal(message.Value, event); err != nil {
+		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
@@ -36,6 +37,7 @@ func (c *ImageConsumer) ConsumeImageUploadedEvent(message *sarama.ConsumerMessag
 	converter.ModelImageUploadedEventToModelNotifyFollowerOnUploadRequest(ctx, event, req)
 
 	if err := c.Usecase.NotifyFollowerOnUpload(ctx, req); err != nil {
+		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
@@ -48,7 +50,7 @@ func (c *ImageConsumer) ConsumeImageLikedEvent(message *sarama.ConsumerMessage) 
 
 	event := new(model.ImageLikedEvent)
 	if err := json.Unmarshal(message.Value, event); err != nil {
-		x.Logger.WithContext(ctx).WithError(err).Error("")
+		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
@@ -56,7 +58,7 @@ func (c *ImageConsumer) ConsumeImageLikedEvent(message *sarama.ConsumerMessage) 
 	x.Logger.WithContext(ctx).WithFields(logrus.Fields{
 		"event":     event,
 		"partition": message.Partition,
-	}).Info("")
+	}).Info()
 
 	return nil
 }
@@ -67,7 +69,7 @@ func (c *ImageConsumer) ConsumeImageCommentedEventForNotification(message *saram
 
 	event := new(model.ImageCommentedEvent)
 	if err := json.Unmarshal(message.Value, event); err != nil {
-		x.Logger.WithContext(ctx).WithError(err).Error("")
+		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
@@ -75,6 +77,7 @@ func (c *ImageConsumer) ConsumeImageCommentedEventForNotification(message *saram
 	converter.ModelImageCommentedEventToModelNotifyUserImageCommentedRequest(ctx, event, req)
 
 	if err := c.Usecase.NotifyUserImageCommented(ctx, req); err != nil {
+		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
@@ -89,6 +92,7 @@ func (c *ImageConsumer) ConsumeImageCommentedEventForUpdateCount(messages []*sar
 	converter.SaramaConsumerMessageListToModelBatchUpdateImageCommentCountRequest(ctx, messages, req)
 
 	if err := c.Usecase.BatchUpdateImageCommentCount(ctx, req); err != nil {
+		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 

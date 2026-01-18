@@ -28,7 +28,7 @@ func (u *UserUsecaseImpl) BatchUpdateUserFollowStats(ctx context.Context, req *m
 			x.Logger.WithContext(ctx).WithField("v", v).Warn("invalid follower count and following count")
 		}
 		if err != nil {
-			x.Logger.WithContext(ctx).WithError(err).Warn("")
+			x.Logger.WithContext(ctx).WithError(err).Warn()
 		}
 	}
 

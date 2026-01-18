@@ -8,6 +8,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/IBM/sarama"
 )
 
@@ -27,6 +28,7 @@ func (c *UserConsumer) ConsumeUserFollowedEventForNotification(message *sarama.C
 
 	event := new(model.UserFollowedEvent)
 	if err := json.Unmarshal(message.Value, event); err != nil {
+		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
@@ -34,6 +36,7 @@ func (c *UserConsumer) ConsumeUserFollowedEventForNotification(message *sarama.C
 	converter.ModelUserFollowedEventToModelNotifyUserBeingFollowedRequest(ctx, event, req)
 
 	if err := c.Usecase.NotifyUserBeingFollowed(ctx, req); err != nil {
+		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
@@ -48,6 +51,7 @@ func (c *UserConsumer) ConsumeUserFollowedEventForUpdateCount(messages []*sarama
 	converter.SaramaConsumerMessageListToModelBatchUpdateUserFollowStatsRequest(ctx, messages, req)
 
 	if err := c.Usecase.BatchUpdateUserFollowStats(ctx, req); err != nil {
+		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
