@@ -201,6 +201,27 @@ func commentImage(t *testing.T, token string, imageID int64, comment string) {
 	require.Equal(t, http.StatusOK, res.StatusCode)
 }
 
+func likeImage(t *testing.T, token string, imageID int64) {
+	t.Helper()
+
+	reqBody := model.LikeImageRequest{
+		ImageID: imageID,
+	}
+	bodyJson, err := json.Marshal(reqBody)
+	require.Nil(t, err)
+
+	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/images/_like", bytes.NewReader(bodyJson))
+	require.Nil(t, err)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", bearerToken(token))
+
+	res, err := http.DefaultClient.Do(req)
+	require.Nil(t, err)
+	defer res.Body.Close()
+
+	require.Equal(t, http.StatusOK, res.StatusCode)
+}
+
 func ClearAll() {
 	ClearComments()
 	ClearLikes()

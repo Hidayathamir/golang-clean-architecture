@@ -334,3 +334,39 @@ func TestMultipleUsersCommentImage(t *testing.T) {
 
 	require.Len(t, respBody.Data, 2)
 }
+
+func TestMultipleUsersLikeImage(t *testing.T) {
+	ClearAll()
+
+	// Register users
+	tokenA := registerAndLoginUser(t, "userA", "password", "User A")
+	tokenB := registerAndLoginUser(t, "userB", "password", "User B")
+	tokenC := registerAndLoginUser(t, "userC", "password", "User C")
+
+	// User A uploads image
+	imageID := uploadImage(t, tokenA)
+
+	// User B likes
+	likeImage(t, tokenB, imageID)
+
+	// User C likes
+	likeImage(t, tokenC, imageID)
+
+	// Verify likes
+	url := fmt.Sprintf("http://127.0.0.1:3000/api/images/%d/likes", imageID)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	require.Nil(t, err)
+	req.Header.Set("Authorization", bearerToken(tokenA))
+
+	res, err := http.DefaultClient.Do(req)
+	require.Nil(t, err)
+	defer res.Body.Close()
+
+	require.Equal(t, http.StatusOK, res.StatusCode)
+
+	respBody := new(response.WebResponse[model.LikeResponseList])
+	err = json.NewDecoder(res.Body).Decode(respBody)
+	require.Nil(t, err)
+
+	require.Len(t, respBody.Data, 2)
+}
