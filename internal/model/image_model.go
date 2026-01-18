@@ -23,16 +23,16 @@ type UploadImageRequest struct {
 }
 
 type LikeImageRequest struct {
-	ImageID int64 `json:"image_id"`
+	ImageID int64 `json:"image_id" validate:"required"`
 }
 
 type CommentImageRequest struct {
-	ImageID int64  `json:"image_id"`
-	Comment string `json:"comment"`
+	ImageID int64  `json:"image_id" validate:"required"`
+	Comment string `json:"comment" validate:"required"`
 }
 
 type GetImageRequest struct {
-	ID int64
+	ID int64 `validate:"required"`
 }
 
 type LikeResponse struct {

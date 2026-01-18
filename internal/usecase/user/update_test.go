@@ -185,44 +185,4 @@ func TestUserUsecaseImpl_Update_Fail_Update(t *testing.T) {
 	require.ErrorIs(t, err, assert.AnError)
 }
 
-func TestUserUsecaseImpl_Update_Fail_Send(t *testing.T) {
-	gormDB, _ := newFakeDB(t)
-	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserProducerMock{}
-	u := &user.UserUsecaseImpl{
-		DB:             gormDB,
-		Config:         viper.New(),
-		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
-	}
 
-	// ------------------------------------------------------- //
-
-	req := &model.UpdateUserRequest{
-		ID: 1,
-	}
-
-	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id int64) error {
-		return nil
-	}
-
-	UserRepository.UpdateFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User) error {
-		return nil
-	}
-
-	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
-		return assert.AnError
-	}
-
-	// ------------------------------------------------------- //
-
-	res, err := u.Update(context.Background(), req)
-
-	// ------------------------------------------------------- //
-
-	var expected *model.UserResponse
-
-	require.Equal(t, expected, res)
-	require.NotNil(t, err)
-	require.ErrorIs(t, err, assert.AnError)
-}

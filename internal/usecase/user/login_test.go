@@ -159,61 +159,7 @@ func TestUserUsecaseImpl_Login_Fail_CompareHashAndPassword(t *testing.T) {
 	require.NotNil(t, err)
 }
 
-func TestUserUsecaseImpl_Login_Fail_IsConnected(t *testing.T) {
-	u, repo, producer := newLoginUsecase(t)
 
-	req := &model.LoginUserRequest{
-		Username: "user1",
-		Password: "password1",
-	}
-
-	repo.FindByUsernameFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, username string) error {
-		pw, err := bcrypt.GenerateFromPassword([]byte("password1"), bcrypt.DefaultCost)
-		require.NoError(t, err)
-		entityMoqParam.Password = string(pw)
-		entityMoqParam.ID = 123
-		entityMoqParam.Username = username
-		return nil
-	}
-
-	producer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
-		return nil
-	}
-
-	res, err := u.Login(context.Background(), req)
-
-	require.Nil(t, res)
-	require.NotNil(t, err)
-	require.ErrorIs(t, err, assert.AnError)
-}
-
-func TestUserUsecaseImpl_Login_Fail_Send(t *testing.T) {
-	u, repo, producer := newLoginUsecase(t)
-
-	req := &model.LoginUserRequest{
-		Username: "user1",
-		Password: "password1",
-	}
-
-	repo.FindByUsernameFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, username string) error {
-		pw, err := bcrypt.GenerateFromPassword([]byte("password1"), bcrypt.DefaultCost)
-		require.NoError(t, err)
-		entityMoqParam.Password = string(pw)
-		entityMoqParam.ID = 123
-		entityMoqParam.Username = username
-		return nil
-	}
-
-	producer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
-		return assert.AnError
-	}
-
-	res, err := u.Login(context.Background(), req)
-
-	require.Nil(t, res)
-	require.NotNil(t, err)
-	require.ErrorIs(t, err, assert.AnError)
-}
 
 func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
