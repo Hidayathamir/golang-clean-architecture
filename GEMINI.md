@@ -22,7 +22,7 @@ This repo is a reusable Golang clean architecture template. The `architecture.pn
 - `db/migrations`: Timestamped SQL files consumed by `cmd/migrate`.
 - `api/`: Generated Swagger specs and client/server stubs. Never edit by hand.
 - `signoz/`: Docker-compose fragments and dashboards for observability lab environments.
-- Root docs & helpers: `README.md`, `run_app.md` (step-by-step runbook), `README_my_note.md` (author notes), `Makefile`, `.env` samples under `config/` when present.
+- Root docs & helpers: `README.md`, `Makefile`, `config.json`.
 
 ## 3. Build, Run, and Tooling Commands
 - `make run`, `make run-worker`, `make migrate`: Start the web app, workers, and schema migrations respectively.
@@ -46,7 +46,7 @@ This repo is a reusable Golang clean architecture template. The `architecture.pn
 
 ## 6. Environment & Configuration
 - Use `make docker-compose` after checkout or schema changes to ensure Postgres/Kafka/Signoz stacks match expectations.
-- Keep environment variables in sync with the `.env` samples and avoid committing secrets.
+- Application configuration is managed via `config.json`.
 - Document any new external tooling in `README.md` and extend `make check-tools` when introducing additional CLIs or generators.
 
 ## 7. Commit & PR Expectations
