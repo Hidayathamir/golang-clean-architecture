@@ -24,7 +24,7 @@ func ModelUploadImageRequestToModelS3UploadImageRequest(ctx context.Context, req
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
-	defer x.LogIfErr(ctx, file.Close())
+	defer x.LogIfErrForDeferContext(ctx, file.Close)
 	s3UploadImgReq.Body = file
 	return nil
 }
