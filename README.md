@@ -58,11 +58,12 @@ This template implements a social media-like backend to demonstrate scalable sys
    - **Better delivery return handling** — see [`return response.Data(ctx, http.StatusOK, res)`](internal/delivery/http/user_controller.go).
    - **Swagger auto generation** — see [example](internal/delivery/http/user_controller.go). Generate with `make swag`. Access: [http://localhost:3000/swagger](http://localhost:3000/swagger)
    - **Command shortcuts via Makefile** — see [Makefile](Makefile).
-   - **Gateway REST API client** — example: [S3 client](internal/gateway/rest/s3_client.go).
-   - **Simplified repository (no generics)** — see [UserRepository](internal/repository/user_repository.go).
+    - **Gateway REST API client** — example: [S3 client](internal/infra/storage/s3_client.go).
+    - **Simplified repository (no generics)** — see [UserRepository](internal/infra/repository/user_repository.go).
    - **Simple Kafka producer call** — usage: [`u.UserProducer.SendUserFollowed`](internal/usecase/user/follow.go).
-   - **Split usecase by domain** — example: [User usecase](internal/usecase/user).
-   - **Run with Docker** — see [How To Run Application](#how-to-run-application).
+    - **Split usecase by domain** — example: [User usecase](internal/usecase/user).
+    - **Run with Docker** — see [How To Run Application](#how-to-run-application).
+    - **Typed configuration** — use [`config.Config`](internal/config/config.go) for type-safe access.
 
 2. **Error Handling**
    - **Consistent error wrapping & mapping** — e.g. [`errkit.BadRequest(err)`](internal/usecase/user/create.go) handled by [`response.Error`](internal/config/fiber.go).
