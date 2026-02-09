@@ -3,8 +3,8 @@ package messaging
 import (
 	"encoding/json"
 
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model/converter"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
@@ -26,14 +26,14 @@ func (c *UserConsumer) ConsumeUserFollowedEventForNotification(message *sarama.C
 	ctx, span := telemetry.StartConsumer(message)
 	defer span.End()
 
-	event := new(model.UserFollowedEvent)
+	event := new(dto.UserFollowedEvent)
 	if err := json.Unmarshal(message.Value, event); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
-	req := new(model.NotifyUserBeingFollowedRequest)
-	converter.ModelUserFollowedEventToModelNotifyUserBeingFollowedRequest(ctx, event, req)
+	req := new(dto.NotifyUserBeingFollowedRequest)
+	converter.DtoUserFollowedEventToDtoNotifyUserBeingFollowedRequest(ctx, event, req)
 
 	if err := c.Usecase.NotifyUserBeingFollowed(ctx, req); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
@@ -47,8 +47,8 @@ func (c *UserConsumer) ConsumeUserFollowedEventForUpdateCount(messages []*sarama
 	ctx, span := telemetry.StartNew()
 	defer span.End()
 
-	req := new(model.BatchUpdateUserFollowStatsRequest)
-	converter.SaramaConsumerMessageListToModelBatchUpdateUserFollowStatsRequest(ctx, messages, req)
+	req := new(dto.BatchUpdateUserFollowStatsRequest)
+	converter.SaramaConsumerMessageListToDtoBatchUpdateUserFollowStatsRequest(ctx, messages, req)
 
 	if err := c.Usecase.BatchUpdateUserFollowStats(ctx, req); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()

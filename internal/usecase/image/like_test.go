@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/image"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/go-playground/validator/v10"
@@ -26,7 +26,7 @@ func TestImageUsecaseImpl_Like_Success(t *testing.T) {
 		ImageProducer:  ImageProducer,
 	}
 
-	req := &model.LikeImageRequest{
+	req := &dto.LikeImageRequest{
 		ImageID: 100,
 	}
 
@@ -34,12 +34,12 @@ func TestImageUsecaseImpl_Like_Success(t *testing.T) {
 		return nil
 	}
 
-	ImageProducer.SendImageLikedFunc = func(ctx context.Context, event *model.ImageLikedEvent) error {
+	ImageProducer.SendImageLikedFunc = func(ctx context.Context, event *dto.ImageLikedEvent) error {
 		return nil
 	}
 
 	ctx := context.Background()
-	ctx = ctxuserauth.Set(ctx, &model.UserAuth{ID: 1})
+	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1})
 
 	err := u.Like(ctx, req)
 
@@ -52,7 +52,7 @@ func TestImageUsecaseImpl_Like_Fail_ValidateStruct(t *testing.T) {
 		DB: gormDB,
 	}
 
-	req := &model.LikeImageRequest{}
+	req := &dto.LikeImageRequest{}
 
 	err := u.Like(context.Background(), req)
 
@@ -70,7 +70,7 @@ func TestImageUsecaseImpl_Like_Fail_Create(t *testing.T) {
 		LikeRepository: LikeRepository,
 	}
 
-	req := &model.LikeImageRequest{
+	req := &dto.LikeImageRequest{
 		ImageID: 100,
 	}
 
@@ -79,7 +79,7 @@ func TestImageUsecaseImpl_Like_Fail_Create(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	ctx = ctxuserauth.Set(ctx, &model.UserAuth{ID: 1})
+	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1})
 
 	err := u.Like(ctx, req)
 
@@ -98,7 +98,7 @@ func TestImageUsecaseImpl_Like_Fail_Send(t *testing.T) {
 		ImageProducer:  ImageProducer,
 	}
 
-	req := &model.LikeImageRequest{
+	req := &dto.LikeImageRequest{
 		ImageID: 100,
 	}
 
@@ -106,12 +106,12 @@ func TestImageUsecaseImpl_Like_Fail_Send(t *testing.T) {
 		return nil
 	}
 
-	ImageProducer.SendImageLikedFunc = func(ctx context.Context, event *model.ImageLikedEvent) error {
+	ImageProducer.SendImageLikedFunc = func(ctx context.Context, event *dto.ImageLikedEvent) error {
 		return assert.AnError
 	}
 
 	ctx := context.Background()
-	ctx = ctxuserauth.Set(ctx, &model.UserAuth{ID: 1})
+	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1})
 
 	err := u.Like(ctx, req)
 

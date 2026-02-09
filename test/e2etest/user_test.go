@@ -9,8 +9,8 @@ import (
 	"testing"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/require"
@@ -21,7 +21,7 @@ func TestRegister(t *testing.T) {
 	ClearAll()
 
 	// Prepare registration request
-	requestBody := model.RegisterUserRequest{
+	requestBody := dto.RegisterUserRequest{
 		Username: "khannedy",
 		Password: "rahasia",
 		Name:     "Eko Khannedy",
@@ -47,7 +47,7 @@ func TestRegister(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[dto.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -62,7 +62,7 @@ func TestRegisterError(t *testing.T) {
 	ClearAll()
 
 	// Prepare invalid registration request (empty fields)
-	requestBody := model.RegisterUserRequest{
+	requestBody := dto.RegisterUserRequest{
 		Username: "",
 		Password: "",
 		Name:     "",
@@ -88,7 +88,7 @@ func TestRegisterError(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[dto.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -102,7 +102,7 @@ func TestRegisterDuplicate(t *testing.T) {
 	registerDefaultUser(t)
 
 	// Try to register the same user again
-	requestBody := model.RegisterUserRequest{
+	requestBody := dto.RegisterUserRequest{
 		Username: "khannedy",
 		Password: "rahasia",
 		Name:     "Eko Khannedy",
@@ -127,7 +127,7 @@ func TestRegisterDuplicate(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[dto.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -141,7 +141,7 @@ func TestLogin(t *testing.T) {
 	registerDefaultUser(t)
 
 	// Prepare login request
-	requestBody := model.LoginUserRequest{
+	requestBody := dto.LoginUserRequest{
 		Username: "khannedy",
 		Password: "rahasia",
 	}
@@ -166,7 +166,7 @@ func TestLogin(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[model.UserLoginResponse])
+	responseBody := new(response.WebResponse[dto.UserLoginResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -196,7 +196,7 @@ func TestLoginWrongUsername(t *testing.T) {
 	registerDefaultUser(t)
 
 	// Prepare login request with wrong username
-	requestBody := model.LoginUserRequest{
+	requestBody := dto.LoginUserRequest{
 		Username: "wrong",
 		Password: "rahasia",
 	}
@@ -221,7 +221,7 @@ func TestLoginWrongUsername(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[dto.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -235,7 +235,7 @@ func TestLoginWrongPassword(t *testing.T) {
 	registerDefaultUser(t)
 
 	// Prepare login request with wrong password
-	requestBody := model.LoginUserRequest{
+	requestBody := dto.LoginUserRequest{
 		Username: "khannedy",
 		Password: "wrong",
 	}
@@ -260,7 +260,7 @@ func TestLoginWrongPassword(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[dto.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -296,7 +296,7 @@ func TestGetCurrentUser(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[dto.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -330,7 +330,7 @@ func TestGetCurrentUserFailed(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[dto.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -349,7 +349,7 @@ func TestUpdateUserName(t *testing.T) {
 	require.Nil(t, err)
 
 	// Prepare update request (name change)
-	requestBody := model.UpdateUserRequest{
+	requestBody := dto.UpdateUserRequest{
 		Name: "Eko Kurniawan Khannedy",
 	}
 
@@ -374,7 +374,7 @@ func TestUpdateUserName(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[dto.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -396,7 +396,7 @@ func TestUpdateUserPassword(t *testing.T) {
 	require.Nil(t, err)
 
 	// Prepare update request (password change)
-	requestBody := model.UpdateUserRequest{
+	requestBody := dto.UpdateUserRequest{
 		Password: "rahasialagi",
 	}
 
@@ -421,7 +421,7 @@ func TestUpdateUserPassword(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[dto.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -445,7 +445,7 @@ func TestUpdateFailed(t *testing.T) {
 	registerDefaultUser(t)
 
 	// Prepare update request
-	requestBody := model.UpdateUserRequest{
+	requestBody := dto.UpdateUserRequest{
 		Password: "rahasialagi",
 	}
 
@@ -470,7 +470,7 @@ func TestUpdateFailed(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[dto.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -492,7 +492,7 @@ func TestFollowUser(t *testing.T) {
 	require.Nil(t, err)
 
 	// Prepare follow request
-	requestBody := model.FollowUserRequest{
+	requestBody := dto.FollowUserRequest{
 		FollowingID: followingUser.ID,
 	}
 	bodyJson, err := json.Marshal(requestBody)

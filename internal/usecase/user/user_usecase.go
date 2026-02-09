@@ -4,24 +4,24 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/storage"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"gorm.io/gorm"
 )
 
 //go:generate moq -out=../../mock/MockUsecaseUser.go -pkg=mock . UserUsecase
 
 type UserUsecase interface {
-	Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.UserAuth, error)
-	Create(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error)
-	Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserLoginResponse, error)
-	Current(ctx context.Context, req *model.GetUserRequest) (*model.UserResponse, error)
-	Update(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error)
-	Follow(ctx context.Context, req *model.FollowUserRequest) error
-	NotifyUserBeingFollowed(ctx context.Context, req *model.NotifyUserBeingFollowedRequest) error
-	BatchUpdateUserFollowStats(ctx context.Context, req *model.BatchUpdateUserFollowStatsRequest) error
+	Verify(ctx context.Context, req *dto.VerifyUserRequest) (*dto.UserAuth, error)
+	Create(ctx context.Context, req *dto.RegisterUserRequest) (*dto.UserResponse, error)
+	Login(ctx context.Context, req *dto.LoginUserRequest) (*dto.UserLoginResponse, error)
+	Current(ctx context.Context, req *dto.GetUserRequest) (*dto.UserResponse, error)
+	Update(ctx context.Context, req *dto.UpdateUserRequest) (*dto.UserResponse, error)
+	Follow(ctx context.Context, req *dto.FollowUserRequest) error
+	NotifyUserBeingFollowed(ctx context.Context, req *dto.NotifyUserBeingFollowedRequest) error
+	BatchUpdateUserFollowStats(ctx context.Context, req *dto.BatchUpdateUserFollowStatsRequest) error
 }
 
 var _ UserUsecase = &UserUsecaseImpl{}

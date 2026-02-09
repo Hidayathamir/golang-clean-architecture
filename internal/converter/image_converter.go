@@ -7,15 +7,15 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/IBM/sarama"
 )
 
-func ModelUploadImageRequestToModelS3UploadImageRequest(ctx context.Context, req *model.UploadImageRequest, s3UploadImgReq *model.S3UploadImageRequest) error {
+func DtoUploadImageRequestToDtoS3UploadImageRequest(ctx context.Context, req *dto.UploadImageRequest, s3UploadImgReq *dto.S3UploadImageRequest) error {
 	timenow := time.Now().Unix()
 	userAuth := ctxuserauth.Get(ctx)
 	safeFilename := strings.ReplaceAll(req.File.Filename, " ", "_")
@@ -29,7 +29,7 @@ func ModelUploadImageRequestToModelS3UploadImageRequest(ctx context.Context, req
 	return nil
 }
 
-func EntityImageToModelImageUploadedEvent(ctx context.Context, image *entity.Image, event *model.ImageUploadedEvent) {
+func EntityImageToDtoImageUploadedEvent(ctx context.Context, image *entity.Image, event *dto.ImageUploadedEvent) {
 	event.ID = image.ID
 	event.UserID = image.UserID
 	event.URL = image.URL
@@ -40,13 +40,13 @@ func EntityImageToModelImageUploadedEvent(ctx context.Context, image *entity.Ima
 	event.DeletedAt = image.DeletedAt
 }
 
-func ModelLikeImageRequestToEntityLike(ctx context.Context, req *model.LikeImageRequest, like *entity.Like) {
+func DtoLikeImageRequestToEntityLike(ctx context.Context, req *dto.LikeImageRequest, like *entity.Like) {
 	userAuth := ctxuserauth.Get(ctx)
 	like.UserID = userAuth.ID
 	like.ImageID = req.ImageID
 }
 
-func EntityLikeToModelImageLikedEvent(ctx context.Context, like *entity.Like, event *model.ImageLikedEvent) {
+func EntityLikeToDtoImageLikedEvent(ctx context.Context, like *entity.Like, event *dto.ImageLikedEvent) {
 	event.ID = like.ID
 	event.UserID = like.UserID
 	event.ImageID = like.ImageID
@@ -55,14 +55,14 @@ func EntityLikeToModelImageLikedEvent(ctx context.Context, like *entity.Like, ev
 	event.DeletedAt = like.DeletedAt
 }
 
-func ModelCommentImageRequestToEntityComment(ctx context.Context, req *model.CommentImageRequest, comment *entity.Comment) {
+func DtoCommentImageRequestToEntityComment(ctx context.Context, req *dto.CommentImageRequest, comment *entity.Comment) {
 	userAuth := ctxuserauth.Get(ctx)
 	comment.UserID = userAuth.ID
 	comment.ImageID = req.ImageID
 	comment.Comment = req.Comment
 }
 
-func EntityCommentToModelImageCommentedEvent(ctx context.Context, comment *entity.Comment, event *model.ImageCommentedEvent) {
+func EntityCommentToDtoImageCommentedEvent(ctx context.Context, comment *entity.Comment, event *dto.ImageCommentedEvent) {
 	event.ID = comment.ID
 	event.UserID = comment.UserID
 	event.ImageID = comment.ImageID
@@ -72,7 +72,7 @@ func EntityCommentToModelImageCommentedEvent(ctx context.Context, comment *entit
 	event.DeletedAt = comment.DeletedAt
 }
 
-func EntityImageToModelImageResponse(ctx context.Context, image *entity.Image, res *model.ImageResponse) {
+func EntityImageToDtoImageResponse(ctx context.Context, image *entity.Image, res *dto.ImageResponse) {
 	res.ID = image.ID
 	res.UserID = image.UserID
 	res.URL = image.URL
@@ -83,7 +83,7 @@ func EntityImageToModelImageResponse(ctx context.Context, image *entity.Image, r
 	res.DeletedAt = image.DeletedAt
 }
 
-func EntityLikeToModelLikeResponse(ctx context.Context, like *entity.Like, res *model.LikeResponse) {
+func EntityLikeToDtoLikeResponse(ctx context.Context, like *entity.Like, res *dto.LikeResponse) {
 	res.ID = like.ID
 	res.UserID = like.UserID
 	res.ImageID = like.ImageID
@@ -92,15 +92,15 @@ func EntityLikeToModelLikeResponse(ctx context.Context, like *entity.Like, res *
 	res.DeletedAt = like.DeletedAt
 }
 
-func EntityLikeListToModelLikeResponseList(ctx context.Context, likeList *entity.LikeList, res *model.LikeResponseList) {
+func EntityLikeListToDtoLikeResponseList(ctx context.Context, likeList *entity.LikeList, res *dto.LikeResponseList) {
 	for _, like := range *likeList {
-		r := model.LikeResponse{}
-		EntityLikeToModelLikeResponse(ctx, &like, &r)
+		r := dto.LikeResponse{}
+		EntityLikeToDtoLikeResponse(ctx, &like, &r)
 		*res = append(*res, r)
 	}
 }
 
-func EntityCommentToModelCommentResponse(ctx context.Context, comment *entity.Comment, res *model.CommentResponse) {
+func EntityCommentToDtoCommentResponse(ctx context.Context, comment *entity.Comment, res *dto.CommentResponse) {
 	res.ID = comment.ID
 	res.UserID = comment.UserID
 	res.ImageID = comment.ImageID
@@ -110,28 +110,28 @@ func EntityCommentToModelCommentResponse(ctx context.Context, comment *entity.Co
 	res.DeletedAt = comment.DeletedAt
 }
 
-func EntityCommentListToModelCommentResponseList(ctx context.Context, commentList *entity.CommentList, res *model.CommentResponseList) {
+func EntityCommentListToDtoCommentResponseList(ctx context.Context, commentList *entity.CommentList, res *dto.CommentResponseList) {
 	for _, comment := range *commentList {
-		r := model.CommentResponse{}
-		EntityCommentToModelCommentResponse(ctx, &comment, &r)
+		r := dto.CommentResponse{}
+		EntityCommentToDtoCommentResponse(ctx, &comment, &r)
 		*res = append(*res, r)
 	}
 }
 
-func ModelImageUploadedEventToModelNotifyFollowerOnUploadRequest(ctx context.Context, event *model.ImageUploadedEvent, req *model.NotifyFollowerOnUploadRequest) {
+func DtoImageUploadedEventToDtoNotifyFollowerOnUploadRequest(ctx context.Context, event *dto.ImageUploadedEvent, req *dto.NotifyFollowerOnUploadRequest) {
 	req.UserID = event.UserID
 	req.URL = event.URL
 }
 
-func ModelImageCommentedEventToModelNotifyUserImageCommentedRequest(ctx context.Context, event *model.ImageCommentedEvent, req *model.NotifyUserImageCommentedRequest) {
+func DtoImageCommentedEventToDtoNotifyUserImageCommentedRequest(ctx context.Context, event *dto.ImageCommentedEvent, req *dto.NotifyUserImageCommentedRequest) {
 	req.ImageID = event.ImageID
 	req.CommenterUserID = event.UserID
 }
 
-func SaramaConsumerMessageListToModelBatchUpdateImageCommentCountRequest(ctx context.Context, messages []*sarama.ConsumerMessage, req *model.BatchUpdateImageCommentCountRequest) {
+func SaramaConsumerMessageListToDtoBatchUpdateImageCommentCountRequest(ctx context.Context, messages []*sarama.ConsumerMessage, req *dto.BatchUpdateImageCommentCountRequest) {
 	mapCounter := make(map[int64]int)
 	for _, message := range messages {
-		event := new(model.ImageCommentedEvent)
+		event := new(dto.ImageCommentedEvent)
 		if err := json.Unmarshal(message.Value, event); err != nil {
 			x.Logger.WithContext(ctx).WithError(err).Warn("Failed to unmarshal image commented event")
 			continue
@@ -140,7 +140,7 @@ func SaramaConsumerMessageListToModelBatchUpdateImageCommentCountRequest(ctx con
 	}
 
 	for imageID, count := range mapCounter {
-		object := model.ImageIncreaseCommentCount{
+		object := dto.ImageIncreaseCommentCount{
 			ImageID: imageID,
 			Count:   count,
 		}
@@ -148,15 +148,15 @@ func SaramaConsumerMessageListToModelBatchUpdateImageCommentCountRequest(ctx con
 	}
 }
 
-func ModelImageLikedEventToModelNotifyUserImageLikedRequest(ctx context.Context, event *model.ImageLikedEvent, req *model.NotifyUserImageLikedRequest) {
+func DtoImageLikedEventToDtoNotifyUserImageLikedRequest(ctx context.Context, event *dto.ImageLikedEvent, req *dto.NotifyUserImageLikedRequest) {
 	req.ImageID = event.ImageID
 	req.LikerUserID = event.UserID
 }
 
-func SaramaConsumerMessageListToModelBatchUpdateImageLikeCountRequest(ctx context.Context, messages []*sarama.ConsumerMessage, req *model.BatchUpdateImageLikeCountRequest) {
+func SaramaConsumerMessageListToDtoBatchUpdateImageLikeCountRequest(ctx context.Context, messages []*sarama.ConsumerMessage, req *dto.BatchUpdateImageLikeCountRequest) {
 	mapCounter := make(map[int64]int)
 	for _, message := range messages {
-		event := new(model.ImageLikedEvent)
+		event := new(dto.ImageLikedEvent)
 		if err := json.Unmarshal(message.Value, event); err != nil {
 			x.Logger.WithContext(ctx).WithError(err).Warn("Failed to unmarshal image liked event")
 			continue
@@ -165,7 +165,7 @@ func SaramaConsumerMessageListToModelBatchUpdateImageLikeCountRequest(ctx contex
 	}
 
 	for imageID, count := range mapCounter {
-		object := model.ImageIncreaseLikeCount{
+		object := dto.ImageIncreaseLikeCount{
 			ImageID: imageID,
 			Count:   count,
 		}

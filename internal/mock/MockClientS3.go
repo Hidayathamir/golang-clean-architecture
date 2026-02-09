@@ -5,8 +5,8 @@ package mock
 
 import (
 	"context"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/storage"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"sync"
 )
 
@@ -20,13 +20,13 @@ var _ storage.S3Client = &S3ClientMock{}
 //
 //		// make and configure a mocked storage.S3Client
 //		mockedS3Client := &S3ClientMock{
-//			DeleteObjectFunc: func(ctx context.Context, req model.S3DeleteObjectRequest) (model.S3DeleteObjectResponse, error) {
+//			DeleteObjectFunc: func(ctx context.Context, req dto.S3DeleteObjectRequest) (dto.S3DeleteObjectResponse, error) {
 //				panic("mock out the DeleteObject method")
 //			},
-//			DownloadFunc: func(ctx context.Context, req model.S3DownloadRequest) (model.S3DownloadResponse, error) {
+//			DownloadFunc: func(ctx context.Context, req dto.S3DownloadRequest) (dto.S3DownloadResponse, error) {
 //				panic("mock out the Download method")
 //			},
-//			UploadImageFunc: func(ctx context.Context, req model.S3UploadImageRequest) (string, error) {
+//			UploadImageFunc: func(ctx context.Context, req dto.S3UploadImageRequest) (string, error) {
 //				panic("mock out the UploadImage method")
 //			},
 //		}
@@ -37,13 +37,13 @@ var _ storage.S3Client = &S3ClientMock{}
 //	}
 type S3ClientMock struct {
 	// DeleteObjectFunc mocks the DeleteObject method.
-	DeleteObjectFunc func(ctx context.Context, req model.S3DeleteObjectRequest) (model.S3DeleteObjectResponse, error)
+	DeleteObjectFunc func(ctx context.Context, req dto.S3DeleteObjectRequest) (dto.S3DeleteObjectResponse, error)
 
 	// DownloadFunc mocks the Download method.
-	DownloadFunc func(ctx context.Context, req model.S3DownloadRequest) (model.S3DownloadResponse, error)
+	DownloadFunc func(ctx context.Context, req dto.S3DownloadRequest) (dto.S3DownloadResponse, error)
 
 	// UploadImageFunc mocks the UploadImage method.
-	UploadImageFunc func(ctx context.Context, req model.S3UploadImageRequest) (string, error)
+	UploadImageFunc func(ctx context.Context, req dto.S3UploadImageRequest) (string, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -52,21 +52,21 @@ type S3ClientMock struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req model.S3DeleteObjectRequest
+			Req dto.S3DeleteObjectRequest
 		}
 		// Download holds details about calls to the Download method.
 		Download []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req model.S3DownloadRequest
+			Req dto.S3DownloadRequest
 		}
 		// UploadImage holds details about calls to the UploadImage method.
 		UploadImage []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req model.S3UploadImageRequest
+			Req dto.S3UploadImageRequest
 		}
 	}
 	lockDeleteObject sync.RWMutex
@@ -75,13 +75,13 @@ type S3ClientMock struct {
 }
 
 // DeleteObject calls DeleteObjectFunc.
-func (mock *S3ClientMock) DeleteObject(ctx context.Context, req model.S3DeleteObjectRequest) (model.S3DeleteObjectResponse, error) {
+func (mock *S3ClientMock) DeleteObject(ctx context.Context, req dto.S3DeleteObjectRequest) (dto.S3DeleteObjectResponse, error) {
 	if mock.DeleteObjectFunc == nil {
 		panic("S3ClientMock.DeleteObjectFunc: method is nil but S3Client.DeleteObject was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req model.S3DeleteObjectRequest
+		Req dto.S3DeleteObjectRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -98,11 +98,11 @@ func (mock *S3ClientMock) DeleteObject(ctx context.Context, req model.S3DeleteOb
 //	len(mockedS3Client.DeleteObjectCalls())
 func (mock *S3ClientMock) DeleteObjectCalls() []struct {
 	Ctx context.Context
-	Req model.S3DeleteObjectRequest
+	Req dto.S3DeleteObjectRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req model.S3DeleteObjectRequest
+		Req dto.S3DeleteObjectRequest
 	}
 	mock.lockDeleteObject.RLock()
 	calls = mock.calls.DeleteObject
@@ -111,13 +111,13 @@ func (mock *S3ClientMock) DeleteObjectCalls() []struct {
 }
 
 // Download calls DownloadFunc.
-func (mock *S3ClientMock) Download(ctx context.Context, req model.S3DownloadRequest) (model.S3DownloadResponse, error) {
+func (mock *S3ClientMock) Download(ctx context.Context, req dto.S3DownloadRequest) (dto.S3DownloadResponse, error) {
 	if mock.DownloadFunc == nil {
 		panic("S3ClientMock.DownloadFunc: method is nil but S3Client.Download was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req model.S3DownloadRequest
+		Req dto.S3DownloadRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -134,11 +134,11 @@ func (mock *S3ClientMock) Download(ctx context.Context, req model.S3DownloadRequ
 //	len(mockedS3Client.DownloadCalls())
 func (mock *S3ClientMock) DownloadCalls() []struct {
 	Ctx context.Context
-	Req model.S3DownloadRequest
+	Req dto.S3DownloadRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req model.S3DownloadRequest
+		Req dto.S3DownloadRequest
 	}
 	mock.lockDownload.RLock()
 	calls = mock.calls.Download
@@ -147,13 +147,13 @@ func (mock *S3ClientMock) DownloadCalls() []struct {
 }
 
 // UploadImage calls UploadImageFunc.
-func (mock *S3ClientMock) UploadImage(ctx context.Context, req model.S3UploadImageRequest) (string, error) {
+func (mock *S3ClientMock) UploadImage(ctx context.Context, req dto.S3UploadImageRequest) (string, error) {
 	if mock.UploadImageFunc == nil {
 		panic("S3ClientMock.UploadImageFunc: method is nil but S3Client.UploadImage was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req model.S3UploadImageRequest
+		Req dto.S3UploadImageRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -170,11 +170,11 @@ func (mock *S3ClientMock) UploadImage(ctx context.Context, req model.S3UploadIma
 //	len(mockedS3Client.UploadImageCalls())
 func (mock *S3ClientMock) UploadImageCalls() []struct {
 	Ctx context.Context
-	Req model.S3UploadImageRequest
+	Req dto.S3UploadImageRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req model.S3UploadImageRequest
+		Req dto.S3UploadImageRequest
 	}
 	mock.lockUploadImage.RLock()
 	calls = mock.calls.UploadImage

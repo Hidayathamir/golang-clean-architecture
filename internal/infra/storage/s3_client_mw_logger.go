@@ -3,7 +3,7 @@ package storage
 import (
 	"context"
 
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
@@ -21,7 +21,7 @@ func NewS3ClientMwLogger(next S3Client) *S3ClientMwLogger {
 	}
 }
 
-func (c *S3ClientMwLogger) UploadImage(ctx context.Context, req model.S3UploadImageRequest) (url string, err error) {
+func (c *S3ClientMwLogger) UploadImage(ctx context.Context, req dto.S3UploadImageRequest) (url string, err error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -37,7 +37,7 @@ func (c *S3ClientMwLogger) UploadImage(ctx context.Context, req model.S3UploadIm
 	return url, err
 }
 
-func (c *S3ClientMwLogger) Download(ctx context.Context, req model.S3DownloadRequest) (model.S3DownloadResponse, error) {
+func (c *S3ClientMwLogger) Download(ctx context.Context, req dto.S3DownloadRequest) (dto.S3DownloadResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -54,7 +54,7 @@ func (c *S3ClientMwLogger) Download(ctx context.Context, req model.S3DownloadReq
 	return res, err
 }
 
-func (c *S3ClientMwLogger) DeleteObject(ctx context.Context, req model.S3DeleteObjectRequest) (model.S3DeleteObjectResponse, error) {
+func (c *S3ClientMwLogger) DeleteObject(ctx context.Context, req dto.S3DeleteObjectRequest) (dto.S3DeleteObjectResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 

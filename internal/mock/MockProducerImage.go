@@ -5,8 +5,8 @@ package mock
 
 import (
 	"context"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/messaging"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"sync"
 )
 
@@ -20,13 +20,13 @@ var _ messaging.ImageProducer = &ImageProducerMock{}
 //
 //		// make and configure a mocked messaging.ImageProducer
 //		mockedImageProducer := &ImageProducerMock{
-//			SendImageCommentedFunc: func(ctx context.Context, event *model.ImageCommentedEvent) error {
+//			SendImageCommentedFunc: func(ctx context.Context, event *dto.ImageCommentedEvent) error {
 //				panic("mock out the SendImageCommented method")
 //			},
-//			SendImageLikedFunc: func(ctx context.Context, event *model.ImageLikedEvent) error {
+//			SendImageLikedFunc: func(ctx context.Context, event *dto.ImageLikedEvent) error {
 //				panic("mock out the SendImageLiked method")
 //			},
-//			SendImageUploadedFunc: func(ctx context.Context, event *model.ImageUploadedEvent) error {
+//			SendImageUploadedFunc: func(ctx context.Context, event *dto.ImageUploadedEvent) error {
 //				panic("mock out the SendImageUploaded method")
 //			},
 //		}
@@ -37,13 +37,13 @@ var _ messaging.ImageProducer = &ImageProducerMock{}
 //	}
 type ImageProducerMock struct {
 	// SendImageCommentedFunc mocks the SendImageCommented method.
-	SendImageCommentedFunc func(ctx context.Context, event *model.ImageCommentedEvent) error
+	SendImageCommentedFunc func(ctx context.Context, event *dto.ImageCommentedEvent) error
 
 	// SendImageLikedFunc mocks the SendImageLiked method.
-	SendImageLikedFunc func(ctx context.Context, event *model.ImageLikedEvent) error
+	SendImageLikedFunc func(ctx context.Context, event *dto.ImageLikedEvent) error
 
 	// SendImageUploadedFunc mocks the SendImageUploaded method.
-	SendImageUploadedFunc func(ctx context.Context, event *model.ImageUploadedEvent) error
+	SendImageUploadedFunc func(ctx context.Context, event *dto.ImageUploadedEvent) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -52,21 +52,21 @@ type ImageProducerMock struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Event is the event argument value.
-			Event *model.ImageCommentedEvent
+			Event *dto.ImageCommentedEvent
 		}
 		// SendImageLiked holds details about calls to the SendImageLiked method.
 		SendImageLiked []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Event is the event argument value.
-			Event *model.ImageLikedEvent
+			Event *dto.ImageLikedEvent
 		}
 		// SendImageUploaded holds details about calls to the SendImageUploaded method.
 		SendImageUploaded []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Event is the event argument value.
-			Event *model.ImageUploadedEvent
+			Event *dto.ImageUploadedEvent
 		}
 	}
 	lockSendImageCommented sync.RWMutex
@@ -75,13 +75,13 @@ type ImageProducerMock struct {
 }
 
 // SendImageCommented calls SendImageCommentedFunc.
-func (mock *ImageProducerMock) SendImageCommented(ctx context.Context, event *model.ImageCommentedEvent) error {
+func (mock *ImageProducerMock) SendImageCommented(ctx context.Context, event *dto.ImageCommentedEvent) error {
 	if mock.SendImageCommentedFunc == nil {
 		panic("ImageProducerMock.SendImageCommentedFunc: method is nil but ImageProducer.SendImageCommented was just called")
 	}
 	callInfo := struct {
 		Ctx   context.Context
-		Event *model.ImageCommentedEvent
+		Event *dto.ImageCommentedEvent
 	}{
 		Ctx:   ctx,
 		Event: event,
@@ -98,11 +98,11 @@ func (mock *ImageProducerMock) SendImageCommented(ctx context.Context, event *mo
 //	len(mockedImageProducer.SendImageCommentedCalls())
 func (mock *ImageProducerMock) SendImageCommentedCalls() []struct {
 	Ctx   context.Context
-	Event *model.ImageCommentedEvent
+	Event *dto.ImageCommentedEvent
 } {
 	var calls []struct {
 		Ctx   context.Context
-		Event *model.ImageCommentedEvent
+		Event *dto.ImageCommentedEvent
 	}
 	mock.lockSendImageCommented.RLock()
 	calls = mock.calls.SendImageCommented
@@ -111,13 +111,13 @@ func (mock *ImageProducerMock) SendImageCommentedCalls() []struct {
 }
 
 // SendImageLiked calls SendImageLikedFunc.
-func (mock *ImageProducerMock) SendImageLiked(ctx context.Context, event *model.ImageLikedEvent) error {
+func (mock *ImageProducerMock) SendImageLiked(ctx context.Context, event *dto.ImageLikedEvent) error {
 	if mock.SendImageLikedFunc == nil {
 		panic("ImageProducerMock.SendImageLikedFunc: method is nil but ImageProducer.SendImageLiked was just called")
 	}
 	callInfo := struct {
 		Ctx   context.Context
-		Event *model.ImageLikedEvent
+		Event *dto.ImageLikedEvent
 	}{
 		Ctx:   ctx,
 		Event: event,
@@ -134,11 +134,11 @@ func (mock *ImageProducerMock) SendImageLiked(ctx context.Context, event *model.
 //	len(mockedImageProducer.SendImageLikedCalls())
 func (mock *ImageProducerMock) SendImageLikedCalls() []struct {
 	Ctx   context.Context
-	Event *model.ImageLikedEvent
+	Event *dto.ImageLikedEvent
 } {
 	var calls []struct {
 		Ctx   context.Context
-		Event *model.ImageLikedEvent
+		Event *dto.ImageLikedEvent
 	}
 	mock.lockSendImageLiked.RLock()
 	calls = mock.calls.SendImageLiked
@@ -147,13 +147,13 @@ func (mock *ImageProducerMock) SendImageLikedCalls() []struct {
 }
 
 // SendImageUploaded calls SendImageUploadedFunc.
-func (mock *ImageProducerMock) SendImageUploaded(ctx context.Context, event *model.ImageUploadedEvent) error {
+func (mock *ImageProducerMock) SendImageUploaded(ctx context.Context, event *dto.ImageUploadedEvent) error {
 	if mock.SendImageUploadedFunc == nil {
 		panic("ImageProducerMock.SendImageUploadedFunc: method is nil but ImageProducer.SendImageUploaded was just called")
 	}
 	callInfo := struct {
 		Ctx   context.Context
-		Event *model.ImageUploadedEvent
+		Event *dto.ImageUploadedEvent
 	}{
 		Ctx:   ctx,
 		Event: event,
@@ -170,11 +170,11 @@ func (mock *ImageProducerMock) SendImageUploaded(ctx context.Context, event *mod
 //	len(mockedImageProducer.SendImageUploadedCalls())
 func (mock *ImageProducerMock) SendImageUploadedCalls() []struct {
 	Ctx   context.Context
-	Event *model.ImageUploadedEvent
+	Event *dto.ImageUploadedEvent
 } {
 	var calls []struct {
 		Ctx   context.Context
-		Event *model.ImageUploadedEvent
+		Event *dto.ImageUploadedEvent
 	}
 	mock.lockSendImageUploaded.RLock()
 	calls = mock.calls.SendImageUploaded

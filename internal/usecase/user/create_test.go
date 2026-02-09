@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
@@ -27,7 +27,7 @@ func TestUserUsecaseImpl_Create_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	req := &model.RegisterUserRequest{
+	req := &dto.RegisterUserRequest{
 		Username: "user1",
 		Password: "pw1",
 		Name:     "name1",
@@ -41,7 +41,7 @@ func TestUserUsecaseImpl_Create_Success(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
+	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *dto.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -51,7 +51,7 @@ func TestUserUsecaseImpl_Create_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected = &model.UserResponse{
+	var expected = &dto.UserResponse{
 		ID:        0,
 		Username:  "user1",
 		Name:      "name1",
@@ -75,7 +75,7 @@ func TestUserUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	req := &model.RegisterUserRequest{
+	req := &dto.RegisterUserRequest{
 		Username: "",
 		Password: "pw1",
 		Name:     "name1",
@@ -89,7 +89,7 @@ func TestUserUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
+	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *dto.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -99,7 +99,7 @@ func TestUserUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected *model.UserResponse
+	var expected *dto.UserResponse
 
 	require.Equal(t, expected, res)
 	require.NotNil(t, err)
@@ -119,7 +119,7 @@ func TestUserUsecaseImpl_Create_Fail_Create(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	req := &model.RegisterUserRequest{
+	req := &dto.RegisterUserRequest{
 		Username: "user1",
 		Password: "pw1",
 		Name:     "name1",
@@ -135,7 +135,7 @@ func TestUserUsecaseImpl_Create_Fail_Create(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected *model.UserResponse
+	var expected *dto.UserResponse
 
 	require.Equal(t, expected, res)
 	require.NotNil(t, err)

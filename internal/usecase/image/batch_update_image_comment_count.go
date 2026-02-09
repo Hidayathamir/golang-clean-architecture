@@ -3,12 +3,12 @@ package image
 import (
 	"context"
 
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
-func (u *ImageUsecaseImpl) BatchUpdateImageCommentCount(ctx context.Context, req *model.BatchUpdateImageCommentCountRequest) error {
+func (u *ImageUsecaseImpl) BatchUpdateImageCommentCount(ctx context.Context, req *dto.BatchUpdateImageCommentCountRequest) error {
 	err := x.Validate.Struct(req)
 	if err != nil {
 		err = errkit.BadRequest(err)

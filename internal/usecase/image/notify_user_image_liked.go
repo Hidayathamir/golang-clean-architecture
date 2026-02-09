@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
-func (u *ImageUsecaseImpl) NotifyUserImageLiked(ctx context.Context, req *model.NotifyUserImageLikedRequest) error {
+func (u *ImageUsecaseImpl) NotifyUserImageLiked(ctx context.Context, req *dto.NotifyUserImageLikedRequest) error {
 	err := x.Validate.Struct(req)
 	if err != nil {
 		err = errkit.BadRequest(err)
@@ -35,7 +35,7 @@ func (u *ImageUsecaseImpl) NotifyUserImageLiked(ctx context.Context, req *model.
 		return errkit.AddFuncName(err)
 	}
 
-	event := &model.NotifEvent{
+	event := &dto.NotifEvent{
 		UserID:  uploader.ID,
 		Message: fmt.Sprintf("%s just liked your post", liker.Name),
 	}

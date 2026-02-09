@@ -1,7 +1,10 @@
-package model
+package dto
 
 import (
+	"strconv"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type UserResponse struct {
@@ -82,3 +85,16 @@ func (u UserIncreaseFollowerFollowingCount) HasFollowerCountAndFollowingCount() 
 }
 
 type UserIncreaseFollowerFollowingCountList []UserIncreaseFollowerFollowingCount
+
+type UserFollowedEvent struct {
+	ID          int64          `json:"id"`
+	FollowerID  int64          `json:"follower_id"`
+	FollowingID int64          `json:"following_id"`
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
+	DeletedAt   gorm.DeletedAt `json:"deleted_at"`
+}
+
+func (u *UserFollowedEvent) GetID() string {
+	return strconv.FormatInt(u.ID, 10)
+}

@@ -6,7 +6,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/image"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
@@ -35,7 +35,7 @@ func NewImageController(cfg *config.Config, usecase image.ImageUsecase) *ImageCo
 //	@Produce		json
 //	@Param			image	formData	file	true	"Image to upload"
 //	@Security		SimpleApiKeyAuth
-//	@Success		200	{object}	response.WebResponse[model.ImageResponse]
+//	@Success		200	{object}	response.WebResponse[dto.ImageResponse]
 //	@Router			/api/images [post]
 func (c *ImageController) Upload(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
@@ -48,7 +48,7 @@ func (c *ImageController) Upload(ctx *fiber.Ctx) error {
 		return errkit.AddFuncName(err)
 	}
 
-	req := new(model.UploadImageRequest)
+	req := new(dto.UploadImageRequest)
 	req.File = file
 
 	res, err := c.Usecase.Upload(ctx.UserContext(), req)
@@ -67,7 +67,7 @@ func (c *ImageController) Upload(ctx *fiber.Ctx) error {
 //	@Tags			images
 //	@Accept			json
 //	@Produce		json
-//	@Param			request	body	model.LikeImageRequest	true	"Like Image Request"
+//	@Param			request	body	dto.LikeImageRequest	true	"Like Image Request"
 //	@Security		SimpleApiKeyAuth
 //	@Success		200	{object}	response.WebResponse[string]
 //	@Router			/api/images/_like [post]
@@ -75,7 +75,7 @@ func (c *ImageController) Like(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	req := new(model.LikeImageRequest)
+	req := new(dto.LikeImageRequest)
 	err := ctx.BodyParser(req)
 	if err != nil {
 		err = errkit.BadRequest(err)
@@ -99,7 +99,7 @@ func (c *ImageController) Like(ctx *fiber.Ctx) error {
 //	@Tags			images
 //	@Accept			json
 //	@Produce		json
-//	@Param			request	body	model.CommentImageRequest	true	"Comment Image Request"
+//	@Param			request	body	dto.CommentImageRequest	true	"Comment Image Request"
 //	@Security		SimpleApiKeyAuth
 //	@Success		200	{object}	response.WebResponse[string]
 //	@Router			/api/images/_comment [post]
@@ -107,7 +107,7 @@ func (c *ImageController) Comment(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	req := new(model.CommentImageRequest)
+	req := new(dto.CommentImageRequest)
 	err := ctx.BodyParser(req)
 	if err != nil {
 		err = errkit.BadRequest(err)
@@ -132,7 +132,7 @@ func (c *ImageController) Comment(ctx *fiber.Ctx) error {
 //	@Produce		json
 //	@Param			imageId	path	int	true	"Image ID"
 //	@Security		SimpleApiKeyAuth
-//	@Success		200	{object}	response.WebResponse[model.LikeResponseList]
+//	@Success		200	{object}	response.WebResponse[dto.LikeResponseList]
 //	@Router			/api/images/{imageId}/likes [get]
 func (c *ImageController) GetLike(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
@@ -145,7 +145,7 @@ func (c *ImageController) GetLike(ctx *fiber.Ctx) error {
 		return errkit.AddFuncName(err)
 	}
 
-	req := &model.GetLikeRequest{
+	req := &dto.GetLikeRequest{
 		ImageID: imageID,
 	}
 
@@ -166,7 +166,7 @@ func (c *ImageController) GetLike(ctx *fiber.Ctx) error {
 //	@Produce		json
 //	@Param			imageId	path	int	true	"Image ID"
 //	@Security		SimpleApiKeyAuth
-//	@Success		200	{object}	response.WebResponse[model.CommentResponseList]
+//	@Success		200	{object}	response.WebResponse[dto.CommentResponseList]
 //	@Router			/api/images/{imageId}/comments [get]
 func (c *ImageController) GetComment(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
@@ -179,7 +179,7 @@ func (c *ImageController) GetComment(ctx *fiber.Ctx) error {
 		return errkit.AddFuncName(err)
 	}
 
-	req := &model.GetCommentRequest{
+	req := &dto.GetCommentRequest{
 		ImageID: imageID,
 	}
 

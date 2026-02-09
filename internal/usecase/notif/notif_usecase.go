@@ -4,14 +4,14 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"gorm.io/gorm"
 )
 
 //go:generate moq -out=../../mock/MockUsecaseNotif.go -pkg=mock . NotifUsecase
 
 type NotifUsecase interface {
-	Notify(ctx context.Context, req *model.NotifyRequest) error
+	Notify(ctx context.Context, req *dto.NotifyRequest) error
 }
 
 var _ NotifUsecase = &NotifUsecaseImpl{}

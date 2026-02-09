@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/topic"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
@@ -16,9 +16,9 @@ import (
 //go:generate moq -out=../../mock/MockProducerImage.go -pkg=mock . ImageProducer
 
 type ImageProducer interface {
-	SendImageUploaded(ctx context.Context, event *model.ImageUploadedEvent) error
-	SendImageLiked(ctx context.Context, event *model.ImageLikedEvent) error
-	SendImageCommented(ctx context.Context, event *model.ImageCommentedEvent) error
+	SendImageUploaded(ctx context.Context, event *dto.ImageUploadedEvent) error
+	SendImageLiked(ctx context.Context, event *dto.ImageLikedEvent) error
+	SendImageCommented(ctx context.Context, event *dto.ImageCommentedEvent) error
 }
 
 var _ ImageProducer = &ImageProducerImpl{}
@@ -35,7 +35,7 @@ func NewImageProducer(cfg *config.Config, producer sarama.SyncProducer) *ImagePr
 	}
 }
 
-func (p *ImageProducerImpl) SendImageUploaded(ctx context.Context, event *model.ImageUploadedEvent) error {
+func (p *ImageProducerImpl) SendImageUploaded(ctx context.Context, event *dto.ImageUploadedEvent) error {
 	if p.Producer == nil {
 		x.Logger.WithContext(ctx).Warn("Kafka producer is disabled")
 		return nil
@@ -63,7 +63,7 @@ func (p *ImageProducerImpl) SendImageUploaded(ctx context.Context, event *model.
 	return nil
 }
 
-func (p *ImageProducerImpl) SendImageLiked(ctx context.Context, event *model.ImageLikedEvent) error {
+func (p *ImageProducerImpl) SendImageLiked(ctx context.Context, event *dto.ImageLikedEvent) error {
 	if p.Producer == nil {
 		x.Logger.WithContext(ctx).Warn("Kafka producer is disabled")
 		return nil
@@ -91,7 +91,7 @@ func (p *ImageProducerImpl) SendImageLiked(ctx context.Context, event *model.Ima
 	return nil
 }
 
-func (p *ImageProducerImpl) SendImageCommented(ctx context.Context, event *model.ImageCommentedEvent) error {
+func (p *ImageProducerImpl) SendImageCommented(ctx context.Context, event *dto.ImageCommentedEvent) error {
 	if p.Producer == nil {
 		x.Logger.WithContext(ctx).Warn("Kafka producer is disabled")
 		return nil

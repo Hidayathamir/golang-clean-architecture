@@ -5,8 +5,8 @@ package mock
 
 import (
 	"context"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/messaging"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"sync"
 )
 
@@ -20,7 +20,7 @@ var _ messaging.UserProducer = &UserProducerMock{}
 //
 //		// make and configure a mocked messaging.UserProducer
 //		mockedUserProducer := &UserProducerMock{
-//			SendUserFollowedFunc: func(ctx context.Context, event *model.UserFollowedEvent) error {
+//			SendUserFollowedFunc: func(ctx context.Context, event *dto.UserFollowedEvent) error {
 //				panic("mock out the SendUserFollowed method")
 //			},
 //		}
@@ -31,7 +31,7 @@ var _ messaging.UserProducer = &UserProducerMock{}
 //	}
 type UserProducerMock struct {
 	// SendUserFollowedFunc mocks the SendUserFollowed method.
-	SendUserFollowedFunc func(ctx context.Context, event *model.UserFollowedEvent) error
+	SendUserFollowedFunc func(ctx context.Context, event *dto.UserFollowedEvent) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -40,20 +40,20 @@ type UserProducerMock struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Event is the event argument value.
-			Event *model.UserFollowedEvent
+			Event *dto.UserFollowedEvent
 		}
 	}
 	lockSendUserFollowed sync.RWMutex
 }
 
 // SendUserFollowed calls SendUserFollowedFunc.
-func (mock *UserProducerMock) SendUserFollowed(ctx context.Context, event *model.UserFollowedEvent) error {
+func (mock *UserProducerMock) SendUserFollowed(ctx context.Context, event *dto.UserFollowedEvent) error {
 	if mock.SendUserFollowedFunc == nil {
 		panic("UserProducerMock.SendUserFollowedFunc: method is nil but UserProducer.SendUserFollowed was just called")
 	}
 	callInfo := struct {
 		Ctx   context.Context
-		Event *model.UserFollowedEvent
+		Event *dto.UserFollowedEvent
 	}{
 		Ctx:   ctx,
 		Event: event,
@@ -70,11 +70,11 @@ func (mock *UserProducerMock) SendUserFollowed(ctx context.Context, event *model
 //	len(mockedUserProducer.SendUserFollowedCalls())
 func (mock *UserProducerMock) SendUserFollowedCalls() []struct {
 	Ctx   context.Context
-	Event *model.UserFollowedEvent
+	Event *dto.UserFollowedEvent
 } {
 	var calls []struct {
 		Ctx   context.Context
-		Event *model.UserFollowedEvent
+		Event *dto.UserFollowedEvent
 	}
 	mock.lockSendUserFollowed.RLock()
 	calls = mock.calls.SendUserFollowed

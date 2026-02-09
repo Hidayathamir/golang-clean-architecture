@@ -10,11 +10,11 @@ definitions:
       total_page:
         type: integer
     type: object
-  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_CommentResponseList
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_CommentResponseList
   : properties:
       data:
         items:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentResponse'
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.CommentResponse'
         type: array
       error_detail:
         items:
@@ -25,10 +25,10 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
     type: object
-  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ImageResponse
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ImageResponse
   : properties:
       data:
-        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.ImageResponse'
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.ImageResponse'
       error_detail:
         items:
           type: string
@@ -38,11 +38,11 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
     type: object
-  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_LikeResponseList
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_LikeResponseList
   : properties:
       data:
         items:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeResponse'
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.LikeResponse'
         type: array
       error_detail:
         items:
@@ -53,10 +53,10 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
     type: object
-  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserLoginResponse
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_UserLoginResponse
   : properties:
       data:
-        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UserLoginResponse'
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.UserLoginResponse'
       error_detail:
         items:
           type: string
@@ -66,10 +66,10 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
     type: object
-  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_UserResponse
   : properties:
       data:
-        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UserResponse'
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.UserResponse'
       error_detail:
         items:
           type: string
@@ -92,7 +92,7 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.PageMetadata'
     type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentImageRequest:
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.CommentImageRequest:
     properties:
       comment:
         type: string
@@ -102,7 +102,7 @@ definitions:
     - comment
     - image_id
     type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentResponse:
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.CommentResponse:
     properties:
       comment:
         type: string
@@ -119,12 +119,12 @@ definitions:
       user_id:
         type: integer
     type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.FollowUserRequest:
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.FollowUserRequest:
     properties:
       following_id:
         type: integer
     type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.ImageResponse:
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.ImageResponse:
     properties:
       comment_count:
         type: integer
@@ -143,14 +143,14 @@ definitions:
       user_id:
         type: integer
     type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeImageRequest:
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.LikeImageRequest:
     properties:
       image_id:
         type: integer
     required:
     - image_id
     type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeResponse:
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.LikeResponse:
     properties:
       created_at:
         type: string
@@ -165,7 +165,7 @@ definitions:
       user_id:
         type: integer
     type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.LoginUserRequest:
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.LoginUserRequest:
     properties:
       password:
         maxLength: 100
@@ -177,7 +177,7 @@ definitions:
     - password
     - username
     type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.RegisterUserRequest:
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.RegisterUserRequest:
     properties:
       name:
         maxLength: 100
@@ -193,7 +193,7 @@ definitions:
     - password
     - username
     type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateUserRequest:
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.UpdateUserRequest:
     properties:
       name:
         maxLength: 100
@@ -202,7 +202,7 @@ definitions:
         maxLength: 100
         type: string
     type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.UserLoginResponse:
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.UserLoginResponse:
     properties:
       created_at:
         type: string
@@ -217,7 +217,7 @@ definitions:
       username:
         type: string
     type: object
-  github_com_Hidayathamir_golang-clean-architecture_internal_model.UserResponse:
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.UserResponse:
     properties:
       created_at:
         type: string
@@ -259,7 +259,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ImageResponse'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ImageResponse'
       security:
       - SimpleApiKeyAuth: []
       summary: Upload image
@@ -276,7 +276,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentImageRequest'
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.CommentImageRequest'
       produces:
       - application/json
       responses:
@@ -300,7 +300,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeImageRequest'
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.LikeImageRequest'
       produces:
       - application/json
       responses:
@@ -328,7 +328,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_CommentResponseList'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_CommentResponseList'
       security:
       - SimpleApiKeyAuth: []
       summary: Get image comments
@@ -349,7 +349,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_LikeResponseList'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_LikeResponseList'
       security:
       - SimpleApiKeyAuth: []
       summary: Get image likes
@@ -364,12 +364,12 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.RegisterUserRequest'
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.RegisterUserRequest'
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_UserResponse'
       summary: Register user
       tags:
       - users
@@ -380,7 +380,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_UserResponse'
       security:
       - SimpleApiKeyAuth: []
       summary: Get current user
@@ -394,12 +394,12 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateUserRequest'
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.UpdateUserRequest'
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_UserResponse'
       security:
       - SimpleApiKeyAuth: []
       summary: Update user
@@ -414,7 +414,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.FollowUserRequest'
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.FollowUserRequest'
       responses:
         "200":
           description: OK
@@ -434,12 +434,12 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.LoginUserRequest'
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.LoginUserRequest'
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserLoginResponse'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_UserLoginResponse'
       summary: Login user
       tags:
       - users

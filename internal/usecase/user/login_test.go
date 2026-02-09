@@ -8,9 +8,9 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/go-playground/validator/v10"
@@ -45,7 +45,7 @@ func newLoginUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepositoryM
 func TestUserUsecaseImpl_Login_Success(t *testing.T) {
 	u, repo, producer := newLoginUsecase(t)
 
-	req := &model.LoginUserRequest{
+	req := &dto.LoginUserRequest{
 		Username: "user1",
 		Password: "password1",
 	}
@@ -59,7 +59,7 @@ func TestUserUsecaseImpl_Login_Success(t *testing.T) {
 		return nil
 	}
 
-	producer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
+	producer.SendUserFollowedFunc = func(ctx context.Context, event *dto.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -83,7 +83,7 @@ func TestUserUsecaseImpl_Login_Success(t *testing.T) {
 func TestUserUsecaseImpl_Login_Fail_ValidateStruct(t *testing.T) {
 	u, repo, producer := newLoginUsecase(t)
 
-	req := &model.LoginUserRequest{
+	req := &dto.LoginUserRequest{
 		Username: "",
 		Password: "password1",
 	}
@@ -97,7 +97,7 @@ func TestUserUsecaseImpl_Login_Fail_ValidateStruct(t *testing.T) {
 		return nil
 	}
 
-	producer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
+	producer.SendUserFollowedFunc = func(ctx context.Context, event *dto.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -112,7 +112,7 @@ func TestUserUsecaseImpl_Login_Fail_ValidateStruct(t *testing.T) {
 func TestUserUsecaseImpl_Login_Fail_FindByUsername(t *testing.T) {
 	u, repo, producer := newLoginUsecase(t)
 
-	req := &model.LoginUserRequest{
+	req := &dto.LoginUserRequest{
 		Username: "user1",
 		Password: "password1",
 	}
@@ -121,7 +121,7 @@ func TestUserUsecaseImpl_Login_Fail_FindByUsername(t *testing.T) {
 		return assert.AnError
 	}
 
-	producer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
+	producer.SendUserFollowedFunc = func(ctx context.Context, event *dto.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -135,7 +135,7 @@ func TestUserUsecaseImpl_Login_Fail_FindByUsername(t *testing.T) {
 func TestUserUsecaseImpl_Login_Fail_CompareHashAndPassword(t *testing.T) {
 	u, repo, producer := newLoginUsecase(t)
 
-	req := &model.LoginUserRequest{
+	req := &dto.LoginUserRequest{
 		Username: "user1",
 		Password: "password1",
 	}
@@ -149,7 +149,7 @@ func TestUserUsecaseImpl_Login_Fail_CompareHashAndPassword(t *testing.T) {
 		return nil
 	}
 
-	producer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
+	producer.SendUserFollowedFunc = func(ctx context.Context, event *dto.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -175,7 +175,7 @@ func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 		UserProducer:   producer,
 	}
 
-	req := &model.LoginUserRequest{
+	req := &dto.LoginUserRequest{
 		Username: "user1",
 		Password: "password1",
 	}
@@ -189,7 +189,7 @@ func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 		return nil
 	}
 
-	producer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
+	producer.SendUserFollowedFunc = func(ctx context.Context, event *dto.UserFollowedEvent) error {
 		return nil
 	}
 

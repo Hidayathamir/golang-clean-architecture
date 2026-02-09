@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
@@ -33,7 +33,7 @@ func NewAuth(userUserCase user.UserUsecase) fiber.Handler {
 			return errkit.AddFuncName(err)
 		}
 
-		req := &model.VerifyUserRequest{Token: token}
+		req := &dto.VerifyUserRequest{Token: token}
 		userAuth, err := userUserCase.Verify(ctx.UserContext(), req)
 		if err != nil {
 			err = errkit.Unauthorized(err)

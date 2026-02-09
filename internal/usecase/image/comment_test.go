@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/image"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/go-playground/validator/v10"
@@ -26,7 +26,7 @@ func TestImageUsecaseImpl_Comment_Success(t *testing.T) {
 		ImageProducer:     ImageProducer,
 	}
 
-	req := &model.CommentImageRequest{
+	req := &dto.CommentImageRequest{
 		ImageID: 100,
 		Comment: "nice pic",
 	}
@@ -35,12 +35,12 @@ func TestImageUsecaseImpl_Comment_Success(t *testing.T) {
 		return nil
 	}
 
-	ImageProducer.SendImageCommentedFunc = func(ctx context.Context, event *model.ImageCommentedEvent) error {
+	ImageProducer.SendImageCommentedFunc = func(ctx context.Context, event *dto.ImageCommentedEvent) error {
 		return nil
 	}
 
 	ctx := context.Background()
-	ctx = ctxuserauth.Set(ctx, &model.UserAuth{ID: 1})
+	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1})
 
 	err := u.Comment(ctx, req)
 
@@ -53,7 +53,7 @@ func TestImageUsecaseImpl_Comment_Fail_ValidateStruct(t *testing.T) {
 		DB: gormDB,
 	}
 
-	req := &model.CommentImageRequest{} // invalid
+	req := &dto.CommentImageRequest{} // invalid
 
 	err := u.Comment(context.Background(), req)
 
@@ -71,7 +71,7 @@ func TestImageUsecaseImpl_Comment_Fail_Create(t *testing.T) {
 		CommentRepository: CommentRepository,
 	}
 
-	req := &model.CommentImageRequest{
+	req := &dto.CommentImageRequest{
 		ImageID: 100,
 		Comment: "nice pic",
 	}
@@ -81,7 +81,7 @@ func TestImageUsecaseImpl_Comment_Fail_Create(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	ctx = ctxuserauth.Set(ctx, &model.UserAuth{ID: 1})
+	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1})
 
 	err := u.Comment(ctx, req)
 
@@ -100,7 +100,7 @@ func TestImageUsecaseImpl_Comment_Fail_Send(t *testing.T) {
 		ImageProducer:     ImageProducer,
 	}
 
-	req := &model.CommentImageRequest{
+	req := &dto.CommentImageRequest{
 		ImageID: 100,
 		Comment: "nice pic",
 	}
@@ -109,12 +109,12 @@ func TestImageUsecaseImpl_Comment_Fail_Send(t *testing.T) {
 		return nil
 	}
 
-	ImageProducer.SendImageCommentedFunc = func(ctx context.Context, event *model.ImageCommentedEvent) error {
+	ImageProducer.SendImageCommentedFunc = func(ctx context.Context, event *dto.ImageCommentedEvent) error {
 		return assert.AnError
 	}
 
 	ctx := context.Background()
-	ctx = ctxuserauth.Set(ctx, &model.UserAuth{ID: 1})
+	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1})
 
 	err := u.Comment(ctx, req)
 

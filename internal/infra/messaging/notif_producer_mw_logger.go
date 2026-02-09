@@ -3,7 +3,7 @@ package messaging
 import (
 	"context"
 
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
@@ -21,7 +21,7 @@ func NewNotifProducerMwLogger(next NotifProducer) *NotifProducerMwLogger {
 	}
 }
 
-func (p *NotifProducerMwLogger) SendNotif(ctx context.Context, event *model.NotifEvent) error {
+func (p *NotifProducerMwLogger) SendNotif(ctx context.Context, event *dto.NotifEvent) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 

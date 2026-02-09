@@ -3,7 +3,7 @@ package messaging
 import (
 	"context"
 
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
@@ -21,7 +21,7 @@ func NewImageProducerMwLogger(next ImageProducer) *ImageProducerMwLogger {
 	}
 }
 
-func (p *ImageProducerMwLogger) SendImageUploaded(ctx context.Context, event *model.ImageUploadedEvent) error {
+func (p *ImageProducerMwLogger) SendImageUploaded(ctx context.Context, event *dto.ImageUploadedEvent) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -36,7 +36,7 @@ func (p *ImageProducerMwLogger) SendImageUploaded(ctx context.Context, event *mo
 	return err
 }
 
-func (p *ImageProducerMwLogger) SendImageLiked(ctx context.Context, event *model.ImageLikedEvent) error {
+func (p *ImageProducerMwLogger) SendImageLiked(ctx context.Context, event *dto.ImageLikedEvent) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -51,7 +51,7 @@ func (p *ImageProducerMwLogger) SendImageLiked(ctx context.Context, event *model
 	return err
 }
 
-func (p *ImageProducerMwLogger) SendImageCommented(ctx context.Context, event *model.ImageCommentedEvent) error {
+func (p *ImageProducerMwLogger) SendImageCommented(ctx context.Context, event *dto.ImageCommentedEvent) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 

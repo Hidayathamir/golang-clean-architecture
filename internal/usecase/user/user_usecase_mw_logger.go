@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
@@ -21,7 +21,7 @@ func NewUserUsecaseMwLogger(next UserUsecase) *UserUsecaseMwLogger {
 	}
 }
 
-func (u *UserUsecaseMwLogger) Follow(ctx context.Context, req *model.FollowUserRequest) error {
+func (u *UserUsecaseMwLogger) Follow(ctx context.Context, req *dto.FollowUserRequest) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -36,7 +36,7 @@ func (u *UserUsecaseMwLogger) Follow(ctx context.Context, req *model.FollowUserR
 	return err
 }
 
-func (u *UserUsecaseMwLogger) Create(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error) {
+func (u *UserUsecaseMwLogger) Create(ctx context.Context, req *dto.RegisterUserRequest) (*dto.UserResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -52,7 +52,7 @@ func (u *UserUsecaseMwLogger) Create(ctx context.Context, req *model.RegisterUse
 	return res, err
 }
 
-func (u *UserUsecaseMwLogger) Current(ctx context.Context, req *model.GetUserRequest) (*model.UserResponse, error) {
+func (u *UserUsecaseMwLogger) Current(ctx context.Context, req *dto.GetUserRequest) (*dto.UserResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -68,7 +68,7 @@ func (u *UserUsecaseMwLogger) Current(ctx context.Context, req *model.GetUserReq
 	return res, err
 }
 
-func (u *UserUsecaseMwLogger) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserLoginResponse, error) {
+func (u *UserUsecaseMwLogger) Login(ctx context.Context, req *dto.LoginUserRequest) (*dto.UserLoginResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -84,7 +84,7 @@ func (u *UserUsecaseMwLogger) Login(ctx context.Context, req *model.LoginUserReq
 	return res, err
 }
 
-func (u *UserUsecaseMwLogger) Update(ctx context.Context, req *model.UpdateUserRequest) (*model.UserResponse, error) {
+func (u *UserUsecaseMwLogger) Update(ctx context.Context, req *dto.UpdateUserRequest) (*dto.UserResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -100,7 +100,7 @@ func (u *UserUsecaseMwLogger) Update(ctx context.Context, req *model.UpdateUserR
 	return res, err
 }
 
-func (u *UserUsecaseMwLogger) Verify(ctx context.Context, req *model.VerifyUserRequest) (*model.UserAuth, error) {
+func (u *UserUsecaseMwLogger) Verify(ctx context.Context, req *dto.VerifyUserRequest) (*dto.UserAuth, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -116,7 +116,7 @@ func (u *UserUsecaseMwLogger) Verify(ctx context.Context, req *model.VerifyUserR
 	return res, err
 }
 
-func (u *UserUsecaseMwLogger) NotifyUserBeingFollowed(ctx context.Context, req *model.NotifyUserBeingFollowedRequest) error {
+func (u *UserUsecaseMwLogger) NotifyUserBeingFollowed(ctx context.Context, req *dto.NotifyUserBeingFollowedRequest) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -131,7 +131,7 @@ func (u *UserUsecaseMwLogger) NotifyUserBeingFollowed(ctx context.Context, req *
 	return err
 }
 
-func (u *UserUsecaseMwLogger) BatchUpdateUserFollowStats(ctx context.Context, req *model.BatchUpdateUserFollowStatsRequest) error {
+func (u *UserUsecaseMwLogger) BatchUpdateUserFollowStats(ctx context.Context, req *dto.BatchUpdateUserFollowStatsRequest) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 

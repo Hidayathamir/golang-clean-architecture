@@ -1,4 +1,4 @@
-package model
+package dto
 
 import (
 	"mime/multipart"
@@ -102,3 +102,33 @@ type ImageIncreaseLikeCount struct {
 }
 
 type ImageIncreaseLikeCountList []ImageIncreaseLikeCount
+
+type ImageUploadedEvent struct {
+	ID           int64          `json:"id"`
+	UserID       int64          `json:"user_id"`
+	URL          string         `json:"url"`
+	LikeCount    int            `json:"like_count"`
+	CommentCount int            `json:"comment_count"`
+	CreatedAt    time.Time      `json:"created_at"`
+	UpdatedAt    time.Time      `json:"updated_at"`
+	DeletedAt    gorm.DeletedAt `json:"deleted_at"`
+}
+
+type ImageLikedEvent struct {
+	ID        int64          `json:"id"`
+	UserID    int64          `json:"user_id"`
+	ImageID   int64          `json:"image_id"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `json:"deleted_at"`
+}
+
+type ImageCommentedEvent struct {
+	ID        int64          `json:"id"`
+	UserID    int64          `json:"user_id"`
+	ImageID   int64          `json:"image_id"`
+	Comment   string         `json:"comment"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `json:"deleted_at"`
+}

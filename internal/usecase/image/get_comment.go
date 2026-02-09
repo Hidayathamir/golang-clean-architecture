@@ -3,14 +3,14 @@ package image
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
-func (u *ImageUsecaseImpl) GetComment(ctx context.Context, req *model.GetCommentRequest) (*model.CommentResponseList, error) {
+func (u *ImageUsecaseImpl) GetComment(ctx context.Context, req *dto.GetCommentRequest) (*dto.CommentResponseList, error) {
 	if err := x.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
@@ -21,8 +21,8 @@ func (u *ImageUsecaseImpl) GetComment(ctx context.Context, req *model.GetComment
 		return nil, errkit.AddFuncName(err)
 	}
 
-	res := new(model.CommentResponseList)
-	converter.EntityCommentListToModelCommentResponseList(ctx, commentList, res)
+	res := new(dto.CommentResponseList)
+	converter.EntityCommentListToDtoCommentResponseList(ctx, commentList, res)
 
 	return res, nil
 }

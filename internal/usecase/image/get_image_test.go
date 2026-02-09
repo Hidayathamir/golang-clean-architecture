@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/image"
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
@@ -24,7 +24,7 @@ func TestImageUsecaseImpl_GetImage_Success(t *testing.T) {
 		ImageRepository: ImageRepository,
 	}
 
-	req := &model.GetImageRequest{
+	req := &dto.GetImageRequest{
 		ID: 100,
 	}
 
@@ -37,7 +37,7 @@ func TestImageUsecaseImpl_GetImage_Success(t *testing.T) {
 
 	res, err := u.GetImage(context.Background(), req)
 
-	expected := &model.ImageResponse{
+	expected := &dto.ImageResponse{
 		ID:        100,
 		UserID:    1,
 		URL:       "url",
@@ -55,7 +55,7 @@ func TestImageUsecaseImpl_GetImage_Fail_ValidateStruct(t *testing.T) {
 		DB: gormDB,
 	}
 
-	req := &model.GetImageRequest{}
+	req := &dto.GetImageRequest{}
 
 	res, err := u.GetImage(context.Background(), req)
 
@@ -74,7 +74,7 @@ func TestImageUsecaseImpl_GetImage_Fail_FindByID(t *testing.T) {
 		ImageRepository: ImageRepository,
 	}
 
-	req := &model.GetImageRequest{
+	req := &dto.GetImageRequest{
 		ID: 100,
 	}
 

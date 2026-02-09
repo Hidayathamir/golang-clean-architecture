@@ -5,8 +5,8 @@ package mock
 
 import (
 	"context"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/messaging"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"sync"
 )
 
@@ -20,7 +20,7 @@ var _ messaging.NotifProducer = &NotifProducerMock{}
 //
 //		// make and configure a mocked messaging.NotifProducer
 //		mockedNotifProducer := &NotifProducerMock{
-//			SendNotifFunc: func(ctx context.Context, event *model.NotifEvent) error {
+//			SendNotifFunc: func(ctx context.Context, event *dto.NotifEvent) error {
 //				panic("mock out the SendNotif method")
 //			},
 //		}
@@ -31,7 +31,7 @@ var _ messaging.NotifProducer = &NotifProducerMock{}
 //	}
 type NotifProducerMock struct {
 	// SendNotifFunc mocks the SendNotif method.
-	SendNotifFunc func(ctx context.Context, event *model.NotifEvent) error
+	SendNotifFunc func(ctx context.Context, event *dto.NotifEvent) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -40,20 +40,20 @@ type NotifProducerMock struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Event is the event argument value.
-			Event *model.NotifEvent
+			Event *dto.NotifEvent
 		}
 	}
 	lockSendNotif sync.RWMutex
 }
 
 // SendNotif calls SendNotifFunc.
-func (mock *NotifProducerMock) SendNotif(ctx context.Context, event *model.NotifEvent) error {
+func (mock *NotifProducerMock) SendNotif(ctx context.Context, event *dto.NotifEvent) error {
 	if mock.SendNotifFunc == nil {
 		panic("NotifProducerMock.SendNotifFunc: method is nil but NotifProducer.SendNotif was just called")
 	}
 	callInfo := struct {
 		Ctx   context.Context
-		Event *model.NotifEvent
+		Event *dto.NotifEvent
 	}{
 		Ctx:   ctx,
 		Event: event,
@@ -70,11 +70,11 @@ func (mock *NotifProducerMock) SendNotif(ctx context.Context, event *model.Notif
 //	len(mockedNotifProducer.SendNotifCalls())
 func (mock *NotifProducerMock) SendNotifCalls() []struct {
 	Ctx   context.Context
-	Event *model.NotifEvent
+	Event *dto.NotifEvent
 } {
 	var calls []struct {
 		Ctx   context.Context
-		Event *model.NotifEvent
+		Event *dto.NotifEvent
 	}
 	mock.lockSendNotif.RLock()
 	calls = mock.calls.SendNotif

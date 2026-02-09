@@ -3,7 +3,7 @@ package notif
 import (
 	"context"
 
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
@@ -21,7 +21,7 @@ func NewNotifUsecaseMwLogger(next NotifUsecase) *NotifUsecaseMwLogger {
 	}
 }
 
-func (u *NotifUsecaseMwLogger) Notify(ctx context.Context, req *model.NotifyRequest) error {
+func (u *NotifUsecaseMwLogger) Notify(ctx context.Context, req *dto.NotifyRequest) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 

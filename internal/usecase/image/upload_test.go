@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/image"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/go-playground/validator/v10"
@@ -31,11 +31,11 @@ func TestImageUsecaseImpl_Upload_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	req := &model.UploadImageRequest{
+	req := &dto.UploadImageRequest{
 		File: newFileHeader(t, "image.png", []byte("image-data")),
 	}
 
-	S3Client.UploadImageFunc = func(ctx context.Context, req model.S3UploadImageRequest) (string, error) {
+	S3Client.UploadImageFunc = func(ctx context.Context, req dto.S3UploadImageRequest) (string, error) {
 		return "http://image-url.com/image.png", nil
 	}
 
@@ -44,20 +44,20 @@ func TestImageUsecaseImpl_Upload_Success(t *testing.T) {
 		return nil
 	}
 
-	ImageProducer.SendImageUploadedFunc = func(ctx context.Context, event *model.ImageUploadedEvent) error {
+	ImageProducer.SendImageUploadedFunc = func(ctx context.Context, event *dto.ImageUploadedEvent) error {
 		return nil
 	}
 
 	// ------------------------------------------------------- //
 
 	ctx := context.Background()
-	ctx = ctxuserauth.Set(ctx, &model.UserAuth{ID: 1, Username: "user1"})
+	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1, Username: "user1"})
 
 	res, err := u.Upload(ctx, req)
 
 	// ------------------------------------------------------- //
 
-	expected := &model.ImageResponse{
+	expected := &dto.ImageResponse{
 		ID:        100,
 		UserID:    1,
 		URL:       "http://image-url.com/image.png",
@@ -75,7 +75,7 @@ func TestImageUsecaseImpl_Upload_Fail_ValidateStruct(t *testing.T) {
 		DB: gormDB,
 	}
 
-	req := &model.UploadImageRequest{} // invalid request
+	req := &dto.UploadImageRequest{} // invalid request
 
 	res, err := u.Upload(context.Background(), req)
 
@@ -94,16 +94,16 @@ func TestImageUsecaseImpl_Upload_Fail_S3Upload(t *testing.T) {
 		S3Client: S3Client,
 	}
 
-	req := &model.UploadImageRequest{
+	req := &dto.UploadImageRequest{
 		File: newFileHeader(t, "image.png", []byte("image-data")),
 	}
 
-	S3Client.UploadImageFunc = func(ctx context.Context, req model.S3UploadImageRequest) (string, error) {
+	S3Client.UploadImageFunc = func(ctx context.Context, req dto.S3UploadImageRequest) (string, error) {
 		return "", assert.AnError
 	}
 
 	ctx := context.Background()
-	ctx = ctxuserauth.Set(ctx, &model.UserAuth{ID: 1, Username: "user1"})
+	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1, Username: "user1"})
 
 	res, err := u.Upload(ctx, req)
 
@@ -123,11 +123,11 @@ func TestImageUsecaseImpl_Upload_Fail_Create(t *testing.T) {
 		S3Client:        S3Client,
 	}
 
-	req := &model.UploadImageRequest{
+	req := &dto.UploadImageRequest{
 		File: newFileHeader(t, "image.png", []byte("image-data")),
 	}
 
-	S3Client.UploadImageFunc = func(ctx context.Context, req model.S3UploadImageRequest) (string, error) {
+	S3Client.UploadImageFunc = func(ctx context.Context, req dto.S3UploadImageRequest) (string, error) {
 		return "url", nil
 	}
 
@@ -136,7 +136,7 @@ func TestImageUsecaseImpl_Upload_Fail_Create(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	ctx = ctxuserauth.Set(ctx, &model.UserAuth{ID: 1, Username: "user1"})
+	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1, Username: "user1"})
 
 	res, err := u.Upload(ctx, req)
 
@@ -158,11 +158,11 @@ func TestImageUsecaseImpl_Upload_Fail_Send(t *testing.T) {
 		S3Client:        S3Client,
 	}
 
-	req := &model.UploadImageRequest{
+	req := &dto.UploadImageRequest{
 		File: newFileHeader(t, "image.png", []byte("image-data")),
 	}
 
-	S3Client.UploadImageFunc = func(ctx context.Context, req model.S3UploadImageRequest) (string, error) {
+	S3Client.UploadImageFunc = func(ctx context.Context, req dto.S3UploadImageRequest) (string, error) {
 		return "url", nil
 	}
 
@@ -170,12 +170,12 @@ func TestImageUsecaseImpl_Upload_Fail_Send(t *testing.T) {
 		return nil
 	}
 
-	ImageProducer.SendImageUploadedFunc = func(ctx context.Context, event *model.ImageUploadedEvent) error {
+	ImageProducer.SendImageUploadedFunc = func(ctx context.Context, event *dto.ImageUploadedEvent) error {
 		return assert.AnError
 	}
 
 	ctx := context.Background()
-	ctx = ctxuserauth.Set(ctx, &model.UserAuth{ID: 1, Username: "user1"})
+	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1, Username: "user1"})
 
 	res, err := u.Upload(ctx, req)
 

@@ -46,7 +46,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ImageResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ImageResponse"
                         }
                     }
                 }
@@ -77,7 +77,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentImageRequest"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.CommentImageRequest"
                         }
                     }
                 ],
@@ -116,7 +116,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeImageRequest"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.LikeImageRequest"
                         }
                     }
                 ],
@@ -158,7 +158,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_CommentResponseList"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_CommentResponseList"
                         }
                     }
                 }
@@ -192,7 +192,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_LikeResponseList"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_LikeResponseList"
                         }
                     }
                 }
@@ -212,7 +212,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.RegisterUserRequest"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.RegisterUserRequest"
                         }
                     }
                 ],
@@ -220,7 +220,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_UserResponse"
                         }
                     }
                 }
@@ -242,7 +242,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_UserResponse"
                         }
                     }
                 }
@@ -265,7 +265,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateUserRequest"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.UpdateUserRequest"
                         }
                     }
                 ],
@@ -273,7 +273,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_UserResponse"
                         }
                     }
                 }
@@ -298,7 +298,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.FollowUserRequest"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.FollowUserRequest"
                         }
                     }
                 ],
@@ -326,7 +326,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.LoginUserRequest"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.LoginUserRequest"
                         }
                     }
                 ],
@@ -334,7 +334,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserLoginResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_UserLoginResponse"
                         }
                     }
                 }
@@ -359,13 +359,13 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_CommentResponseList": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_CommentResponseList": {
             "type": "object",
             "properties": {
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentResponse"
+                        "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.CommentResponse"
                     }
                 },
                 "error_detail": {
@@ -382,11 +382,11 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_ImageResponse": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ImageResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.ImageResponse"
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.ImageResponse"
                 },
                 "error_detail": {
                     "type": "array",
@@ -402,13 +402,13 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_LikeResponseList": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_LikeResponseList": {
             "type": "object",
             "properties": {
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeResponse"
+                        "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.LikeResponse"
                     }
                 },
                 "error_detail": {
@@ -425,11 +425,11 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserLoginResponse": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_UserLoginResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UserLoginResponse"
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.UserLoginResponse"
                 },
                 "error_detail": {
                     "type": "array",
@@ -445,11 +445,11 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_model_UserResponse": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_delivery_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_UserResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_model.UserResponse"
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.UserResponse"
                 },
                 "error_detail": {
                     "type": "array",
@@ -485,7 +485,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentImageRequest": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_dto.CommentImageRequest": {
             "type": "object",
             "required": [
                 "comment",
@@ -500,7 +500,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentResponse": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_dto.CommentResponse": {
             "type": "object",
             "properties": {
                 "comment": {
@@ -526,7 +526,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.FollowUserRequest": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_dto.FollowUserRequest": {
             "type": "object",
             "properties": {
                 "following_id": {
@@ -534,7 +534,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.ImageResponse": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_dto.ImageResponse": {
             "type": "object",
             "properties": {
                 "comment_count": {
@@ -563,7 +563,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeImageRequest": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_dto.LikeImageRequest": {
             "type": "object",
             "required": [
                 "image_id"
@@ -574,7 +574,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeResponse": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_dto.LikeResponse": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -597,7 +597,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.LoginUserRequest": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_dto.LoginUserRequest": {
             "type": "object",
             "required": [
                 "password",
@@ -614,7 +614,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.RegisterUserRequest": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_dto.RegisterUserRequest": {
             "type": "object",
             "required": [
                 "name",
@@ -636,7 +636,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.UpdateUserRequest": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_dto.UpdateUserRequest": {
             "type": "object",
             "properties": {
                 "name": {
@@ -649,7 +649,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.UserLoginResponse": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_dto.UserLoginResponse": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -672,7 +672,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_model.UserResponse": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_dto.UserResponse": {
             "type": "object",
             "properties": {
                 "created_at": {

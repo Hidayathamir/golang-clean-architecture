@@ -10,8 +10,8 @@ import (
 	"testing"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/stretchr/testify/require"
 )
 
@@ -39,7 +39,7 @@ func uploadImage(t *testing.T, token string) int64 {
 	bytesBody, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[model.ImageResponse])
+	responseBody := new(response.WebResponse[dto.ImageResponse])
 	err = json.Unmarshal(bytesBody, responseBody)
 	require.Nil(t, err)
 
@@ -78,7 +78,7 @@ func TestUploadImage(t *testing.T) {
 	bytesBody, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[model.ImageResponse])
+	responseBody := new(response.WebResponse[dto.ImageResponse])
 	err = json.Unmarshal(bytesBody, responseBody)
 	require.Nil(t, err)
 
@@ -102,7 +102,7 @@ func TestLikeImage(t *testing.T) {
 	imageID := uploadImage(t, token)
 
 	// Prepare like request
-	reqBody := model.LikeImageRequest{
+	reqBody := dto.LikeImageRequest{
 		ImageID: imageID,
 	}
 	bodyJson, err := json.Marshal(reqBody)
@@ -138,7 +138,7 @@ func TestCommentImage(t *testing.T) {
 	imageID := uploadImage(t, token)
 
 	// Prepare comment request
-	reqBody := model.CommentImageRequest{
+	reqBody := dto.CommentImageRequest{
 		ImageID: imageID,
 		Comment: "Nice!",
 	}
@@ -175,7 +175,7 @@ func TestGetLikes(t *testing.T) {
 	imageID := uploadImage(t, token)
 
 	// Like it first
-	reqBody := model.LikeImageRequest{
+	reqBody := dto.LikeImageRequest{
 		ImageID: imageID,
 	}
 	bodyJson, err := json.Marshal(reqBody)
@@ -202,7 +202,7 @@ func TestGetLikes(t *testing.T) {
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
 	// Verify response body
-	respBody := new(response.WebResponse[model.LikeResponseList])
+	respBody := new(response.WebResponse[dto.LikeResponseList])
 	err = json.NewDecoder(res.Body).Decode(respBody)
 	require.Nil(t, err)
 	require.NotEmpty(t, respBody.Data)
@@ -219,7 +219,7 @@ func TestGetComments(t *testing.T) {
 	imageID := uploadImage(t, token)
 
 	// Comment first
-	reqBody := model.CommentImageRequest{
+	reqBody := dto.CommentImageRequest{
 		ImageID: imageID,
 		Comment: "Wow",
 	}
@@ -247,7 +247,7 @@ func TestGetComments(t *testing.T) {
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
 	// Verify response body
-	respBody := new(response.WebResponse[model.CommentResponseList])
+	respBody := new(response.WebResponse[dto.CommentResponseList])
 	err = json.NewDecoder(res.Body).Decode(respBody)
 	require.Nil(t, err)
 	require.NotEmpty(t, respBody.Data)
@@ -268,7 +268,7 @@ func TestImageFlow(t *testing.T) {
 	require.Nil(t, err)
 
 	// User 2 follows User 1
-	reqBodyFollow := model.FollowUserRequest{
+	reqBodyFollow := dto.FollowUserRequest{
 		FollowingID: user1.ID,
 	}
 	bodyJsonFollow, err := json.Marshal(reqBodyFollow)
@@ -328,7 +328,7 @@ func TestMultipleUsersCommentImage(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
-	respBody := new(response.WebResponse[model.CommentResponseList])
+	respBody := new(response.WebResponse[dto.CommentResponseList])
 	err = json.NewDecoder(res.Body).Decode(respBody)
 	require.Nil(t, err)
 
@@ -364,7 +364,7 @@ func TestMultipleUsersLikeImage(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
-	respBody := new(response.WebResponse[model.LikeResponseList])
+	respBody := new(response.WebResponse[dto.LikeResponseList])
 	err = json.NewDecoder(res.Body).Decode(respBody)
 	require.Nil(t, err)
 

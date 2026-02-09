@@ -3,14 +3,14 @@ package image
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
-func (u *ImageUsecaseImpl) GetLike(ctx context.Context, req *model.GetLikeRequest) (*model.LikeResponseList, error) {
+func (u *ImageUsecaseImpl) GetLike(ctx context.Context, req *dto.GetLikeRequest) (*dto.LikeResponseList, error) {
 	if err := x.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
@@ -21,8 +21,8 @@ func (u *ImageUsecaseImpl) GetLike(ctx context.Context, req *model.GetLikeReques
 		return nil, errkit.AddFuncName(err)
 	}
 
-	res := new(model.LikeResponseList)
-	converter.EntityLikeListToModelLikeResponseList(ctx, likeList, res)
+	res := new(dto.LikeResponseList)
+	converter.EntityLikeListToDtoLikeResponseList(ctx, likeList, res)
 
 	return res, nil
 }

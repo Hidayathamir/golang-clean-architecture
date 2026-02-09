@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
@@ -24,7 +24,7 @@ func TestUserUsecaseImpl_Current_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	req := &model.GetUserRequest{
+	req := &dto.GetUserRequest{
 		ID: 1,
 	}
 
@@ -38,7 +38,7 @@ func TestUserUsecaseImpl_Current_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected = &model.UserResponse{}
+	var expected = &dto.UserResponse{}
 
 	require.Equal(t, expected, res)
 	require.Nil(t, err)
@@ -54,7 +54,7 @@ func TestUserUsecaseImpl_Current_Fail_ValidateStruct(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	req := &model.GetUserRequest{
+	req := &dto.GetUserRequest{
 		ID: 0,
 	}
 
@@ -68,7 +68,7 @@ func TestUserUsecaseImpl_Current_Fail_ValidateStruct(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected *model.UserResponse
+	var expected *dto.UserResponse
 
 	require.Equal(t, expected, res)
 	require.NotNil(t, err)
@@ -86,7 +86,7 @@ func TestUserUsecaseImpl_Current_Fail_FindByID(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	req := &model.GetUserRequest{
+	req := &dto.GetUserRequest{
 		ID: 1,
 	}
 
@@ -100,7 +100,7 @@ func TestUserUsecaseImpl_Current_Fail_FindByID(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected *model.UserResponse
+	var expected *dto.UserResponse
 
 	require.Equal(t, expected, res)
 	require.NotNil(t, err)

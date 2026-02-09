@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
-func (u *ImageUsecaseImpl) NotifyFollowerOnUpload(ctx context.Context, req *model.NotifyFollowerOnUploadRequest) error {
+func (u *ImageUsecaseImpl) NotifyFollowerOnUpload(ctx context.Context, req *dto.NotifyFollowerOnUploadRequest) error {
 	err := x.Validate.Struct(req)
 	if err != nil {
 		err = errkit.BadRequest(err)
@@ -30,7 +30,7 @@ func (u *ImageUsecaseImpl) NotifyFollowerOnUpload(ctx context.Context, req *mode
 	}
 
 	for _, follow := range *followList {
-		event := &model.NotifEvent{
+		event := &dto.NotifEvent{
 			UserID:  follow.FollowerID,
 			Message: fmt.Sprintf("%s just upload an image", user.Name),
 		}

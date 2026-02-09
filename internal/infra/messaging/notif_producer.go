@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/topic"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
@@ -16,7 +16,7 @@ import (
 //go:generate moq -out=../../mock/MockProducerNotif.go -pkg=mock . NotifProducer
 
 type NotifProducer interface {
-	SendNotif(ctx context.Context, event *model.NotifEvent) error
+	SendNotif(ctx context.Context, event *dto.NotifEvent) error
 }
 
 var _ NotifProducer = &NotifProducerImpl{}
@@ -33,7 +33,7 @@ func NewNotifProducer(cfg *config.Config, producer sarama.SyncProducer) *NotifPr
 	}
 }
 
-func (p *NotifProducerImpl) SendNotif(ctx context.Context, event *model.NotifEvent) error {
+func (p *NotifProducerImpl) SendNotif(ctx context.Context, event *dto.NotifEvent) error {
 	if p.Producer == nil {
 		x.Logger.WithContext(ctx).Warn("Kafka producer is disabled")
 		return nil

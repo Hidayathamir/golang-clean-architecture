@@ -9,9 +9,9 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/go-playground/validator/v10"
@@ -62,7 +62,7 @@ func TestUserUsecaseImpl_Verify_Success(t *testing.T) {
 
 	tokenString := newSignedToken(t, u.Config, 1)
 
-	req := &model.VerifyUserRequest{
+	req := &dto.VerifyUserRequest{
 		Token: tokenString,
 	}
 
@@ -74,13 +74,13 @@ func TestUserUsecaseImpl_Verify_Success(t *testing.T) {
 	res, err := u.Verify(context.Background(), req)
 
 	require.NoError(t, err)
-	require.Equal(t, &model.UserAuth{ID: 1}, res)
+	require.Equal(t, &dto.UserAuth{ID: 1}, res)
 }
 
 func TestUserUsecaseImpl_Verify_ValidateStruct(t *testing.T) {
 	u, repo := newVerifyUsecase(t)
 
-	req := &model.VerifyUserRequest{
+	req := &dto.VerifyUserRequest{
 		Token: "",
 	}
 
@@ -99,7 +99,7 @@ func TestUserUsecaseImpl_Verify_ValidateStruct(t *testing.T) {
 func TestUserUsecaseImpl_Verify_ParseAccessToken(t *testing.T) {
 	u, repo := newVerifyUsecase(t)
 
-	req := &model.VerifyUserRequest{
+	req := &dto.VerifyUserRequest{
 		Token: "invalid-token",
 	}
 
@@ -118,7 +118,7 @@ func TestUserUsecaseImpl_Verify_FindByID(t *testing.T) {
 
 	tokenString := newSignedToken(t, u.Config, 1)
 
-	req := &model.VerifyUserRequest{
+	req := &dto.VerifyUserRequest{
 		Token: tokenString,
 	}
 

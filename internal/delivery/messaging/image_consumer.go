@@ -3,8 +3,8 @@ package messaging
 import (
 	"encoding/json"
 
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model/converter"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/image"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
@@ -26,14 +26,14 @@ func (c *ImageConsumer) ConsumeImageUploadedEvent(message *sarama.ConsumerMessag
 	ctx, span := telemetry.StartConsumer(message)
 	defer span.End()
 
-	event := new(model.ImageUploadedEvent)
+	event := new(dto.ImageUploadedEvent)
 	if err := json.Unmarshal(message.Value, event); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
-	req := new(model.NotifyFollowerOnUploadRequest)
-	converter.ModelImageUploadedEventToModelNotifyFollowerOnUploadRequest(ctx, event, req)
+	req := new(dto.NotifyFollowerOnUploadRequest)
+	converter.DtoImageUploadedEventToDtoNotifyFollowerOnUploadRequest(ctx, event, req)
 
 	if err := c.Usecase.NotifyFollowerOnUpload(ctx, req); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
@@ -47,14 +47,14 @@ func (c *ImageConsumer) ConsumeImageLikedEventForNotification(message *sarama.Co
 	ctx, span := telemetry.StartConsumer(message)
 	defer span.End()
 
-	event := new(model.ImageLikedEvent)
+	event := new(dto.ImageLikedEvent)
 	if err := json.Unmarshal(message.Value, event); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
-	req := new(model.NotifyUserImageLikedRequest)
-	converter.ModelImageLikedEventToModelNotifyUserImageLikedRequest(ctx, event, req)
+	req := new(dto.NotifyUserImageLikedRequest)
+	converter.DtoImageLikedEventToDtoNotifyUserImageLikedRequest(ctx, event, req)
 
 	if err := c.Usecase.NotifyUserImageLiked(ctx, req); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
@@ -68,8 +68,8 @@ func (c *ImageConsumer) ConsumeImageLikedEventForUpdateCount(messages []*sarama.
 	ctx, span := telemetry.StartNew()
 	defer span.End()
 
-	req := new(model.BatchUpdateImageLikeCountRequest)
-	converter.SaramaConsumerMessageListToModelBatchUpdateImageLikeCountRequest(ctx, messages, req)
+	req := new(dto.BatchUpdateImageLikeCountRequest)
+	converter.SaramaConsumerMessageListToDtoBatchUpdateImageLikeCountRequest(ctx, messages, req)
 
 	if err := c.Usecase.BatchUpdateImageLikeCount(ctx, req); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
@@ -83,14 +83,14 @@ func (c *ImageConsumer) ConsumeImageCommentedEventForNotification(message *saram
 	ctx, span := telemetry.StartConsumer(message)
 	defer span.End()
 
-	event := new(model.ImageCommentedEvent)
+	event := new(dto.ImageCommentedEvent)
 	if err := json.Unmarshal(message.Value, event); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
-	req := new(model.NotifyUserImageCommentedRequest)
-	converter.ModelImageCommentedEventToModelNotifyUserImageCommentedRequest(ctx, event, req)
+	req := new(dto.NotifyUserImageCommentedRequest)
+	converter.DtoImageCommentedEventToDtoNotifyUserImageCommentedRequest(ctx, event, req)
 
 	if err := c.Usecase.NotifyUserImageCommented(ctx, req); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
@@ -104,8 +104,8 @@ func (c *ImageConsumer) ConsumeImageCommentedEventForUpdateCount(messages []*sar
 	ctx, span := telemetry.StartNew()
 	defer span.End()
 
-	req := new(model.BatchUpdateImageCommentCountRequest)
-	converter.SaramaConsumerMessageListToModelBatchUpdateImageCommentCountRequest(ctx, messages, req)
+	req := new(dto.BatchUpdateImageCommentCountRequest)
+	converter.SaramaConsumerMessageListToDtoBatchUpdateImageCommentCountRequest(ctx, messages, req)
 
 	if err := c.Usecase.BatchUpdateImageCommentCount(ctx, req); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()

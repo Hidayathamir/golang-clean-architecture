@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
@@ -28,7 +28,7 @@ func TestUserUsecaseImpl_Update_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	req := &model.UpdateUserRequest{
+	req := &dto.UpdateUserRequest{
 		ID:       1,
 		Password: "password1",
 		Name:     "name1",
@@ -42,7 +42,7 @@ func TestUserUsecaseImpl_Update_Success(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
+	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *dto.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -52,7 +52,7 @@ func TestUserUsecaseImpl_Update_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected = &model.UserResponse{Name: "name1"}
+	var expected = &dto.UserResponse{Name: "name1"}
 
 	require.Equal(t, expected, res)
 	require.Nil(t, err)
@@ -71,7 +71,7 @@ func TestUserUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	req := &model.UpdateUserRequest{
+	req := &dto.UpdateUserRequest{
 		ID: 0,
 	}
 
@@ -83,7 +83,7 @@ func TestUserUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
+	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *dto.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -93,7 +93,7 @@ func TestUserUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected *model.UserResponse
+	var expected *dto.UserResponse
 
 	require.Equal(t, expected, res)
 	require.NotNil(t, err)
@@ -114,7 +114,7 @@ func TestUserUsecaseImpl_Update_Fail_FindByID(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	req := &model.UpdateUserRequest{
+	req := &dto.UpdateUserRequest{
 		ID: 1,
 	}
 
@@ -126,7 +126,7 @@ func TestUserUsecaseImpl_Update_Fail_FindByID(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
+	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *dto.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -136,7 +136,7 @@ func TestUserUsecaseImpl_Update_Fail_FindByID(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected *model.UserResponse
+	var expected *dto.UserResponse
 
 	require.Equal(t, expected, res)
 	require.NotNil(t, err)
@@ -156,7 +156,7 @@ func TestUserUsecaseImpl_Update_Fail_Update(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	req := &model.UpdateUserRequest{
+	req := &dto.UpdateUserRequest{
 		ID: 1,
 	}
 
@@ -168,7 +168,7 @@ func TestUserUsecaseImpl_Update_Fail_Update(t *testing.T) {
 		return assert.AnError
 	}
 
-	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *model.UserFollowedEvent) error {
+	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *dto.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -178,7 +178,7 @@ func TestUserUsecaseImpl_Update_Fail_Update(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	var expected *model.UserResponse
+	var expected *dto.UserResponse
 
 	require.Equal(t, expected, res)
 	require.NotNil(t, err)

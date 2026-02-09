@@ -3,15 +3,15 @@ package user
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (u *UserUsecaseImpl) Create(ctx context.Context, req *model.RegisterUserRequest) (*model.UserResponse, error) {
+func (u *UserUsecaseImpl) Create(ctx context.Context, req *dto.RegisterUserRequest) (*dto.UserResponse, error) {
 	err := x.Validate.Struct(req)
 	if err != nil {
 		err = errkit.BadRequest(err)
@@ -24,14 +24,14 @@ func (u *UserUsecaseImpl) Create(ctx context.Context, req *model.RegisterUserReq
 	}
 
 	user := new(entity.User)
-	converter.ModelRegisterUserRequestToEntityUser(req, user, string(password))
+	converter.DtoRegisterUserRequestToEntityUser(req, user, string(password))
 
 	if err := u.UserRepository.Create(ctx, u.DB.WithContext(ctx), user); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
-	res := new(model.UserResponse)
-	converter.EntityUserToModelUserResponse(user, res)
+	res := new(dto.UserResponse)
+	converter.EntityUserToDtoUserResponse(user, res)
 
 	return res, nil
 }

@@ -3,7 +3,7 @@ package messaging
 import (
 	"context"
 
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
@@ -21,7 +21,7 @@ func NewUserProducerMwLogger(next UserProducer) *UserProducerMwLogger {
 	}
 }
 
-func (p *UserProducerMwLogger) SendUserFollowed(ctx context.Context, event *model.UserFollowedEvent) error {
+func (p *UserProducerMwLogger) SendUserFollowed(ctx context.Context, event *dto.UserFollowedEvent) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 

@@ -3,14 +3,14 @@ package user
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
-func (u *UserUsecaseImpl) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserLoginResponse, error) {
+func (u *UserUsecaseImpl) Login(ctx context.Context, req *dto.LoginUserRequest) (*dto.UserLoginResponse, error) {
 	if err := x.Validate.Struct(req); err != nil {
 		err = errkit.BadRequest(err)
 		return nil, errkit.AddFuncName(err)
@@ -32,8 +32,8 @@ func (u *UserUsecaseImpl) Login(ctx context.Context, req *model.LoginUserRequest
 		return nil, errkit.AddFuncName(err)
 	}
 
-	res := new(model.UserLoginResponse)
-	converter.EntityUserToModelUserLoginResponse(user, res)
+	res := new(dto.UserLoginResponse)
+	converter.EntityUserToDtoUserLoginResponse(user, res)
 	res.Token = token
 
 	return res, nil

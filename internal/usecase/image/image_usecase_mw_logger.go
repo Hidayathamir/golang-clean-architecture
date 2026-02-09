@@ -3,7 +3,7 @@ package image
 import (
 	"context"
 
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
@@ -21,7 +21,7 @@ func NewImageUsecaseMwLogger(next ImageUsecase) *ImageUsecaseMwLogger {
 	}
 }
 
-func (u *ImageUsecaseMwLogger) Comment(ctx context.Context, req *model.CommentImageRequest) error {
+func (u *ImageUsecaseMwLogger) Comment(ctx context.Context, req *dto.CommentImageRequest) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -36,7 +36,7 @@ func (u *ImageUsecaseMwLogger) Comment(ctx context.Context, req *model.CommentIm
 	return err
 }
 
-func (u *ImageUsecaseMwLogger) Like(ctx context.Context, req *model.LikeImageRequest) error {
+func (u *ImageUsecaseMwLogger) Like(ctx context.Context, req *dto.LikeImageRequest) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -51,7 +51,7 @@ func (u *ImageUsecaseMwLogger) Like(ctx context.Context, req *model.LikeImageReq
 	return err
 }
 
-func (u *ImageUsecaseMwLogger) Upload(ctx context.Context, req *model.UploadImageRequest) (*model.ImageResponse, error) {
+func (u *ImageUsecaseMwLogger) Upload(ctx context.Context, req *dto.UploadImageRequest) (*dto.ImageResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -67,7 +67,7 @@ func (u *ImageUsecaseMwLogger) Upload(ctx context.Context, req *model.UploadImag
 	return res, err
 }
 
-func (u *ImageUsecaseMwLogger) GetImage(ctx context.Context, req *model.GetImageRequest) (*model.ImageResponse, error) {
+func (u *ImageUsecaseMwLogger) GetImage(ctx context.Context, req *dto.GetImageRequest) (*dto.ImageResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -83,7 +83,7 @@ func (u *ImageUsecaseMwLogger) GetImage(ctx context.Context, req *model.GetImage
 	return res, err
 }
 
-func (u *ImageUsecaseMwLogger) GetComment(ctx context.Context, req *model.GetCommentRequest) (*model.CommentResponseList, error) {
+func (u *ImageUsecaseMwLogger) GetComment(ctx context.Context, req *dto.GetCommentRequest) (*dto.CommentResponseList, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -99,7 +99,7 @@ func (u *ImageUsecaseMwLogger) GetComment(ctx context.Context, req *model.GetCom
 	return res, err
 }
 
-func (u *ImageUsecaseMwLogger) GetLike(ctx context.Context, req *model.GetLikeRequest) (*model.LikeResponseList, error) {
+func (u *ImageUsecaseMwLogger) GetLike(ctx context.Context, req *dto.GetLikeRequest) (*dto.LikeResponseList, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -115,7 +115,7 @@ func (u *ImageUsecaseMwLogger) GetLike(ctx context.Context, req *model.GetLikeRe
 	return res, err
 }
 
-func (u *ImageUsecaseMwLogger) NotifyFollowerOnUpload(ctx context.Context, req *model.NotifyFollowerOnUploadRequest) error {
+func (u *ImageUsecaseMwLogger) NotifyFollowerOnUpload(ctx context.Context, req *dto.NotifyFollowerOnUploadRequest) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -130,7 +130,7 @@ func (u *ImageUsecaseMwLogger) NotifyFollowerOnUpload(ctx context.Context, req *
 	return err
 }
 
-func (u *ImageUsecaseMwLogger) NotifyUserImageCommented(ctx context.Context, req *model.NotifyUserImageCommentedRequest) error {
+func (u *ImageUsecaseMwLogger) NotifyUserImageCommented(ctx context.Context, req *dto.NotifyUserImageCommentedRequest) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -145,7 +145,7 @@ func (u *ImageUsecaseMwLogger) NotifyUserImageCommented(ctx context.Context, req
 	return err
 }
 
-func (u *ImageUsecaseMwLogger) BatchUpdateImageCommentCount(ctx context.Context, req *model.BatchUpdateImageCommentCountRequest) error {
+func (u *ImageUsecaseMwLogger) BatchUpdateImageCommentCount(ctx context.Context, req *dto.BatchUpdateImageCommentCountRequest) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -160,7 +160,7 @@ func (u *ImageUsecaseMwLogger) BatchUpdateImageCommentCount(ctx context.Context,
 	return err
 }
 
-func (u *ImageUsecaseMwLogger) NotifyUserImageLiked(ctx context.Context, req *model.NotifyUserImageLikedRequest) error {
+func (u *ImageUsecaseMwLogger) NotifyUserImageLiked(ctx context.Context, req *dto.NotifyUserImageLikedRequest) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -175,7 +175,7 @@ func (u *ImageUsecaseMwLogger) NotifyUserImageLiked(ctx context.Context, req *mo
 	return err
 }
 
-func (u *ImageUsecaseMwLogger) BatchUpdateImageLikeCount(ctx context.Context, req *model.BatchUpdateImageLikeCountRequest) error {
+func (u *ImageUsecaseMwLogger) BatchUpdateImageLikeCount(ctx context.Context, req *dto.BatchUpdateImageLikeCountRequest) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 

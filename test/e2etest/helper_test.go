@@ -9,8 +9,8 @@ import (
 	"testing"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/stretchr/testify/require"
 )
@@ -32,7 +32,7 @@ func registerUser(t *testing.T, username, password, name string) {
 	t.Helper()
 
 	// Prepare registration request body
-	requestBody := model.RegisterUserRequest{
+	requestBody := dto.RegisterUserRequest{
 		Username: username,
 		Password: password,
 		Name:     name,
@@ -56,7 +56,7 @@ func registerUser(t *testing.T, username, password, name string) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[model.UserResponse])
+	responseBody := new(response.WebResponse[dto.UserResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -75,7 +75,7 @@ func loginUser(t *testing.T, username, password string) string {
 	t.Helper()
 
 	// Prepare login request body
-	requestBody := model.LoginUserRequest{
+	requestBody := dto.LoginUserRequest{
 		Username: username,
 		Password: password,
 	}
@@ -98,7 +98,7 @@ func loginUser(t *testing.T, username, password string) string {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[model.UserLoginResponse])
+	responseBody := new(response.WebResponse[dto.UserLoginResponse])
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -139,7 +139,7 @@ func followUser(t *testing.T, token string, followingID int64) {
 	t.Helper()
 
 	// Prepare follow request body
-	requestBody := model.FollowUserRequest{
+	requestBody := dto.FollowUserRequest{
 		FollowingID: followingID,
 	}
 	bodyJson, err := json.Marshal(requestBody)
@@ -182,7 +182,7 @@ func checkFollow(t *testing.T, followerID, followingID int64) {
 func commentImage(t *testing.T, token string, imageID int64, comment string) {
 	t.Helper()
 
-	reqBody := model.CommentImageRequest{
+	reqBody := dto.CommentImageRequest{
 		ImageID: imageID,
 		Comment: comment,
 	}
@@ -204,7 +204,7 @@ func commentImage(t *testing.T, token string, imageID int64, comment string) {
 func likeImage(t *testing.T, token string, imageID int64) {
 	t.Helper()
 
-	reqBody := model.LikeImageRequest{
+	reqBody := dto.LikeImageRequest{
 		ImageID: imageID,
 	}
 	bodyJson, err := json.Marshal(reqBody)
