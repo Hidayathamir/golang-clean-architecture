@@ -7,7 +7,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/bucketname"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
@@ -44,7 +43,7 @@ func (c *S3ClientImpl) UploadImage(ctx context.Context, req dto.S3UploadImageReq
 		return "", errkit.AddFuncName(err)
 	}
 
-	baseEndpoint := c.Cfg.GetString(configkey.AWSBaseEndpoint)
+	baseEndpoint := c.Cfg.GetAWSBaseEndpoint()
 	url = fmt.Sprintf("%s/%s/%s", baseEndpoint, bucketname.Image, req.Key)
 
 	return url, nil

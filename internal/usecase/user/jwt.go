@@ -8,26 +8,25 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 )
 
 func (u *UserUsecaseImpl) signAccessToken(ctx context.Context, userID int64) (string, error) {
-	secret := u.Config.GetString(configkey.AuthJWTSecret)
+	secret := u.Config.GetAuthJWTSecret()
 	if secret == "" {
 		err := fmt.Errorf("jwt secret is not configured")
 		err = errkit.InternalServerError(err)
 		return "", errkit.AddFuncName(err)
 	}
 
-	expireSeconds := u.Config.GetInt(configkey.AuthJWTExpireSeconds)
+	expireSeconds := u.Config.GetAuthJWTExpireSeconds()
 	if expireSeconds <= 0 {
 		err := fmt.Errorf("jwt expire seconds must be greater than zero")
 		err = errkit.InternalServerError(err)
 		return "", errkit.AddFuncName(err)
 	}
 
-	issuer := u.Config.GetString(configkey.AuthJWTIssuer)
+	issuer := u.Config.GetAuthJWTIssuer()
 	now := time.Now()
 	claims := jwt.RegisteredClaims{
 		Subject:   strconv.FormatInt(userID, 10),
@@ -53,7 +52,7 @@ func (u *UserUsecaseImpl) parseAccessToken(ctx context.Context, tokenString stri
 		return 0, errkit.AddFuncName(err)
 	}
 
-	secret := u.Config.GetString(configkey.AuthJWTSecret)
+	secret := u.Config.GetAuthJWTSecret()
 	if secret == "" {
 		err := fmt.Errorf("jwt secret is not configured")
 		err = errkit.InternalServerError(err)

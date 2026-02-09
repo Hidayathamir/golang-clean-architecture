@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -27,14 +26,14 @@ func InitTraceProvider(cfg *config.Config) Stop {
 		sdktrace.WithResource(
 			resource.NewWithAttributes(
 				semconv.SchemaURL,
-				semconv.ServiceNameKey.String(cfg.GetString(configkey.AppName)),
+				semconv.ServiceNameKey.String(cfg.GetAppName()),
 			),
 		),
 	)
 
 	otel.SetTracerProvider(tp)
 
-	tracer = tp.Tracer(cfg.GetString(configkey.AppName))
+	tracer = tp.Tracer(cfg.GetAppName())
 
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 
@@ -51,7 +50,7 @@ func InitTraceProvider(cfg *config.Config) Stop {
 }
 
 func newSpanExporter(cfg *config.Config) sdktrace.SpanExporter {
-	endpoint := cfg.GetString(configkey.TelemetryOTLPEndpoint)
+	endpoint := cfg.GetTelemetryOTLPEndpoint()
 	if endpoint == "" {
 		err := fmt.Errorf("missing OTLP endpoint configuration")
 		panic(err)

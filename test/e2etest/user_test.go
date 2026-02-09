@@ -11,7 +11,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
@@ -175,7 +174,7 @@ func TestLogin(t *testing.T) {
 	// Verify JWT token claims
 	claims := &jwt.RegisteredClaims{}
 	token, err := jwt.ParseWithClaims(responseBody.Data.Token, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(cfg.GetString(configkey.AuthJWTSecret)), nil
+		return []byte(cfg.GetAuthJWTSecret()), nil
 	})
 	require.Nil(t, err)
 	require.True(t, token.Valid)
@@ -185,7 +184,7 @@ func TestLogin(t *testing.T) {
 	err = db.Where("username = ?", requestBody.Username).First(user).Error
 	require.Nil(t, err)
 	require.Equal(t, strconv.FormatInt(user.ID, 10), claims.Subject)
-	require.Equal(t, cfg.GetString(configkey.AuthJWTIssuer), claims.Issuer)
+	require.Equal(t, cfg.GetAuthJWTIssuer(), claims.Issuer)
 	require.NotNil(t, claims.ExpiresAt)
 }
 

@@ -6,7 +6,6 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/provider"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/migrate"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"gorm.io/gorm"
@@ -26,7 +25,7 @@ func TestMain(m *testing.M) {
 	db = provider.NewDatabase(cfg)
 	db.Exec(`DROP SCHEMA public CASCADE`)
 	db.Exec(`CREATE SCHEMA public`)
-	cfg.Set(configkey.DatabaseMigrations, "../../db/migrations")
+	cfg.SetDatabaseMigrations("../../db/migrations")
 	migrate.Migrate(cfg, db)
 
 	code := m.Run()

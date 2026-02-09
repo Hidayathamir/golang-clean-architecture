@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
@@ -15,14 +14,14 @@ import (
 )
 
 func NewDatabase(cfg *config.Config) *gorm.DB {
-	username := cfg.GetString(configkey.DatabaseUsername)
-	password := cfg.GetString(configkey.DatabasePassword)
-	host := cfg.GetString(configkey.DatabaseHost)
-	port := cfg.GetInt(configkey.DatabasePort)
-	database := cfg.GetString(configkey.DatabaseName)
-	idleConnection := cfg.GetInt(configkey.DatabasePoolIdle)
-	maxConnection := cfg.GetInt(configkey.DatabasePoolMax)
-	maxLifeTimeConnection := cfg.GetInt(configkey.DatabasePoolLifetime)
+	username := cfg.GetDatabaseUsername()
+	password := cfg.GetDatabasePassword()
+	host := cfg.GetDatabaseHost()
+	port := cfg.GetDatabasePort()
+	database := cfg.GetDatabaseName()
+	idleConnection := cfg.GetDatabasePoolIdle()
+	maxConnection := cfg.GetDatabasePoolMax()
+	maxLifeTimeConnection := cfg.GetDatabasePoolLifetime()
 
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable TimeZone=UTC", host, port, username, password, database)
 

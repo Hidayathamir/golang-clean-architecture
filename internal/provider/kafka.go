@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/IBM/sarama"
 	"github.com/dnwe/otelsarama"
@@ -14,14 +13,20 @@ func NewKafkaConsumerGroup(config *config.Config, groupID string) sarama.Consume
 	saramaConfig := sarama.NewConfig()
 	saramaConfig.Consumer.Return.Errors = true
 
-	offsetReset := config.GetString(configkey.KafkaAutoOffsetReset)
+	offsetReset := config.GetKafkaAutoOffsetReset()
+	if offsetReset == "" {
+		offsetReset = "earliest"
+	}
 	if offsetReset == "earliest" {
 		saramaConfig.Consumer.Offsets.Initial = sarama.OffsetOldest
 	} else {
 		saramaConfig.Consumer.Offsets.Initial = sarama.OffsetNewest
 	}
 
-	brokers := strings.Split(config.GetString(configkey.KafkaBootstrapServers), ",")
+	brokers := strings.Split(config.GetKafkaBootstrapServers(), ",")
+	if len(brokers) == 0 {
+		x.Logger.Panicf("Kafka brokers are not configured for consumer group %s", groupID)
+	}
 
 	consumerGroup, err := sarama.NewConsumerGroup(brokers, groupID, saramaConfig)
 	if err != nil {
@@ -31,7 +36,7 @@ func NewKafkaConsumerGroup(config *config.Config, groupID string) sarama.Consume
 }
 
 func NewKafkaProducer(cfg *config.Config) sarama.SyncProducer {
-	if !cfg.GetBool(configkey.KafkaProducerEnabled) {
+	if !cfg.GetKafkaProducerEnabled() {
 		x.Logger.Info("Kafka producer is disabled")
 		return nil
 	}
@@ -41,7 +46,7 @@ func NewKafkaProducer(cfg *config.Config) sarama.SyncProducer {
 	saramaConfig.Producer.RequiredAcks = sarama.WaitForAll
 	saramaConfig.Producer.Retry.Max = 3
 
-	brokers := strings.Split(cfg.GetString(configkey.KafkaBootstrapServers), ",")
+	brokers := strings.Split(cfg.GetKafkaBootstrapServers(), ",")
 
 	producer, err := sarama.NewSyncProducer(brokers, saramaConfig)
 	if err != nil {

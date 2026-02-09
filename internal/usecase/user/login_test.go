@@ -12,7 +12,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -28,9 +27,9 @@ func newLoginUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepositoryM
 	producer := &mock.UserProducerMock{}
 
 	cfg := config.NewConfig()
-	cfg.Set(configkey.AuthJWTSecret, "test-secret")
-	cfg.Set(configkey.AuthJWTIssuer, "test-issuer")
-	cfg.Set(configkey.AuthJWTExpireSeconds, 60)
+	cfg.SetAuthJWTSecret("test-secret")
+	cfg.SetAuthJWTIssuer("test-issuer")
+	cfg.SetAuthJWTExpireSeconds(60)
 
 	u := &user.UserUsecaseImpl{
 		Config:         cfg,
@@ -70,12 +69,12 @@ func TestUserUsecaseImpl_Login_Success(t *testing.T) {
 
 	claims := &jwt.RegisteredClaims{}
 	token, err := jwt.ParseWithClaims(res.Token, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(u.Config.GetString(configkey.AuthJWTSecret)), nil
+		return []byte(u.Config.GetAuthJWTSecret()), nil
 	})
 	require.NoError(t, err)
 	require.True(t, token.Valid)
 	require.Equal(t, "123", claims.Subject)
-	require.Equal(t, u.Config.GetString(configkey.AuthJWTIssuer), claims.Issuer)
+	require.Equal(t, u.Config.GetAuthJWTIssuer(), claims.Issuer)
 	require.NotNil(t, claims.ExpiresAt)
 	assert.WithinDuration(t, time.Now().Add(time.Minute), claims.ExpiresAt.Time, time.Minute)
 }
@@ -165,8 +164,9 @@ func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 	producer := &mock.UserProducerMock{}
 
 	cfg := config.NewConfig()
-	cfg.Set(configkey.AuthJWTIssuer, "test-issuer")
-	cfg.Set(configkey.AuthJWTExpireSeconds, 60)
+	cfg.SetAuthJWTSecret("")
+	cfg.SetAuthJWTIssuer("test-issuer")
+	cfg.SetAuthJWTExpireSeconds(60)
 
 	u := &user.UserUsecaseImpl{
 		Config:         cfg,

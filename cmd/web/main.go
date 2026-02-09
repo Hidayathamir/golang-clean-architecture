@@ -11,7 +11,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/route"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dependency_injection"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/provider"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/otelkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
@@ -66,7 +65,7 @@ func runHTTPServer(cfg *config.Config, controllers *dependency_injection.Control
 		x.PanicIfErr(err)
 	}()
 
-	webPort := cfg.GetString(configkey.WebPort)
+	webPort := cfg.GetWebPort()
 	fmt.Printf("Go to swagger http://localhost:%s/swagger\n", webPort)
 	err := app.Listen(":" + webPort) // Start the HTTP server and block until app shutdown.
 	x.PanicIfErr(err)

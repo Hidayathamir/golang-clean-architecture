@@ -2,7 +2,6 @@ package migrate
 
 import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -18,7 +17,7 @@ func Migrate(cfg *config.Config, db *gorm.DB) {
 	x.PanicIfErr(err)
 
 	m, err := migrate.NewWithDatabaseInstance(
-		"file://"+cfg.GetString(configkey.DatabaseMigrations),
+		"file://"+cfg.GetDatabaseMigrations(),
 		"postgres",
 		driver,
 	)

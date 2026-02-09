@@ -13,7 +13,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -27,9 +26,9 @@ func newVerifyUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepository
 	repo := &mock.UserRepositoryMock{}
 
 	cfg := config.NewConfig()
-	cfg.Set(configkey.AuthJWTSecret, "test-secret")
-	cfg.Set(configkey.AuthJWTIssuer, "test-issuer")
-	cfg.Set(configkey.AuthJWTExpireSeconds, 60)
+	cfg.SetAuthJWTSecret("test-secret")
+	cfg.SetAuthJWTIssuer("test-issuer")
+	cfg.SetAuthJWTExpireSeconds(60)
 
 	u := &user.UserUsecaseImpl{
 		Config:         cfg,
@@ -46,13 +45,13 @@ func newSignedToken(t *testing.T, cfg *config.Config, userID int64) string {
 	now := time.Now()
 	claims := jwt.RegisteredClaims{
 		Subject:   strconv.FormatInt(userID, 10),
-		Issuer:    cfg.GetString(configkey.AuthJWTIssuer),
+		Issuer:    cfg.GetAuthJWTIssuer(),
 		IssuedAt:  jwt.NewNumericDate(now),
 		ExpiresAt: jwt.NewNumericDate(now.Add(time.Minute)),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(cfg.GetString(configkey.AuthJWTSecret)))
+	tokenString, err := token.SignedString([]byte(cfg.GetAuthJWTSecret()))
 	require.NoError(t, err)
 	return tokenString
 }

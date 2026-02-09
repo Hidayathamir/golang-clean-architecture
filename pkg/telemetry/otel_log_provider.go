@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 	"go.opentelemetry.io/otel/log"
@@ -25,14 +24,14 @@ func InitLogProvider(cfg *config.Config) Stop {
 		sdklog.WithResource(
 			resource.NewWithAttributes(
 				semconv.SchemaURL,
-				semconv.ServiceNameKey.String(cfg.GetString(configkey.AppName)),
+				semconv.ServiceNameKey.String(cfg.GetAppName()),
 			),
 		),
 	)
 
 	global.SetLoggerProvider(lp)
 
-	logger = lp.Logger(cfg.GetString(configkey.AppName))
+	logger = lp.Logger(cfg.GetAppName())
 
 	stop := func() {
 		if err := lp.ForceFlush(context.Background()); err != nil {
@@ -47,7 +46,7 @@ func InitLogProvider(cfg *config.Config) Stop {
 }
 
 func newLogExporter(cfg *config.Config) sdklog.Exporter {
-	endpoint := cfg.GetString(configkey.TelemetryOTLPEndpoint)
+	endpoint := cfg.GetTelemetryOTLPEndpoint()
 	if endpoint == "" {
 		err := fmt.Errorf("missing OTLP endpoint configuration")
 		panic(err)

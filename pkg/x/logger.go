@@ -2,7 +2,6 @@ package x
 
 import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logrushook"
 	"github.com/sirupsen/logrus"
 )
@@ -12,7 +11,7 @@ var Logger = logrus.New()
 func SetupLogger(cfg *config.Config) {
 	logger := logrus.New()
 
-	lvl, err := logrus.ParseLevel(cfg.GetString(configkey.LogLevel))
+	lvl, err := logrus.ParseLevel(cfg.GetLogLevel())
 	if err != nil {
 		lvl = logrus.InfoLevel
 	}

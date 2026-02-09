@@ -1,12 +1,14 @@
-package configkey
+package config
 
 const (
 	AppName = "app.name"
 
-	WebPort    = "web.port"
-	WebPrefork = "web.prefork"
+	AuthJWTSecret        = "auth.jwt.secret"
+	AuthJWTIssuer        = "auth.jwt.issuer"
+	AuthJWTExpireSeconds = "auth.jwt.expire_seconds"
 
-	LogLevel = "log.level"
+	AWSRegion       = "aws.region"
+	AWSBaseEndpoint = "aws.base_endpoint"
 
 	DatabaseMigrations   = "database.migrations"
 	DatabaseUsername     = "database.username"
@@ -22,12 +24,10 @@ const (
 	KafkaAutoOffsetReset  = "kafka.auto.offset.reset"
 	KafkaProducerEnabled  = "kafka.producer.enabled"
 
+	LogLevel = "log.level"
+
 	TelemetryOTLPEndpoint = "telemetry.otlp.endpoint"
 
-	AuthJWTSecret        = "auth.jwt.secret"
-	AuthJWTIssuer        = "auth.jwt.issuer"
-	AuthJWTExpireSeconds = "auth.jwt.expire_seconds"
-
-	AWSRegion       = "aws.region"
-	AWSBaseEndpoint = "aws.base_endpoint"
+	WebPort    = "web.port"
+	WebPrefork = "web.prefork"
 )
