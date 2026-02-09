@@ -7,6 +7,5 @@ create table images
     comment_count   int     not null,
     created_at      timestamptz not null default now(),
     updated_at      timestamptz not null default now(),
-    deleted_at      timestamptz null,
-    constraint fk_images_user_id foreign key (user_id) references users (id)  on delete cascade
+    deleted_at      timestamptz null
 );
