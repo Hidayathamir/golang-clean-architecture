@@ -2,12 +2,12 @@ package route
 
 import (
 	_ "github.com/Hidayathamir/golang-clean-architecture/api" // need import for swagger
-	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dependency_injection"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
 )
 
-func Setup(app *fiber.App, controllers *config.Controllers, middlewares *config.Middlewares) {
+func Setup(app *fiber.App, controllers *dependency_injection.Controllers, middlewares *dependency_injection.Middlewares) {
 	root := app.Group("")
 
 	setupHomeRoute(root)
@@ -31,7 +31,7 @@ func setupSwaggerRoute(router fiber.Router) {
 	router.Get("/swagger/*", swagger.HandlerDefault)
 }
 
-func setupGuestRoute(router fiber.Router, controllers *config.Controllers) {
+func setupGuestRoute(router fiber.Router, controllers *dependency_injection.Controllers) {
 	users := router.Group("/users")
 	{
 		users.Post("", controllers.UserController.Register)
@@ -39,7 +39,7 @@ func setupGuestRoute(router fiber.Router, controllers *config.Controllers) {
 	}
 }
 
-func setupAuthRoute(router fiber.Router, controllers *config.Controllers) {
+func setupAuthRoute(router fiber.Router, controllers *dependency_injection.Controllers) {
 	users := router.Group("/users")
 	{
 		users.Patch("/_current", controllers.UserController.Update)

@@ -1,8 +1,6 @@
-package config
+package dependency_injection
 
 import (
-	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/middleware"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/rest"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
@@ -11,7 +9,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/IBM/sarama"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/gofiber/fiber/v2"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
@@ -84,38 +81,5 @@ func SetupUsecases(
 		UserUsecase:  userUsecase,
 		ImageUsecase: imageUsecase,
 		NotifUsecase: notifUsecase,
-	}
-}
-
-type Controllers struct {
-	UserController  *http.UserController
-	ImageController *http.ImageController
-}
-
-func SetupControllers(viperConfig *viper.Viper, usecases *Usecases) *Controllers {
-	userController := http.NewUserController(viperConfig, usecases.UserUsecase)
-	imageController := http.NewImageController(viperConfig, usecases.ImageUsecase)
-
-	return &Controllers{
-		UserController:  userController,
-		ImageController: imageController,
-	}
-}
-
-type Middlewares struct {
-	AuthMiddleware      fiber.Handler
-	TraceIDMiddleware   fiber.Handler
-	OtelFiberMiddleware fiber.Handler
-}
-
-func SetupMiddlewares(usecases *Usecases) *Middlewares {
-	authMiddleware := middleware.NewAuth(usecases.UserUsecase)
-	traceIDMiddleware := middleware.NewTraceID()
-	otelFiberMiddleware := middleware.NewOtelFiberMiddleware()
-
-	return &Middlewares{
-		AuthMiddleware:      authMiddleware,
-		TraceIDMiddleware:   traceIDMiddleware,
-		OtelFiberMiddleware: otelFiberMiddleware,
 	}
 }

@@ -10,6 +10,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/messaging/route"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/dependency_injection"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
@@ -25,7 +26,7 @@ func main() {
 	s3Client := config.NewS3Client(viperConfig)
 	producer := config.NewKafkaProducer(viperConfig)
 
-	usecases := config.SetupUsecases(viperConfig, db, producer, s3Client)
+	usecases := dependency_injection.SetupUsecases(viperConfig, db, producer, s3Client)
 
 	stopTraceProvider, err := telemetry.InitTraceProvider(viperConfig)
 	panicIfErr(err)
