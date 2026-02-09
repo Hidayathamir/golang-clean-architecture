@@ -3,6 +3,7 @@ package http
 import (
 	"net/http"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
@@ -11,18 +12,17 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/gofiber/fiber/v2"
-	"github.com/spf13/viper"
 )
 
 type UserController struct {
-	Config  *viper.Viper
+	Cfg     *config.Config
 	Usecase user.UserUsecase
 }
 
-func NewUserController(cfg *viper.Viper, useCase user.UserUsecase) *UserController {
+func NewUserController(cfg *config.Config, usecase user.UserUsecase) *UserController {
 	return &UserController{
-		Config:  cfg,
-		Usecase: useCase,
+		Cfg:     cfg,
+		Usecase: usecase,
 	}
 }
 

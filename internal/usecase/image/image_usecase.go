@@ -3,11 +3,11 @@ package image
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/storage"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
@@ -30,8 +30,8 @@ type ImageUsecase interface {
 var _ ImageUsecase = &ImageUsecaseImpl{}
 
 type ImageUsecaseImpl struct {
-	Config *viper.Viper
-	DB     *gorm.DB
+	Cfg *config.Config
+	DB  *gorm.DB
 
 	// repository
 	ImageRepository   repository.ImageRepository
@@ -49,7 +49,7 @@ type ImageUsecaseImpl struct {
 }
 
 func NewImageUsecase(
-	Config *viper.Viper,
+	Config *config.Config,
 	DB *gorm.DB,
 
 	// repository
@@ -67,8 +67,8 @@ func NewImageUsecase(
 	S3Client storage.S3Client,
 ) *ImageUsecaseImpl {
 	return &ImageUsecaseImpl{
-		Config: Config,
-		DB:     DB,
+		Cfg: Config,
+		DB:  DB,
 
 		// repository
 		ImageRepository:   ImageRepository,

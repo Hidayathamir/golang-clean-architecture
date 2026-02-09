@@ -3,19 +3,19 @@ package user_test
 import (
 	"testing"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/storage"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 )
 
 func TestNewUserUsecase(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	var DB = gormDB
-	var Config = viper.New()
+	var Config = config.NewConfig()
 
 	var UserRepository repository.UserRepository = &mock.UserRepositoryMock{}
 	var FollowRepository repository.FollowRepository = &mock.FollowRepositoryMock{}

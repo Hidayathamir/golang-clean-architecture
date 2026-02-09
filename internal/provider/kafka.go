@@ -1,16 +1,16 @@
-package config
+package provider
 
 import (
 	"strings"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/IBM/sarama"
 	"github.com/dnwe/otelsarama"
-	"github.com/spf13/viper"
 )
 
-func NewKafkaConsumerGroup(config *viper.Viper, groupID string) sarama.ConsumerGroup {
+func NewKafkaConsumerGroup(config *config.Config, groupID string) sarama.ConsumerGroup {
 	saramaConfig := sarama.NewConfig()
 	saramaConfig.Consumer.Return.Errors = true
 
@@ -30,8 +30,8 @@ func NewKafkaConsumerGroup(config *viper.Viper, groupID string) sarama.ConsumerG
 	return consumerGroup
 }
 
-func NewKafkaProducer(viperConfig *viper.Viper) sarama.SyncProducer {
-	if !viperConfig.GetBool(configkey.KafkaProducerEnabled) {
+func NewKafkaProducer(cfg *config.Config) sarama.SyncProducer {
+	if !cfg.GetBool(configkey.KafkaProducerEnabled) {
 		x.Logger.Info("Kafka producer is disabled")
 		return nil
 	}
@@ -41,7 +41,7 @@ func NewKafkaProducer(viperConfig *viper.Viper) sarama.SyncProducer {
 	saramaConfig.Producer.RequiredAcks = sarama.WaitForAll
 	saramaConfig.Producer.Retry.Max = 3
 
-	brokers := strings.Split(viperConfig.GetString(configkey.KafkaBootstrapServers), ",")
+	brokers := strings.Split(cfg.GetString(configkey.KafkaBootstrapServers), ",")
 
 	producer, err := sarama.NewSyncProducer(brokers, saramaConfig)
 	if err != nil {

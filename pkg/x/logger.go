@@ -1,18 +1,18 @@
 package x
 
 import (
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logrushook"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 var Logger = logrus.New()
 
-func SetupLogger(viperConfig *viper.Viper) {
+func SetupLogger(cfg *config.Config) {
 	logger := logrus.New()
 
-	lvl, err := logrus.ParseLevel(viperConfig.GetString(configkey.LogLevel))
+	lvl, err := logrus.ParseLevel(cfg.GetString(configkey.LogLevel))
 	if err != nil {
 		lvl = logrus.InfoLevel
 	}

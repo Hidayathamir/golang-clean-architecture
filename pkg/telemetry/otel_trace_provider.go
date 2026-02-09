@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/spf13/viper"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
@@ -18,8 +18,8 @@ import (
 
 var tracer trace.Tracer = otel.Tracer(instrumentationScope)
 
-func InitTraceProvider(viperConfig *viper.Viper) (Stop, error) {
-	exporter, err := newSpanExporter(viperConfig)
+func InitTraceProvider(cfg *config.Config) (Stop, error) {
+	exporter, err := newSpanExporter(cfg)
 	if err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
@@ -30,14 +30,14 @@ func InitTraceProvider(viperConfig *viper.Viper) (Stop, error) {
 		sdktrace.WithResource(
 			resource.NewWithAttributes(
 				semconv.SchemaURL,
-				semconv.ServiceNameKey.String(viperConfig.GetString(configkey.AppName)),
+				semconv.ServiceNameKey.String(cfg.GetString(configkey.AppName)),
 			),
 		),
 	)
 
 	otel.SetTracerProvider(tp)
 
-	tracer = tp.Tracer(viperConfig.GetString(configkey.AppName))
+	tracer = tp.Tracer(cfg.GetString(configkey.AppName))
 
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 
@@ -53,8 +53,8 @@ func InitTraceProvider(viperConfig *viper.Viper) (Stop, error) {
 	return stop, nil
 }
 
-func newSpanExporter(viperConfig *viper.Viper) (sdktrace.SpanExporter, error) {
-	endpoint := viperConfig.GetString(configkey.TelemetryOTLPEndpoint)
+func newSpanExporter(cfg *config.Config) (sdktrace.SpanExporter, error) {
+	endpoint := cfg.GetString(configkey.TelemetryOTLPEndpoint)
 	if endpoint == "" {
 		err := fmt.Errorf("missing OTLP endpoint configuration")
 		return nil, errkit.AddFuncName(err)

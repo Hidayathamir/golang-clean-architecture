@@ -3,10 +3,10 @@ package repository
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/column"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
@@ -20,12 +20,12 @@ type FollowRepository interface {
 var _ FollowRepository = &FollowRepositoryImpl{}
 
 type FollowRepositoryImpl struct {
-	Config *viper.Viper
+	Cfg *config.Config
 }
 
-func NewFollowRepository(cfg *viper.Viper) *FollowRepositoryImpl {
+func NewFollowRepository(cfg *config.Config) *FollowRepositoryImpl {
 	return &FollowRepositoryImpl{
-		Config: cfg,
+		Cfg: cfg,
 	}
 }
 

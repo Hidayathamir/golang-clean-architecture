@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/spf13/viper"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 	"go.opentelemetry.io/otel/log"
 	"go.opentelemetry.io/otel/log/global"
@@ -17,8 +17,8 @@ import (
 
 var logger log.Logger = global.GetLoggerProvider().Logger(instrumentationScope)
 
-func InitLogProvider(viperConfig *viper.Viper) (Stop, error) {
-	exporter, err := newLogExporter(viperConfig)
+func InitLogProvider(cfg *config.Config) (Stop, error) {
+	exporter, err := newLogExporter(cfg)
 	if err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
@@ -28,14 +28,14 @@ func InitLogProvider(viperConfig *viper.Viper) (Stop, error) {
 		sdklog.WithResource(
 			resource.NewWithAttributes(
 				semconv.SchemaURL,
-				semconv.ServiceNameKey.String(viperConfig.GetString(configkey.AppName)),
+				semconv.ServiceNameKey.String(cfg.GetString(configkey.AppName)),
 			),
 		),
 	)
 
 	global.SetLoggerProvider(lp)
 
-	logger = lp.Logger(viperConfig.GetString(configkey.AppName))
+	logger = lp.Logger(cfg.GetString(configkey.AppName))
 
 	stop := func() {
 		if err := lp.ForceFlush(context.Background()); err != nil {
@@ -49,8 +49,8 @@ func InitLogProvider(viperConfig *viper.Viper) (Stop, error) {
 	return stop, nil
 }
 
-func newLogExporter(viperConfig *viper.Viper) (sdklog.Exporter, error) {
-	endpoint := viperConfig.GetString(configkey.TelemetryOTLPEndpoint)
+func newLogExporter(cfg *config.Config) (sdklog.Exporter, error) {
+	endpoint := cfg.GetString(configkey.TelemetryOTLPEndpoint)
 	if endpoint == "" {
 		err := fmt.Errorf("missing OTLP endpoint configuration")
 		return nil, errkit.AddFuncName(err)

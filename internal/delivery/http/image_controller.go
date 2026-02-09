@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/image"
@@ -11,18 +12,17 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/gofiber/fiber/v2"
-	"github.com/spf13/viper"
 )
 
 type ImageController struct {
-	Config  *viper.Viper
+	Cfg     *config.Config
 	Usecase image.ImageUsecase
 }
 
-func NewImageController(cfg *viper.Viper, useCase image.ImageUsecase) *ImageController {
+func NewImageController(cfg *config.Config, usecase image.ImageUsecase) *ImageController {
 	return &ImageController{
-		Config:  cfg,
-		Usecase: useCase,
+		Cfg:     cfg,
+		Usecase: usecase,
 	}
 }
 

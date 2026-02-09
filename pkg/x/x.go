@@ -1,8 +1,8 @@
 package x
 
-import "github.com/spf13/viper"
+import "github.com/Hidayathamir/golang-clean-architecture/internal/config"
 
-func SetupAll(viperConfig *viper.Viper) {
-	SetupLogger(viperConfig)
-	SetupValidator(viperConfig)
+func SetupAll(cfg *config.Config) {
+	SetupLogger(cfg)
+	SetupValidator(cfg)
 }

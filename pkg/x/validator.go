@@ -1,12 +1,12 @@
 package x
 
 import (
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/go-playground/validator/v10"
-	"github.com/spf13/viper"
 )
 
 var Validate = validator.New()
 
-func SetupValidator(viperConfig *viper.Viper) {
+func SetupValidator(cfg *config.Config) {
 	Validate = validator.New()
 }

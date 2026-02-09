@@ -3,10 +3,10 @@ package repository
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/column"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
@@ -20,12 +20,12 @@ type LikeRepository interface {
 var _ LikeRepository = &LikeRepositoryImpl{}
 
 type LikeRepositoryImpl struct {
-	Config *viper.Viper
+	Cfg *config.Config
 }
 
-func NewLikeRepository(cfg *viper.Viper) *LikeRepositoryImpl {
+func NewLikeRepository(cfg *config.Config) *LikeRepositoryImpl {
 	return &LikeRepositoryImpl{
-		Config: cfg,
+		Cfg: cfg,
 	}
 }
 

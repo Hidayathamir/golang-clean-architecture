@@ -11,6 +11,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/messaging/route"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dependency_injection"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/provider"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
@@ -20,35 +21,37 @@ import (
 )
 
 func main() {
-	viperConfig := config.NewViper()
-	x.SetupAll(viperConfig)
-	db := config.NewDatabase(viperConfig)
-	s3Client := config.NewS3Client(viperConfig)
-	producer := config.NewKafkaProducer(viperConfig)
+	cfg := config.NewConfig()
 
-	usecases := dependency_injection.SetupUsecases(viperConfig, db, producer, s3Client)
+	x.SetupAll(cfg)
 
-	stopTraceProvider, err := telemetry.InitTraceProvider(viperConfig)
+	db := provider.NewDatabase(cfg)
+	s3Client := provider.NewS3Client(cfg)
+	producer := provider.NewKafkaProducer(cfg)
+
+	usecases := dependency_injection.SetupUsecases(cfg, db, producer, s3Client)
+
+	stopTraceProvider, err := telemetry.InitTraceProvider(cfg)
 	panicIfErr(err)
 	defer stopTraceProvider()
 
 	validateAbleToExportSpan()
 
-	stopLogProvider, err := telemetry.InitLogProvider(viperConfig)
+	stopLogProvider, err := telemetry.InitLogProvider(cfg)
 	panicIfErr(err)
 	defer stopLogProvider()
 
 	ctx, cancel := context.WithCancel(context.Background())
 
 	x.Logger.Info("Starting worker service")
-	go route.ConsumeUserFollowedEventForNotification(ctx, viperConfig, usecases)
-	go route.ConsumeUserFollowedEventForUpdateCount(ctx, viperConfig, usecases)
-	go route.SetupImageUploadedConsumer(ctx, viperConfig, usecases)
-	go route.ConsumeImageLikedEventForNotification(ctx, viperConfig, usecases)
-	go route.ConsumeImageLikedEventForUpdateCount(ctx, viperConfig, usecases)
-	go route.ConsumeImageCommentedEventForNotification(ctx, viperConfig, usecases)
-	go route.ConsumeImageCommentedEventForUpdateCount(ctx, viperConfig, usecases)
-	go route.SetupNotifConsumer(ctx, viperConfig, usecases)
+	go route.ConsumeUserFollowedEventForNotification(ctx, cfg, usecases)
+	go route.ConsumeUserFollowedEventForUpdateCount(ctx, cfg, usecases)
+	go route.SetupImageUploadedConsumer(ctx, cfg, usecases)
+	go route.ConsumeImageLikedEventForNotification(ctx, cfg, usecases)
+	go route.ConsumeImageLikedEventForUpdateCount(ctx, cfg, usecases)
+	go route.ConsumeImageCommentedEventForNotification(ctx, cfg, usecases)
+	go route.ConsumeImageCommentedEventForUpdateCount(ctx, cfg, usecases)
+	go route.SetupNotifConsumer(ctx, cfg, usecases)
 
 	terminateSignals := make(chan os.Signal, 1)
 	signal.Notify(terminateSignals, syscall.SIGINT, syscall.SIGTERM)

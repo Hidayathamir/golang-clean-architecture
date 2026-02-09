@@ -3,11 +3,11 @@ package repository
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/column"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/table"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
@@ -23,12 +23,12 @@ type ImageRepository interface {
 var _ ImageRepository = &ImageRepositoryImpl{}
 
 type ImageRepositoryImpl struct {
-	Config *viper.Viper
+	Cfg *config.Config
 }
 
-func NewImageRepository(cfg *viper.Viper) *ImageRepositoryImpl {
+func NewImageRepository(cfg *config.Config) *ImageRepositoryImpl {
 	return &ImageRepositoryImpl{
-		Config: cfg,
+		Cfg: cfg,
 	}
 }
 

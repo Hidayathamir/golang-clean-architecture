@@ -4,13 +4,13 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/topic"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/IBM/sarama"
-	"github.com/spf13/viper"
 )
 
 //go:generate moq -out=../../mock/MockProducerImage.go -pkg=mock . ImageProducer
@@ -24,13 +24,13 @@ type ImageProducer interface {
 var _ ImageProducer = &ImageProducerImpl{}
 
 type ImageProducerImpl struct {
-	Config   *viper.Viper
+	Cfg      *config.Config
 	Producer sarama.SyncProducer
 }
 
-func NewImageProducer(cfg *viper.Viper, producer sarama.SyncProducer) *ImageProducerImpl {
+func NewImageProducer(cfg *config.Config, producer sarama.SyncProducer) *ImageProducerImpl {
 	return &ImageProducerImpl{
-		Config:   cfg,
+		Cfg:      cfg,
 		Producer: producer,
 	}
 }

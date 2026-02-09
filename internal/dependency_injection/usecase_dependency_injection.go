@@ -1,6 +1,7 @@
 package dependency_injection
 
 import (
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/storage"
@@ -9,7 +10,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/IBM/sarama"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
@@ -20,61 +20,61 @@ type Usecases struct {
 }
 
 func SetupUsecases(
-	viperConfig *viper.Viper,
+	cfg *config.Config,
 	db *gorm.DB,
 	producer sarama.SyncProducer,
 	awsS3Client *s3.Client,
 ) *Usecases {
 	// setup repositories
 	var userRepository repository.UserRepository
-	userRepository = repository.NewUserRepository(viperConfig)
+	userRepository = repository.NewUserRepository(cfg)
 	userRepository = repository.NewUserRepositoryMwLogger(userRepository)
 
 	var imageRepository repository.ImageRepository
-	imageRepository = repository.NewImageRepository(viperConfig)
+	imageRepository = repository.NewImageRepository(cfg)
 	imageRepository = repository.NewImageRepositoryMwLogger(imageRepository)
 
 	var likeRepository repository.LikeRepository
-	likeRepository = repository.NewLikeRepository(viperConfig)
+	likeRepository = repository.NewLikeRepository(cfg)
 	likeRepository = repository.NewLikeRepositoryMwLogger(likeRepository)
 
 	var commentRepository repository.CommentRepository
-	commentRepository = repository.NewCommentRepository(viperConfig)
+	commentRepository = repository.NewCommentRepository(cfg)
 	commentRepository = repository.NewCommentRepositoryMwLogger(commentRepository)
 
 	var followRepository repository.FollowRepository
-	followRepository = repository.NewFollowRepository(viperConfig)
+	followRepository = repository.NewFollowRepository(cfg)
 	followRepository = repository.NewFollowRepositoryMwLogger(followRepository)
 
 	// setup producer
 	var userProducer messaging.UserProducer
-	userProducer = messaging.NewUserProducer(viperConfig, producer)
+	userProducer = messaging.NewUserProducer(cfg, producer)
 	userProducer = messaging.NewUserProducerMwLogger(userProducer)
 
 	var imageProducer messaging.ImageProducer
-	imageProducer = messaging.NewImageProducer(viperConfig, producer)
+	imageProducer = messaging.NewImageProducer(cfg, producer)
 	imageProducer = messaging.NewImageProducerMwLogger(imageProducer)
 
 	var notifProducer messaging.NotifProducer
-	notifProducer = messaging.NewNotifProducer(viperConfig, producer)
+	notifProducer = messaging.NewNotifProducer(cfg, producer)
 	notifProducer = messaging.NewNotifProducerMwLogger(notifProducer)
 
 	// setup client
 	var s3Client storage.S3Client
-	s3Client = storage.NewS3Client(viperConfig, awsS3Client)
+	s3Client = storage.NewS3Client(cfg, awsS3Client)
 	s3Client = storage.NewS3ClientMwLogger(s3Client)
 
 	// setup use cases
 	var userUsecase user.UserUsecase
-	userUsecase = user.NewUserUsecase(viperConfig, db, userRepository, followRepository, userProducer, notifProducer, s3Client)
+	userUsecase = user.NewUserUsecase(cfg, db, userRepository, followRepository, userProducer, notifProducer, s3Client)
 	userUsecase = user.NewUserUsecaseMwLogger(userUsecase)
 
 	var imageUsecase image.ImageUsecase
-	imageUsecase = image.NewImageUsecase(viperConfig, db, imageRepository, likeRepository, commentRepository, followRepository, userRepository, imageProducer, notifProducer, s3Client)
+	imageUsecase = image.NewImageUsecase(cfg, db, imageRepository, likeRepository, commentRepository, followRepository, userRepository, imageProducer, notifProducer, s3Client)
 	imageUsecase = image.NewImageUsecaseMwLogger(imageUsecase)
 
 	var notifUsecase notif.NotifUsecase
-	notifUsecase = notif.NewNotifUsecase(viperConfig, db)
+	notifUsecase = notif.NewNotifUsecase(cfg, db)
 	notifUsecase = notif.NewNotifUsecaseMwLogger(notifUsecase)
 
 	return &Usecases{

@@ -3,11 +3,11 @@ package user
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/storage"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
@@ -27,7 +27,7 @@ type UserUsecase interface {
 var _ UserUsecase = &UserUsecaseImpl{}
 
 type UserUsecaseImpl struct {
-	Config *viper.Viper
+	Config *config.Config
 	DB     *gorm.DB
 
 	// repository
@@ -43,33 +43,33 @@ type UserUsecaseImpl struct {
 }
 
 func NewUserUsecase(
-	cfg *viper.Viper,
-	db *gorm.DB,
+	Cfg *config.Config,
+	DB *gorm.DB,
 
 	// repository
-	userRepository repository.UserRepository,
+	UserRepository repository.UserRepository,
 	FollowRepository repository.FollowRepository,
 
 	// producer
-	userProducer messaging.UserProducer,
+	UserProducer messaging.UserProducer,
 	NotifProducer messaging.NotifProducer,
 
 	// client
-	s3Client storage.S3Client,
+	S3Client storage.S3Client,
 ) *UserUsecaseImpl {
 	return &UserUsecaseImpl{
-		Config: cfg,
-		DB:     db,
+		Config: Cfg,
+		DB:     DB,
 
 		// repository
-		UserRepository:   userRepository,
+		UserRepository:   UserRepository,
 		FollowRepository: FollowRepository,
 
 		// producer
-		UserProducer:  userProducer,
+		UserProducer:  UserProducer,
 		NotifProducer: NotifProducer,
 
 		// client
-		S3Client: s3Client,
+		S3Client: S3Client,
 	}
 }

@@ -5,11 +5,11 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/column"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/table"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
@@ -29,12 +29,12 @@ type UserRepository interface {
 var _ UserRepository = &UserRepositoryImpl{}
 
 type UserRepositoryImpl struct {
-	Config *viper.Viper
+	Cfg *config.Config
 }
 
-func NewUserRepository(cfg *viper.Viper) *UserRepositoryImpl {
+func NewUserRepository(cfg *config.Config) *UserRepositoryImpl {
 	return &UserRepositoryImpl{
-		Config: cfg,
+		Cfg: cfg,
 	}
 }
 

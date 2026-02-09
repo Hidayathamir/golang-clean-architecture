@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/spf13/viper"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
@@ -26,7 +26,7 @@ func newVerifyUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepository
 	gormDB, _ := newFakeDB(t)
 	repo := &mock.UserRepositoryMock{}
 
-	cfg := viper.New()
+	cfg := config.NewConfig()
 	cfg.Set(configkey.AuthJWTSecret, "test-secret")
 	cfg.Set(configkey.AuthJWTIssuer, "test-issuer")
 	cfg.Set(configkey.AuthJWTExpireSeconds, 60)
@@ -40,7 +40,7 @@ func newVerifyUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepository
 	return u, repo
 }
 
-func newSignedToken(t *testing.T, cfg *viper.Viper, userID int64) string {
+func newSignedToken(t *testing.T, cfg *config.Config, userID int64) string {
 	t.Helper()
 
 	now := time.Now()

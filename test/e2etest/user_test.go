@@ -175,7 +175,7 @@ func TestLogin(t *testing.T) {
 	// Verify JWT token claims
 	claims := &jwt.RegisteredClaims{}
 	token, err := jwt.ParseWithClaims(responseBody.Data.Token, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(viperConfig.GetString(configkey.AuthJWTSecret)), nil
+		return []byte(cfg.GetString(configkey.AuthJWTSecret)), nil
 	})
 	require.Nil(t, err)
 	require.True(t, token.Valid)
@@ -185,7 +185,7 @@ func TestLogin(t *testing.T) {
 	err = db.Where("username = ?", requestBody.Username).First(user).Error
 	require.Nil(t, err)
 	require.Equal(t, strconv.FormatInt(user.ID, 10), claims.Subject)
-	require.Equal(t, viperConfig.GetString(configkey.AuthJWTIssuer), claims.Issuer)
+	require.Equal(t, cfg.GetString(configkey.AuthJWTIssuer), claims.Issuer)
 	require.NotNil(t, claims.ExpiresAt)
 }
 

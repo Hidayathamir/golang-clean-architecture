@@ -3,10 +3,10 @@ package repository
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/column"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
@@ -20,12 +20,12 @@ type CommentRepository interface {
 var _ CommentRepository = &CommentRepositoryImpl{}
 
 type CommentRepositoryImpl struct {
-	Config *viper.Viper
+	Cfg *config.Config
 }
 
-func NewCommentRepository(cfg *viper.Viper) *CommentRepositoryImpl {
+func NewCommentRepository(cfg *config.Config) *CommentRepositoryImpl {
 	return &CommentRepositoryImpl{
-		Config: cfg,
+		Cfg: cfg,
 	}
 }
 

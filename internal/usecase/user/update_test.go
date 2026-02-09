@@ -4,12 +4,12 @@ import (
 	"context"
 	"testing"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/go-playground/validator/v10"
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
@@ -21,7 +21,7 @@ func TestUserUsecaseImpl_Update_Success(t *testing.T) {
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
 		DB:             gormDB,
-		Config:         viper.New(),
+		Config:         config.NewConfig(),
 		UserRepository: UserRepository,
 		UserProducer:   UserProducer,
 	}
@@ -64,7 +64,7 @@ func TestUserUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
 		DB:             gormDB,
-		Config:         viper.New(),
+		Config:         config.NewConfig(),
 		UserRepository: UserRepository,
 		UserProducer:   UserProducer,
 	}
@@ -107,7 +107,7 @@ func TestUserUsecaseImpl_Update_Fail_FindByID(t *testing.T) {
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
 		DB:             gormDB,
-		Config:         viper.New(),
+		Config:         config.NewConfig(),
 		UserRepository: UserRepository,
 		UserProducer:   UserProducer,
 	}
@@ -149,7 +149,7 @@ func TestUserUsecaseImpl_Update_Fail_Update(t *testing.T) {
 	UserProducer := &mock.UserProducerMock{}
 	u := &user.UserUsecaseImpl{
 		DB:             gormDB,
-		Config:         viper.New(),
+		Config:         config.NewConfig(),
 		UserRepository: UserRepository,
 		UserProducer:   UserProducer,
 	}
@@ -184,5 +184,3 @@ func TestUserUsecaseImpl_Update_Fail_Update(t *testing.T) {
 	require.NotNil(t, err)
 	require.ErrorIs(t, err, assert.AnError)
 }
-
-

@@ -3,8 +3,8 @@ package notif
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
@@ -17,7 +17,7 @@ type NotifUsecase interface {
 var _ NotifUsecase = &NotifUsecaseImpl{}
 
 type NotifUsecaseImpl struct {
-	Config *viper.Viper
+	Config *config.Config
 	DB     *gorm.DB
 
 	// repository
@@ -28,7 +28,7 @@ type NotifUsecaseImpl struct {
 }
 
 func NewNotifUsecase(
-	Config *viper.Viper,
+	Cfg *config.Config,
 	DB *gorm.DB,
 
 	// repository
@@ -38,7 +38,7 @@ func NewNotifUsecase(
 	// client
 ) *NotifUsecaseImpl {
 	return &NotifUsecaseImpl{
-		Config: Config,
+		Config: Cfg,
 		DB:     DB,
 
 		// repository

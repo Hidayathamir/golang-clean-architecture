@@ -12,12 +12,12 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/route"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dependency_injection"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/provider"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/gofiber/fiber/v2"
-	"github.com/spf13/viper"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/trace"
@@ -34,34 +34,36 @@ import (
 //	@description				Simple token authorization
 
 func main() {
-	viperConfig := config.NewViper()
-	x.SetupAll(viperConfig)
-	db := config.NewDatabase(viperConfig)
-	s3Client := config.NewS3Client(viperConfig)
-	producer := config.NewKafkaProducer(viperConfig)
+	cfg := config.NewConfig()
 
-	usecases := dependency_injection.SetupUsecases(viperConfig, db, producer, s3Client)
+	x.SetupAll(cfg)
 
-	controllers := dependency_injection.SetupControllers(viperConfig, usecases)
+	db := provider.NewDatabase(cfg)
+	s3Client := provider.NewS3Client(cfg)
+	producer := provider.NewKafkaProducer(cfg)
+
+	usecases := dependency_injection.SetupUsecases(cfg, db, producer, s3Client)
+
+	controllers := dependency_injection.SetupControllers(cfg, usecases)
 	middlewares := dependency_injection.SetupMiddlewares(usecases)
 
-	stopTraceProvider, err := telemetry.InitTraceProvider(viperConfig)
+	stopTraceProvider, err := telemetry.InitTraceProvider(cfg)
 	panicIfErr(err)
 	defer stopTraceProvider()
 
 	validateAbleToExportSpan()
 
-	stopLogProvider, err := telemetry.InitLogProvider(viperConfig)
+	stopLogProvider, err := telemetry.InitLogProvider(cfg)
 	panicIfErr(err)
 	defer stopLogProvider()
 
-	app := config.NewFiber(viperConfig)
+	app := provider.NewFiber(cfg)
 	route.Setup(app, controllers, middlewares)
 
-	runHTTPServer(viperConfig, app)
+	runHTTPServer(cfg, app)
 }
 
-func runHTTPServer(viperConfig *viper.Viper, app *fiber.App) {
+func runHTTPServer(cfg *config.Config, app *fiber.App) {
 	// Watch for termination signals so the server can exit gracefully.
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
@@ -72,7 +74,7 @@ func runHTTPServer(viperConfig *viper.Viper, app *fiber.App) {
 		panicIfErr(err)
 	}()
 
-	webPort := viperConfig.GetString(configkey.WebPort)
+	webPort := cfg.GetString(configkey.WebPort)
 	fmt.Printf("Go to swagger http://localhost:%s/swagger\n", webPort)
 	err := app.Listen(":" + webPort) // Start the HTTP server and block until app shutdown.
 	panicIfErr(err)

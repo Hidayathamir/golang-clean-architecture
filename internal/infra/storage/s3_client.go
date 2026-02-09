@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/bucketname"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/configkey"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/spf13/viper"
 )
 
 //go:generate moq -out=../../mock/MockClientS3.go -pkg=mock . S3Client
@@ -23,13 +23,13 @@ type S3Client interface {
 var _ S3Client = &S3ClientImpl{}
 
 type S3ClientImpl struct {
-	Config      *viper.Viper
+	Cfg         *config.Config
 	AWSS3Client *s3.Client
 }
 
-func NewS3Client(cfg *viper.Viper, awsS3Client *s3.Client) *S3ClientImpl {
+func NewS3Client(cfg *config.Config, awsS3Client *s3.Client) *S3ClientImpl {
 	return &S3ClientImpl{
-		Config:      cfg,
+		Cfg:         cfg,
 		AWSS3Client: awsS3Client,
 	}
 }
@@ -44,7 +44,7 @@ func (c *S3ClientImpl) UploadImage(ctx context.Context, req model.S3UploadImageR
 		return "", errkit.AddFuncName(err)
 	}
 
-	baseEndpoint := c.Config.GetString(configkey.AWSBaseEndpoint)
+	baseEndpoint := c.Cfg.GetString(configkey.AWSBaseEndpoint)
 	url = fmt.Sprintf("%s/%s/%s", baseEndpoint, bucketname.Image, req.Key)
 
 	return url, nil

@@ -4,13 +4,13 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/topic"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/IBM/sarama"
-	"github.com/spf13/viper"
 )
 
 //go:generate moq -out=../../mock/MockProducerNotif.go -pkg=mock . NotifProducer
@@ -22,13 +22,13 @@ type NotifProducer interface {
 var _ NotifProducer = &NotifProducerImpl{}
 
 type NotifProducerImpl struct {
-	Config   *viper.Viper
+	Cfg      *config.Config
 	Producer sarama.SyncProducer
 }
 
-func NewNotifProducer(cfg *viper.Viper, producer sarama.SyncProducer) *NotifProducerImpl {
+func NewNotifProducer(cfg *config.Config, producer sarama.SyncProducer) *NotifProducerImpl {
 	return &NotifProducerImpl{
-		Config:   cfg,
+		Cfg:      cfg,
 		Producer: producer,
 	}
 }
