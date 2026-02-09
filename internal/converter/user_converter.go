@@ -12,20 +12,12 @@ import (
 )
 
 func DtoRegisterUserRequestToEntityUser(req *dto.RegisterUserRequest, user *entity.User, password string) {
-	if req == nil || user == nil {
-		return
-	}
-
 	user.Username = req.Username
 	user.Name = req.Name
 	user.Password = password
 }
 
 func DtoUpdateUserRequestToEntityUser(req *dto.UpdateUserRequest, user *entity.User, password string) {
-	if req == nil || user == nil {
-		return
-	}
-
 	if req.Name != "" {
 		user.Name = req.Name
 	}
