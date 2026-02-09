@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-//go:generate moq -out=../mock/MockRepositoryComment.go -pkg=mock . CommentRepository
+//go:generate moq -out=../../mock/MockRepositoryComment.go -pkg=mock . CommentRepository
 
 type CommentRepository interface {
 	Create(ctx context.Context, db *gorm.DB, comment *entity.Comment) error

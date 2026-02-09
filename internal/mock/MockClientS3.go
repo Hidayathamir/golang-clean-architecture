@@ -5,20 +5,20 @@ package mock
 
 import (
 	"context"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/rest"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/storage"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"sync"
 )
 
-// Ensure, that S3ClientMock does implement rest.S3Client.
+// Ensure, that S3ClientMock does implement storage.S3Client.
 // If this is not the case, regenerate this file with moq.
-var _ rest.S3Client = &S3ClientMock{}
+var _ storage.S3Client = &S3ClientMock{}
 
-// S3ClientMock is a mock implementation of rest.S3Client.
+// S3ClientMock is a mock implementation of storage.S3Client.
 //
 //	func TestSomethingThatUsesS3Client(t *testing.T) {
 //
-//		// make and configure a mocked rest.S3Client
+//		// make and configure a mocked storage.S3Client
 //		mockedS3Client := &S3ClientMock{
 //			DeleteObjectFunc: func(ctx context.Context, req model.S3DeleteObjectRequest) (model.S3DeleteObjectResponse, error) {
 //				panic("mock out the DeleteObject method")
@@ -31,7 +31,7 @@ var _ rest.S3Client = &S3ClientMock{}
 //			},
 //		}
 //
-//		// use mockedS3Client in code that requires rest.S3Client
+//		// use mockedS3Client in code that requires storage.S3Client
 //		// and then make assertions.
 //
 //	}

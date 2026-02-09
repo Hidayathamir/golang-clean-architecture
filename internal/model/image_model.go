@@ -28,7 +28,7 @@ type LikeImageRequest struct {
 
 type CommentImageRequest struct {
 	ImageID int64  `json:"image_id" validate:"required"`
-	Comment string `json:"comment" validate:"required"`
+	Comment string `json:"comment"  validate:"required"`
 }
 
 type GetImageRequest struct {

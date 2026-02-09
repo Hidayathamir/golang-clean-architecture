@@ -13,7 +13,7 @@ import (
 	"gorm.io/gorm"
 )
 
-//go:generate moq -out=../mock/MockRepositoryUser.go -pkg=mock . UserRepository
+//go:generate moq -out=../../mock/MockRepositoryUser.go -pkg=mock . UserRepository
 
 type UserRepository interface {
 	Create(ctx context.Context, db *gorm.DB, user *entity.User) error

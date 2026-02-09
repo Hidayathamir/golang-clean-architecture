@@ -5,7 +5,7 @@ package mock
 
 import (
 	"context"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/messaging"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
 	"sync"
 )

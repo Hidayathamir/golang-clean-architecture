@@ -487,6 +487,10 @@ const docTemplate = `{
         },
         "github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentImageRequest": {
             "type": "object",
+            "required": [
+                "comment",
+                "image_id"
+            ],
             "properties": {
                 "comment": {
                     "type": "string"
@@ -561,6 +565,9 @@ const docTemplate = `{
         },
         "github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeImageRequest": {
             "type": "object",
+            "required": [
+                "image_id"
+            ],
             "properties": {
                 "image_id": {
                     "type": "integer"

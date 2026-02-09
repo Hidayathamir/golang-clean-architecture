@@ -3,10 +3,10 @@ package user_test
 import (
 	"testing"
 
-	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/messaging"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/rest"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/messaging"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/repository"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/storage"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
@@ -23,7 +23,7 @@ func TestNewUserUsecase(t *testing.T) {
 	var UserProducer messaging.UserProducer = &mock.UserProducerMock{}
 	var NotifProducer messaging.NotifProducer = &mock.NotifProducerMock{}
 
-	var S3Client rest.S3Client = &mock.S3ClientMock{}
+	var S3Client storage.S3Client = &mock.S3ClientMock{}
 
 	u := user.NewUserUsecase(Config, DB, UserRepository, FollowRepository, UserProducer, NotifProducer, S3Client)
 

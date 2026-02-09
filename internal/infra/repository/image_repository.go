@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-//go:generate moq -out=../mock/MockRepositoryImage.go -pkg=mock . ImageRepository
+//go:generate moq -out=../../mock/MockRepositoryImage.go -pkg=mock . ImageRepository
 
 type ImageRepository interface {
 	Create(ctx context.Context, db *gorm.DB, image *entity.Image) error

@@ -1,9 +1,9 @@
 package dependency_injection
 
 import (
-	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/messaging"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/rest"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/messaging"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/repository"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/storage"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/image"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/notif"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
@@ -60,9 +60,9 @@ func SetupUsecases(
 	notifProducer = messaging.NewNotifProducerMwLogger(notifProducer)
 
 	// setup client
-	var s3Client rest.S3Client
-	s3Client = rest.NewS3Client(viperConfig, awsS3Client)
-	s3Client = rest.NewS3ClientMwLogger(s3Client)
+	var s3Client storage.S3Client
+	s3Client = storage.NewS3Client(viperConfig, awsS3Client)
+	s3Client = storage.NewS3ClientMwLogger(s3Client)
 
 	// setup use cases
 	var userUsecase user.UserUsecase

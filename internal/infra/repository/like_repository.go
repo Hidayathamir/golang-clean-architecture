@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-//go:generate moq -out=../mock/MockRepositoryLike.go -pkg=mock . LikeRepository
+//go:generate moq -out=../../mock/MockRepositoryLike.go -pkg=mock . LikeRepository
 
 type LikeRepository interface {
 	Create(ctx context.Context, db *gorm.DB, like *entity.Like) error

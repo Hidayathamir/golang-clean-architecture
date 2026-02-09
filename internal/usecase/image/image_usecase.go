@@ -3,10 +3,10 @@ package image
 import (
 	"context"
 
-	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/messaging"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/rest"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/messaging"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/repository"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/storage"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
@@ -45,7 +45,7 @@ type ImageUsecaseImpl struct {
 	NotifProducer messaging.NotifProducer
 
 	// client
-	S3Client rest.S3Client
+	S3Client storage.S3Client
 }
 
 func NewImageUsecase(
@@ -64,7 +64,7 @@ func NewImageUsecase(
 	NotifProducer messaging.NotifProducer,
 
 	// client
-	S3Client rest.S3Client,
+	S3Client storage.S3Client,
 ) *ImageUsecaseImpl {
 	return &ImageUsecaseImpl{
 		Config: Config,

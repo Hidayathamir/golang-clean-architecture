@@ -98,6 +98,9 @@ definitions:
         type: string
       image_id:
         type: integer
+    required:
+    - comment
+    - image_id
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.CommentResponse:
     properties:
@@ -144,6 +147,8 @@ definitions:
     properties:
       image_id:
         type: integer
+    required:
+    - image_id
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_model.LikeResponse:
     properties:

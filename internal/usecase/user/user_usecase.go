@@ -3,10 +3,10 @@ package user
 import (
 	"context"
 
-	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/messaging"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/gateway/rest"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/messaging"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/repository"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/storage"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/model"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/repository"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
@@ -39,7 +39,7 @@ type UserUsecaseImpl struct {
 	NotifProducer messaging.NotifProducer
 
 	// client
-	S3Client rest.S3Client
+	S3Client storage.S3Client
 }
 
 func NewUserUsecase(
@@ -55,7 +55,7 @@ func NewUserUsecase(
 	NotifProducer messaging.NotifProducer,
 
 	// client
-	s3Client rest.S3Client,
+	s3Client storage.S3Client,
 ) *UserUsecaseImpl {
 	return &UserUsecaseImpl{
 		Config: cfg,

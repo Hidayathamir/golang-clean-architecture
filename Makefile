@@ -1,10 +1,16 @@
 .SILENT:
 
 run:
-	go run cmd/web/main.go
+	mkdir -p logs
+	go run cmd/web/main.go >> logs/web_log.jsonl 2>&1
 
 run-worker:
-	go run cmd/worker/main.go
+	mkdir -p logs
+	go run cmd/worker/main.go >> logs/worker_log.jsonl 2>&1
+
+run-cron:
+	mkdir -p logs
+	go run cmd/cron/main.go >> logs/cron_log.jsonl 2>&1
 
 go-test:
 	go test -count=1 -v ./internal/...
@@ -46,7 +52,7 @@ generate:
 	rm -rf internal/mock &&	go generate ./internal/...
 
 swag:
-	swag fmt --exclude ./internal/mock && swag init --parseDependency --parseInternal --generalInfo ./cmd/web/main.go --output ./api/
+	rm -rf api/ && swag fmt --exclude ./internal/mock && swag init --parseDependency --parseInternal --generalInfo ./cmd/web/main.go --output ./api/
 
 check-tools:
 	@echo "🔍 Checking required tools..."
