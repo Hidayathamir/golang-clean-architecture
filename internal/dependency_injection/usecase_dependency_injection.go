@@ -30,6 +30,10 @@ func SetupUsecases(
 	userRepository = repository.NewUserRepository(cfg)
 	userRepository = repository.NewUserRepositoryMwLogger(userRepository)
 
+	var userStatRepository repository.UserStatRepository
+	userStatRepository = repository.NewUserStatRepository(cfg)
+	userStatRepository = repository.NewUserStatRepositoryMwLogger(userStatRepository)
+
 	var imageRepository repository.ImageRepository
 	imageRepository = repository.NewImageRepository(cfg)
 	imageRepository = repository.NewImageRepositoryMwLogger(imageRepository)
@@ -66,7 +70,7 @@ func SetupUsecases(
 
 	// setup use cases
 	var userUsecase user.UserUsecase
-	userUsecase = user.NewUserUsecase(cfg, db, userRepository, followRepository, userProducer, notifProducer, s3Client)
+	userUsecase = user.NewUserUsecase(cfg, db, userRepository, userStatRepository, followRepository, userProducer, notifProducer, s3Client)
 	userUsecase = user.NewUserUsecaseMwLogger(userUsecase)
 
 	var imageUsecase image.ImageUsecase

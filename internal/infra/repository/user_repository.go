@@ -8,7 +8,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/column"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/table"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"gorm.io/gorm"
 )
@@ -21,9 +20,6 @@ type UserRepository interface {
 	CountByUsername(ctx context.Context, db *gorm.DB, username string) (int64, error)
 	FindByID(ctx context.Context, db *gorm.DB, user *entity.User, id int64) error
 	FindByUsername(ctx context.Context, db *gorm.DB, user *entity.User, username string) error
-	IncrementFollowerCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error
-	IncrementFollowingCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error
-	IncrementFollowerCountAndFollowingCountByID(ctx context.Context, db *gorm.DB, id int64, followerCount int, followingCount int) error
 }
 
 var _ UserRepository = &UserRepositoryImpl{}
@@ -87,46 +83,6 @@ func (r *UserRepositoryImpl) FindByUsername(ctx context.Context, db *gorm.DB, us
 	err := db.WithContext(ctx).Where(column.Username.Eq(username)).Take(user).Error
 	if err != nil {
 		err = errkit.NotFound(err)
-		return errkit.AddFuncName(err)
-	}
-	return nil
-}
-
-func (r *UserRepositoryImpl) IncrementFollowerCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error {
-	err := db.WithContext(ctx).
-		Table(table.User).
-		Where(column.ID.Eq(id)).
-		Updates(map[string]any{
-			column.FollowerCount.Str(): gorm.Expr(column.FollowerCount.Plus(count)),
-		}).Error
-	if err != nil {
-		return errkit.AddFuncName(err)
-	}
-	return nil
-}
-
-func (r *UserRepositoryImpl) IncrementFollowingCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error {
-	err := db.WithContext(ctx).
-		Table(table.User).
-		Where(column.ID.Eq(id)).
-		Updates(map[string]any{
-			column.FollowingCount.Str(): gorm.Expr(column.FollowingCount.Plus(count)),
-		}).Error
-	if err != nil {
-		return errkit.AddFuncName(err)
-	}
-	return nil
-}
-
-func (r *UserRepositoryImpl) IncrementFollowerCountAndFollowingCountByID(ctx context.Context, db *gorm.DB, id int64, followerCount int, followingCount int) error {
-	err := db.WithContext(ctx).
-		Table(table.User).
-		Where(column.ID.Eq(id)).
-		Updates(map[string]any{
-			column.FollowerCount.Str():  gorm.Expr(column.FollowerCount.Plus(followerCount)),
-			column.FollowingCount.Str(): gorm.Expr(column.FollowingCount.Plus(followingCount)),
-		}).Error
-	if err != nil {
 		return errkit.AddFuncName(err)
 	}
 	return nil

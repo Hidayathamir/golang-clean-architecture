@@ -19,11 +19,11 @@ func (u *UserUsecaseImpl) BatchUpdateUserFollowStats(ctx context.Context, req *d
 		var err error = nil
 		switch {
 		case v.HasFollowerCountAndFollowingCount():
-			err = u.UserRepository.IncrementFollowerCountAndFollowingCountByID(ctx, u.DB, v.UserID, v.FollowerCount, v.FollowingCount)
+			err = u.UserStatRepository.IncrementFollowerCountAndFollowingCountByID(ctx, u.DB, v.UserID, v.FollowerCount, v.FollowingCount)
 		case v.HasFollowerCount():
-			err = u.UserRepository.IncrementFollowerCountByID(ctx, u.DB, v.UserID, v.FollowerCount)
+			err = u.UserStatRepository.IncrementFollowerCountByID(ctx, u.DB, v.UserID, v.FollowerCount)
 		case v.HasFollowingCount():
-			err = u.UserRepository.IncrementFollowingCountByID(ctx, u.DB, v.UserID, v.FollowingCount)
+			err = u.UserStatRepository.IncrementFollowingCountByID(ctx, u.DB, v.UserID, v.FollowingCount)
 		default:
 			x.Logger.WithContext(ctx).WithField("v", v).Warn("invalid follower count and following count")
 		}

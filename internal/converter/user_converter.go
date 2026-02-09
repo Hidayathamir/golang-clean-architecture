@@ -44,15 +44,9 @@ func EntityUserToDtoUserLoginResponse(user *entity.User, res *dto.UserLoginRespo
 }
 
 func EntityUserToDtoUserAuth(user *entity.User, userAuth *dto.UserAuth) {
-	if user == nil || userAuth == nil {
-		return
-	}
-
 	userAuth.ID = user.ID
 	userAuth.Username = user.Username
 	userAuth.Name = user.Name
-	userAuth.FollowerCount = user.FollowerCount
-	userAuth.FollowingCount = user.FollowingCount
 	userAuth.CreatedAt = user.CreatedAt
 	userAuth.UpdatedAt = user.UpdatedAt
 	userAuth.DeletedAt = user.DeletedAt

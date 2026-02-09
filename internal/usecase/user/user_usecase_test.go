@@ -18,6 +18,7 @@ func TestNewUserUsecase(t *testing.T) {
 	var Config = config.NewConfig()
 
 	var UserRepository repository.UserRepository = &mock.UserRepositoryMock{}
+	var UserStatRepository repository.UserStatRepository = &mock.UserStatRepositoryMock{}
 	var FollowRepository repository.FollowRepository = &mock.FollowRepositoryMock{}
 
 	var UserProducer messaging.UserProducer = &mock.UserProducerMock{}
@@ -25,7 +26,7 @@ func TestNewUserUsecase(t *testing.T) {
 
 	var S3Client storage.S3Client = &mock.S3ClientMock{}
 
-	u := user.NewUserUsecase(Config, DB, UserRepository, FollowRepository, UserProducer, NotifProducer, S3Client)
+	u := user.NewUserUsecase(Config, DB, UserRepository, UserStatRepository, FollowRepository, UserProducer, NotifProducer, S3Client)
 
 	require.NotEmpty(t, u)
 }

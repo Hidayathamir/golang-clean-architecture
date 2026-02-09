@@ -33,15 +33,6 @@ var _ repository.UserRepository = &UserRepositoryMock{}
 //			FindByUsernameFunc: func(ctx context.Context, db *gorm.DB, user *entity.User, username string) error {
 //				panic("mock out the FindByUsername method")
 //			},
-//			IncrementFollowerCountAndFollowingCountByIDFunc: func(ctx context.Context, db *gorm.DB, id int64, followerCount int, followingCount int) error {
-//				panic("mock out the IncrementFollowerCountAndFollowingCountByID method")
-//			},
-//			IncrementFollowerCountByIDFunc: func(ctx context.Context, db *gorm.DB, id int64, count int) error {
-//				panic("mock out the IncrementFollowerCountByID method")
-//			},
-//			IncrementFollowingCountByIDFunc: func(ctx context.Context, db *gorm.DB, id int64, count int) error {
-//				panic("mock out the IncrementFollowingCountByID method")
-//			},
 //			UpdateFunc: func(ctx context.Context, db *gorm.DB, user *entity.User) error {
 //				panic("mock out the Update method")
 //			},
@@ -63,15 +54,6 @@ type UserRepositoryMock struct {
 
 	// FindByUsernameFunc mocks the FindByUsername method.
 	FindByUsernameFunc func(ctx context.Context, db *gorm.DB, user *entity.User, username string) error
-
-	// IncrementFollowerCountAndFollowingCountByIDFunc mocks the IncrementFollowerCountAndFollowingCountByID method.
-	IncrementFollowerCountAndFollowingCountByIDFunc func(ctx context.Context, db *gorm.DB, id int64, followerCount int, followingCount int) error
-
-	// IncrementFollowerCountByIDFunc mocks the IncrementFollowerCountByID method.
-	IncrementFollowerCountByIDFunc func(ctx context.Context, db *gorm.DB, id int64, count int) error
-
-	// IncrementFollowingCountByIDFunc mocks the IncrementFollowingCountByID method.
-	IncrementFollowingCountByIDFunc func(ctx context.Context, db *gorm.DB, id int64, count int) error
 
 	// UpdateFunc mocks the Update method.
 	UpdateFunc func(ctx context.Context, db *gorm.DB, user *entity.User) error
@@ -118,41 +100,6 @@ type UserRepositoryMock struct {
 			// Username is the username argument value.
 			Username string
 		}
-		// IncrementFollowerCountAndFollowingCountByID holds details about calls to the IncrementFollowerCountAndFollowingCountByID method.
-		IncrementFollowerCountAndFollowingCountByID []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
-			// Db is the db argument value.
-			Db *gorm.DB
-			// ID is the id argument value.
-			ID int64
-			// FollowerCount is the followerCount argument value.
-			FollowerCount int
-			// FollowingCount is the followingCount argument value.
-			FollowingCount int
-		}
-		// IncrementFollowerCountByID holds details about calls to the IncrementFollowerCountByID method.
-		IncrementFollowerCountByID []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
-			// Db is the db argument value.
-			Db *gorm.DB
-			// ID is the id argument value.
-			ID int64
-			// Count is the count argument value.
-			Count int
-		}
-		// IncrementFollowingCountByID holds details about calls to the IncrementFollowingCountByID method.
-		IncrementFollowingCountByID []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
-			// Db is the db argument value.
-			Db *gorm.DB
-			// ID is the id argument value.
-			ID int64
-			// Count is the count argument value.
-			Count int
-		}
 		// Update holds details about calls to the Update method.
 		Update []struct {
 			// Ctx is the ctx argument value.
@@ -163,14 +110,11 @@ type UserRepositoryMock struct {
 			User *entity.User
 		}
 	}
-	lockCountByUsername                             sync.RWMutex
-	lockCreate                                      sync.RWMutex
-	lockFindByID                                    sync.RWMutex
-	lockFindByUsername                              sync.RWMutex
-	lockIncrementFollowerCountAndFollowingCountByID sync.RWMutex
-	lockIncrementFollowerCountByID                  sync.RWMutex
-	lockIncrementFollowingCountByID                 sync.RWMutex
-	lockUpdate                                      sync.RWMutex
+	lockCountByUsername sync.RWMutex
+	lockCreate          sync.RWMutex
+	lockFindByID        sync.RWMutex
+	lockFindByUsername  sync.RWMutex
+	lockUpdate          sync.RWMutex
 }
 
 // CountByUsername calls CountByUsernameFunc.
@@ -338,142 +282,6 @@ func (mock *UserRepositoryMock) FindByUsernameCalls() []struct {
 	mock.lockFindByUsername.RLock()
 	calls = mock.calls.FindByUsername
 	mock.lockFindByUsername.RUnlock()
-	return calls
-}
-
-// IncrementFollowerCountAndFollowingCountByID calls IncrementFollowerCountAndFollowingCountByIDFunc.
-func (mock *UserRepositoryMock) IncrementFollowerCountAndFollowingCountByID(ctx context.Context, db *gorm.DB, id int64, followerCount int, followingCount int) error {
-	if mock.IncrementFollowerCountAndFollowingCountByIDFunc == nil {
-		panic("UserRepositoryMock.IncrementFollowerCountAndFollowingCountByIDFunc: method is nil but UserRepository.IncrementFollowerCountAndFollowingCountByID was just called")
-	}
-	callInfo := struct {
-		Ctx            context.Context
-		Db             *gorm.DB
-		ID             int64
-		FollowerCount  int
-		FollowingCount int
-	}{
-		Ctx:            ctx,
-		Db:             db,
-		ID:             id,
-		FollowerCount:  followerCount,
-		FollowingCount: followingCount,
-	}
-	mock.lockIncrementFollowerCountAndFollowingCountByID.Lock()
-	mock.calls.IncrementFollowerCountAndFollowingCountByID = append(mock.calls.IncrementFollowerCountAndFollowingCountByID, callInfo)
-	mock.lockIncrementFollowerCountAndFollowingCountByID.Unlock()
-	return mock.IncrementFollowerCountAndFollowingCountByIDFunc(ctx, db, id, followerCount, followingCount)
-}
-
-// IncrementFollowerCountAndFollowingCountByIDCalls gets all the calls that were made to IncrementFollowerCountAndFollowingCountByID.
-// Check the length with:
-//
-//	len(mockedUserRepository.IncrementFollowerCountAndFollowingCountByIDCalls())
-func (mock *UserRepositoryMock) IncrementFollowerCountAndFollowingCountByIDCalls() []struct {
-	Ctx            context.Context
-	Db             *gorm.DB
-	ID             int64
-	FollowerCount  int
-	FollowingCount int
-} {
-	var calls []struct {
-		Ctx            context.Context
-		Db             *gorm.DB
-		ID             int64
-		FollowerCount  int
-		FollowingCount int
-	}
-	mock.lockIncrementFollowerCountAndFollowingCountByID.RLock()
-	calls = mock.calls.IncrementFollowerCountAndFollowingCountByID
-	mock.lockIncrementFollowerCountAndFollowingCountByID.RUnlock()
-	return calls
-}
-
-// IncrementFollowerCountByID calls IncrementFollowerCountByIDFunc.
-func (mock *UserRepositoryMock) IncrementFollowerCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error {
-	if mock.IncrementFollowerCountByIDFunc == nil {
-		panic("UserRepositoryMock.IncrementFollowerCountByIDFunc: method is nil but UserRepository.IncrementFollowerCountByID was just called")
-	}
-	callInfo := struct {
-		Ctx   context.Context
-		Db    *gorm.DB
-		ID    int64
-		Count int
-	}{
-		Ctx:   ctx,
-		Db:    db,
-		ID:    id,
-		Count: count,
-	}
-	mock.lockIncrementFollowerCountByID.Lock()
-	mock.calls.IncrementFollowerCountByID = append(mock.calls.IncrementFollowerCountByID, callInfo)
-	mock.lockIncrementFollowerCountByID.Unlock()
-	return mock.IncrementFollowerCountByIDFunc(ctx, db, id, count)
-}
-
-// IncrementFollowerCountByIDCalls gets all the calls that were made to IncrementFollowerCountByID.
-// Check the length with:
-//
-//	len(mockedUserRepository.IncrementFollowerCountByIDCalls())
-func (mock *UserRepositoryMock) IncrementFollowerCountByIDCalls() []struct {
-	Ctx   context.Context
-	Db    *gorm.DB
-	ID    int64
-	Count int
-} {
-	var calls []struct {
-		Ctx   context.Context
-		Db    *gorm.DB
-		ID    int64
-		Count int
-	}
-	mock.lockIncrementFollowerCountByID.RLock()
-	calls = mock.calls.IncrementFollowerCountByID
-	mock.lockIncrementFollowerCountByID.RUnlock()
-	return calls
-}
-
-// IncrementFollowingCountByID calls IncrementFollowingCountByIDFunc.
-func (mock *UserRepositoryMock) IncrementFollowingCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error {
-	if mock.IncrementFollowingCountByIDFunc == nil {
-		panic("UserRepositoryMock.IncrementFollowingCountByIDFunc: method is nil but UserRepository.IncrementFollowingCountByID was just called")
-	}
-	callInfo := struct {
-		Ctx   context.Context
-		Db    *gorm.DB
-		ID    int64
-		Count int
-	}{
-		Ctx:   ctx,
-		Db:    db,
-		ID:    id,
-		Count: count,
-	}
-	mock.lockIncrementFollowingCountByID.Lock()
-	mock.calls.IncrementFollowingCountByID = append(mock.calls.IncrementFollowingCountByID, callInfo)
-	mock.lockIncrementFollowingCountByID.Unlock()
-	return mock.IncrementFollowingCountByIDFunc(ctx, db, id, count)
-}
-
-// IncrementFollowingCountByIDCalls gets all the calls that were made to IncrementFollowingCountByID.
-// Check the length with:
-//
-//	len(mockedUserRepository.IncrementFollowingCountByIDCalls())
-func (mock *UserRepositoryMock) IncrementFollowingCountByIDCalls() []struct {
-	Ctx   context.Context
-	Db    *gorm.DB
-	ID    int64
-	Count int
-} {
-	var calls []struct {
-		Ctx   context.Context
-		Db    *gorm.DB
-		ID    int64
-		Count int
-	}
-	mock.lockIncrementFollowingCountByID.RLock()
-	calls = mock.calls.IncrementFollowingCountByID
-	mock.lockIncrementFollowingCountByID.RUnlock()
 	return calls
 }
 
