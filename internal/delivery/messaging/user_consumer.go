@@ -1,6 +1,7 @@
 package messaging
 
 import (
+	"context"
 	"encoding/json"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
@@ -9,7 +10,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
-	"github.com/IBM/sarama"
+	"github.com/twmb/franz-go/pkg/kgo"
 )
 
 type UserConsumer struct {
@@ -22,12 +23,22 @@ func NewUserConsumer(usecase user.UserUsecase) *UserConsumer {
 	}
 }
 
-func (c *UserConsumer) ConsumeUserFollowedEventForNotification(message *sarama.ConsumerMessage) error {
-	ctx, span := telemetry.StartConsumer(message)
+func (c *UserConsumer) NotifyUserBeingFollowed(ctx context.Context, records []*kgo.Record) error {
+	for _, record := range records {
+		if err := c.notifyUserBeingFollowed(ctx, record); err != nil {
+			x.Logger.WithContext(ctx).WithError(err).Error()
+			continue
+		}
+	}
+	return nil
+}
+
+func (c *UserConsumer) notifyUserBeingFollowed(ctx context.Context, record *kgo.Record) error {
+	ctx, span := telemetry.StartConsumer(ctx, record)
 	defer span.End()
 
 	event := new(dto.UserFollowedEvent)
-	if err := json.Unmarshal(message.Value, event); err != nil {
+	if err := json.Unmarshal(record.Value, event); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
@@ -43,12 +54,12 @@ func (c *UserConsumer) ConsumeUserFollowedEventForNotification(message *sarama.C
 	return nil
 }
 
-func (c *UserConsumer) ConsumeUserFollowedEventForUpdateCount(messages []*sarama.ConsumerMessage) error {
-	ctx, span := telemetry.StartNew()
+func (c *UserConsumer) BatchUpdateUserFollowStats(ctx context.Context, records []*kgo.Record) error {
+	ctx, span := telemetry.StartConsumerBatch(ctx, records)
 	defer span.End()
 
 	req := new(dto.BatchUpdateUserFollowStatsRequest)
-	converter.SaramaConsumerMessageListToDtoBatchUpdateUserFollowStatsRequest(ctx, messages, req)
+	converter.KGoRecordListToDtoBatchUpdateUserFollowStatsRequest(ctx, records, req)
 
 	if err := c.Usecase.BatchUpdateUserFollowStats(ctx, req); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()

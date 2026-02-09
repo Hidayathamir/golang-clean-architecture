@@ -13,10 +13,10 @@ run-cron:
 	go run cmd/cron/main.go >> logs/cron_log.jsonl 2>&1
 
 go-test:
-	go test -count=1 -v ./internal/...
+	go test -count=1 -v ./internal/... >> logs/go_test.jsonl 2>&1
 
 go-e2e-test:
-	go test -count=1 -v ./test/e2etest/...
+	go test -count=1 -v ./test/e2etest/... >> logs/go_e2e_test.jsonl 2>&1
 
 #################################### 
 

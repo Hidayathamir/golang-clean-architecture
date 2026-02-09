@@ -1,6 +1,7 @@
 package messaging
 
 import (
+	"context"
 	"encoding/json"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
@@ -9,7 +10,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
-	"github.com/IBM/sarama"
+	"github.com/twmb/franz-go/pkg/kgo"
 )
 
 type ImageConsumer struct {
@@ -22,12 +23,22 @@ func NewImageConsumer(usecase image.ImageUsecase) *ImageConsumer {
 	}
 }
 
-func (c *ImageConsumer) ConsumeImageUploadedEvent(message *sarama.ConsumerMessage) error {
-	ctx, span := telemetry.StartConsumer(message)
+func (c *ImageConsumer) NotifyFollowerOnUpload(ctx context.Context, records []*kgo.Record) error {
+	for _, record := range records {
+		if err := c.notifyFollowerOnUpload(ctx, record); err != nil {
+			x.Logger.WithContext(ctx).WithError(err).Error()
+			continue
+		}
+	}
+	return nil
+}
+
+func (c *ImageConsumer) notifyFollowerOnUpload(ctx context.Context, record *kgo.Record) error {
+	ctx, span := telemetry.StartConsumer(ctx, record)
 	defer span.End()
 
 	event := new(dto.ImageUploadedEvent)
-	if err := json.Unmarshal(message.Value, event); err != nil {
+	if err := json.Unmarshal(record.Value, event); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
@@ -43,12 +54,22 @@ func (c *ImageConsumer) ConsumeImageUploadedEvent(message *sarama.ConsumerMessag
 	return nil
 }
 
-func (c *ImageConsumer) ConsumeImageLikedEventForNotification(message *sarama.ConsumerMessage) error {
-	ctx, span := telemetry.StartConsumer(message)
+func (c *ImageConsumer) NotifyUserImageLiked(ctx context.Context, records []*kgo.Record) error {
+	for _, record := range records {
+		if err := c.notifyUserImageLiked(ctx, record); err != nil {
+			x.Logger.WithContext(ctx).WithError(err).Error()
+			continue
+		}
+	}
+	return nil
+}
+
+func (c *ImageConsumer) notifyUserImageLiked(ctx context.Context, record *kgo.Record) error {
+	ctx, span := telemetry.StartConsumer(ctx, record)
 	defer span.End()
 
 	event := new(dto.ImageLikedEvent)
-	if err := json.Unmarshal(message.Value, event); err != nil {
+	if err := json.Unmarshal(record.Value, event); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
@@ -64,12 +85,12 @@ func (c *ImageConsumer) ConsumeImageLikedEventForNotification(message *sarama.Co
 	return nil
 }
 
-func (c *ImageConsumer) ConsumeImageLikedEventForUpdateCount(messages []*sarama.ConsumerMessage) error {
-	ctx, span := telemetry.StartNew()
+func (c *ImageConsumer) BatchUpdateImageLikeCount(originalCtx context.Context, records []*kgo.Record) error {
+	ctx, span := telemetry.StartConsumerBatch(originalCtx, records)
 	defer span.End()
 
 	req := new(dto.BatchUpdateImageLikeCountRequest)
-	converter.SaramaConsumerMessageListToDtoBatchUpdateImageLikeCountRequest(ctx, messages, req)
+	converter.KGoRecordListToDtoBatchUpdateImageLikeCountRequest(ctx, records, req)
 
 	if err := c.Usecase.BatchUpdateImageLikeCount(ctx, req); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
@@ -79,12 +100,22 @@ func (c *ImageConsumer) ConsumeImageLikedEventForUpdateCount(messages []*sarama.
 	return nil
 }
 
-func (c *ImageConsumer) ConsumeImageCommentedEventForNotification(message *sarama.ConsumerMessage) error {
-	ctx, span := telemetry.StartConsumer(message)
+func (c *ImageConsumer) NotifyUserImageCommented(ctx context.Context, records []*kgo.Record) error {
+	for _, record := range records {
+		if err := c.notifyUserImageCommented(ctx, record); err != nil {
+			x.Logger.WithContext(ctx).WithError(err).Error()
+			continue
+		}
+	}
+	return nil
+}
+
+func (c *ImageConsumer) notifyUserImageCommented(ctx context.Context, record *kgo.Record) error {
+	ctx, span := telemetry.StartConsumer(ctx, record)
 	defer span.End()
 
 	event := new(dto.ImageCommentedEvent)
-	if err := json.Unmarshal(message.Value, event); err != nil {
+	if err := json.Unmarshal(record.Value, event); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
@@ -100,12 +131,12 @@ func (c *ImageConsumer) ConsumeImageCommentedEventForNotification(message *saram
 	return nil
 }
 
-func (c *ImageConsumer) ConsumeImageCommentedEventForUpdateCount(messages []*sarama.ConsumerMessage) error {
-	ctx, span := telemetry.StartNew()
+func (c *ImageConsumer) BatchUpdateImageCommentCount(ctx context.Context, records []*kgo.Record) error {
+	ctx, span := telemetry.StartConsumerBatch(ctx, records)
 	defer span.End()
 
 	req := new(dto.BatchUpdateImageCommentCountRequest)
-	converter.SaramaConsumerMessageListToDtoBatchUpdateImageCommentCountRequest(ctx, messages, req)
+	converter.KGoRecordListToDtoBatchUpdateImageCommentCountRequest(ctx, records, req)
 
 	if err := c.Usecase.BatchUpdateImageCommentCount(ctx, req); err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()

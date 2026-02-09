@@ -8,12 +8,11 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/topic"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
-	"github.com/IBM/sarama"
+	"github.com/twmb/franz-go/pkg/kgo"
 )
 
-//go:generate moq -out=../../mock/MockProducerImage.go -pkg=mock . ImageProducer
+//go:generate moq -out=../../mock/MockProducerImage2.go -pkg=mock . ImageProducer
 
 type ImageProducer interface {
 	SendImageUploaded(ctx context.Context, event *dto.ImageUploadedEvent) error
@@ -24,75 +23,43 @@ type ImageProducer interface {
 var _ ImageProducer = &ImageProducerImpl{}
 
 type ImageProducerImpl struct {
-	Cfg      *config.Config
-	Producer sarama.SyncProducer
+	Cfg    *config.Config
+	Client *kgo.Client
 }
 
-func NewImageProducer(cfg *config.Config, producer sarama.SyncProducer) *ImageProducerImpl {
+func NewImageProducer(cfg *config.Config, client *kgo.Client) *ImageProducerImpl {
 	return &ImageProducerImpl{
-		Cfg:      cfg,
-		Producer: producer,
+		Cfg:    cfg,
+		Client: client,
 	}
 }
 
 func (p *ImageProducerImpl) SendImageUploaded(ctx context.Context, event *dto.ImageUploadedEvent) error {
-	if p.Producer == nil {
-		x.Logger.WithContext(ctx).Warn("Kafka producer is disabled")
-		return nil
-	}
-
-	value, err := json.Marshal(event)
+	err := p.send(ctx, topic.ImageUploaded, event)
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
-
-	message := &sarama.ProducerMessage{
-		Topic: topic.ImageUploaded,
-		Value: sarama.ByteEncoder(value),
-	}
-
-	telemetry.InjectCtxToProducerMessage(ctx, message)
-
-	partition, offset, err := p.Producer.SendMessage(message)
-	if err != nil {
-		return errkit.AddFuncName(err)
-	}
-
-	x.Logger.WithContext(ctx).Debugf("Message sent to topic %s, partition %d, offset %d", message.Topic, partition, offset)
-
 	return nil
 }
 
 func (p *ImageProducerImpl) SendImageLiked(ctx context.Context, event *dto.ImageLikedEvent) error {
-	if p.Producer == nil {
-		x.Logger.WithContext(ctx).Warn("Kafka producer is disabled")
-		return nil
-	}
-
-	value, err := json.Marshal(event)
+	err := p.send(ctx, topic.ImageLiked, event)
 	if err != nil {
 		return errkit.AddFuncName(err)
 	}
-
-	message := &sarama.ProducerMessage{
-		Topic: topic.ImageLiked,
-		Value: sarama.ByteEncoder(value),
-	}
-
-	telemetry.InjectCtxToProducerMessage(ctx, message)
-
-	partition, offset, err := p.Producer.SendMessage(message)
-	if err != nil {
-		return errkit.AddFuncName(err)
-	}
-
-	x.Logger.WithContext(ctx).Debugf("Message sent to topic %s, partition %d, offset %d", message.Topic, partition, offset)
-
 	return nil
 }
 
 func (p *ImageProducerImpl) SendImageCommented(ctx context.Context, event *dto.ImageCommentedEvent) error {
-	if p.Producer == nil {
+	err := p.send(ctx, topic.ImageCommented, event)
+	if err != nil {
+		return errkit.AddFuncName(err)
+	}
+	return nil
+}
+
+func (p *ImageProducerImpl) send(ctx context.Context, topicName string, event any) error {
+	if p.Client == nil {
 		x.Logger.WithContext(ctx).Warn("Kafka producer is disabled")
 		return nil
 	}
@@ -102,19 +69,16 @@ func (p *ImageProducerImpl) SendImageCommented(ctx context.Context, event *dto.I
 		return errkit.AddFuncName(err)
 	}
 
-	message := &sarama.ProducerMessage{
-		Topic: topic.ImageCommented,
-		Value: sarama.ByteEncoder(value),
+	record := &kgo.Record{
+		Topic: topicName,
+		Value: value,
 	}
 
-	telemetry.InjectCtxToProducerMessage(ctx, message)
-
-	partition, offset, err := p.Producer.SendMessage(message)
-	if err != nil {
+	if err := p.Client.ProduceSync(ctx, record).FirstErr(); err != nil {
 		return errkit.AddFuncName(err)
 	}
 
-	x.Logger.WithContext(ctx).Debugf("Message sent to topic %s, partition %d, offset %d", message.Topic, partition, offset)
+	x.Logger.WithContext(ctx).WithField("topic", topicName).Debug("message sent")
 
 	return nil
 }

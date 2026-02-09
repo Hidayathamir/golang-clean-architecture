@@ -4,8 +4,8 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
-	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/messaging/route"
@@ -23,7 +23,7 @@ func main() {
 
 	db := provider.NewDatabase(cfg)
 	s3Client := provider.NewS3Client(cfg)
-	producer := provider.NewKafkaProducer(cfg)
+	producer := provider.NewKafkaClientProducer(cfg)
 
 	usecases := dependency_injection.SetupUsecases(cfg, db, producer, s3Client)
 
@@ -42,16 +42,11 @@ func main() {
 
 func runConsumers(cfg *config.Config, consumers *dependency_injection.Consumers) {
 	ctx, cancel := context.WithCancel(context.Background())
+	wg := &sync.WaitGroup{}
 
-	x.Logger.Info("Starting worker service")
-	go route.ConsumeUserFollowedEventForNotification(ctx, cfg, consumers)
-	go route.ConsumeUserFollowedEventForUpdateCount(ctx, cfg, consumers)
-	go route.SetupImageUploadedConsumer(ctx, cfg, consumers)
-	go route.ConsumeImageLikedEventForNotification(ctx, cfg, consumers)
-	go route.ConsumeImageLikedEventForUpdateCount(ctx, cfg, consumers)
-	go route.ConsumeImageCommentedEventForNotification(ctx, cfg, consumers)
-	go route.ConsumeImageCommentedEventForUpdateCount(ctx, cfg, consumers)
-	go route.SetupNotifConsumer(ctx, cfg, consumers)
+	x.Logger.Info("starting worker service")
+
+	route.Setup(ctx, cfg, consumers, wg)
 
 	terminateSignals := make(chan os.Signal, 1)
 	signal.Notify(terminateSignals, syscall.SIGINT, syscall.SIGTERM)
@@ -63,8 +58,8 @@ func runConsumers(cfg *config.Config, consumers *dependency_injection.Consumers)
 	cancel()
 	x.Logger.Info("canceled")
 
-	x.Logger.Info("wait for all consumer to finish processing, 5 second")
-	time.Sleep(5 * time.Second)
+	x.Logger.Info("wait for all consumer to finish processing")
+	wg.Wait()
 	x.Logger.Info("done waiting")
 
 	x.Logger.Info("end process of worker")

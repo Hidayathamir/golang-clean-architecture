@@ -8,8 +8,8 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/image"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/notif"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
-	"github.com/IBM/sarama"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/twmb/franz-go/pkg/kgo"
 	"gorm.io/gorm"
 )
 
@@ -22,7 +22,7 @@ type Usecases struct {
 func SetupUsecases(
 	cfg *config.Config,
 	db *gorm.DB,
-	producer sarama.SyncProducer,
+	producer *kgo.Client,
 	awsS3Client *s3.Client,
 ) *Usecases {
 	// setup repositories

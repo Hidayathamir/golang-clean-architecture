@@ -8,7 +8,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
-	"github.com/IBM/sarama"
+	"github.com/twmb/franz-go/pkg/kgo"
 )
 
 func DtoRegisterUserRequestToEntityUser(req *dto.RegisterUserRequest, user *entity.User, password string) {
@@ -72,13 +72,13 @@ func DtoUserFollowedEventToDtoNotifyUserBeingFollowedRequest(ctx context.Context
 	req.FollowingID = event.FollowingID
 }
 
-func SaramaConsumerMessageListToDtoBatchUpdateUserFollowStatsRequest(ctx context.Context, messages []*sarama.ConsumerMessage, req *dto.BatchUpdateUserFollowStatsRequest) {
+func KGoRecordListToDtoBatchUpdateUserFollowStatsRequest(ctx context.Context, records []*kgo.Record, req *dto.BatchUpdateUserFollowStatsRequest) {
 	userFollowerCounts := make(map[int64]int)
 	userFollowingCounts := make(map[int64]int)
 
-	for _, message := range messages {
+	for _, record := range records {
 		event := new(dto.UserFollowedEvent)
-		if err := json.Unmarshal(message.Value, event); err != nil {
+		if err := json.Unmarshal(record.Value, event); err != nil {
 			x.Logger.WithContext(ctx).WithError(err).Warn("Failed to unmarshal user followed event")
 			continue
 		}

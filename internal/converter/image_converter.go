@@ -12,7 +12,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
-	"github.com/IBM/sarama"
+	"github.com/twmb/franz-go/pkg/kgo"
 )
 
 func DtoUploadImageRequestToDtoS3UploadImageRequest(ctx context.Context, req *dto.UploadImageRequest, s3UploadImgReq *dto.S3UploadImageRequest) error {
@@ -128,11 +128,11 @@ func DtoImageCommentedEventToDtoNotifyUserImageCommentedRequest(ctx context.Cont
 	req.CommenterUserID = event.UserID
 }
 
-func SaramaConsumerMessageListToDtoBatchUpdateImageCommentCountRequest(ctx context.Context, messages []*sarama.ConsumerMessage, req *dto.BatchUpdateImageCommentCountRequest) {
+func KGoRecordListToDtoBatchUpdateImageCommentCountRequest(ctx context.Context, records []*kgo.Record, req *dto.BatchUpdateImageCommentCountRequest) {
 	mapCounter := make(map[int64]int)
-	for _, message := range messages {
+	for _, record := range records {
 		event := new(dto.ImageCommentedEvent)
-		if err := json.Unmarshal(message.Value, event); err != nil {
+		if err := json.Unmarshal(record.Value, event); err != nil {
 			x.Logger.WithContext(ctx).WithError(err).Warn("Failed to unmarshal image commented event")
 			continue
 		}
@@ -153,11 +153,11 @@ func DtoImageLikedEventToDtoNotifyUserImageLikedRequest(ctx context.Context, eve
 	req.LikerUserID = event.UserID
 }
 
-func SaramaConsumerMessageListToDtoBatchUpdateImageLikeCountRequest(ctx context.Context, messages []*sarama.ConsumerMessage, req *dto.BatchUpdateImageLikeCountRequest) {
+func KGoRecordListToDtoBatchUpdateImageLikeCountRequest(ctx context.Context, records []*kgo.Record, req *dto.BatchUpdateImageLikeCountRequest) {
 	mapCounter := make(map[int64]int)
-	for _, message := range messages {
+	for _, record := range records {
 		event := new(dto.ImageLikedEvent)
-		if err := json.Unmarshal(message.Value, event); err != nil {
+		if err := json.Unmarshal(record.Value, event); err != nil {
 			x.Logger.WithContext(ctx).WithError(err).Warn("Failed to unmarshal image liked event")
 			continue
 		}

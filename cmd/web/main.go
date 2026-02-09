@@ -33,7 +33,8 @@ func main() {
 
 	db := provider.NewDatabase(cfg)
 	s3Client := provider.NewS3Client(cfg)
-	producer := provider.NewKafkaProducer(cfg)
+	// producer := provider.NewKafkaProducer(cfg)
+	producer := provider.NewKafkaClientProducer(cfg)
 
 	usecases := dependency_injection.SetupUsecases(cfg, db, producer, s3Client)
 
