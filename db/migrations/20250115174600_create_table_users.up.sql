@@ -4,8 +4,6 @@ create table users
     username        varchar     not null,
     password        text        not null,
     name            varchar     not null,
-    follower_count  int         not null,
-    following_count int         not null,
     created_at      timestamptz not null default now(),
     updated_at      timestamptz not null default now(),
     deleted_at      timestamptz null

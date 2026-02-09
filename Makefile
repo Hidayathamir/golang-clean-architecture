@@ -18,9 +18,6 @@ go-test:
 go-e2e-test:
 	go test -count=1 -v ./test/e2etest/...
 
-test:
-	go test -count=1 ./...
-
 #################################### 
 
 migrate:
