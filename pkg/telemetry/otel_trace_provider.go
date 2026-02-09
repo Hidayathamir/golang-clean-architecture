@@ -18,11 +18,8 @@ import (
 
 var tracer trace.Tracer = otel.Tracer(instrumentationScope)
 
-func InitTraceProvider(cfg *config.Config) (Stop, error) {
-	exporter, err := newSpanExporter(cfg)
-	if err != nil {
-		return nil, errkit.AddFuncName(err)
-	}
+func InitTraceProvider(cfg *config.Config) Stop {
+	exporter := newSpanExporter(cfg)
 
 	tp := sdktrace.NewTracerProvider(
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),
@@ -50,14 +47,14 @@ func InitTraceProvider(cfg *config.Config) (Stop, error) {
 		}
 	}
 
-	return stop, nil
+	return stop
 }
 
-func newSpanExporter(cfg *config.Config) (sdktrace.SpanExporter, error) {
+func newSpanExporter(cfg *config.Config) sdktrace.SpanExporter {
 	endpoint := cfg.GetString(configkey.TelemetryOTLPEndpoint)
 	if endpoint == "" {
 		err := fmt.Errorf("missing OTLP endpoint configuration")
-		return nil, errkit.AddFuncName(err)
+		panic(err)
 	}
 
 	options := []otlptracegrpc.Option{
@@ -67,8 +64,8 @@ func newSpanExporter(cfg *config.Config) (sdktrace.SpanExporter, error) {
 
 	exporter, err := otlptracegrpc.New(context.Background(), options...)
 	if err != nil {
-		return nil, errkit.AddFuncName(err)
+		panic(err)
 	}
 
-	return exporter, nil
+	return exporter
 }

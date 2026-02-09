@@ -17,11 +17,8 @@ import (
 
 var logger log.Logger = global.GetLoggerProvider().Logger(instrumentationScope)
 
-func InitLogProvider(cfg *config.Config) (Stop, error) {
-	exporter, err := newLogExporter(cfg)
-	if err != nil {
-		return nil, errkit.AddFuncName(err)
-	}
+func InitLogProvider(cfg *config.Config) Stop {
+	exporter := newLogExporter(cfg)
 
 	lp := sdklog.NewLoggerProvider(
 		sdklog.WithProcessor(sdklog.NewBatchProcessor(exporter)),
@@ -46,14 +43,14 @@ func InitLogProvider(cfg *config.Config) (Stop, error) {
 		}
 	}
 
-	return stop, nil
+	return stop
 }
 
-func newLogExporter(cfg *config.Config) (sdklog.Exporter, error) {
+func newLogExporter(cfg *config.Config) sdklog.Exporter {
 	endpoint := cfg.GetString(configkey.TelemetryOTLPEndpoint)
 	if endpoint == "" {
 		err := fmt.Errorf("missing OTLP endpoint configuration")
-		return nil, errkit.AddFuncName(err)
+		panic(err)
 	}
 
 	options := []otlploggrpc.Option{
@@ -63,8 +60,8 @@ func newLogExporter(cfg *config.Config) (sdklog.Exporter, error) {
 
 	exporter, err := otlploggrpc.New(context.Background(), options...)
 	if err != nil {
-		return nil, errkit.AddFuncName(err)
+		panic(err)
 	}
 
-	return exporter, nil
+	return exporter
 }

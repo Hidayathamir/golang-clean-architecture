@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,12 +11,9 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/messaging/route"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dependency_injection"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/provider"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/otelkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/sdk/trace"
 )
 
 func main() {
@@ -33,14 +29,12 @@ func main() {
 
 	consumers := dependency_injection.SetupConsumers(cfg, usecases)
 
-	stopTraceProvider, err := telemetry.InitTraceProvider(cfg)
-	panicIfErr(err)
+	stopTraceProvider := telemetry.InitTraceProvider(cfg)
 	defer stopTraceProvider()
 
-	validateAbleToExportSpan()
+	otelkit.ValidateAbleToExportSpan()
 
-	stopLogProvider, err := telemetry.InitLogProvider(cfg)
-	panicIfErr(err)
+	stopLogProvider := telemetry.InitLogProvider(cfg)
 	defer stopLogProvider()
 
 	runConsumers(cfg, consumers)
@@ -74,29 +68,4 @@ func runConsumers(cfg *config.Config, consumers *dependency_injection.Consumers)
 	x.Logger.Info("done waiting")
 
 	x.Logger.Info("end process of worker")
-}
-
-func validateAbleToExportSpan() {
-	tracer := otel.Tracer("manual-validation-worker")
-	_, span := tracer.Start(context.Background(), "startup-check-worker")
-	span.SetAttributes(attribute.String("check", "success"))
-	span.End()
-
-	flushCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	if tp, ok := otel.GetTracerProvider().(*trace.TracerProvider); ok {
-		err := tp.ForceFlush(flushCtx)
-		if err != nil {
-			err = errkit.SetMessage(err, "error export span, wait a little longer, or check is the collector ready")
-			x.Logger.WithError(err).Panic()
-		}
-		x.Logger.Info("Successfully sent manual trace for worker")
-	}
-}
-
-func panicIfErr(err error) {
-	if err != nil {
-		log.Panic(err)
-	}
 }
