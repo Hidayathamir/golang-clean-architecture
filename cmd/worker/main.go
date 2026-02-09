@@ -31,6 +31,8 @@ func main() {
 
 	usecases := dependency_injection.SetupUsecases(cfg, db, producer, s3Client)
 
+	consumers := dependency_injection.SetupConsumers(cfg, usecases)
+
 	stopTraceProvider, err := telemetry.InitTraceProvider(cfg)
 	panicIfErr(err)
 	defer stopTraceProvider()
@@ -41,17 +43,21 @@ func main() {
 	panicIfErr(err)
 	defer stopLogProvider()
 
+	runConsumers(cfg, consumers)
+}
+
+func runConsumers(cfg *config.Config, consumers *dependency_injection.Consumers) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	x.Logger.Info("Starting worker service")
-	go route.ConsumeUserFollowedEventForNotification(ctx, cfg, usecases)
-	go route.ConsumeUserFollowedEventForUpdateCount(ctx, cfg, usecases)
-	go route.SetupImageUploadedConsumer(ctx, cfg, usecases)
-	go route.ConsumeImageLikedEventForNotification(ctx, cfg, usecases)
-	go route.ConsumeImageLikedEventForUpdateCount(ctx, cfg, usecases)
-	go route.ConsumeImageCommentedEventForNotification(ctx, cfg, usecases)
-	go route.ConsumeImageCommentedEventForUpdateCount(ctx, cfg, usecases)
-	go route.SetupNotifConsumer(ctx, cfg, usecases)
+	go route.ConsumeUserFollowedEventForNotification(ctx, cfg, consumers)
+	go route.ConsumeUserFollowedEventForUpdateCount(ctx, cfg, consumers)
+	go route.SetupImageUploadedConsumer(ctx, cfg, consumers)
+	go route.ConsumeImageLikedEventForNotification(ctx, cfg, consumers)
+	go route.ConsumeImageLikedEventForUpdateCount(ctx, cfg, consumers)
+	go route.ConsumeImageCommentedEventForNotification(ctx, cfg, consumers)
+	go route.ConsumeImageCommentedEventForUpdateCount(ctx, cfg, consumers)
+	go route.SetupNotifConsumer(ctx, cfg, consumers)
 
 	terminateSignals := make(chan os.Signal, 1)
 	signal.Notify(terminateSignals, syscall.SIGINT, syscall.SIGTERM)
