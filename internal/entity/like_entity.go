@@ -14,9 +14,6 @@ type Like struct {
 	CreatedAt time.Time      `gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt time.Time      `gorm:"column:updated_at;autoUpdateTime"`
 	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at"`
-
-	User  User  `gorm:"foreignKey:user_id;references:id"`
-	Image Image `gorm:"foreignKey:image_id;references:id"`
 }
 
 func (l *Like) TableName() string {

@@ -14,9 +14,6 @@ type Follow struct {
 	CreatedAt   time.Time      `gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt   time.Time      `gorm:"column:updated_at;autoUpdateTime"`
 	DeletedAt   gorm.DeletedAt `gorm:"column:deleted_at"`
-
-	Follower  User `gorm:"foreignKey:follower_id;references:id"`
-	Following User `gorm:"foreignKey:following_id;references:id"`
 }
 
 func (f *Follow) TableName() string {
