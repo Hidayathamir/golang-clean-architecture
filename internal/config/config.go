@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+
 	"github.com/spf13/viper"
 )
 
@@ -118,6 +120,30 @@ func (c *Config) GetKafkaProducerEnabled() bool {
 
 func (c *Config) GetLogLevel() string {
 	return c.GetString(LogLevel)
+}
+
+func (c *Config) GetRedisAddr() string {
+	return fmt.Sprintf("%s:%d", c.GetRedisHost(), c.GetRedisPort())
+}
+
+func (c *Config) GetRedisHost() string {
+	return c.GetString(RedisHost)
+}
+
+func (c *Config) GetRedisPort() int {
+	return c.GetInt(RedisPort)
+}
+
+func (c *Config) GetRedisDB() int {
+	return c.GetInt(RedisDB)
+}
+
+func (c *Config) GetRedisUsername() string {
+	return c.GetString(RedisUsername)
+}
+
+func (c *Config) GetRedisPassword() string {
+	return c.GetString(RedisPassword)
 }
 
 func (c *Config) GetTelemetryOTLPEndpoint() string {

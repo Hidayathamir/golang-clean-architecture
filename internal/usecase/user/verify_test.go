@@ -34,6 +34,7 @@ func newVerifyUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepository
 		Config:         cfg,
 		DB:             gormDB,
 		UserRepository: repo,
+		UserCache:      newUserCacheMock(t),
 	}
 
 	return u, repo

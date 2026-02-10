@@ -23,6 +23,7 @@ func TestUserUsecaseImpl_Create_Success(t *testing.T) {
 		DB:             gormDB,
 		UserRepository: UserRepository,
 		UserProducer:   UserProducer,
+		UserCache:      newUserCacheMock(t),
 	}
 
 	// ------------------------------------------------------- //
@@ -71,6 +72,7 @@ func TestUserUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 		DB:             gormDB,
 		UserRepository: UserRepository,
 		UserProducer:   UserProducer,
+		UserCache:      newUserCacheMock(t),
 	}
 
 	// ------------------------------------------------------- //
@@ -115,6 +117,7 @@ func TestUserUsecaseImpl_Create_Fail_Create(t *testing.T) {
 		DB:             gormDB,
 		UserRepository: UserRepository,
 		UserProducer:   UserProducer,
+		UserCache:      newUserCacheMock(t),
 	}
 
 	// ------------------------------------------------------- //

@@ -20,12 +20,22 @@ func TestUserUsecaseImpl_Current_Success(t *testing.T) {
 	u := &user.UserUsecaseImpl{
 		DB:             gormDB,
 		UserRepository: UserRepository,
+		UserCache:      newUserCacheMock(t),
 	}
 
 	// ------------------------------------------------------- //
 
 	req := &dto.GetUserRequest{
 		ID: 1,
+	}
+
+	u.UserCache = &mock.UserCacheMock{
+		GetFunc: func(ctx context.Context, id int64) (*entity.User, error) {
+			return nil, nil
+		},
+		SetFunc: func(ctx context.Context, user *entity.User) error {
+			return nil
+		},
 	}
 
 	UserRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User, id int64) error {
@@ -50,6 +60,7 @@ func TestUserUsecaseImpl_Current_Fail_ValidateStruct(t *testing.T) {
 	u := &user.UserUsecaseImpl{
 		DB:             gormDB,
 		UserRepository: UserRepository,
+		UserCache:      newUserCacheMock(t),
 	}
 
 	// ------------------------------------------------------- //
@@ -82,6 +93,7 @@ func TestUserUsecaseImpl_Current_Fail_FindByID(t *testing.T) {
 	u := &user.UserUsecaseImpl{
 		DB:             gormDB,
 		UserRepository: UserRepository,
+		UserCache:      newUserCacheMock(t),
 	}
 
 	// ------------------------------------------------------- //

@@ -22,10 +22,11 @@ func main() {
 	x.SetupAll(cfg)
 
 	db := provider.NewDatabase(cfg)
-	s3Client := provider.NewS3Client(cfg)
+	s3Client := provider.NewAWSS3Client(cfg)
 	producer := provider.NewKafkaClientProducer(cfg)
+	redisClient := provider.NewRedisClient(cfg)
 
-	usecases := dependency_injection.SetupUsecases(cfg, db, producer, s3Client)
+	usecases := dependency_injection.SetupUsecases(cfg, db, producer, s3Client, redisClient)
 
 	consumers := dependency_injection.SetupConsumers(cfg, usecases)
 

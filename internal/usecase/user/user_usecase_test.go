@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/cache"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/storage"
@@ -25,8 +26,9 @@ func TestNewUserUsecase(t *testing.T) {
 	var NotifProducer messaging.NotifProducer = &mock.NotifProducerMock{}
 
 	var S3Client storage.S3Client = &mock.S3ClientMock{}
+	var UserCache cache.UserCache = &mock.UserCacheMock{}
 
-	u := user.NewUserUsecase(Config, DB, UserRepository, UserStatRepository, FollowRepository, UserProducer, NotifProducer, S3Client)
+	u := user.NewUserUsecase(Config, DB, UserRepository, UserStatRepository, FollowRepository, UserProducer, NotifProducer, S3Client, UserCache)
 
 	require.NotEmpty(t, u)
 }

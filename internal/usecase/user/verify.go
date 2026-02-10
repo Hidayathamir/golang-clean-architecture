@@ -22,10 +22,20 @@ func (u *UserUsecaseImpl) Verify(ctx context.Context, req *dto.VerifyUserRequest
 		return nil, errkit.AddFuncName(err)
 	}
 
+	cachedUser, err := u.UserCache.Get(ctx, userID)
+	if err == nil && cachedUser != nil {
+		userAuth := new(dto.UserAuth)
+		converter.EntityUserToDtoUserAuth(cachedUser, userAuth)
+		return userAuth, nil
+	}
+
 	user := new(entity.User)
 	if err := u.UserRepository.FindByID(ctx, u.DB.WithContext(ctx), user, userID); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
+
+	err = u.UserCache.Set(ctx, user)
+	x.LogIfErr(err)
 
 	userAuth := new(dto.UserAuth)
 	converter.EntityUserToDtoUserAuth(user, userAuth)

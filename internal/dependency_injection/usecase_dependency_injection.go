@@ -2,6 +2,7 @@ package dependency_injection
 
 import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/cache"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/storage"
@@ -9,6 +10,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/notif"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/redis/go-redis/v9"
 	"github.com/twmb/franz-go/pkg/kgo"
 	"gorm.io/gorm"
 )
@@ -24,6 +26,7 @@ func SetupUsecases(
 	db *gorm.DB,
 	producer *kgo.Client,
 	awsS3Client *s3.Client,
+	redisClient *redis.Client,
 ) *Usecases {
 	// setup repositories
 	var userRepository repository.UserRepository
@@ -68,9 +71,14 @@ func SetupUsecases(
 	s3Client = storage.NewS3Client(cfg, awsS3Client)
 	s3Client = storage.NewS3ClientMwLogger(s3Client)
 
+	// setup cache
+	var userCache cache.UserCache
+	userCache = cache.NewUserCache(redisClient)
+	userCache = cache.NewUserCacheMwLogger(userCache)
+
 	// setup use cases
 	var userUsecase user.UserUsecase
-	userUsecase = user.NewUserUsecase(cfg, db, userRepository, userStatRepository, followRepository, userProducer, notifProducer, s3Client)
+	userUsecase = user.NewUserUsecase(cfg, db, userRepository, userStatRepository, followRepository, userProducer, notifProducer, s3Client, userCache)
 	userUsecase = user.NewUserUsecaseMwLogger(userUsecase)
 
 	var imageUsecase image.ImageUsecase

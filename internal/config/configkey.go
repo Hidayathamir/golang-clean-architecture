@@ -26,6 +26,12 @@ const (
 
 	LogLevel = "log.level"
 
+	RedisHost     = "redis.host"
+	RedisPort     = "redis.port"
+	RedisDB       = "redis.db"
+	RedisUsername = "redis.username"
+	RedisPassword = "redis.password"
+
 	TelemetryOTLPEndpoint = "telemetry.otlp.endpoint"
 
 	WebPort    = "web.port"

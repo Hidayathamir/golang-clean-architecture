@@ -16,10 +16,20 @@ func (u *UserUsecaseImpl) Current(ctx context.Context, req *dto.GetUserRequest) 
 		return nil, errkit.AddFuncName(err)
 	}
 
+	cachedUser, err := u.UserCache.Get(ctx, req.ID)
+	if err == nil && cachedUser != nil {
+		res := new(dto.UserResponse)
+		converter.EntityUserToDtoUserResponse(cachedUser, res)
+		return res, nil
+	}
+
 	user := new(entity.User)
 	if err := u.UserRepository.FindByID(ctx, u.DB.WithContext(ctx), user, req.ID); err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
+
+	err = u.UserCache.Set(ctx, user)
+	x.LogIfErr(err)
 
 	res := new(dto.UserResponse)
 	converter.EntityUserToDtoUserResponse(user, res)

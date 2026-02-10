@@ -4,7 +4,12 @@ import (
 	"database/sql"
 	"testing"
 
+	"context"
+
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/cache"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
 	"github.com/stretchr/testify/require"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -23,4 +28,20 @@ func newFakeDB(t *testing.T) (gormDB *gorm.DB, sqlMockDB sqlmock.Sqlmock) {
 	require.NoError(t, err)
 
 	return gormDB, sqlMockDB
+}
+
+func newUserCacheMock(t *testing.T) cache.UserCache {
+	t.Helper()
+
+	return &mock.UserCacheMock{
+		GetFunc: func(ctx context.Context, id int64) (*entity.User, error) {
+			return nil, nil
+		},
+		SetFunc: func(ctx context.Context, user *entity.User) error {
+			return nil
+		},
+		DeleteFunc: func(ctx context.Context, id int64) error {
+			return nil
+		},
+	}
 }

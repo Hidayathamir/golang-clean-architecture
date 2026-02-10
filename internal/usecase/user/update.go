@@ -37,6 +37,9 @@ func (u *UserUsecaseImpl) Update(ctx context.Context, req *dto.UpdateUserRequest
 		return nil, errkit.AddFuncName(err)
 	}
 
+	err := u.UserCache.Delete(ctx, req.ID)
+	x.LogIfErr(err)
+
 	res := new(dto.UserResponse)
 	converter.EntityUserToDtoUserResponse(user, res)
 

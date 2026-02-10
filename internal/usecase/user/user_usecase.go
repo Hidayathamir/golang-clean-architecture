@@ -5,6 +5,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/cache"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/storage"
@@ -41,6 +42,9 @@ type UserUsecaseImpl struct {
 
 	// client
 	S3Client storage.S3Client
+
+	// cache
+	UserCache cache.UserCache
 }
 
 func NewUserUsecase(
@@ -58,6 +62,9 @@ func NewUserUsecase(
 
 	// client
 	S3Client storage.S3Client,
+
+	// cache
+	UserCache cache.UserCache,
 ) *UserUsecaseImpl {
 	return &UserUsecaseImpl{
 		Config: Cfg,
@@ -74,5 +81,8 @@ func NewUserUsecase(
 
 		// client
 		S3Client: S3Client,
+
+		// cache
+		UserCache: UserCache,
 	}
 }

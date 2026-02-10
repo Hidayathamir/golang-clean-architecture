@@ -11,7 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-func NewS3Client(cfg *config.Config) *s3.Client {
+func NewAWSS3Client(cfg *config.Config) *s3.Client {
 	region := cfg.GetAWSRegion()
 
 	awsConfig, err := awsconfig.LoadDefaultConfig(context.Background(),
@@ -24,10 +24,10 @@ func NewS3Client(cfg *config.Config) *s3.Client {
 
 	baseEndpoint := cfg.GetAWSBaseEndpoint()
 
-	s3Client := s3.NewFromConfig(awsConfig, func(o *s3.Options) {
+	awsS3Client := s3.NewFromConfig(awsConfig, func(o *s3.Options) {
 		o.BaseEndpoint = aws.String(baseEndpoint)
 		o.UsePathStyle = true
 	})
 
-	return s3Client
+	return awsS3Client
 }

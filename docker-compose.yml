@@ -65,6 +65,12 @@ x-signoz-db-depend: &signoz-db-depend
       condition: service_completed_successfully
 
 services:
+  redis:
+    image: redis:7-alpine
+    container_name: redis-clean-arch
+    ports:
+      - "6379:6379"
+
   postgres:
     image: postgres:15
     container_name: postgres-clean-arch

@@ -2,6 +2,7 @@ package e2etest
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -227,6 +228,7 @@ func ClearAll() {
 	ClearLikes()
 	ClearImages()
 	ClearUsers()
+	redisClient.FlushAll(context.Background())
 }
 
 func ClearUsers() {

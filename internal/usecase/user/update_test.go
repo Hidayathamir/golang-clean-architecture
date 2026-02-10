@@ -24,6 +24,7 @@ func TestUserUsecaseImpl_Update_Success(t *testing.T) {
 		Config:         config.NewConfig(),
 		UserRepository: UserRepository,
 		UserProducer:   UserProducer,
+		UserCache:      newUserCacheMock(t),
 	}
 
 	// ------------------------------------------------------- //
@@ -67,6 +68,7 @@ func TestUserUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 		Config:         config.NewConfig(),
 		UserRepository: UserRepository,
 		UserProducer:   UserProducer,
+		UserCache:      newUserCacheMock(t),
 	}
 
 	// ------------------------------------------------------- //
@@ -110,6 +112,7 @@ func TestUserUsecaseImpl_Update_Fail_FindByID(t *testing.T) {
 		Config:         config.NewConfig(),
 		UserRepository: UserRepository,
 		UserProducer:   UserProducer,
+		UserCache:      newUserCacheMock(t),
 	}
 
 	// ------------------------------------------------------- //
@@ -152,6 +155,7 @@ func TestUserUsecaseImpl_Update_Fail_Update(t *testing.T) {
 		Config:         config.NewConfig(),
 		UserRepository: UserRepository,
 		UserProducer:   UserProducer,
+		UserCache:      newUserCacheMock(t),
 	}
 
 	// ------------------------------------------------------- //

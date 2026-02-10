@@ -36,6 +36,7 @@ func newLoginUsecase(t *testing.T) (*user.UserUsecaseImpl, *mock.UserRepositoryM
 		DB:             gormDB,
 		UserRepository: repo,
 		UserProducer:   producer,
+		UserCache:      newUserCacheMock(t),
 	}
 
 	return u, repo, producer
@@ -173,6 +174,7 @@ func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 		DB:             gormDB,
 		UserRepository: repo,
 		UserProducer:   producer,
+		UserCache:      newUserCacheMock(t),
 	}
 
 	req := &dto.LoginUserRequest{

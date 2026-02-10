@@ -42,6 +42,13 @@
   "log": {
     "level": "trace"
   },
+  "redis": {
+    "host": "localhost",
+    "port": 6379,
+    "db": 0,
+    "username": "",
+    "password": ""
+  },
   "telemetry": {
     "otlp": {
       "endpoint": "localhost:4317"
