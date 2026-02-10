@@ -135,6 +135,10 @@ func loginAndGetDefaultUser(t *testing.T) (string, *entity.User) {
 	return token, user
 }
 
+// will remove when loginAndGetDefaultUser is actually used,
+// this just so it not throw warning
+var _ = loginAndGetDefaultUser
+
 // followUser performs an HTTP request to follow another user.
 func followUser(t *testing.T, token string, followingID int64) {
 	t.Helper()
@@ -155,7 +159,7 @@ func followUser(t *testing.T, token string, followingID int64) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	// Verify status code and response data
 	require.Equal(t, http.StatusOK, res.StatusCode)
@@ -197,7 +201,7 @@ func commentImage(t *testing.T, token string, imageID int64, comment string) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	require.Equal(t, http.StatusOK, res.StatusCode)
 }
@@ -218,9 +222,13 @@ func likeImage(t *testing.T, token string, imageID int64) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	require.Equal(t, http.StatusOK, res.StatusCode)
+}
+
+func requireNil(t *testing.T, f func() error) {
+	require.Nil(t, f())
 }
 
 func ClearAll() {

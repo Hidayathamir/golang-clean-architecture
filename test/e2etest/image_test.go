@@ -23,7 +23,7 @@ func uploadImage(t *testing.T, token string) int64 {
 	require.Nil(t, err)
 	_, err = part.Write([]byte("dummy image content"))
 	require.Nil(t, err)
-	writer.Close()
+	require.Nil(t, writer.Close())
 
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/images", body)
 	require.Nil(t, err)
@@ -32,7 +32,7 @@ func uploadImage(t *testing.T, token string) int64 {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
@@ -59,7 +59,7 @@ func TestUploadImage(t *testing.T) {
 	require.Nil(t, err)
 	_, err = part.Write([]byte("dummy image content"))
 	require.Nil(t, err)
-	writer.Close()
+	require.Nil(t, writer.Close())
 
 	// Send upload request
 	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/images", body)
@@ -69,7 +69,7 @@ func TestUploadImage(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	// Verify response status code
 	require.Equal(t, http.StatusOK, res.StatusCode)
@@ -116,7 +116,7 @@ func TestLikeImage(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	// Verify response status code
 	require.Equal(t, http.StatusOK, res.StatusCode)
@@ -153,7 +153,7 @@ func TestCommentImage(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	// Verify response status code
 	require.Equal(t, http.StatusOK, res.StatusCode)
@@ -186,7 +186,7 @@ func TestGetLikes(t *testing.T) {
 	reqLike.Header.Set("Authorization", bearerToken(token))
 	resLike, err := http.DefaultClient.Do(reqLike)
 	require.Nil(t, err)
-	resLike.Body.Close()
+	require.Nil(t, resLike.Body.Close())
 
 	// Send get likes request
 	url := fmt.Sprintf("http://127.0.0.1:3000/api/images/%d/likes", imageID)
@@ -196,7 +196,7 @@ func TestGetLikes(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	// Verify response status code
 	require.Equal(t, http.StatusOK, res.StatusCode)
@@ -231,7 +231,7 @@ func TestGetComments(t *testing.T) {
 	reqComm.Header.Set("Authorization", bearerToken(token))
 	resComm, err := http.DefaultClient.Do(reqComm)
 	require.Nil(t, err)
-	resComm.Body.Close()
+	require.Nil(t, resComm.Body.Close())
 
 	// Send get comments request
 	url := fmt.Sprintf("http://127.0.0.1:3000/api/images/%d/comments", imageID)
@@ -241,7 +241,7 @@ func TestGetComments(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	// Verify response status code
 	require.Equal(t, http.StatusOK, res.StatusCode)
@@ -281,7 +281,7 @@ func TestImageFlow(t *testing.T) {
 
 	resFollow2, err := http.DefaultClient.Do(reqFollow2)
 	require.Nil(t, err)
-	resFollow2.Body.Close()
+	require.Nil(t, resFollow2.Body.Close())
 	require.Equal(t, http.StatusOK, resFollow2.StatusCode)
 
 	// User 3 follows User 1
@@ -292,7 +292,7 @@ func TestImageFlow(t *testing.T) {
 
 	resFollow3, err := http.DefaultClient.Do(reqFollow3)
 	require.Nil(t, err)
-	resFollow3.Body.Close()
+	require.Nil(t, resFollow3.Body.Close())
 	require.Equal(t, http.StatusOK, resFollow3.StatusCode)
 
 	// User 1 uploads image
@@ -324,7 +324,7 @@ func TestMultipleUsersCommentImage(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
@@ -360,7 +360,7 @@ func TestMultipleUsersLikeImage(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	require.Equal(t, http.StatusOK, res.StatusCode)
 

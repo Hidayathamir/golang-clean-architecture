@@ -37,7 +37,7 @@ func TestRegister(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	// Verify response status code
 	require.Equal(t, http.StatusOK, res.StatusCode)
@@ -78,7 +78,7 @@ func TestRegisterError(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	// Verify status code is Bad Request
 	require.Equal(t, http.StatusBadRequest, res.StatusCode)
@@ -117,7 +117,7 @@ func TestRegisterDuplicate(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	// Verify status code is Conflict
 	require.Equal(t, http.StatusConflict, res.StatusCode)
@@ -156,7 +156,7 @@ func TestLogin(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	// Verify status code is OK
 	require.Equal(t, http.StatusOK, res.StatusCode)
@@ -211,7 +211,7 @@ func TestLoginWrongUsername(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	// Verify status code is Unauthorized
 	require.Equal(t, http.StatusUnauthorized, res.StatusCode)
@@ -250,7 +250,7 @@ func TestLoginWrongPassword(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	// Verify status code is Unauthorized
 	require.Equal(t, http.StatusUnauthorized, res.StatusCode)
@@ -286,7 +286,7 @@ func TestGetCurrentUser(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	// Verify status code is OK
 	require.Equal(t, http.StatusOK, res.StatusCode)
@@ -320,7 +320,7 @@ func TestGetCurrentUserFailed(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	// Verify status code is Unauthorized
 	require.Equal(t, http.StatusUnauthorized, res.StatusCode)
@@ -364,7 +364,7 @@ func TestUpdateUserName(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	// Verify status code is OK
 	require.Equal(t, http.StatusOK, res.StatusCode)
@@ -411,7 +411,7 @@ func TestUpdateUserPassword(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	// Verify status code is OK
 	require.Equal(t, http.StatusOK, res.StatusCode)
@@ -460,7 +460,7 @@ func TestUpdateFailed(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	// Verify status code is Unauthorized
 	require.Equal(t, http.StatusUnauthorized, res.StatusCode)
@@ -506,7 +506,7 @@ func TestFollowUser(t *testing.T) {
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
-	defer res.Body.Close()
+	defer requireNil(t, res.Body.Close)
 
 	// Verify status code is OK
 	require.Equal(t, http.StatusOK, res.StatusCode)
