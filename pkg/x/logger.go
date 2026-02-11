@@ -20,6 +20,7 @@ func SetupLogger(cfg *config.Config) {
 	logger.SetLevel(lvl)
 	logger.SetFormatter(&logrus.JSONFormatter{})
 
+	logger.AddHook(logrushook.NewLevelColorHook())
 	logger.AddHook(logrushook.NewOtelHook())
 
 	Logger = logger
