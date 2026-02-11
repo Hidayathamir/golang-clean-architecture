@@ -65,6 +65,26 @@ x-signoz-db-depend: &signoz-db-depend
       condition: service_completed_successfully
 
 services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.3.0
+    container_name: elasticsearch-clean-arch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.3.0
+    container_name: kibana-clean-arch
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+
   redis:
     image: redis:7-alpine
     container_name: redis-clean-arch
@@ -90,7 +110,7 @@ services:
     ports:
       - "2181:2181"
     healthcheck:
-      test: ["CMD", "bash", "-c", "echo ruok > /dev/tcp/127.0.0.1/2181 && exit 0 || exit 1"]
+      test: [ "CMD", "bash", "-c", "echo ruok > /dev/tcp/127.0.0.1/2181 && exit 0 || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5

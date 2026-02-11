@@ -5,11 +5,13 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/cache"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/repository"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/search"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/storage"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/image"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/notif"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/redis/go-redis/v9"
 	"github.com/twmb/franz-go/pkg/kgo"
 	"gorm.io/gorm"
@@ -27,6 +29,7 @@ func SetupUsecases(
 	producer *kgo.Client,
 	awsS3Client *s3.Client,
 	redisClient *redis.Client,
+	elasticsearchClient *elasticsearch.Client,
 ) *Usecases {
 	// setup repositories
 	var userRepository repository.UserRepository
@@ -76,13 +79,18 @@ func SetupUsecases(
 	userCache = cache.NewUserCache(redisClient)
 	userCache = cache.NewUserCacheMwLogger(userCache)
 
+	// setup search
+	var imageSearch search.ImageSearch
+	imageSearch = search.NewImageSearch(elasticsearchClient)
+	imageSearch = search.NewImageSearchMwLogger(imageSearch)
+
 	// setup use cases
 	var userUsecase user.UserUsecase
 	userUsecase = user.NewUserUsecase(cfg, db, userRepository, userStatRepository, followRepository, userProducer, notifProducer, s3Client, userCache)
 	userUsecase = user.NewUserUsecaseMwLogger(userUsecase)
 
 	var imageUsecase image.ImageUsecase
-	imageUsecase = image.NewImageUsecase(cfg, db, imageRepository, likeRepository, commentRepository, followRepository, userRepository, imageProducer, notifProducer, s3Client)
+	imageUsecase = image.NewImageUsecase(cfg, db, imageRepository, likeRepository, commentRepository, followRepository, userRepository, imageProducer, notifProducer, s3Client, imageSearch)
 	imageUsecase = image.NewImageUsecaseMwLogger(imageUsecase)
 
 	var notifUsecase notif.NotifUsecase

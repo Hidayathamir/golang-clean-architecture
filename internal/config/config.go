@@ -106,6 +106,10 @@ func (c *Config) GetDatabasePoolLifetime() int {
 	return c.GetInt(DatabasePoolLifetime)
 }
 
+func (c *Config) GetElasticsearchAddress() string {
+	return c.GetString(ElasticsearchAddress)
+}
+
 func (c *Config) GetKafkaBootstrapServers() string {
 	return c.GetString(KafkaBootstrapServers)
 }

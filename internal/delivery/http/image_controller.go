@@ -50,6 +50,7 @@ func (c *ImageController) Upload(ctx *fiber.Ctx) error {
 
 	req := new(dto.UploadImageRequest)
 	req.File = file
+	req.Caption = ctx.FormValue("caption")
 
 	res, err := c.Usecase.Upload(ctx.UserContext(), req)
 	if err != nil {

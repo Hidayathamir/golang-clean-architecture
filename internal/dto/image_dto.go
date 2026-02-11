@@ -10,6 +10,7 @@ import (
 type ImageResponse struct {
 	ID           int64          `json:"id"`
 	UserID       int64          `json:"user_id"`
+	Caption      string         `json:"caption"`
 	URL          string         `json:"url"`
 	LikeCount    int            `json:"like_count"`
 	CommentCount int            `json:"comment_count"`
@@ -19,7 +20,8 @@ type ImageResponse struct {
 }
 
 type UploadImageRequest struct {
-	File *multipart.FileHeader `validate:"required"`
+	File    *multipart.FileHeader `validate:"required"`
+	Caption string
 }
 
 type LikeImageRequest struct {
@@ -71,6 +73,18 @@ type NotifyFollowerOnUploadRequest struct {
 	URL    string
 }
 
+type SyncImageToElasticsearchRequest struct {
+	ID           int64
+	UserID       int64
+	Caption      string
+	URL          string
+	LikeCount    int
+	CommentCount int
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	DeletedAt    gorm.DeletedAt
+}
+
 type NotifyUserImageCommentedRequest struct {
 	ImageID         int64
 	CommenterUserID int64
@@ -106,6 +120,19 @@ type ImageIncreaseLikeCountList []ImageIncreaseLikeCount
 type ImageUploadedEvent struct {
 	ID           int64          `json:"id"`
 	UserID       int64          `json:"user_id"`
+	Caption      string         `json:"caption"`
+	URL          string         `json:"url"`
+	LikeCount    int            `json:"like_count"`
+	CommentCount int            `json:"comment_count"`
+	CreatedAt    time.Time      `json:"created_at"`
+	UpdatedAt    time.Time      `json:"updated_at"`
+	DeletedAt    gorm.DeletedAt `json:"deleted_at"`
+}
+
+type ImageDocument struct {
+	ID           int64          `json:"id"`
+	UserID       int64          `json:"user_id"`
+	Caption      string         `json:"caption"`
 	URL          string         `json:"url"`
 	LikeCount    int            `json:"like_count"`
 	CommentCount int            `json:"comment_count"`

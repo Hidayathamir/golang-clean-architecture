@@ -130,6 +130,21 @@ func (u *ImageUsecaseMwLogger) NotifyFollowerOnUpload(ctx context.Context, req *
 	return err
 }
 
+func (u *ImageUsecaseMwLogger) SyncImageToElasticsearch(ctx context.Context, req *dto.SyncImageToElasticsearchRequest) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := u.Next.SyncImageToElasticsearch(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+	}
+	x.LogMw(ctx, fields, err)
+
+	return err
+}
+
 func (u *ImageUsecaseMwLogger) NotifyUserImageCommented(ctx context.Context, req *dto.NotifyUserImageCommentedRequest) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()

@@ -24,7 +24,7 @@ type NotifUsecaseImpl struct {
 
 	// producer
 
-	// client
+	// storage
 }
 
 func NewNotifUsecase(
@@ -35,7 +35,7 @@ func NewNotifUsecase(
 
 	// producer
 
-	// client
+	// storage
 ) *NotifUsecaseImpl {
 	return &NotifUsecaseImpl{
 		Config: Cfg,
@@ -45,6 +45,6 @@ func NewNotifUsecase(
 
 		// producer
 
-		// client
+		// storage
 	}
 }

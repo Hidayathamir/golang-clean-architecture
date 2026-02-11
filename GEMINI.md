@@ -18,6 +18,7 @@ This repo is a reusable Golang clean architecture template. The `architecture.pn
     - `cache`: cache implementations.
     - `messaging`: Kafka producers and messaging clients.
     - `storage`: S3 and other storage clients.
+    - `search`: Elasticsearch clients.
   - `entity`: Pure domain objects and business logic.
   - `dto`: Data Transfer Objects for cross-layer communication.
   - `converter`: Mapping logic between entities and DTOs.

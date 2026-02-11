@@ -34,6 +34,13 @@ func Setup(ctx context.Context, cfg *config.Config, consumers *dependency_inject
 	})
 
 	wg.Go(func() {
+		consumerGroup := consumergroup.ImageUploadedGroup2
+		_topic := topic.ImageUploaded
+		handler := consumers.ImageConsumer.SyncImageToElasticsearch
+		messaging.ConsumeEvent(ctx, cfg, consumerGroup, _topic, handler)
+	})
+
+	wg.Go(func() {
 		consumerGroup := consumergroup.ImageLikedGroup1
 		_topic := topic.ImageLiked
 		handler := consumers.ImageConsumer.NotifyUserImageLiked

@@ -537,6 +537,9 @@ const docTemplate = `{
         "github_com_Hidayathamir_golang-clean-architecture_internal_dto.ImageResponse": {
             "type": "object",
             "properties": {
+                "caption": {
+                    "type": "string"
+                },
                 "comment_count": {
                     "type": "integer"
                 },

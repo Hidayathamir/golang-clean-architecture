@@ -10,6 +10,7 @@ import (
 type Image struct {
 	ID           int64          `gorm:"column:id;primaryKey"`
 	UserID       int64          `gorm:"column:user_id"`
+	Caption      string         `gorm:"column:caption"`
 	URL          string         `gorm:"column:url"`
 	LikeCount    int            `gorm:"column:like_count"`
 	CommentCount int            `gorm:"column:comment_count"`

@@ -20,6 +20,8 @@ const (
 	DatabasePoolMax      = "database.pool.max"
 	DatabasePoolLifetime = "database.pool.lifetime"
 
+	ElasticsearchAddress = "elasticsearch.address"
+
 	KafkaBootstrapServers = "kafka.bootstrap.servers"
 	KafkaAutoOffsetReset  = "kafka.auto.offset.reset"
 	KafkaProducerEnabled  = "kafka.producer.enabled"

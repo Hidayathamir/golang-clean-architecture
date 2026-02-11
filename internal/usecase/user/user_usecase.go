@@ -40,7 +40,7 @@ type UserUsecaseImpl struct {
 	UserProducer  messaging.UserProducer
 	NotifProducer messaging.NotifProducer
 
-	// client
+	// storage
 	S3Client storage.S3Client
 
 	// cache
@@ -60,7 +60,7 @@ func NewUserUsecase(
 	UserProducer messaging.UserProducer,
 	NotifProducer messaging.NotifProducer,
 
-	// client
+	// storage
 	S3Client storage.S3Client,
 
 	// cache
@@ -79,7 +79,7 @@ func NewUserUsecase(
 		UserProducer:  UserProducer,
 		NotifProducer: NotifProducer,
 
-		// client
+		// storage
 		S3Client: S3Client,
 
 		// cache

@@ -32,6 +32,7 @@ func DtoUploadImageRequestToDtoS3UploadImageRequest(ctx context.Context, req *dt
 func EntityImageToDtoImageUploadedEvent(ctx context.Context, image *entity.Image, event *dto.ImageUploadedEvent) {
 	event.ID = image.ID
 	event.UserID = image.UserID
+	event.Caption = image.Caption
 	event.URL = image.URL
 	event.LikeCount = image.LikeCount
 	event.CommentCount = image.CommentCount
@@ -75,6 +76,7 @@ func EntityCommentToDtoImageCommentedEvent(ctx context.Context, comment *entity.
 func EntityImageToDtoImageResponse(ctx context.Context, image *entity.Image, res *dto.ImageResponse) {
 	res.ID = image.ID
 	res.UserID = image.UserID
+	res.Caption = image.Caption
 	res.URL = image.URL
 	res.LikeCount = image.LikeCount
 	res.CommentCount = image.CommentCount
@@ -121,6 +123,30 @@ func EntityCommentListToDtoCommentResponseList(ctx context.Context, commentList 
 func DtoImageUploadedEventToDtoNotifyFollowerOnUploadRequest(ctx context.Context, event *dto.ImageUploadedEvent, req *dto.NotifyFollowerOnUploadRequest) {
 	req.UserID = event.UserID
 	req.URL = event.URL
+}
+
+func DtoImageUploadedEventToDtoSyncImageToElasticsearchRequest(ctx context.Context, event *dto.ImageUploadedEvent, req *dto.SyncImageToElasticsearchRequest) {
+	req.ID = event.ID
+	req.UserID = event.UserID
+	req.Caption = event.Caption
+	req.URL = event.URL
+	req.LikeCount = event.LikeCount
+	req.CommentCount = event.CommentCount
+	req.CreatedAt = event.CreatedAt
+	req.UpdatedAt = event.UpdatedAt
+	req.DeletedAt = event.DeletedAt
+}
+
+func DtoSyncImageToElasticsearchRequestToDtoImageDocument(ctx context.Context, req *dto.SyncImageToElasticsearchRequest, imageDocument *dto.ImageDocument) {
+	imageDocument.ID = req.ID
+	imageDocument.UserID = req.UserID
+	imageDocument.Caption = req.Caption
+	imageDocument.URL = req.URL
+	imageDocument.LikeCount = req.LikeCount
+	imageDocument.CommentCount = req.CommentCount
+	imageDocument.CreatedAt = req.CreatedAt
+	imageDocument.UpdatedAt = req.UpdatedAt
+	imageDocument.DeletedAt = req.DeletedAt
 }
 
 func DtoImageCommentedEventToDtoNotifyUserImageCommentedRequest(ctx context.Context, event *dto.ImageCommentedEvent, req *dto.NotifyUserImageCommentedRequest) {

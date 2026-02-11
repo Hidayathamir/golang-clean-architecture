@@ -2,6 +2,7 @@ package consumergroup
 
 const (
 	ImageUploadedGroup1  = "image.uploaded.group-1"
+	ImageUploadedGroup2  = "image.uploaded.group-2"
 	ImageLikedGroup1     = "image.liked.group-1"
 	ImageLikedGroup2     = "image.liked.group-2"
 	ImageCommentedGroup1 = "image.commented.group-1"

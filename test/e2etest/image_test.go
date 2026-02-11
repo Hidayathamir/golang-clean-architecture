@@ -59,6 +59,8 @@ func TestUploadImage(t *testing.T) {
 	require.Nil(t, err)
 	_, err = part.Write([]byte("dummy image content"))
 	require.Nil(t, err)
+	err = writer.WriteField("caption", "My Caption")
+	require.Nil(t, err)
 	require.Nil(t, writer.Close())
 
 	// Send upload request
@@ -84,12 +86,13 @@ func TestUploadImage(t *testing.T) {
 
 	require.NotZero(t, responseBody.Data.ID)
 	require.NotEmpty(t, responseBody.Data.URL)
+	require.Equal(t, "My Caption", responseBody.Data.Caption)
 
 	// Verify database record
-	var count int64
-	err = db.Model(&entity.Image{}).Where("id = ?", responseBody.Data.ID).Count(&count).Error
+	image := new(entity.Image)
+	err = db.First(image, responseBody.Data.ID).Error
 	require.Nil(t, err)
-	require.Equal(t, int64(1), count)
+	require.Equal(t, "My Caption", image.Caption)
 }
 
 func TestLikeImage(t *testing.T) {

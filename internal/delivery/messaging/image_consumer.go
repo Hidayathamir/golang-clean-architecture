@@ -54,6 +54,37 @@ func (c *ImageConsumer) notifyFollowerOnUpload(ctx context.Context, record *kgo.
 	return nil
 }
 
+func (c *ImageConsumer) SyncImageToElasticsearch(ctx context.Context, records []*kgo.Record) error {
+	for _, record := range records {
+		if err := c.syncImageToElasticsearch(ctx, record); err != nil {
+			x.Logger.WithContext(ctx).WithError(err).Error()
+			continue
+		}
+	}
+	return nil
+}
+
+func (c *ImageConsumer) syncImageToElasticsearch(ctx context.Context, record *kgo.Record) error {
+	ctx, span := telemetry.StartConsumer(ctx, record)
+	defer span.End()
+
+	event := new(dto.ImageUploadedEvent)
+	if err := json.Unmarshal(record.Value, event); err != nil {
+		x.Logger.WithContext(ctx).WithError(err).Error()
+		return errkit.AddFuncName(err)
+	}
+
+	req := new(dto.SyncImageToElasticsearchRequest)
+	converter.DtoImageUploadedEventToDtoSyncImageToElasticsearchRequest(ctx, event, req)
+
+	if err := c.Usecase.SyncImageToElasticsearch(ctx, req); err != nil {
+		x.Logger.WithContext(ctx).WithError(err).Error()
+		return errkit.AddFuncName(err)
+	}
+
+	return nil
+}
+
 func (c *ImageConsumer) NotifyUserImageLiked(ctx context.Context, records []*kgo.Record) error {
 	for _, record := range records {
 		if err := c.notifyUserImageLiked(ctx, record); err != nil {

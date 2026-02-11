@@ -25,8 +25,9 @@ func main() {
 	s3Client := provider.NewAWSS3Client(cfg)
 	producer := provider.NewKafkaClientProducer(cfg)
 	redisClient := provider.NewRedisClient(cfg)
+	elasticsearchClient := provider.NewelasticsearchClient(cfg)
 
-	usecases := dependency_injection.SetupUsecases(cfg, db, producer, s3Client, redisClient)
+	usecases := dependency_injection.SetupUsecases(cfg, db, producer, s3Client, redisClient, elasticsearchClient)
 
 	consumers := dependency_injection.SetupConsumers(cfg, usecases)
 

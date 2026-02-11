@@ -26,6 +26,9 @@
       "lifetime": 300
     }
   },
+  "elasticsearch": {
+    "address": "http://localhost:9200"
+  },
   "kafka": {
     "bootstrap": {
       "servers": "localhost:9093"

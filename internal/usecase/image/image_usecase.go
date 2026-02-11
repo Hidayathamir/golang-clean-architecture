@@ -7,6 +7,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/repository"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/search"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/storage"
 	"gorm.io/gorm"
 )
@@ -21,6 +22,7 @@ type ImageUsecase interface {
 	GetLike(ctx context.Context, req *dto.GetLikeRequest) (*dto.LikeResponseList, error)
 	GetComment(ctx context.Context, req *dto.GetCommentRequest) (*dto.CommentResponseList, error)
 	NotifyFollowerOnUpload(ctx context.Context, req *dto.NotifyFollowerOnUploadRequest) error
+	SyncImageToElasticsearch(ctx context.Context, req *dto.SyncImageToElasticsearchRequest) error
 	NotifyUserImageCommented(ctx context.Context, req *dto.NotifyUserImageCommentedRequest) error
 	BatchUpdateImageCommentCount(ctx context.Context, req *dto.BatchUpdateImageCommentCountRequest) error
 	NotifyUserImageLiked(ctx context.Context, req *dto.NotifyUserImageLikedRequest) error
@@ -44,8 +46,11 @@ type ImageUsecaseImpl struct {
 	ImageProducer messaging.ImageProducer
 	NotifProducer messaging.NotifProducer
 
-	// client
+	// storage
 	S3Client storage.S3Client
+
+	// search
+	ImageSearch search.ImageSearch
 }
 
 func NewImageUsecase(
@@ -63,8 +68,11 @@ func NewImageUsecase(
 	ImageProducer messaging.ImageProducer,
 	NotifProducer messaging.NotifProducer,
 
-	// client
+	// storage
 	S3Client storage.S3Client,
+
+	// search
+	ImageSearch search.ImageSearch,
 ) *ImageUsecaseImpl {
 	return &ImageUsecaseImpl{
 		Cfg: Config,
@@ -81,7 +89,10 @@ func NewImageUsecase(
 		ImageProducer: ImageProducer,
 		NotifProducer: NotifProducer,
 
-		// client
+		// storage
 		S3Client: S3Client,
+
+		// search
+		ImageSearch: ImageSearch,
 	}
 }

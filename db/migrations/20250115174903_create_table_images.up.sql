@@ -2,6 +2,7 @@ create table images
 (
     id              bigserial   primary key,
     user_id         bigint      not null,
+    caption         text        not null,
     url             text        not null,
     like_count      int     not null,
     comment_count   int     not null,
