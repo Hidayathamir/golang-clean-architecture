@@ -10,25 +10,27 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
-func (u *UserUsecaseImpl) NotifyUserBeingFollowed(ctx context.Context, req *dto.NotifyUserBeingFollowedRequest) error {
-	err := x.Validate.Struct(req)
+func (u *UserUsecaseImpl) NotifyUserBeingFollowed(ctx context.Context, req dto.NotifyUserBeingFollowedRequest) error {
+	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.BadRequest(err)
 		return errkit.AddFuncName(err)
 	}
 
-	followerUser := new(entity.User)
+	followerUser := entity.User{}
 
-	if err := u.UserRepository.FindByID(ctx, u.DB, followerUser, req.FollowerID); err != nil {
+	err = u.UserRepository.FindByID(ctx, u.DB, &followerUser, req.FollowerID)
+	if err != nil {
 		return errkit.AddFuncName(err)
 	}
 
-	event := &dto.NotifEvent{
+	event := dto.NotifEvent{
 		UserID:  req.FollowingID,
 		Message: fmt.Sprintf("%s just follow you", followerUser.Name),
 	}
 
-	if err := u.NotifProducer.SendNotif(ctx, event); err != nil {
+	err = u.NotifProducer.SendNotif(ctx, &event)
+	if err != nil {
 		return errkit.AddFuncName(err)
 	}
 

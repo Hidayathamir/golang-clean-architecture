@@ -11,27 +11,28 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (u *UserUsecaseImpl) Create(ctx context.Context, req *dto.RegisterUserRequest) (*dto.UserResponse, error) {
-	err := x.Validate.Struct(req)
+func (u *UserUsecaseImpl) Create(ctx context.Context, req dto.RegisterUserRequest) (dto.UserResponse, error) {
+	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.BadRequest(err)
-		return nil, errkit.AddFuncName(err)
+		return dto.UserResponse{}, errkit.AddFuncName(err)
 	}
 
 	password, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, errkit.AddFuncName(err)
+		return dto.UserResponse{}, errkit.AddFuncName(err)
 	}
 
-	user := new(entity.User)
-	converter.DtoRegisterUserRequestToEntityUser(req, user, string(password))
+	user := entity.User{}
+	converter.DtoRegisterUserRequestToEntityUser(req, &user, string(password))
 
-	if err := u.UserRepository.Create(ctx, u.DB.WithContext(ctx), user); err != nil {
-		return nil, errkit.AddFuncName(err)
+	err = u.UserRepository.Create(ctx, u.DB.WithContext(ctx), &user)
+	if err != nil {
+		return dto.UserResponse{}, errkit.AddFuncName(err)
 	}
 
-	res := new(dto.UserResponse)
-	converter.EntityUserToDtoUserResponse(user, res)
+	res := dto.UserResponse{}
+	converter.EntityUserToDtoUserResponse(user, &res)
 
 	return res, nil
 }

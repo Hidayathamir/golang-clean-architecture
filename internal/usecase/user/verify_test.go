@@ -71,10 +71,10 @@ func TestUserUsecaseImpl_Verify_Success(t *testing.T) {
 		return nil
 	}
 
-	res, err := u.Verify(context.Background(), req)
+	res, err := u.Verify(context.Background(), *req)
 
 	require.NoError(t, err)
-	require.Equal(t, &dto.UserAuth{ID: 1}, res)
+	require.Equal(t, dto.UserAuth{ID: 1}, res)
 }
 
 func TestUserUsecaseImpl_Verify_ValidateStruct(t *testing.T) {
@@ -88,9 +88,9 @@ func TestUserUsecaseImpl_Verify_ValidateStruct(t *testing.T) {
 		return nil
 	}
 
-	res, err := u.Verify(context.Background(), req)
+	res, err := u.Verify(context.Background(), *req)
 
-	require.Nil(t, res)
+	require.Equal(t, dto.UserAuth{}, res)
 	require.NotNil(t, err)
 	var verrs validator.ValidationErrors
 	require.ErrorAs(t, err, &verrs)
@@ -107,9 +107,9 @@ func TestUserUsecaseImpl_Verify_ParseAccessToken(t *testing.T) {
 		return nil
 	}
 
-	res, err := u.Verify(context.Background(), req)
+	res, err := u.Verify(context.Background(), *req)
 
-	require.Nil(t, res)
+	require.Equal(t, dto.UserAuth{}, res)
 	require.NotNil(t, err)
 }
 
@@ -126,9 +126,9 @@ func TestUserUsecaseImpl_Verify_FindByID(t *testing.T) {
 		return assert.AnError
 	}
 
-	res, err := u.Verify(context.Background(), req)
+	res, err := u.Verify(context.Background(), *req)
 
-	require.Nil(t, res)
+	require.Equal(t, dto.UserAuth{}, res)
 	require.NotNil(t, err)
 	require.ErrorIs(t, err, assert.AnError)
 }

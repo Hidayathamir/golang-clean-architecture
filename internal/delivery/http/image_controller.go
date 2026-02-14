@@ -48,7 +48,7 @@ func (c *ImageController) Upload(ctx *fiber.Ctx) error {
 		return errkit.AddFuncName(err)
 	}
 
-	req := new(dto.UploadImageRequest)
+	req := dto.UploadImageRequest{}
 	req.File = file
 	req.Caption = ctx.FormValue("caption")
 
@@ -76,8 +76,8 @@ func (c *ImageController) Like(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	req := new(dto.LikeImageRequest)
-	err := ctx.BodyParser(req)
+	req := dto.LikeImageRequest{}
+	err := ctx.BodyParser(&req)
 	if err != nil {
 		err = errkit.BadRequest(err)
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
@@ -108,8 +108,8 @@ func (c *ImageController) Comment(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	req := new(dto.CommentImageRequest)
-	err := ctx.BodyParser(req)
+	req := dto.CommentImageRequest{}
+	err := ctx.BodyParser(&req)
 	if err != nil {
 		err = errkit.BadRequest(err)
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
@@ -146,7 +146,7 @@ func (c *ImageController) GetLike(ctx *fiber.Ctx) error {
 		return errkit.AddFuncName(err)
 	}
 
-	req := &dto.GetLikeRequest{
+	req := dto.GetLikeRequest{
 		ImageID: imageID,
 	}
 
@@ -180,7 +180,7 @@ func (c *ImageController) GetComment(ctx *fiber.Ctx) error {
 		return errkit.AddFuncName(err)
 	}
 
-	req := &dto.GetCommentRequest{
+	req := dto.GetCommentRequest{
 		ImageID: imageID,
 	}
 

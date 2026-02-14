@@ -63,7 +63,7 @@ func TestUserUsecaseImpl_Login_Success(t *testing.T) {
 		return nil
 	}
 
-	res, err := u.Login(context.Background(), req)
+	res, err := u.Login(context.Background(), *req)
 	require.NoError(t, err)
 	require.NotNil(t, res)
 	require.NotEmpty(t, res.Token)
@@ -101,9 +101,9 @@ func TestUserUsecaseImpl_Login_Fail_ValidateStruct(t *testing.T) {
 		return nil
 	}
 
-	res, err := u.Login(context.Background(), req)
+	res, err := u.Login(context.Background(), *req)
 
-	require.Nil(t, res)
+	require.Equal(t, dto.UserLoginResponse{}, res)
 	require.NotNil(t, err)
 	var verrs validator.ValidationErrors
 	require.ErrorAs(t, err, &verrs)
@@ -125,9 +125,9 @@ func TestUserUsecaseImpl_Login_Fail_FindByUsername(t *testing.T) {
 		return nil
 	}
 
-	res, err := u.Login(context.Background(), req)
+	res, err := u.Login(context.Background(), *req)
 
-	require.Nil(t, res)
+	require.Equal(t, dto.UserLoginResponse{}, res)
 	require.NotNil(t, err)
 	require.ErrorIs(t, err, assert.AnError)
 }
@@ -153,9 +153,9 @@ func TestUserUsecaseImpl_Login_Fail_CompareHashAndPassword(t *testing.T) {
 		return nil
 	}
 
-	res, err := u.Login(context.Background(), req)
+	res, err := u.Login(context.Background(), *req)
 
-	require.Nil(t, res)
+	require.Equal(t, dto.UserLoginResponse{}, res)
 	require.NotNil(t, err)
 }
 
@@ -195,8 +195,8 @@ func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 		return nil
 	}
 
-	res, err := u.Login(context.Background(), req)
+	res, err := u.Login(context.Background(), *req)
 
-	require.Nil(t, res)
+	require.Equal(t, dto.UserLoginResponse{}, res)
 	require.NotNil(t, err)
 }

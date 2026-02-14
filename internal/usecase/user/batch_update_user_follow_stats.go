@@ -8,8 +8,8 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
-func (u *UserUsecaseImpl) BatchUpdateUserFollowStats(ctx context.Context, req *dto.BatchUpdateUserFollowStatsRequest) error {
-	err := x.Validate.Struct(req)
+func (u *UserUsecaseImpl) BatchUpdateUserFollowStats(ctx context.Context, req dto.BatchUpdateUserFollowStatsRequest) error {
+	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.BadRequest(err)
 		return errkit.AddFuncName(err)

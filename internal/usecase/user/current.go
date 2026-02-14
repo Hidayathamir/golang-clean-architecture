@@ -10,29 +10,31 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
-func (u *UserUsecaseImpl) Current(ctx context.Context, req *dto.GetUserRequest) (*dto.UserResponse, error) {
-	if err := x.Validate.Struct(req); err != nil {
+func (u *UserUsecaseImpl) Current(ctx context.Context, req dto.GetUserRequest) (dto.UserResponse, error) {
+	err := x.Validate.Struct(&req)
+	if err != nil {
 		err = errkit.BadRequest(err)
-		return nil, errkit.AddFuncName(err)
+		return dto.UserResponse{}, errkit.AddFuncName(err)
 	}
 
 	cachedUser, err := u.UserCache.Get(ctx, req.ID)
 	if err == nil && cachedUser != nil {
-		res := new(dto.UserResponse)
-		converter.EntityUserToDtoUserResponse(cachedUser, res)
+		res := dto.UserResponse{}
+		converter.EntityUserToDtoUserResponse(*cachedUser, &res)
 		return res, nil
 	}
 
-	user := new(entity.User)
-	if err := u.UserRepository.FindByID(ctx, u.DB.WithContext(ctx), user, req.ID); err != nil {
-		return nil, errkit.AddFuncName(err)
+	user := entity.User{}
+	err = u.UserRepository.FindByID(ctx, u.DB.WithContext(ctx), &user, req.ID)
+	if err != nil {
+		return dto.UserResponse{}, errkit.AddFuncName(err)
 	}
 
-	err = u.UserCache.Set(ctx, user)
+	err = u.UserCache.Set(ctx, &user)
 	x.LogIfErr(err)
 
-	res := new(dto.UserResponse)
-	converter.EntityUserToDtoUserResponse(user, res)
+	res := dto.UserResponse{}
+	converter.EntityUserToDtoUserResponse(user, &res)
 
 	return res, nil
 }

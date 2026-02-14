@@ -42,7 +42,7 @@ func TestImageUsecaseImpl_Comment_Success(t *testing.T) {
 	ctx := context.Background()
 	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1})
 
-	err := u.Comment(ctx, req)
+	err := u.Comment(ctx, *req)
 
 	require.Nil(t, err)
 }
@@ -55,7 +55,7 @@ func TestImageUsecaseImpl_Comment_Fail_ValidateStruct(t *testing.T) {
 
 	req := &dto.CommentImageRequest{} // invalid
 
-	err := u.Comment(context.Background(), req)
+	err := u.Comment(context.Background(), *req)
 
 	require.NotNil(t, err)
 	var verrs validator.ValidationErrors
@@ -83,7 +83,7 @@ func TestImageUsecaseImpl_Comment_Fail_Create(t *testing.T) {
 	ctx := context.Background()
 	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1})
 
-	err := u.Comment(ctx, req)
+	err := u.Comment(ctx, *req)
 
 	require.NotNil(t, err)
 	require.ErrorIs(t, err, assert.AnError)
@@ -116,7 +116,7 @@ func TestImageUsecaseImpl_Comment_Fail_Send(t *testing.T) {
 	ctx := context.Background()
 	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1})
 
-	err := u.Comment(ctx, req)
+	err := u.Comment(ctx, *req)
 
 	require.NotNil(t, err)
 	require.ErrorIs(t, err, assert.AnError)

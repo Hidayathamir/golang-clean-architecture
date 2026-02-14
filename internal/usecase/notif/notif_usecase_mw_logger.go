@@ -21,7 +21,7 @@ func NewNotifUsecaseMwLogger(next NotifUsecase) *NotifUsecaseMwLogger {
 	}
 }
 
-func (u *NotifUsecaseMwLogger) Notify(ctx context.Context, req *dto.NotifyRequest) error {
+func (u *NotifUsecaseMwLogger) Notify(ctx context.Context, req dto.NotifyRequest) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 

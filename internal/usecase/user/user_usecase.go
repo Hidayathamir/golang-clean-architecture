@@ -15,14 +15,14 @@ import (
 //go:generate moq -out=../../mock/MockUsecaseUser.go -pkg=mock . UserUsecase
 
 type UserUsecase interface {
-	Verify(ctx context.Context, req *dto.VerifyUserRequest) (*dto.UserAuth, error)
-	Create(ctx context.Context, req *dto.RegisterUserRequest) (*dto.UserResponse, error)
-	Login(ctx context.Context, req *dto.LoginUserRequest) (*dto.UserLoginResponse, error)
-	Current(ctx context.Context, req *dto.GetUserRequest) (*dto.UserResponse, error)
-	Update(ctx context.Context, req *dto.UpdateUserRequest) (*dto.UserResponse, error)
-	Follow(ctx context.Context, req *dto.FollowUserRequest) error
-	NotifyUserBeingFollowed(ctx context.Context, req *dto.NotifyUserBeingFollowedRequest) error
-	BatchUpdateUserFollowStats(ctx context.Context, req *dto.BatchUpdateUserFollowStatsRequest) error
+	Verify(ctx context.Context, req dto.VerifyUserRequest) (dto.UserAuth, error)
+	Create(ctx context.Context, req dto.RegisterUserRequest) (dto.UserResponse, error)
+	Login(ctx context.Context, req dto.LoginUserRequest) (dto.UserLoginResponse, error)
+	Current(ctx context.Context, req dto.GetUserRequest) (dto.UserResponse, error)
+	Update(ctx context.Context, req dto.UpdateUserRequest) (dto.UserResponse, error)
+	Follow(ctx context.Context, req dto.FollowUserRequest) error
+	NotifyUserBeingFollowed(ctx context.Context, req dto.NotifyUserBeingFollowedRequest) error
+	BatchUpdateUserFollowStats(ctx context.Context, req dto.BatchUpdateUserFollowStatsRequest) error
 }
 
 var _ UserUsecase = &UserUsecaseImpl{}

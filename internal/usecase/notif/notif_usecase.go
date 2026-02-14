@@ -11,7 +11,7 @@ import (
 //go:generate moq -out=../../mock/MockUsecaseNotif.go -pkg=mock . NotifUsecase
 
 type NotifUsecase interface {
-	Notify(ctx context.Context, req *dto.NotifyRequest) error
+	Notify(ctx context.Context, req dto.NotifyRequest) error
 }
 
 var _ NotifUsecase = &NotifUsecaseImpl{}

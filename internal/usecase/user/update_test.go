@@ -49,11 +49,11 @@ func TestUserUsecaseImpl_Update_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	res, err := u.Update(context.Background(), req)
+	res, err := u.Update(context.Background(), *req)
 
 	// ------------------------------------------------------- //
 
-	var expected = &dto.UserResponse{Name: "name1"}
+	var expected = dto.UserResponse{Name: "name1"}
 
 	require.Equal(t, expected, res)
 	require.Nil(t, err)
@@ -91,11 +91,11 @@ func TestUserUsecaseImpl_Update_Fail_ValidateStruct(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	res, err := u.Update(context.Background(), req)
+	res, err := u.Update(context.Background(), *req)
 
 	// ------------------------------------------------------- //
 
-	var expected *dto.UserResponse
+	var expected dto.UserResponse
 
 	require.Equal(t, expected, res)
 	require.NotNil(t, err)
@@ -135,11 +135,11 @@ func TestUserUsecaseImpl_Update_Fail_FindByID(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	res, err := u.Update(context.Background(), req)
+	res, err := u.Update(context.Background(), *req)
 
 	// ------------------------------------------------------- //
 
-	var expected *dto.UserResponse
+	var expected dto.UserResponse
 
 	require.Equal(t, expected, res)
 	require.NotNil(t, err)
@@ -178,11 +178,11 @@ func TestUserUsecaseImpl_Update_Fail_Update(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	res, err := u.Update(context.Background(), req)
+	res, err := u.Update(context.Background(), *req)
 
 	// ------------------------------------------------------- //
 
-	var expected *dto.UserResponse
+	var expected dto.UserResponse
 
 	require.Equal(t, expected, res)
 	require.NotNil(t, err)

@@ -25,7 +25,8 @@ func NewUserConsumer(usecase user.UserUsecase) *UserConsumer {
 
 func (c *UserConsumer) NotifyUserBeingFollowed(ctx context.Context, records []*kgo.Record) error {
 	for _, record := range records {
-		if err := c.notifyUserBeingFollowed(ctx, record); err != nil {
+		err := c.notifyUserBeingFollowed(ctx, record)
+		if err != nil {
 			x.Logger.WithContext(ctx).WithError(err).Error()
 			continue
 		}
@@ -37,16 +38,18 @@ func (c *UserConsumer) notifyUserBeingFollowed(ctx context.Context, record *kgo.
 	ctx, span := telemetry.StartConsumer(ctx, record)
 	defer span.End()
 
-	event := new(dto.UserFollowedEvent)
-	if err := json.Unmarshal(record.Value, event); err != nil {
+	event := dto.UserFollowedEvent{}
+	err := json.Unmarshal(record.Value, &event)
+	if err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
-	req := new(dto.NotifyUserBeingFollowedRequest)
-	converter.DtoUserFollowedEventToDtoNotifyUserBeingFollowedRequest(ctx, event, req)
+	req := dto.NotifyUserBeingFollowedRequest{}
+	converter.DtoUserFollowedEventToDtoNotifyUserBeingFollowedRequest(event, &req)
 
-	if err := c.Usecase.NotifyUserBeingFollowed(ctx, req); err != nil {
+	err = c.Usecase.NotifyUserBeingFollowed(ctx, req)
+	if err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
@@ -58,10 +61,11 @@ func (c *UserConsumer) BatchUpdateUserFollowStats(ctx context.Context, records [
 	ctx, span := telemetry.StartConsumerBatch(ctx, records)
 	defer span.End()
 
-	req := new(dto.BatchUpdateUserFollowStatsRequest)
-	converter.KGoRecordListToDtoBatchUpdateUserFollowStatsRequest(ctx, records, req)
+	req := dto.BatchUpdateUserFollowStatsRequest{}
+	converter.KGoRecordListToDtoBatchUpdateUserFollowStatsRequest(ctx, records, &req)
 
-	if err := c.Usecase.BatchUpdateUserFollowStats(ctx, req); err != nil {
+	err := c.Usecase.BatchUpdateUserFollowStats(ctx, req)
+	if err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}

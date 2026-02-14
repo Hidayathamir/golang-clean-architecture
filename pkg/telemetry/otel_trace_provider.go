@@ -38,10 +38,12 @@ func InitTraceProvider(cfg *config.Config) Stop {
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 
 	stop := func() {
-		if err := tp.ForceFlush(context.Background()); err != nil {
+		err := tp.ForceFlush(context.Background())
+		if err != nil {
 			fmt.Println(errkit.AddFuncName(err))
 		}
-		if err := tp.Shutdown(context.Background()); err != nil {
+		err = tp.Shutdown(context.Background())
+		if err != nil {
 			fmt.Println(errkit.AddFuncName(err))
 		}
 	}

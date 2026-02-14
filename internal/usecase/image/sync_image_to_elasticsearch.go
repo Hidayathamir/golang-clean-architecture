@@ -9,17 +9,18 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
-func (u *ImageUsecaseImpl) SyncImageToElasticsearch(ctx context.Context, req *dto.SyncImageToElasticsearchRequest) error {
-	err := x.Validate.Struct(req)
+func (u *ImageUsecaseImpl) SyncImageToElasticsearch(ctx context.Context, req dto.SyncImageToElasticsearchRequest) error {
+	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.BadRequest(err)
 		return errkit.AddFuncName(err)
 	}
 
-	imageDocument := new(dto.ImageDocument)
-	converter.DtoSyncImageToElasticsearchRequestToDtoImageDocument(ctx, req, imageDocument)
+	imageDocument := dto.ImageDocument{}
+	converter.DtoSyncImageToElasticsearchRequestToDtoImageDocument(req, &imageDocument)
 
-	if err := u.ImageSearch.IndexImage(ctx, imageDocument); err != nil {
+	err = u.ImageSearch.IndexImage(ctx, &imageDocument)
+	if err != nil {
 		return errkit.AddFuncName(err)
 	}
 

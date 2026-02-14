@@ -20,40 +20,40 @@ var _ image.ImageUsecase = &ImageUsecaseMock{}
 //
 //		// make and configure a mocked image.ImageUsecase
 //		mockedImageUsecase := &ImageUsecaseMock{
-//			BatchUpdateImageCommentCountFunc: func(ctx context.Context, req *dto.BatchUpdateImageCommentCountRequest) error {
+//			BatchUpdateImageCommentCountFunc: func(ctx context.Context, req dto.BatchUpdateImageCommentCountRequest) error {
 //				panic("mock out the BatchUpdateImageCommentCount method")
 //			},
-//			BatchUpdateImageLikeCountFunc: func(ctx context.Context, req *dto.BatchUpdateImageLikeCountRequest) error {
+//			BatchUpdateImageLikeCountFunc: func(ctx context.Context, req dto.BatchUpdateImageLikeCountRequest) error {
 //				panic("mock out the BatchUpdateImageLikeCount method")
 //			},
-//			CommentFunc: func(ctx context.Context, req *dto.CommentImageRequest) error {
+//			CommentFunc: func(ctx context.Context, req dto.CommentImageRequest) error {
 //				panic("mock out the Comment method")
 //			},
-//			GetCommentFunc: func(ctx context.Context, req *dto.GetCommentRequest) (*dto.CommentResponseList, error) {
+//			GetCommentFunc: func(ctx context.Context, req dto.GetCommentRequest) (dto.CommentResponseList, error) {
 //				panic("mock out the GetComment method")
 //			},
-//			GetImageFunc: func(ctx context.Context, req *dto.GetImageRequest) (*dto.ImageResponse, error) {
+//			GetImageFunc: func(ctx context.Context, req dto.GetImageRequest) (dto.ImageResponse, error) {
 //				panic("mock out the GetImage method")
 //			},
-//			GetLikeFunc: func(ctx context.Context, req *dto.GetLikeRequest) (*dto.LikeResponseList, error) {
+//			GetLikeFunc: func(ctx context.Context, req dto.GetLikeRequest) (dto.LikeResponseList, error) {
 //				panic("mock out the GetLike method")
 //			},
-//			LikeFunc: func(ctx context.Context, req *dto.LikeImageRequest) error {
+//			LikeFunc: func(ctx context.Context, req dto.LikeImageRequest) error {
 //				panic("mock out the Like method")
 //			},
-//			NotifyFollowerOnUploadFunc: func(ctx context.Context, req *dto.NotifyFollowerOnUploadRequest) error {
+//			NotifyFollowerOnUploadFunc: func(ctx context.Context, req dto.NotifyFollowerOnUploadRequest) error {
 //				panic("mock out the NotifyFollowerOnUpload method")
 //			},
-//			NotifyUserImageCommentedFunc: func(ctx context.Context, req *dto.NotifyUserImageCommentedRequest) error {
+//			NotifyUserImageCommentedFunc: func(ctx context.Context, req dto.NotifyUserImageCommentedRequest) error {
 //				panic("mock out the NotifyUserImageCommented method")
 //			},
-//			NotifyUserImageLikedFunc: func(ctx context.Context, req *dto.NotifyUserImageLikedRequest) error {
+//			NotifyUserImageLikedFunc: func(ctx context.Context, req dto.NotifyUserImageLikedRequest) error {
 //				panic("mock out the NotifyUserImageLiked method")
 //			},
-//			SyncImageToElasticsearchFunc: func(ctx context.Context, req *dto.SyncImageToElasticsearchRequest) error {
+//			SyncImageToElasticsearchFunc: func(ctx context.Context, req dto.SyncImageToElasticsearchRequest) error {
 //				panic("mock out the SyncImageToElasticsearch method")
 //			},
-//			UploadFunc: func(ctx context.Context, req *dto.UploadImageRequest) (*dto.ImageResponse, error) {
+//			UploadFunc: func(ctx context.Context, req dto.UploadImageRequest) (dto.ImageResponse, error) {
 //				panic("mock out the Upload method")
 //			},
 //		}
@@ -64,40 +64,40 @@ var _ image.ImageUsecase = &ImageUsecaseMock{}
 //	}
 type ImageUsecaseMock struct {
 	// BatchUpdateImageCommentCountFunc mocks the BatchUpdateImageCommentCount method.
-	BatchUpdateImageCommentCountFunc func(ctx context.Context, req *dto.BatchUpdateImageCommentCountRequest) error
+	BatchUpdateImageCommentCountFunc func(ctx context.Context, req dto.BatchUpdateImageCommentCountRequest) error
 
 	// BatchUpdateImageLikeCountFunc mocks the BatchUpdateImageLikeCount method.
-	BatchUpdateImageLikeCountFunc func(ctx context.Context, req *dto.BatchUpdateImageLikeCountRequest) error
+	BatchUpdateImageLikeCountFunc func(ctx context.Context, req dto.BatchUpdateImageLikeCountRequest) error
 
 	// CommentFunc mocks the Comment method.
-	CommentFunc func(ctx context.Context, req *dto.CommentImageRequest) error
+	CommentFunc func(ctx context.Context, req dto.CommentImageRequest) error
 
 	// GetCommentFunc mocks the GetComment method.
-	GetCommentFunc func(ctx context.Context, req *dto.GetCommentRequest) (*dto.CommentResponseList, error)
+	GetCommentFunc func(ctx context.Context, req dto.GetCommentRequest) (dto.CommentResponseList, error)
 
 	// GetImageFunc mocks the GetImage method.
-	GetImageFunc func(ctx context.Context, req *dto.GetImageRequest) (*dto.ImageResponse, error)
+	GetImageFunc func(ctx context.Context, req dto.GetImageRequest) (dto.ImageResponse, error)
 
 	// GetLikeFunc mocks the GetLike method.
-	GetLikeFunc func(ctx context.Context, req *dto.GetLikeRequest) (*dto.LikeResponseList, error)
+	GetLikeFunc func(ctx context.Context, req dto.GetLikeRequest) (dto.LikeResponseList, error)
 
 	// LikeFunc mocks the Like method.
-	LikeFunc func(ctx context.Context, req *dto.LikeImageRequest) error
+	LikeFunc func(ctx context.Context, req dto.LikeImageRequest) error
 
 	// NotifyFollowerOnUploadFunc mocks the NotifyFollowerOnUpload method.
-	NotifyFollowerOnUploadFunc func(ctx context.Context, req *dto.NotifyFollowerOnUploadRequest) error
+	NotifyFollowerOnUploadFunc func(ctx context.Context, req dto.NotifyFollowerOnUploadRequest) error
 
 	// NotifyUserImageCommentedFunc mocks the NotifyUserImageCommented method.
-	NotifyUserImageCommentedFunc func(ctx context.Context, req *dto.NotifyUserImageCommentedRequest) error
+	NotifyUserImageCommentedFunc func(ctx context.Context, req dto.NotifyUserImageCommentedRequest) error
 
 	// NotifyUserImageLikedFunc mocks the NotifyUserImageLiked method.
-	NotifyUserImageLikedFunc func(ctx context.Context, req *dto.NotifyUserImageLikedRequest) error
+	NotifyUserImageLikedFunc func(ctx context.Context, req dto.NotifyUserImageLikedRequest) error
 
 	// SyncImageToElasticsearchFunc mocks the SyncImageToElasticsearch method.
-	SyncImageToElasticsearchFunc func(ctx context.Context, req *dto.SyncImageToElasticsearchRequest) error
+	SyncImageToElasticsearchFunc func(ctx context.Context, req dto.SyncImageToElasticsearchRequest) error
 
 	// UploadFunc mocks the Upload method.
-	UploadFunc func(ctx context.Context, req *dto.UploadImageRequest) (*dto.ImageResponse, error)
+	UploadFunc func(ctx context.Context, req dto.UploadImageRequest) (dto.ImageResponse, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -106,84 +106,84 @@ type ImageUsecaseMock struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.BatchUpdateImageCommentCountRequest
+			Req dto.BatchUpdateImageCommentCountRequest
 		}
 		// BatchUpdateImageLikeCount holds details about calls to the BatchUpdateImageLikeCount method.
 		BatchUpdateImageLikeCount []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.BatchUpdateImageLikeCountRequest
+			Req dto.BatchUpdateImageLikeCountRequest
 		}
 		// Comment holds details about calls to the Comment method.
 		Comment []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.CommentImageRequest
+			Req dto.CommentImageRequest
 		}
 		// GetComment holds details about calls to the GetComment method.
 		GetComment []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.GetCommentRequest
+			Req dto.GetCommentRequest
 		}
 		// GetImage holds details about calls to the GetImage method.
 		GetImage []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.GetImageRequest
+			Req dto.GetImageRequest
 		}
 		// GetLike holds details about calls to the GetLike method.
 		GetLike []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.GetLikeRequest
+			Req dto.GetLikeRequest
 		}
 		// Like holds details about calls to the Like method.
 		Like []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.LikeImageRequest
+			Req dto.LikeImageRequest
 		}
 		// NotifyFollowerOnUpload holds details about calls to the NotifyFollowerOnUpload method.
 		NotifyFollowerOnUpload []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.NotifyFollowerOnUploadRequest
+			Req dto.NotifyFollowerOnUploadRequest
 		}
 		// NotifyUserImageCommented holds details about calls to the NotifyUserImageCommented method.
 		NotifyUserImageCommented []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.NotifyUserImageCommentedRequest
+			Req dto.NotifyUserImageCommentedRequest
 		}
 		// NotifyUserImageLiked holds details about calls to the NotifyUserImageLiked method.
 		NotifyUserImageLiked []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.NotifyUserImageLikedRequest
+			Req dto.NotifyUserImageLikedRequest
 		}
 		// SyncImageToElasticsearch holds details about calls to the SyncImageToElasticsearch method.
 		SyncImageToElasticsearch []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.SyncImageToElasticsearchRequest
+			Req dto.SyncImageToElasticsearchRequest
 		}
 		// Upload holds details about calls to the Upload method.
 		Upload []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.UploadImageRequest
+			Req dto.UploadImageRequest
 		}
 	}
 	lockBatchUpdateImageCommentCount sync.RWMutex
@@ -201,13 +201,13 @@ type ImageUsecaseMock struct {
 }
 
 // BatchUpdateImageCommentCount calls BatchUpdateImageCommentCountFunc.
-func (mock *ImageUsecaseMock) BatchUpdateImageCommentCount(ctx context.Context, req *dto.BatchUpdateImageCommentCountRequest) error {
+func (mock *ImageUsecaseMock) BatchUpdateImageCommentCount(ctx context.Context, req dto.BatchUpdateImageCommentCountRequest) error {
 	if mock.BatchUpdateImageCommentCountFunc == nil {
 		panic("ImageUsecaseMock.BatchUpdateImageCommentCountFunc: method is nil but ImageUsecase.BatchUpdateImageCommentCount was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.BatchUpdateImageCommentCountRequest
+		Req dto.BatchUpdateImageCommentCountRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -224,11 +224,11 @@ func (mock *ImageUsecaseMock) BatchUpdateImageCommentCount(ctx context.Context, 
 //	len(mockedImageUsecase.BatchUpdateImageCommentCountCalls())
 func (mock *ImageUsecaseMock) BatchUpdateImageCommentCountCalls() []struct {
 	Ctx context.Context
-	Req *dto.BatchUpdateImageCommentCountRequest
+	Req dto.BatchUpdateImageCommentCountRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.BatchUpdateImageCommentCountRequest
+		Req dto.BatchUpdateImageCommentCountRequest
 	}
 	mock.lockBatchUpdateImageCommentCount.RLock()
 	calls = mock.calls.BatchUpdateImageCommentCount
@@ -237,13 +237,13 @@ func (mock *ImageUsecaseMock) BatchUpdateImageCommentCountCalls() []struct {
 }
 
 // BatchUpdateImageLikeCount calls BatchUpdateImageLikeCountFunc.
-func (mock *ImageUsecaseMock) BatchUpdateImageLikeCount(ctx context.Context, req *dto.BatchUpdateImageLikeCountRequest) error {
+func (mock *ImageUsecaseMock) BatchUpdateImageLikeCount(ctx context.Context, req dto.BatchUpdateImageLikeCountRequest) error {
 	if mock.BatchUpdateImageLikeCountFunc == nil {
 		panic("ImageUsecaseMock.BatchUpdateImageLikeCountFunc: method is nil but ImageUsecase.BatchUpdateImageLikeCount was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.BatchUpdateImageLikeCountRequest
+		Req dto.BatchUpdateImageLikeCountRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -260,11 +260,11 @@ func (mock *ImageUsecaseMock) BatchUpdateImageLikeCount(ctx context.Context, req
 //	len(mockedImageUsecase.BatchUpdateImageLikeCountCalls())
 func (mock *ImageUsecaseMock) BatchUpdateImageLikeCountCalls() []struct {
 	Ctx context.Context
-	Req *dto.BatchUpdateImageLikeCountRequest
+	Req dto.BatchUpdateImageLikeCountRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.BatchUpdateImageLikeCountRequest
+		Req dto.BatchUpdateImageLikeCountRequest
 	}
 	mock.lockBatchUpdateImageLikeCount.RLock()
 	calls = mock.calls.BatchUpdateImageLikeCount
@@ -273,13 +273,13 @@ func (mock *ImageUsecaseMock) BatchUpdateImageLikeCountCalls() []struct {
 }
 
 // Comment calls CommentFunc.
-func (mock *ImageUsecaseMock) Comment(ctx context.Context, req *dto.CommentImageRequest) error {
+func (mock *ImageUsecaseMock) Comment(ctx context.Context, req dto.CommentImageRequest) error {
 	if mock.CommentFunc == nil {
 		panic("ImageUsecaseMock.CommentFunc: method is nil but ImageUsecase.Comment was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.CommentImageRequest
+		Req dto.CommentImageRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -296,11 +296,11 @@ func (mock *ImageUsecaseMock) Comment(ctx context.Context, req *dto.CommentImage
 //	len(mockedImageUsecase.CommentCalls())
 func (mock *ImageUsecaseMock) CommentCalls() []struct {
 	Ctx context.Context
-	Req *dto.CommentImageRequest
+	Req dto.CommentImageRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.CommentImageRequest
+		Req dto.CommentImageRequest
 	}
 	mock.lockComment.RLock()
 	calls = mock.calls.Comment
@@ -309,13 +309,13 @@ func (mock *ImageUsecaseMock) CommentCalls() []struct {
 }
 
 // GetComment calls GetCommentFunc.
-func (mock *ImageUsecaseMock) GetComment(ctx context.Context, req *dto.GetCommentRequest) (*dto.CommentResponseList, error) {
+func (mock *ImageUsecaseMock) GetComment(ctx context.Context, req dto.GetCommentRequest) (dto.CommentResponseList, error) {
 	if mock.GetCommentFunc == nil {
 		panic("ImageUsecaseMock.GetCommentFunc: method is nil but ImageUsecase.GetComment was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.GetCommentRequest
+		Req dto.GetCommentRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -332,11 +332,11 @@ func (mock *ImageUsecaseMock) GetComment(ctx context.Context, req *dto.GetCommen
 //	len(mockedImageUsecase.GetCommentCalls())
 func (mock *ImageUsecaseMock) GetCommentCalls() []struct {
 	Ctx context.Context
-	Req *dto.GetCommentRequest
+	Req dto.GetCommentRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.GetCommentRequest
+		Req dto.GetCommentRequest
 	}
 	mock.lockGetComment.RLock()
 	calls = mock.calls.GetComment
@@ -345,13 +345,13 @@ func (mock *ImageUsecaseMock) GetCommentCalls() []struct {
 }
 
 // GetImage calls GetImageFunc.
-func (mock *ImageUsecaseMock) GetImage(ctx context.Context, req *dto.GetImageRequest) (*dto.ImageResponse, error) {
+func (mock *ImageUsecaseMock) GetImage(ctx context.Context, req dto.GetImageRequest) (dto.ImageResponse, error) {
 	if mock.GetImageFunc == nil {
 		panic("ImageUsecaseMock.GetImageFunc: method is nil but ImageUsecase.GetImage was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.GetImageRequest
+		Req dto.GetImageRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -368,11 +368,11 @@ func (mock *ImageUsecaseMock) GetImage(ctx context.Context, req *dto.GetImageReq
 //	len(mockedImageUsecase.GetImageCalls())
 func (mock *ImageUsecaseMock) GetImageCalls() []struct {
 	Ctx context.Context
-	Req *dto.GetImageRequest
+	Req dto.GetImageRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.GetImageRequest
+		Req dto.GetImageRequest
 	}
 	mock.lockGetImage.RLock()
 	calls = mock.calls.GetImage
@@ -381,13 +381,13 @@ func (mock *ImageUsecaseMock) GetImageCalls() []struct {
 }
 
 // GetLike calls GetLikeFunc.
-func (mock *ImageUsecaseMock) GetLike(ctx context.Context, req *dto.GetLikeRequest) (*dto.LikeResponseList, error) {
+func (mock *ImageUsecaseMock) GetLike(ctx context.Context, req dto.GetLikeRequest) (dto.LikeResponseList, error) {
 	if mock.GetLikeFunc == nil {
 		panic("ImageUsecaseMock.GetLikeFunc: method is nil but ImageUsecase.GetLike was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.GetLikeRequest
+		Req dto.GetLikeRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -404,11 +404,11 @@ func (mock *ImageUsecaseMock) GetLike(ctx context.Context, req *dto.GetLikeReque
 //	len(mockedImageUsecase.GetLikeCalls())
 func (mock *ImageUsecaseMock) GetLikeCalls() []struct {
 	Ctx context.Context
-	Req *dto.GetLikeRequest
+	Req dto.GetLikeRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.GetLikeRequest
+		Req dto.GetLikeRequest
 	}
 	mock.lockGetLike.RLock()
 	calls = mock.calls.GetLike
@@ -417,13 +417,13 @@ func (mock *ImageUsecaseMock) GetLikeCalls() []struct {
 }
 
 // Like calls LikeFunc.
-func (mock *ImageUsecaseMock) Like(ctx context.Context, req *dto.LikeImageRequest) error {
+func (mock *ImageUsecaseMock) Like(ctx context.Context, req dto.LikeImageRequest) error {
 	if mock.LikeFunc == nil {
 		panic("ImageUsecaseMock.LikeFunc: method is nil but ImageUsecase.Like was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.LikeImageRequest
+		Req dto.LikeImageRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -440,11 +440,11 @@ func (mock *ImageUsecaseMock) Like(ctx context.Context, req *dto.LikeImageReques
 //	len(mockedImageUsecase.LikeCalls())
 func (mock *ImageUsecaseMock) LikeCalls() []struct {
 	Ctx context.Context
-	Req *dto.LikeImageRequest
+	Req dto.LikeImageRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.LikeImageRequest
+		Req dto.LikeImageRequest
 	}
 	mock.lockLike.RLock()
 	calls = mock.calls.Like
@@ -453,13 +453,13 @@ func (mock *ImageUsecaseMock) LikeCalls() []struct {
 }
 
 // NotifyFollowerOnUpload calls NotifyFollowerOnUploadFunc.
-func (mock *ImageUsecaseMock) NotifyFollowerOnUpload(ctx context.Context, req *dto.NotifyFollowerOnUploadRequest) error {
+func (mock *ImageUsecaseMock) NotifyFollowerOnUpload(ctx context.Context, req dto.NotifyFollowerOnUploadRequest) error {
 	if mock.NotifyFollowerOnUploadFunc == nil {
 		panic("ImageUsecaseMock.NotifyFollowerOnUploadFunc: method is nil but ImageUsecase.NotifyFollowerOnUpload was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.NotifyFollowerOnUploadRequest
+		Req dto.NotifyFollowerOnUploadRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -476,11 +476,11 @@ func (mock *ImageUsecaseMock) NotifyFollowerOnUpload(ctx context.Context, req *d
 //	len(mockedImageUsecase.NotifyFollowerOnUploadCalls())
 func (mock *ImageUsecaseMock) NotifyFollowerOnUploadCalls() []struct {
 	Ctx context.Context
-	Req *dto.NotifyFollowerOnUploadRequest
+	Req dto.NotifyFollowerOnUploadRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.NotifyFollowerOnUploadRequest
+		Req dto.NotifyFollowerOnUploadRequest
 	}
 	mock.lockNotifyFollowerOnUpload.RLock()
 	calls = mock.calls.NotifyFollowerOnUpload
@@ -489,13 +489,13 @@ func (mock *ImageUsecaseMock) NotifyFollowerOnUploadCalls() []struct {
 }
 
 // NotifyUserImageCommented calls NotifyUserImageCommentedFunc.
-func (mock *ImageUsecaseMock) NotifyUserImageCommented(ctx context.Context, req *dto.NotifyUserImageCommentedRequest) error {
+func (mock *ImageUsecaseMock) NotifyUserImageCommented(ctx context.Context, req dto.NotifyUserImageCommentedRequest) error {
 	if mock.NotifyUserImageCommentedFunc == nil {
 		panic("ImageUsecaseMock.NotifyUserImageCommentedFunc: method is nil but ImageUsecase.NotifyUserImageCommented was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.NotifyUserImageCommentedRequest
+		Req dto.NotifyUserImageCommentedRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -512,11 +512,11 @@ func (mock *ImageUsecaseMock) NotifyUserImageCommented(ctx context.Context, req 
 //	len(mockedImageUsecase.NotifyUserImageCommentedCalls())
 func (mock *ImageUsecaseMock) NotifyUserImageCommentedCalls() []struct {
 	Ctx context.Context
-	Req *dto.NotifyUserImageCommentedRequest
+	Req dto.NotifyUserImageCommentedRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.NotifyUserImageCommentedRequest
+		Req dto.NotifyUserImageCommentedRequest
 	}
 	mock.lockNotifyUserImageCommented.RLock()
 	calls = mock.calls.NotifyUserImageCommented
@@ -525,13 +525,13 @@ func (mock *ImageUsecaseMock) NotifyUserImageCommentedCalls() []struct {
 }
 
 // NotifyUserImageLiked calls NotifyUserImageLikedFunc.
-func (mock *ImageUsecaseMock) NotifyUserImageLiked(ctx context.Context, req *dto.NotifyUserImageLikedRequest) error {
+func (mock *ImageUsecaseMock) NotifyUserImageLiked(ctx context.Context, req dto.NotifyUserImageLikedRequest) error {
 	if mock.NotifyUserImageLikedFunc == nil {
 		panic("ImageUsecaseMock.NotifyUserImageLikedFunc: method is nil but ImageUsecase.NotifyUserImageLiked was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.NotifyUserImageLikedRequest
+		Req dto.NotifyUserImageLikedRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -548,11 +548,11 @@ func (mock *ImageUsecaseMock) NotifyUserImageLiked(ctx context.Context, req *dto
 //	len(mockedImageUsecase.NotifyUserImageLikedCalls())
 func (mock *ImageUsecaseMock) NotifyUserImageLikedCalls() []struct {
 	Ctx context.Context
-	Req *dto.NotifyUserImageLikedRequest
+	Req dto.NotifyUserImageLikedRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.NotifyUserImageLikedRequest
+		Req dto.NotifyUserImageLikedRequest
 	}
 	mock.lockNotifyUserImageLiked.RLock()
 	calls = mock.calls.NotifyUserImageLiked
@@ -561,13 +561,13 @@ func (mock *ImageUsecaseMock) NotifyUserImageLikedCalls() []struct {
 }
 
 // SyncImageToElasticsearch calls SyncImageToElasticsearchFunc.
-func (mock *ImageUsecaseMock) SyncImageToElasticsearch(ctx context.Context, req *dto.SyncImageToElasticsearchRequest) error {
+func (mock *ImageUsecaseMock) SyncImageToElasticsearch(ctx context.Context, req dto.SyncImageToElasticsearchRequest) error {
 	if mock.SyncImageToElasticsearchFunc == nil {
 		panic("ImageUsecaseMock.SyncImageToElasticsearchFunc: method is nil but ImageUsecase.SyncImageToElasticsearch was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.SyncImageToElasticsearchRequest
+		Req dto.SyncImageToElasticsearchRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -584,11 +584,11 @@ func (mock *ImageUsecaseMock) SyncImageToElasticsearch(ctx context.Context, req 
 //	len(mockedImageUsecase.SyncImageToElasticsearchCalls())
 func (mock *ImageUsecaseMock) SyncImageToElasticsearchCalls() []struct {
 	Ctx context.Context
-	Req *dto.SyncImageToElasticsearchRequest
+	Req dto.SyncImageToElasticsearchRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.SyncImageToElasticsearchRequest
+		Req dto.SyncImageToElasticsearchRequest
 	}
 	mock.lockSyncImageToElasticsearch.RLock()
 	calls = mock.calls.SyncImageToElasticsearch
@@ -597,13 +597,13 @@ func (mock *ImageUsecaseMock) SyncImageToElasticsearchCalls() []struct {
 }
 
 // Upload calls UploadFunc.
-func (mock *ImageUsecaseMock) Upload(ctx context.Context, req *dto.UploadImageRequest) (*dto.ImageResponse, error) {
+func (mock *ImageUsecaseMock) Upload(ctx context.Context, req dto.UploadImageRequest) (dto.ImageResponse, error) {
 	if mock.UploadFunc == nil {
 		panic("ImageUsecaseMock.UploadFunc: method is nil but ImageUsecase.Upload was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.UploadImageRequest
+		Req dto.UploadImageRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -620,11 +620,11 @@ func (mock *ImageUsecaseMock) Upload(ctx context.Context, req *dto.UploadImageRe
 //	len(mockedImageUsecase.UploadCalls())
 func (mock *ImageUsecaseMock) UploadCalls() []struct {
 	Ctx context.Context
-	Req *dto.UploadImageRequest
+	Req dto.UploadImageRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.UploadImageRequest
+		Req dto.UploadImageRequest
 	}
 	mock.lockUpload.RLock()
 	calls = mock.calls.Upload

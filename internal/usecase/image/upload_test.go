@@ -53,11 +53,11 @@ func TestImageUsecaseImpl_Upload_Success(t *testing.T) {
 	ctx := context.Background()
 	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1, Username: "user1"})
 
-	res, err := u.Upload(ctx, req)
+	res, err := u.Upload(ctx, *req)
 
 	// ------------------------------------------------------- //
 
-	expected := &dto.ImageResponse{
+	expected := dto.ImageResponse{
 		ID:        100,
 		UserID:    1,
 		URL:       "http://image-url.com/image.png",
@@ -77,9 +77,9 @@ func TestImageUsecaseImpl_Upload_Fail_ValidateStruct(t *testing.T) {
 
 	req := &dto.UploadImageRequest{} // invalid request
 
-	res, err := u.Upload(context.Background(), req)
+	res, err := u.Upload(context.Background(), *req)
 
-	require.Nil(t, res)
+	require.Equal(t, dto.ImageResponse{}, res)
 	require.NotNil(t, err)
 	var verrs validator.ValidationErrors
 	require.ErrorAs(t, err, &verrs)
@@ -105,9 +105,9 @@ func TestImageUsecaseImpl_Upload_Fail_S3Upload(t *testing.T) {
 	ctx := context.Background()
 	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1, Username: "user1"})
 
-	res, err := u.Upload(ctx, req)
+	res, err := u.Upload(ctx, *req)
 
-	require.Nil(t, res)
+	require.Equal(t, dto.ImageResponse{}, res)
 	require.NotNil(t, err)
 	require.ErrorIs(t, err, assert.AnError)
 }
@@ -138,9 +138,9 @@ func TestImageUsecaseImpl_Upload_Fail_Create(t *testing.T) {
 	ctx := context.Background()
 	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1, Username: "user1"})
 
-	res, err := u.Upload(ctx, req)
+	res, err := u.Upload(ctx, *req)
 
-	require.Nil(t, res)
+	require.Equal(t, dto.ImageResponse{}, res)
 	require.NotNil(t, err)
 	require.ErrorIs(t, err, assert.AnError)
 }
@@ -177,9 +177,9 @@ func TestImageUsecaseImpl_Upload_Fail_Send(t *testing.T) {
 	ctx := context.Background()
 	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1, Username: "user1"})
 
-	res, err := u.Upload(ctx, req)
+	res, err := u.Upload(ctx, *req)
 
-	require.Nil(t, res)
+	require.Equal(t, dto.ImageResponse{}, res)
 	require.NotNil(t, err)
 	require.ErrorIs(t, err, assert.AnError)
 }

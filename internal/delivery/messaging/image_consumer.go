@@ -25,7 +25,8 @@ func NewImageConsumer(usecase image.ImageUsecase) *ImageConsumer {
 
 func (c *ImageConsumer) NotifyFollowerOnUpload(ctx context.Context, records []*kgo.Record) error {
 	for _, record := range records {
-		if err := c.notifyFollowerOnUpload(ctx, record); err != nil {
+		err := c.notifyFollowerOnUpload(ctx, record)
+		if err != nil {
 			x.Logger.WithContext(ctx).WithError(err).Error()
 			continue
 		}
@@ -37,16 +38,18 @@ func (c *ImageConsumer) notifyFollowerOnUpload(ctx context.Context, record *kgo.
 	ctx, span := telemetry.StartConsumer(ctx, record)
 	defer span.End()
 
-	event := new(dto.ImageUploadedEvent)
-	if err := json.Unmarshal(record.Value, event); err != nil {
+	event := dto.ImageUploadedEvent{}
+	err := json.Unmarshal(record.Value, &event)
+	if err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
-	req := new(dto.NotifyFollowerOnUploadRequest)
-	converter.DtoImageUploadedEventToDtoNotifyFollowerOnUploadRequest(ctx, event, req)
+	req := dto.NotifyFollowerOnUploadRequest{}
+	converter.DtoImageUploadedEventToDtoNotifyFollowerOnUploadRequest(event, &req)
 
-	if err := c.Usecase.NotifyFollowerOnUpload(ctx, req); err != nil {
+	err = c.Usecase.NotifyFollowerOnUpload(ctx, req)
+	if err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
@@ -56,7 +59,8 @@ func (c *ImageConsumer) notifyFollowerOnUpload(ctx context.Context, record *kgo.
 
 func (c *ImageConsumer) SyncImageToElasticsearch(ctx context.Context, records []*kgo.Record) error {
 	for _, record := range records {
-		if err := c.syncImageToElasticsearch(ctx, record); err != nil {
+		err := c.syncImageToElasticsearch(ctx, record)
+		if err != nil {
 			x.Logger.WithContext(ctx).WithError(err).Error()
 			continue
 		}
@@ -68,16 +72,18 @@ func (c *ImageConsumer) syncImageToElasticsearch(ctx context.Context, record *kg
 	ctx, span := telemetry.StartConsumer(ctx, record)
 	defer span.End()
 
-	event := new(dto.ImageUploadedEvent)
-	if err := json.Unmarshal(record.Value, event); err != nil {
+	event := dto.ImageUploadedEvent{}
+	err := json.Unmarshal(record.Value, &event)
+	if err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
-	req := new(dto.SyncImageToElasticsearchRequest)
-	converter.DtoImageUploadedEventToDtoSyncImageToElasticsearchRequest(ctx, event, req)
+	req := dto.SyncImageToElasticsearchRequest{}
+	converter.DtoImageUploadedEventToDtoSyncImageToElasticsearchRequest(event, &req)
 
-	if err := c.Usecase.SyncImageToElasticsearch(ctx, req); err != nil {
+	err = c.Usecase.SyncImageToElasticsearch(ctx, req)
+	if err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
@@ -87,7 +93,8 @@ func (c *ImageConsumer) syncImageToElasticsearch(ctx context.Context, record *kg
 
 func (c *ImageConsumer) NotifyUserImageLiked(ctx context.Context, records []*kgo.Record) error {
 	for _, record := range records {
-		if err := c.notifyUserImageLiked(ctx, record); err != nil {
+		err := c.notifyUserImageLiked(ctx, record)
+		if err != nil {
 			x.Logger.WithContext(ctx).WithError(err).Error()
 			continue
 		}
@@ -99,16 +106,18 @@ func (c *ImageConsumer) notifyUserImageLiked(ctx context.Context, record *kgo.Re
 	ctx, span := telemetry.StartConsumer(ctx, record)
 	defer span.End()
 
-	event := new(dto.ImageLikedEvent)
-	if err := json.Unmarshal(record.Value, event); err != nil {
+	event := dto.ImageLikedEvent{}
+	err := json.Unmarshal(record.Value, &event)
+	if err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
-	req := new(dto.NotifyUserImageLikedRequest)
-	converter.DtoImageLikedEventToDtoNotifyUserImageLikedRequest(ctx, event, req)
+	req := dto.NotifyUserImageLikedRequest{}
+	converter.DtoImageLikedEventToDtoNotifyUserImageLikedRequest(event, &req)
 
-	if err := c.Usecase.NotifyUserImageLiked(ctx, req); err != nil {
+	err = c.Usecase.NotifyUserImageLiked(ctx, req)
+	if err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
@@ -120,10 +129,11 @@ func (c *ImageConsumer) BatchUpdateImageLikeCount(originalCtx context.Context, r
 	ctx, span := telemetry.StartConsumerBatch(originalCtx, records)
 	defer span.End()
 
-	req := new(dto.BatchUpdateImageLikeCountRequest)
-	converter.KGoRecordListToDtoBatchUpdateImageLikeCountRequest(ctx, records, req)
+	req := dto.BatchUpdateImageLikeCountRequest{}
+	converter.KGoRecordListToDtoBatchUpdateImageLikeCountRequest(ctx, records, &req)
 
-	if err := c.Usecase.BatchUpdateImageLikeCount(ctx, req); err != nil {
+	err := c.Usecase.BatchUpdateImageLikeCount(ctx, req)
+	if err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
@@ -133,7 +143,8 @@ func (c *ImageConsumer) BatchUpdateImageLikeCount(originalCtx context.Context, r
 
 func (c *ImageConsumer) NotifyUserImageCommented(ctx context.Context, records []*kgo.Record) error {
 	for _, record := range records {
-		if err := c.notifyUserImageCommented(ctx, record); err != nil {
+		err := c.notifyUserImageCommented(ctx, record)
+		if err != nil {
 			x.Logger.WithContext(ctx).WithError(err).Error()
 			continue
 		}
@@ -145,16 +156,18 @@ func (c *ImageConsumer) notifyUserImageCommented(ctx context.Context, record *kg
 	ctx, span := telemetry.StartConsumer(ctx, record)
 	defer span.End()
 
-	event := new(dto.ImageCommentedEvent)
-	if err := json.Unmarshal(record.Value, event); err != nil {
+	event := dto.ImageCommentedEvent{}
+	err := json.Unmarshal(record.Value, &event)
+	if err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
-	req := new(dto.NotifyUserImageCommentedRequest)
-	converter.DtoImageCommentedEventToDtoNotifyUserImageCommentedRequest(ctx, event, req)
+	req := dto.NotifyUserImageCommentedRequest{}
+	converter.DtoImageCommentedEventToDtoNotifyUserImageCommentedRequest(event, &req)
 
-	if err := c.Usecase.NotifyUserImageCommented(ctx, req); err != nil {
+	err = c.Usecase.NotifyUserImageCommented(ctx, req)
+	if err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
@@ -166,10 +179,11 @@ func (c *ImageConsumer) BatchUpdateImageCommentCount(ctx context.Context, record
 	ctx, span := telemetry.StartConsumerBatch(ctx, records)
 	defer span.End()
 
-	req := new(dto.BatchUpdateImageCommentCountRequest)
-	converter.KGoRecordListToDtoBatchUpdateImageCommentCountRequest(ctx, records, req)
+	req := dto.BatchUpdateImageCommentCountRequest{}
+	converter.KGoRecordListToDtoBatchUpdateImageCommentCountRequest(ctx, records, &req)
 
-	if err := c.Usecase.BatchUpdateImageCommentCount(ctx, req); err != nil {
+	err := c.Usecase.BatchUpdateImageCommentCount(ctx, req)
+	if err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}

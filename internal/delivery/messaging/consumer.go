@@ -32,11 +32,13 @@ func ConsumeEvent(ctx context.Context, cfg *config.Config, consumerGroup string,
 
 		records := fetches.Records()
 		if len(records) > 0 {
-			if err := handler(ctx, records); err != nil {
+			err := handler(ctx, records)
+			if err != nil {
 				localLogger.WithError(err).Error("handler got error processing message")
 			}
 
-			if err := client.CommitUncommittedOffsets(ctx); err != nil {
+			err = client.CommitUncommittedOffsets(ctx)
+			if err != nil {
 				localLogger.WithError(err).Error("client error commit")
 			}
 		}

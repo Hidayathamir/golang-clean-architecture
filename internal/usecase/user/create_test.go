@@ -48,11 +48,11 @@ func TestUserUsecaseImpl_Create_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	res, err := u.Create(context.Background(), req)
+	res, err := u.Create(context.Background(), *req)
 
 	// ------------------------------------------------------- //
 
-	var expected = &dto.UserResponse{
+	var expected = dto.UserResponse{
 		ID:        0,
 		Username:  "user1",
 		Name:      "name1",
@@ -97,11 +97,11 @@ func TestUserUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	res, err := u.Create(context.Background(), req)
+	res, err := u.Create(context.Background(), *req)
 
 	// ------------------------------------------------------- //
 
-	var expected *dto.UserResponse
+	var expected dto.UserResponse
 
 	require.Equal(t, expected, res)
 	require.NotNil(t, err)
@@ -134,11 +134,11 @@ func TestUserUsecaseImpl_Create_Fail_Create(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	res, err := u.Create(context.Background(), req)
+	res, err := u.Create(context.Background(), *req)
 
 	// ------------------------------------------------------- //
 
-	var expected *dto.UserResponse
+	var expected dto.UserResponse
 
 	require.Equal(t, expected, res)
 	require.NotNil(t, err)

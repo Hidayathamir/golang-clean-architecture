@@ -2,23 +2,32 @@
 
 ## Description
 
-This is a Golang clean architecture template. It demonstrates how to run an HTTP server and Kafka consumers, while also providing examples of Kafka producers.
+This is a Golang clean architecture template.
 
 ## Architecture
 
 ![Clean Architecture](architecture.png)
 
-1. External system perform request (HTTP, gRPC, Messaging, etc)
-2. The Delivery creates various Model from request data
-3. The Delivery calls Use Case, and execute it using Model data
-4. The Use Case create Entity data for the business logic
-5. The Use Case calls Repository, and execute it using Entity data
-6. The Repository use Entity data to perform database operation
-7. The Repository perform database operation to the database
-8. The Use Case create various Model for Gateway or from Entity data
-9. The Use Case calls Gateway, and execute it using Model data
-10. The Gateway using Model data to construct request to external system 
-11. The Gateway perform request to external system (HTTP, gRPC, Messaging, etc)
+1. Application starts and loads **Config**.
+2. **Inbound triggers**:<br>
+   2.1 Upstream service sends request → enters via **HTTP** (Delivery layer).<br>
+   2.2 Kafka sends event → enters via **Messaging** (Delivery layer).<br>
+   2.3 Scheduler triggers job → enters via **Cron** (Delivery layer).
+3. Delivery layer converts incoming data → **DTO**.
+4. DTO is passed to the **Use Case**.
+5. Use Case executes business logic.
+6. Use Case calls required **Interface (Infra port)**.
+7. Infra implementations execute:<br>
+   7.1 **Repository** → persist/read from **Database**.<br>
+   7.2 **Cache** → read/write to **Redis**.<br>
+   7.3 **Storage** → upload/download to **S3**.<br>
+   7.4 **Messaging (Producer)** → publish event to **Kafka**.
+8. Infra returns result to Use Case.
+9. Use Case returns response DTO.
+10. Delivery layer formats and returns response:<br>
+    10.1 HTTP → send HTTP response.<br>
+    10.2 Messaging → commit/ack message.<br>
+    10.3 Cron → finish scheduled execution.
 
 ## System Design & Features
 
@@ -26,47 +35,17 @@ This template implements a social media-like backend to demonstrate scalable sys
 
 ![System Design](system-design.png)
 
-### Implemented Flows
-
-1.  **Upload Image**
-    *   **Flow:** Client uploads image -> Saved to S3 & DB -> `image.uploaded` event published to Kafka.
-    *   **Async Processing:** Workers consume the event to notify followers (fetching friend lists from User Service) and trigger notification events.
-
-2.  **Like Image**
-    *   **Flow:** Client likes image -> Record saved to DB -> `image.liked` event published to Kafka.
-    *   **Async Processing:**
-        *   Worker notifies the image poster.
-        *   Worker aggregates like counts and updates the `images` table asynchronously (eventual consistency).
-
-3.  **Comment on Image**
-    *   **Flow:** Client comments -> Record saved to DB -> `image.commented` event published to Kafka.
-    *   **Async Processing:**
-        *   Worker notifies the image poster.
-        *   Worker aggregates comment counts and updates the `images` table.
-
-4.  **Follow User**
-    *   **Flow:** Client follows user -> Record saved to DB -> `user.followed` event published to Kafka.
-    *   **Async Processing:**
-        *   Worker notifies the followed user.
-        *   Worker calculates and updates follower/following counts for involved users.
-
----
 
 ### 🚀 Key Features
 
 1. **General**
-   - **Better delivery return handling** — see [`return response.Data(ctx, http.StatusOK, res)`](internal/delivery/http/user_controller.go).
-   - **Swagger auto generation** — see [example](internal/delivery/http/user_controller.go). Generate with `make swag`. Access: [http://localhost:3000/swagger](http://localhost:3000/swagger)
-   - **Command shortcuts via Makefile** — see [Makefile](Makefile).
-    - **Gateway REST API client** — example: [S3 client](internal/infra/storage/s3_client.go).
-    - **Simplified repository (no generics)** — see [UserRepository](internal/infra/repository/user_repository.go).
-   - **Simple Kafka producer call** — usage: [`u.UserProducer.SendUserFollowed`](internal/usecase/user/follow.go).
-    - **Split usecase by domain** — example: [User usecase](internal/usecase/user).
-    - **Run with Docker** — see [How To Run Application](#how-to-run-application).
+    - **Better delivery return handling** — see [`return response.Data(ctx, http.StatusOK, res)`](internal/delivery/http/user_controller.go).
+    - **Swagger auto generation** — see [example](internal/delivery/http/user_controller.go). Generate with `make swag`. Access: [http://localhost:3000/swagger](http://localhost:3000/swagger)
+    - **Command shortcuts via Makefile** — see [Makefile](Makefile).
     - **Typed configuration** — use [`config.Config`](internal/config/config.go) for type-safe access.
 
 2. **Error Handling**
-   - **Consistent error wrapping & mapping** — e.g. [`errkit.BadRequest(err)`](internal/usecase/user/create.go) handled by [`response.Error`](internal/config/fiber.go).
+   - **Consistent error wrapping & mapping** — e.g. [`errkit.BadRequest(err)`](internal/usecase/user/create.go) handled by [`response.Error`](internal/delivery/http/response/response.go).
    - **Auto function-name enrichment** — [`errkit.AddFuncName`](internal/usecase/user/create.go).
    - **Example response:**
      ```json
@@ -120,19 +99,7 @@ This template implements a social media-like backend to demonstrate scalable sys
 
 The application uses `config.json` for configuration. Ensure the values match your environment (e.g., database credentials, Kafka brokers, etc.).
 
-### 2. Initial Setup
-
-1. Check required tools:
-```shell
-make check-tools
-```
-
-2. Rename go module name:
-```shell
-make rename-go-mod
-```
-
-### 3. How To Run Application
+### 2. How To Run Application
 
 Follow these steps to set up and run the entire ecosystem (Web, Worker, and Observability tools).
 
@@ -166,7 +133,6 @@ You usually need to run both the Web server (for APIs) and the Worker (for backg
 make run
 ```
 *   **Swagger UI**: [http://localhost:3000/swagger](http://localhost:3000/swagger)
-*   **API Base URL**: `http://localhost:3000`
 
 **Terminal B: Run Worker**
 ```bash

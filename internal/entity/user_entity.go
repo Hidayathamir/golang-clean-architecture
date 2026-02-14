@@ -24,7 +24,8 @@ func (u *User) TableName() string {
 }
 
 func (u *User) ValidatePassword(password string) error {
-	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)); err != nil {
+	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+	if err != nil {
 		return errkit.AddFuncName(err)
 	}
 

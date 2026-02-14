@@ -41,7 +41,7 @@ func TestImageUsecaseImpl_Like_Success(t *testing.T) {
 	ctx := context.Background()
 	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1})
 
-	err := u.Like(ctx, req)
+	err := u.Like(ctx, *req)
 
 	require.Nil(t, err)
 }
@@ -54,7 +54,7 @@ func TestImageUsecaseImpl_Like_Fail_ValidateStruct(t *testing.T) {
 
 	req := &dto.LikeImageRequest{}
 
-	err := u.Like(context.Background(), req)
+	err := u.Like(context.Background(), *req)
 
 	require.NotNil(t, err)
 	var verrs validator.ValidationErrors
@@ -81,7 +81,7 @@ func TestImageUsecaseImpl_Like_Fail_Create(t *testing.T) {
 	ctx := context.Background()
 	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1})
 
-	err := u.Like(ctx, req)
+	err := u.Like(ctx, *req)
 
 	require.NotNil(t, err)
 	require.ErrorIs(t, err, assert.AnError)
@@ -113,7 +113,7 @@ func TestImageUsecaseImpl_Like_Fail_Send(t *testing.T) {
 	ctx := context.Background()
 	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1})
 
-	err := u.Like(ctx, req)
+	err := u.Like(ctx, *req)
 
 	require.NotNil(t, err)
 	require.ErrorIs(t, err, assert.AnError)

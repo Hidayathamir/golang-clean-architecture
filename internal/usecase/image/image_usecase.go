@@ -15,18 +15,18 @@ import (
 //go:generate moq -out=../../mock/MockUsecaseImage.go -pkg=mock . ImageUsecase
 
 type ImageUsecase interface {
-	Upload(ctx context.Context, req *dto.UploadImageRequest) (*dto.ImageResponse, error)
-	Like(ctx context.Context, req *dto.LikeImageRequest) error
-	Comment(ctx context.Context, req *dto.CommentImageRequest) error
-	GetImage(ctx context.Context, req *dto.GetImageRequest) (*dto.ImageResponse, error)
-	GetLike(ctx context.Context, req *dto.GetLikeRequest) (*dto.LikeResponseList, error)
-	GetComment(ctx context.Context, req *dto.GetCommentRequest) (*dto.CommentResponseList, error)
-	NotifyFollowerOnUpload(ctx context.Context, req *dto.NotifyFollowerOnUploadRequest) error
-	SyncImageToElasticsearch(ctx context.Context, req *dto.SyncImageToElasticsearchRequest) error
-	NotifyUserImageCommented(ctx context.Context, req *dto.NotifyUserImageCommentedRequest) error
-	BatchUpdateImageCommentCount(ctx context.Context, req *dto.BatchUpdateImageCommentCountRequest) error
-	NotifyUserImageLiked(ctx context.Context, req *dto.NotifyUserImageLikedRequest) error
-	BatchUpdateImageLikeCount(ctx context.Context, req *dto.BatchUpdateImageLikeCountRequest) error
+	Upload(ctx context.Context, req dto.UploadImageRequest) (dto.ImageResponse, error)
+	Like(ctx context.Context, req dto.LikeImageRequest) error
+	Comment(ctx context.Context, req dto.CommentImageRequest) error
+	GetImage(ctx context.Context, req dto.GetImageRequest) (dto.ImageResponse, error)
+	GetLike(ctx context.Context, req dto.GetLikeRequest) (dto.LikeResponseList, error)
+	GetComment(ctx context.Context, req dto.GetCommentRequest) (dto.CommentResponseList, error)
+	NotifyFollowerOnUpload(ctx context.Context, req dto.NotifyFollowerOnUploadRequest) error
+	SyncImageToElasticsearch(ctx context.Context, req dto.SyncImageToElasticsearchRequest) error
+	NotifyUserImageCommented(ctx context.Context, req dto.NotifyUserImageCommentedRequest) error
+	BatchUpdateImageCommentCount(ctx context.Context, req dto.BatchUpdateImageCommentCountRequest) error
+	NotifyUserImageLiked(ctx context.Context, req dto.NotifyUserImageLikedRequest) error
+	BatchUpdateImageLikeCount(ctx context.Context, req dto.BatchUpdateImageLikeCountRequest) error
 }
 
 var _ ImageUsecase = &ImageUsecaseImpl{}

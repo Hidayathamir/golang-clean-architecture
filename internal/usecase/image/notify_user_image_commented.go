@@ -10,37 +10,41 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
-func (u *ImageUsecaseImpl) NotifyUserImageCommented(ctx context.Context, req *dto.NotifyUserImageCommentedRequest) error {
-	err := x.Validate.Struct(req)
+func (u *ImageUsecaseImpl) NotifyUserImageCommented(ctx context.Context, req dto.NotifyUserImageCommentedRequest) error {
+	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.BadRequest(err)
 		return errkit.AddFuncName(err)
 	}
 
-	image := new(entity.Image)
+	image := entity.Image{}
 
-	if err := u.ImageRepository.FindByID(ctx, u.DB, image, req.ImageID); err != nil {
+	err = u.ImageRepository.FindByID(ctx, u.DB, &image, req.ImageID)
+	if err != nil {
 		return errkit.AddFuncName(err)
 	}
 
-	uploader := new(entity.User)
+	uploader := entity.User{}
 
-	if err := u.UserRepository.FindByID(ctx, u.DB, uploader, image.UserID); err != nil {
+	err = u.UserRepository.FindByID(ctx, u.DB, &uploader, image.UserID)
+	if err != nil {
 		return errkit.AddFuncName(err)
 	}
 
-	commenter := new(entity.User)
+	commenter := entity.User{}
 
-	if err := u.UserRepository.FindByID(ctx, u.DB, commenter, req.CommenterUserID); err != nil {
+	err = u.UserRepository.FindByID(ctx, u.DB, &commenter, req.CommenterUserID)
+	if err != nil {
 		return errkit.AddFuncName(err)
 	}
 
-	event := &dto.NotifEvent{
+	event := dto.NotifEvent{
 		UserID:  uploader.ID,
 		Message: fmt.Sprintf("%s just comment on your post", commenter.Name),
 	}
 
-	if err := u.NotifProducer.SendNotif(ctx, event); err != nil {
+	err = u.NotifProducer.SendNotif(ctx, &event)
+	if err != nil {
 		return errkit.AddFuncName(err)
 	}
 

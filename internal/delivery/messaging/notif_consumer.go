@@ -25,7 +25,8 @@ func NewNotifConsumer(usecase notif.NotifUsecase) *NotifConsumer {
 
 func (c *NotifConsumer) Notify(ctx context.Context, records []*kgo.Record) error {
 	for _, record := range records {
-		if err := c.notify(ctx, record); err != nil {
+		err := c.notify(ctx, record)
+		if err != nil {
 			x.Logger.WithContext(ctx).WithError(err).Error()
 			continue
 		}
@@ -37,16 +38,18 @@ func (c *NotifConsumer) notify(ctx context.Context, record *kgo.Record) error {
 	ctx, span := telemetry.StartConsumer(ctx, record)
 	defer span.End()
 
-	event := new(dto.NotifEvent)
-	if err := json.Unmarshal(record.Value, event); err != nil {
+	event := dto.NotifEvent{}
+	err := json.Unmarshal(record.Value, &event)
+	if err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
 
-	req := new(dto.NotifyRequest)
-	converter.DtoNotifEventToDtoNotifyRequest(ctx, event, req)
+	req := dto.NotifyRequest{}
+	converter.DtoNotifEventToDtoNotifyRequest(event, &req)
 
-	if err := c.Usecase.Notify(ctx, req); err != nil {
+	err = c.Usecase.Notify(ctx, req)
+	if err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}

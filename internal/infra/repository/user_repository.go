@@ -63,7 +63,7 @@ func (r *UserRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, user *enti
 
 func (r *UserRepositoryImpl) CountByUsername(ctx context.Context, db *gorm.DB, username string) (int64, error) {
 	var total int64
-	err := db.WithContext(ctx).Model(new(entity.User)).Where(column.Username.Eq(username)).Count(&total).Error
+	err := db.WithContext(ctx).Model(&entity.User{}).Where(column.Username.Eq(username)).Count(&total).Error
 	if err != nil {
 		return 0, errkit.AddFuncName(err)
 	}

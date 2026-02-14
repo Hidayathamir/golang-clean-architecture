@@ -10,19 +10,21 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
-func (u *ImageUsecaseImpl) GetComment(ctx context.Context, req *dto.GetCommentRequest) (*dto.CommentResponseList, error) {
-	if err := x.Validate.Struct(req); err != nil {
+func (u *ImageUsecaseImpl) GetComment(ctx context.Context, req dto.GetCommentRequest) (dto.CommentResponseList, error) {
+	err := x.Validate.Struct(&req)
+	if err != nil {
 		err = errkit.BadRequest(err)
-		return nil, errkit.AddFuncName(err)
+		return dto.CommentResponseList{}, errkit.AddFuncName(err)
 	}
 
-	commentList := new(entity.CommentList)
-	if err := u.CommentRepository.FindByImageID(ctx, u.DB, commentList, req.ImageID); err != nil {
-		return nil, errkit.AddFuncName(err)
+	commentList := entity.CommentList{}
+	err = u.CommentRepository.FindByImageID(ctx, u.DB, &commentList, req.ImageID)
+	if err != nil {
+		return dto.CommentResponseList{}, errkit.AddFuncName(err)
 	}
 
-	res := new(dto.CommentResponseList)
-	converter.EntityCommentListToDtoCommentResponseList(ctx, commentList, res)
+	res := dto.CommentResponseList{}
+	converter.EntityCommentListToDtoCommentResponseList(commentList, &res)
 
 	return res, nil
 }

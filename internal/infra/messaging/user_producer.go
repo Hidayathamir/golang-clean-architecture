@@ -56,7 +56,8 @@ func (p *UserProducerImpl) send(ctx context.Context, topicName string, event any
 		Value: value,
 	}
 
-	if err := p.Client.ProduceSync(ctx, record).FirstErr(); err != nil {
+	err = p.Client.ProduceSync(ctx, record).FirstErr()
+	if err != nil {
 		return errkit.AddFuncName(err)
 	}
 

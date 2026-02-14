@@ -11,13 +11,13 @@ import (
 	"github.com/twmb/franz-go/pkg/kgo"
 )
 
-func DtoRegisterUserRequestToEntityUser(req *dto.RegisterUserRequest, user *entity.User, password string) {
+func DtoRegisterUserRequestToEntityUser(req dto.RegisterUserRequest, user *entity.User, password string) {
 	user.Username = req.Username
 	user.Name = req.Name
 	user.Password = password
 }
 
-func DtoUpdateUserRequestToEntityUser(req *dto.UpdateUserRequest, user *entity.User, password string) {
+func DtoUpdateUserRequestToEntityUser(req dto.UpdateUserRequest, user *entity.User, password string) {
 	if req.Name != "" {
 		user.Name = req.Name
 	}
@@ -27,7 +27,7 @@ func DtoUpdateUserRequestToEntityUser(req *dto.UpdateUserRequest, user *entity.U
 	}
 }
 
-func EntityUserToDtoUserResponse(user *entity.User, res *dto.UserResponse) {
+func EntityUserToDtoUserResponse(user entity.User, res *dto.UserResponse) {
 	res.ID = user.ID
 	res.Username = user.Username
 	res.Name = user.Name
@@ -35,7 +35,7 @@ func EntityUserToDtoUserResponse(user *entity.User, res *dto.UserResponse) {
 	res.UpdatedAt = user.UpdatedAt
 }
 
-func EntityUserToDtoUserLoginResponse(user *entity.User, res *dto.UserLoginResponse) {
+func EntityUserToDtoUserLoginResponse(user entity.User, res *dto.UserLoginResponse) {
 	res.ID = user.ID
 	res.Username = user.Username
 	res.Name = user.Name
@@ -43,7 +43,7 @@ func EntityUserToDtoUserLoginResponse(user *entity.User, res *dto.UserLoginRespo
 	res.UpdatedAt = user.UpdatedAt
 }
 
-func EntityUserToDtoUserAuth(user *entity.User, userAuth *dto.UserAuth) {
+func EntityUserToDtoUserAuth(user entity.User, userAuth *dto.UserAuth) {
 	userAuth.ID = user.ID
 	userAuth.Username = user.Username
 	userAuth.Name = user.Name
@@ -52,13 +52,13 @@ func EntityUserToDtoUserAuth(user *entity.User, userAuth *dto.UserAuth) {
 	userAuth.DeletedAt = user.DeletedAt
 }
 
-func DtoFollowUserRequestToEntityFollow(ctx context.Context, req *dto.FollowUserRequest, follow *entity.Follow) {
+func DtoFollowUserRequestToEntityFollow(ctx context.Context, req dto.FollowUserRequest, follow *entity.Follow) {
 	userAuth := ctxuserauth.Get(ctx)
 	follow.FollowerID = userAuth.ID
 	follow.FollowingID = req.FollowingID
 }
 
-func EntityFollowToDtoUserFollowedEvent(ctx context.Context, follow *entity.Follow, event *dto.UserFollowedEvent) {
+func EntityFollowToDtoUserFollowedEvent(follow entity.Follow, event *dto.UserFollowedEvent) {
 	event.ID = follow.ID
 	event.FollowerID = follow.FollowerID
 	event.FollowingID = follow.FollowingID
@@ -67,7 +67,7 @@ func EntityFollowToDtoUserFollowedEvent(ctx context.Context, follow *entity.Foll
 	event.DeletedAt = follow.DeletedAt
 }
 
-func DtoUserFollowedEventToDtoNotifyUserBeingFollowedRequest(ctx context.Context, event *dto.UserFollowedEvent, req *dto.NotifyUserBeingFollowedRequest) {
+func DtoUserFollowedEventToDtoNotifyUserBeingFollowedRequest(event dto.UserFollowedEvent, req *dto.NotifyUserBeingFollowedRequest) {
 	req.FollowerID = event.FollowerID
 	req.FollowingID = event.FollowingID
 }
@@ -77,8 +77,9 @@ func KGoRecordListToDtoBatchUpdateUserFollowStatsRequest(ctx context.Context, re
 	userFollowingCounts := make(map[int64]int)
 
 	for _, record := range records {
-		event := new(dto.UserFollowedEvent)
-		if err := json.Unmarshal(record.Value, event); err != nil {
+		event := dto.UserFollowedEvent{}
+		err := json.Unmarshal(record.Value, &event)
+		if err != nil {
 			x.Logger.WithContext(ctx).WithError(err).Warn("Failed to unmarshal user followed event")
 			continue
 		}

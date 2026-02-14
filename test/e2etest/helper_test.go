@@ -57,7 +57,7 @@ func registerUser(t *testing.T, username, password, name string) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[dto.UserResponse])
+	responseBody := &response.WebResponse[dto.UserResponse]{}
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -99,7 +99,7 @@ func loginUser(t *testing.T, username, password string) string {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[dto.UserLoginResponse])
+	responseBody := &response.WebResponse[dto.UserLoginResponse]{}
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -167,7 +167,7 @@ func followUser(t *testing.T, token string, followingID int64) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[string])
+	responseBody := &response.WebResponse[string]{}
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 	require.Equal(t, "ok", responseBody.Data)
@@ -177,7 +177,7 @@ func followUser(t *testing.T, token string, followingID int64) {
 func checkFollow(t *testing.T, followerID, followingID int64) {
 	t.Helper()
 
-	follow := new(entity.Follow)
+	follow := &entity.Follow{}
 	err := db.Where("follower_id = ? AND following_id = ?", followerID, followingID).First(follow).Error
 	require.Nil(t, err)
 	require.Equal(t, followerID, follow.FollowerID)
@@ -268,7 +268,7 @@ func ClearComments() {
 }
 
 func GetFirstUser(t *testing.T) *entity.User {
-	user := new(entity.User)
+	user := &entity.User{}
 	err := db.First(user).Error
 	require.Nil(t, err)
 	return user

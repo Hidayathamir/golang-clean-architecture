@@ -10,19 +10,21 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 )
 
-func (u *ImageUsecaseImpl) GetLike(ctx context.Context, req *dto.GetLikeRequest) (*dto.LikeResponseList, error) {
-	if err := x.Validate.Struct(req); err != nil {
+func (u *ImageUsecaseImpl) GetLike(ctx context.Context, req dto.GetLikeRequest) (dto.LikeResponseList, error) {
+	err := x.Validate.Struct(&req)
+	if err != nil {
 		err = errkit.BadRequest(err)
-		return nil, errkit.AddFuncName(err)
+		return dto.LikeResponseList{}, errkit.AddFuncName(err)
 	}
 
-	likeList := new(entity.LikeList)
-	if err := u.LikeRepository.FindByImageID(ctx, u.DB, likeList, req.ImageID); err != nil {
-		return nil, errkit.AddFuncName(err)
+	likeList := entity.LikeList{}
+	err = u.LikeRepository.FindByImageID(ctx, u.DB, &likeList, req.ImageID)
+	if err != nil {
+		return dto.LikeResponseList{}, errkit.AddFuncName(err)
 	}
 
-	res := new(dto.LikeResponseList)
-	converter.EntityLikeListToDtoLikeResponseList(ctx, likeList, res)
+	res := dto.LikeResponseList{}
+	converter.EntityLikeListToDtoLikeResponseList(likeList, &res)
 
 	return res, nil
 }

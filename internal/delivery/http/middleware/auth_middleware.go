@@ -33,14 +33,14 @@ func NewAuth(userUserCase user.UserUsecase) fiber.Handler {
 			return errkit.AddFuncName(err)
 		}
 
-		req := &dto.VerifyUserRequest{Token: token}
+		req := dto.VerifyUserRequest{Token: token}
 		userAuth, err := userUserCase.Verify(ctx.UserContext(), req)
 		if err != nil {
 			err = errkit.Unauthorized(err)
 			return errkit.AddFuncName(err)
 		}
 
-		ctx.SetUserContext(ctxuserauth.Set(ctx.UserContext(), userAuth))
+		ctx.SetUserContext(ctxuserauth.Set(ctx.UserContext(), &userAuth))
 
 		return ctx.Next()
 	}

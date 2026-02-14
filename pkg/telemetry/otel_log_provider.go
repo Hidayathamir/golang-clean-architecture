@@ -34,10 +34,12 @@ func InitLogProvider(cfg *config.Config) Stop {
 	logger = lp.Logger(cfg.GetAppName())
 
 	stop := func() {
-		if err := lp.ForceFlush(context.Background()); err != nil {
+		err := lp.ForceFlush(context.Background())
+		if err != nil {
 			fmt.Println(errkit.AddFuncName(err))
 		}
-		if err := lp.Shutdown(context.Background()); err != nil {
+		err = lp.Shutdown(context.Background())
+		if err != nil {
 			fmt.Println(errkit.AddFuncName(err))
 		}
 	}

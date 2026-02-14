@@ -74,7 +74,8 @@ func (p *ImageProducerImpl) send(ctx context.Context, topicName string, event an
 		Value: value,
 	}
 
-	if err := p.Client.ProduceSync(ctx, record).FirstErr(); err != nil {
+	err = p.Client.ProduceSync(ctx, record).FirstErr()
+	if err != nil {
 		return errkit.AddFuncName(err)
 	}
 

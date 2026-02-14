@@ -20,7 +20,7 @@ var _ notif.NotifUsecase = &NotifUsecaseMock{}
 //
 //		// make and configure a mocked notif.NotifUsecase
 //		mockedNotifUsecase := &NotifUsecaseMock{
-//			NotifyFunc: func(ctx context.Context, req *dto.NotifyRequest) error {
+//			NotifyFunc: func(ctx context.Context, req dto.NotifyRequest) error {
 //				panic("mock out the Notify method")
 //			},
 //		}
@@ -31,7 +31,7 @@ var _ notif.NotifUsecase = &NotifUsecaseMock{}
 //	}
 type NotifUsecaseMock struct {
 	// NotifyFunc mocks the Notify method.
-	NotifyFunc func(ctx context.Context, req *dto.NotifyRequest) error
+	NotifyFunc func(ctx context.Context, req dto.NotifyRequest) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -40,20 +40,20 @@ type NotifUsecaseMock struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.NotifyRequest
+			Req dto.NotifyRequest
 		}
 	}
 	lockNotify sync.RWMutex
 }
 
 // Notify calls NotifyFunc.
-func (mock *NotifUsecaseMock) Notify(ctx context.Context, req *dto.NotifyRequest) error {
+func (mock *NotifUsecaseMock) Notify(ctx context.Context, req dto.NotifyRequest) error {
 	if mock.NotifyFunc == nil {
 		panic("NotifUsecaseMock.NotifyFunc: method is nil but NotifUsecase.Notify was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.NotifyRequest
+		Req dto.NotifyRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -70,11 +70,11 @@ func (mock *NotifUsecaseMock) Notify(ctx context.Context, req *dto.NotifyRequest
 //	len(mockedNotifUsecase.NotifyCalls())
 func (mock *NotifUsecaseMock) NotifyCalls() []struct {
 	Ctx context.Context
-	Req *dto.NotifyRequest
+	Req dto.NotifyRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.NotifyRequest
+		Req dto.NotifyRequest
 	}
 	mock.lockNotify.RLock()
 	calls = mock.calls.Notify

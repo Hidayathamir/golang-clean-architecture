@@ -11,37 +11,40 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (u *UserUsecaseImpl) Update(ctx context.Context, req *dto.UpdateUserRequest) (*dto.UserResponse, error) {
-	if err := x.Validate.Struct(req); err != nil {
+func (u *UserUsecaseImpl) Update(ctx context.Context, req dto.UpdateUserRequest) (dto.UserResponse, error) {
+	err := x.Validate.Struct(&req)
+	if err != nil {
 		err = errkit.BadRequest(err)
-		return nil, errkit.AddFuncName(err)
+		return dto.UserResponse{}, errkit.AddFuncName(err)
 	}
 
-	user := new(entity.User)
-	if err := u.UserRepository.FindByID(ctx, u.DB.WithContext(ctx), user, req.ID); err != nil {
-		return nil, errkit.AddFuncName(err)
+	user := entity.User{}
+	err = u.UserRepository.FindByID(ctx, u.DB.WithContext(ctx), &user, req.ID)
+	if err != nil {
+		return dto.UserResponse{}, errkit.AddFuncName(err)
 	}
 
 	var password string
 	if req.Password != "" {
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 		if err != nil {
-			return nil, errkit.AddFuncName(err)
+			return dto.UserResponse{}, errkit.AddFuncName(err)
 		}
 		password = string(hashedPassword)
 	}
 
-	converter.DtoUpdateUserRequestToEntityUser(req, user, password)
+	converter.DtoUpdateUserRequestToEntityUser(req, &user, password)
 
-	if err := u.UserRepository.Update(ctx, u.DB.WithContext(ctx), user); err != nil {
-		return nil, errkit.AddFuncName(err)
+	err = u.UserRepository.Update(ctx, u.DB.WithContext(ctx), &user)
+	if err != nil {
+		return dto.UserResponse{}, errkit.AddFuncName(err)
 	}
 
-	err := u.UserCache.Delete(ctx, req.ID)
+	err = u.UserCache.Delete(ctx, req.ID)
 	x.LogIfErr(err)
 
-	res := new(dto.UserResponse)
-	converter.EntityUserToDtoUserResponse(user, res)
+	res := dto.UserResponse{}
+	converter.EntityUserToDtoUserResponse(user, &res)
 
 	return res, nil
 }

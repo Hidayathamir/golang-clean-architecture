@@ -35,9 +35,9 @@ func TestImageUsecaseImpl_GetImage_Success(t *testing.T) {
 		return nil
 	}
 
-	res, err := u.GetImage(context.Background(), req)
+	res, err := u.GetImage(context.Background(), *req)
 
-	expected := &dto.ImageResponse{
+	expected := dto.ImageResponse{
 		ID:        100,
 		UserID:    1,
 		URL:       "url",
@@ -57,9 +57,9 @@ func TestImageUsecaseImpl_GetImage_Fail_ValidateStruct(t *testing.T) {
 
 	req := &dto.GetImageRequest{}
 
-	res, err := u.GetImage(context.Background(), req)
+	res, err := u.GetImage(context.Background(), *req)
 
-	require.Nil(t, res)
+	require.Equal(t, dto.ImageResponse{}, res)
 	require.NotNil(t, err)
 	var verrs validator.ValidationErrors
 	require.ErrorAs(t, err, &verrs)
@@ -82,9 +82,9 @@ func TestImageUsecaseImpl_GetImage_Fail_FindByID(t *testing.T) {
 		return assert.AnError
 	}
 
-	res, err := u.GetImage(context.Background(), req)
+	res, err := u.GetImage(context.Background(), *req)
 
-	require.Nil(t, res)
+	require.Equal(t, dto.ImageResponse{}, res)
 	require.NotNil(t, err)
 	require.ErrorIs(t, err, assert.AnError)
 }

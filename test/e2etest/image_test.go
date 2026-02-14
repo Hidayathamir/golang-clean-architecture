@@ -17,7 +17,7 @@ import (
 
 func uploadImage(t *testing.T, token string) int64 {
 	t.Helper()
-	body := new(bytes.Buffer)
+	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, err := writer.CreateFormFile("image", "test.jpg")
 	require.Nil(t, err)
@@ -39,7 +39,7 @@ func uploadImage(t *testing.T, token string) int64 {
 	bytesBody, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[dto.ImageResponse])
+	responseBody := &response.WebResponse[dto.ImageResponse]{}
 	err = json.Unmarshal(bytesBody, responseBody)
 	require.Nil(t, err)
 
@@ -53,7 +53,7 @@ func TestUploadImage(t *testing.T) {
 	token := registerAndLoginDefaultUser(t)
 
 	// Prepare image upload request
-	body := new(bytes.Buffer)
+	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, err := writer.CreateFormFile("image", "test.jpg")
 	require.Nil(t, err)
@@ -80,7 +80,7 @@ func TestUploadImage(t *testing.T) {
 	bytesBody, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[dto.ImageResponse])
+	responseBody := &response.WebResponse[dto.ImageResponse]{}
 	err = json.Unmarshal(bytesBody, responseBody)
 	require.Nil(t, err)
 
@@ -89,7 +89,7 @@ func TestUploadImage(t *testing.T) {
 	require.Equal(t, "My Caption", responseBody.Data.Caption)
 
 	// Verify database record
-	image := new(entity.Image)
+	image := &entity.Image{}
 	err = db.First(image, responseBody.Data.ID).Error
 	require.Nil(t, err)
 	require.Equal(t, "My Caption", image.Caption)
@@ -205,7 +205,7 @@ func TestGetLikes(t *testing.T) {
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
 	// Verify response body
-	respBody := new(response.WebResponse[dto.LikeResponseList])
+	respBody := &response.WebResponse[dto.LikeResponseList]{}
 	err = json.NewDecoder(res.Body).Decode(respBody)
 	require.Nil(t, err)
 	require.NotEmpty(t, respBody.Data)
@@ -250,7 +250,7 @@ func TestGetComments(t *testing.T) {
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
 	// Verify response body
-	respBody := new(response.WebResponse[dto.CommentResponseList])
+	respBody := &response.WebResponse[dto.CommentResponseList]{}
 	err = json.NewDecoder(res.Body).Decode(respBody)
 	require.Nil(t, err)
 	require.NotEmpty(t, respBody.Data)
@@ -266,7 +266,7 @@ func TestImageFlow(t *testing.T) {
 	token3 := registerAndLoginUser(t, "user3", "password", "User Three")
 
 	// Get User 1 ID
-	user1 := new(entity.User)
+	user1 := &entity.User{}
 	err := db.Where("username = ?", "user1").First(user1).Error
 	require.Nil(t, err)
 
@@ -331,7 +331,7 @@ func TestMultipleUsersCommentImage(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
-	respBody := new(response.WebResponse[dto.CommentResponseList])
+	respBody := &response.WebResponse[dto.CommentResponseList]{}
 	err = json.NewDecoder(res.Body).Decode(respBody)
 	require.Nil(t, err)
 
@@ -367,7 +367,7 @@ func TestMultipleUsersLikeImage(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
-	respBody := new(response.WebResponse[dto.LikeResponseList])
+	respBody := &response.WebResponse[dto.LikeResponseList]{}
 	err = json.NewDecoder(res.Body).Decode(respBody)
 	require.Nil(t, err)
 

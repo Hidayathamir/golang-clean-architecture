@@ -46,7 +46,7 @@ func TestRegister(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[dto.UserResponse])
+	responseBody := &response.WebResponse[dto.UserResponse]{}
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -87,7 +87,7 @@ func TestRegisterError(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[dto.UserResponse])
+	responseBody := &response.WebResponse[dto.UserResponse]{}
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -126,7 +126,7 @@ func TestRegisterDuplicate(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[dto.UserResponse])
+	responseBody := &response.WebResponse[dto.UserResponse]{}
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -165,7 +165,7 @@ func TestLogin(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[dto.UserLoginResponse])
+	responseBody := &response.WebResponse[dto.UserLoginResponse]{}
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -180,7 +180,7 @@ func TestLogin(t *testing.T) {
 	require.True(t, token.Valid)
 
 	// Verify user data matches token subject
-	user := new(entity.User)
+	user := &entity.User{}
 	err = db.Where("username = ?", requestBody.Username).First(user).Error
 	require.Nil(t, err)
 	require.Equal(t, strconv.FormatInt(user.ID, 10), claims.Subject)
@@ -220,7 +220,7 @@ func TestLoginWrongUsername(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[dto.UserResponse])
+	responseBody := &response.WebResponse[dto.UserResponse]{}
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -259,7 +259,7 @@ func TestLoginWrongPassword(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[dto.UserResponse])
+	responseBody := &response.WebResponse[dto.UserResponse]{}
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -273,7 +273,7 @@ func TestGetCurrentUser(t *testing.T) {
 	token := registerAndLoginDefaultUser(t)
 
 	// Get user data from database for comparison
-	user := new(entity.User)
+	user := &entity.User{}
 	err := db.Where("username = ?", "khannedy").First(user).Error
 	require.Nil(t, err)
 
@@ -295,7 +295,7 @@ func TestGetCurrentUser(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[dto.UserResponse])
+	responseBody := &response.WebResponse[dto.UserResponse]{}
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -329,7 +329,7 @@ func TestGetCurrentUserFailed(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[dto.UserResponse])
+	responseBody := &response.WebResponse[dto.UserResponse]{}
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -343,7 +343,7 @@ func TestUpdateUserName(t *testing.T) {
 	token := registerAndLoginDefaultUser(t)
 
 	// Get user data from database
-	user := new(entity.User)
+	user := &entity.User{}
 	err := db.Where("username = ?", "khannedy").First(user).Error
 	require.Nil(t, err)
 
@@ -373,7 +373,7 @@ func TestUpdateUserName(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[dto.UserResponse])
+	responseBody := &response.WebResponse[dto.UserResponse]{}
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -390,7 +390,7 @@ func TestUpdateUserPassword(t *testing.T) {
 	token := registerAndLoginDefaultUser(t)
 
 	// Get user data from database
-	user := new(entity.User)
+	user := &entity.User{}
 	err := db.Where("username = ?", "khannedy").First(user).Error
 	require.Nil(t, err)
 
@@ -420,7 +420,7 @@ func TestUpdateUserPassword(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[dto.UserResponse])
+	responseBody := &response.WebResponse[dto.UserResponse]{}
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -429,7 +429,7 @@ func TestUpdateUserPassword(t *testing.T) {
 	require.NotNil(t, responseBody.Data.UpdatedAt)
 
 	// Verify new password is correctly hashed and stored in database
-	user = new(entity.User)
+	user = &entity.User{}
 	err = db.Where("username = ?", "khannedy").First(user).Error
 	require.Nil(t, err)
 
@@ -469,7 +469,7 @@ func TestUpdateFailed(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[dto.UserResponse])
+	responseBody := &response.WebResponse[dto.UserResponse]{}
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 
@@ -486,7 +486,7 @@ func TestFollowUser(t *testing.T) {
 	followingUsername := "johndoe"
 	registerUser(t, followingUsername, "rahasia", "John Doe")
 
-	followingUser := new(entity.User)
+	followingUser := &entity.User{}
 	err := db.Where("username = ?", followingUsername).First(followingUser).Error
 	require.Nil(t, err)
 
@@ -515,17 +515,17 @@ func TestFollowUser(t *testing.T) {
 	bytes, err := io.ReadAll(res.Body)
 	require.Nil(t, err)
 
-	responseBody := new(response.WebResponse[string])
+	responseBody := &response.WebResponse[string]{}
 	err = json.Unmarshal(bytes, responseBody)
 	require.Nil(t, err)
 	require.Equal(t, "ok", responseBody.Data)
 
 	// Verify follow relationship in database
-	followerUser := new(entity.User)
+	followerUser := &entity.User{}
 	err = db.Where("username = ?", defaultUsername).First(followerUser).Error
 	require.Nil(t, err)
 
-	follow := new(entity.Follow)
+	follow := &entity.Follow{}
 	err = db.Where("follower_id = ? AND following_id = ?", followerUser.ID, followingUser.ID).First(follow).Error
 	require.Nil(t, err)
 }
@@ -539,15 +539,15 @@ func TestUserFollowScenario(t *testing.T) {
 	tokenC := registerAndLoginUser(t, "user_c", "password", "User C")
 
 	// Get User IDs
-	userA := new(entity.User)
+	userA := &entity.User{}
 	err := db.Where("username = ?", "user_a").First(userA).Error
 	require.Nil(t, err)
 
-	userB := new(entity.User)
+	userB := &entity.User{}
 	err = db.Where("username = ?", "user_b").First(userB).Error
 	require.Nil(t, err)
 
-	userC := new(entity.User)
+	userC := &entity.User{}
 	err = db.Where("username = ?", "user_c").First(userC).Error
 	require.Nil(t, err)
 

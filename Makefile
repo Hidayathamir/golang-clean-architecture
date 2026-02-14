@@ -24,7 +24,16 @@ migrate:
 	go run cmd/migrate/main.go
 
 migrate-new:
-	echo "please run: migrate create -ext sql -dir db/migrations create_table_xxx"
+	sql-migrate new -config=dbconfig.yml -env=local
+
+migrate-status:
+	sql-migrate status -config=dbconfig.yml -env=local
+
+migrate-up:
+	sql-migrate up -config=dbconfig.yml -env=local
+
+migrate-down:
+	sql-migrate down -limit=0 -config=dbconfig.yml -env=local
 
 #################################### 
 
@@ -58,10 +67,10 @@ check-tools:
 	else \
 		echo "❌ go not found. Install: https://go.dev/"; \
 	fi
-	@if command -v migrate >/dev/null 2>&1; then \
-		echo "✔ migrate installed"; \
+	@if command -v sql-migrate >/dev/null 2>&1; then \
+		echo "✔ sql-migrate installed"; \
 	else \
-		echo "❌ migrate not found. Install: https://github.com/golang-migrate/migrate"; \
+		echo "❌ sql-migrate not found. Install: go install github.com/rubenv/sql-migrate/sql-migrate@latest"; \
 	fi
 	@if command -v docker >/dev/null 2>&1; then \
 		echo "✔ docker installed"; \

@@ -20,28 +20,28 @@ var _ user.UserUsecase = &UserUsecaseMock{}
 //
 //		// make and configure a mocked user.UserUsecase
 //		mockedUserUsecase := &UserUsecaseMock{
-//			BatchUpdateUserFollowStatsFunc: func(ctx context.Context, req *dto.BatchUpdateUserFollowStatsRequest) error {
+//			BatchUpdateUserFollowStatsFunc: func(ctx context.Context, req dto.BatchUpdateUserFollowStatsRequest) error {
 //				panic("mock out the BatchUpdateUserFollowStats method")
 //			},
-//			CreateFunc: func(ctx context.Context, req *dto.RegisterUserRequest) (*dto.UserResponse, error) {
+//			CreateFunc: func(ctx context.Context, req dto.RegisterUserRequest) (dto.UserResponse, error) {
 //				panic("mock out the Create method")
 //			},
-//			CurrentFunc: func(ctx context.Context, req *dto.GetUserRequest) (*dto.UserResponse, error) {
+//			CurrentFunc: func(ctx context.Context, req dto.GetUserRequest) (dto.UserResponse, error) {
 //				panic("mock out the Current method")
 //			},
-//			FollowFunc: func(ctx context.Context, req *dto.FollowUserRequest) error {
+//			FollowFunc: func(ctx context.Context, req dto.FollowUserRequest) error {
 //				panic("mock out the Follow method")
 //			},
-//			LoginFunc: func(ctx context.Context, req *dto.LoginUserRequest) (*dto.UserLoginResponse, error) {
+//			LoginFunc: func(ctx context.Context, req dto.LoginUserRequest) (dto.UserLoginResponse, error) {
 //				panic("mock out the Login method")
 //			},
-//			NotifyUserBeingFollowedFunc: func(ctx context.Context, req *dto.NotifyUserBeingFollowedRequest) error {
+//			NotifyUserBeingFollowedFunc: func(ctx context.Context, req dto.NotifyUserBeingFollowedRequest) error {
 //				panic("mock out the NotifyUserBeingFollowed method")
 //			},
-//			UpdateFunc: func(ctx context.Context, req *dto.UpdateUserRequest) (*dto.UserResponse, error) {
+//			UpdateFunc: func(ctx context.Context, req dto.UpdateUserRequest) (dto.UserResponse, error) {
 //				panic("mock out the Update method")
 //			},
-//			VerifyFunc: func(ctx context.Context, req *dto.VerifyUserRequest) (*dto.UserAuth, error) {
+//			VerifyFunc: func(ctx context.Context, req dto.VerifyUserRequest) (dto.UserAuth, error) {
 //				panic("mock out the Verify method")
 //			},
 //		}
@@ -52,28 +52,28 @@ var _ user.UserUsecase = &UserUsecaseMock{}
 //	}
 type UserUsecaseMock struct {
 	// BatchUpdateUserFollowStatsFunc mocks the BatchUpdateUserFollowStats method.
-	BatchUpdateUserFollowStatsFunc func(ctx context.Context, req *dto.BatchUpdateUserFollowStatsRequest) error
+	BatchUpdateUserFollowStatsFunc func(ctx context.Context, req dto.BatchUpdateUserFollowStatsRequest) error
 
 	// CreateFunc mocks the Create method.
-	CreateFunc func(ctx context.Context, req *dto.RegisterUserRequest) (*dto.UserResponse, error)
+	CreateFunc func(ctx context.Context, req dto.RegisterUserRequest) (dto.UserResponse, error)
 
 	// CurrentFunc mocks the Current method.
-	CurrentFunc func(ctx context.Context, req *dto.GetUserRequest) (*dto.UserResponse, error)
+	CurrentFunc func(ctx context.Context, req dto.GetUserRequest) (dto.UserResponse, error)
 
 	// FollowFunc mocks the Follow method.
-	FollowFunc func(ctx context.Context, req *dto.FollowUserRequest) error
+	FollowFunc func(ctx context.Context, req dto.FollowUserRequest) error
 
 	// LoginFunc mocks the Login method.
-	LoginFunc func(ctx context.Context, req *dto.LoginUserRequest) (*dto.UserLoginResponse, error)
+	LoginFunc func(ctx context.Context, req dto.LoginUserRequest) (dto.UserLoginResponse, error)
 
 	// NotifyUserBeingFollowedFunc mocks the NotifyUserBeingFollowed method.
-	NotifyUserBeingFollowedFunc func(ctx context.Context, req *dto.NotifyUserBeingFollowedRequest) error
+	NotifyUserBeingFollowedFunc func(ctx context.Context, req dto.NotifyUserBeingFollowedRequest) error
 
 	// UpdateFunc mocks the Update method.
-	UpdateFunc func(ctx context.Context, req *dto.UpdateUserRequest) (*dto.UserResponse, error)
+	UpdateFunc func(ctx context.Context, req dto.UpdateUserRequest) (dto.UserResponse, error)
 
 	// VerifyFunc mocks the Verify method.
-	VerifyFunc func(ctx context.Context, req *dto.VerifyUserRequest) (*dto.UserAuth, error)
+	VerifyFunc func(ctx context.Context, req dto.VerifyUserRequest) (dto.UserAuth, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -82,56 +82,56 @@ type UserUsecaseMock struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.BatchUpdateUserFollowStatsRequest
+			Req dto.BatchUpdateUserFollowStatsRequest
 		}
 		// Create holds details about calls to the Create method.
 		Create []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.RegisterUserRequest
+			Req dto.RegisterUserRequest
 		}
 		// Current holds details about calls to the Current method.
 		Current []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.GetUserRequest
+			Req dto.GetUserRequest
 		}
 		// Follow holds details about calls to the Follow method.
 		Follow []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.FollowUserRequest
+			Req dto.FollowUserRequest
 		}
 		// Login holds details about calls to the Login method.
 		Login []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.LoginUserRequest
+			Req dto.LoginUserRequest
 		}
 		// NotifyUserBeingFollowed holds details about calls to the NotifyUserBeingFollowed method.
 		NotifyUserBeingFollowed []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.NotifyUserBeingFollowedRequest
+			Req dto.NotifyUserBeingFollowedRequest
 		}
 		// Update holds details about calls to the Update method.
 		Update []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.UpdateUserRequest
+			Req dto.UpdateUserRequest
 		}
 		// Verify holds details about calls to the Verify method.
 		Verify []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Req is the req argument value.
-			Req *dto.VerifyUserRequest
+			Req dto.VerifyUserRequest
 		}
 	}
 	lockBatchUpdateUserFollowStats sync.RWMutex
@@ -145,13 +145,13 @@ type UserUsecaseMock struct {
 }
 
 // BatchUpdateUserFollowStats calls BatchUpdateUserFollowStatsFunc.
-func (mock *UserUsecaseMock) BatchUpdateUserFollowStats(ctx context.Context, req *dto.BatchUpdateUserFollowStatsRequest) error {
+func (mock *UserUsecaseMock) BatchUpdateUserFollowStats(ctx context.Context, req dto.BatchUpdateUserFollowStatsRequest) error {
 	if mock.BatchUpdateUserFollowStatsFunc == nil {
 		panic("UserUsecaseMock.BatchUpdateUserFollowStatsFunc: method is nil but UserUsecase.BatchUpdateUserFollowStats was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.BatchUpdateUserFollowStatsRequest
+		Req dto.BatchUpdateUserFollowStatsRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -168,11 +168,11 @@ func (mock *UserUsecaseMock) BatchUpdateUserFollowStats(ctx context.Context, req
 //	len(mockedUserUsecase.BatchUpdateUserFollowStatsCalls())
 func (mock *UserUsecaseMock) BatchUpdateUserFollowStatsCalls() []struct {
 	Ctx context.Context
-	Req *dto.BatchUpdateUserFollowStatsRequest
+	Req dto.BatchUpdateUserFollowStatsRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.BatchUpdateUserFollowStatsRequest
+		Req dto.BatchUpdateUserFollowStatsRequest
 	}
 	mock.lockBatchUpdateUserFollowStats.RLock()
 	calls = mock.calls.BatchUpdateUserFollowStats
@@ -181,13 +181,13 @@ func (mock *UserUsecaseMock) BatchUpdateUserFollowStatsCalls() []struct {
 }
 
 // Create calls CreateFunc.
-func (mock *UserUsecaseMock) Create(ctx context.Context, req *dto.RegisterUserRequest) (*dto.UserResponse, error) {
+func (mock *UserUsecaseMock) Create(ctx context.Context, req dto.RegisterUserRequest) (dto.UserResponse, error) {
 	if mock.CreateFunc == nil {
 		panic("UserUsecaseMock.CreateFunc: method is nil but UserUsecase.Create was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.RegisterUserRequest
+		Req dto.RegisterUserRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -204,11 +204,11 @@ func (mock *UserUsecaseMock) Create(ctx context.Context, req *dto.RegisterUserRe
 //	len(mockedUserUsecase.CreateCalls())
 func (mock *UserUsecaseMock) CreateCalls() []struct {
 	Ctx context.Context
-	Req *dto.RegisterUserRequest
+	Req dto.RegisterUserRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.RegisterUserRequest
+		Req dto.RegisterUserRequest
 	}
 	mock.lockCreate.RLock()
 	calls = mock.calls.Create
@@ -217,13 +217,13 @@ func (mock *UserUsecaseMock) CreateCalls() []struct {
 }
 
 // Current calls CurrentFunc.
-func (mock *UserUsecaseMock) Current(ctx context.Context, req *dto.GetUserRequest) (*dto.UserResponse, error) {
+func (mock *UserUsecaseMock) Current(ctx context.Context, req dto.GetUserRequest) (dto.UserResponse, error) {
 	if mock.CurrentFunc == nil {
 		panic("UserUsecaseMock.CurrentFunc: method is nil but UserUsecase.Current was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.GetUserRequest
+		Req dto.GetUserRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -240,11 +240,11 @@ func (mock *UserUsecaseMock) Current(ctx context.Context, req *dto.GetUserReques
 //	len(mockedUserUsecase.CurrentCalls())
 func (mock *UserUsecaseMock) CurrentCalls() []struct {
 	Ctx context.Context
-	Req *dto.GetUserRequest
+	Req dto.GetUserRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.GetUserRequest
+		Req dto.GetUserRequest
 	}
 	mock.lockCurrent.RLock()
 	calls = mock.calls.Current
@@ -253,13 +253,13 @@ func (mock *UserUsecaseMock) CurrentCalls() []struct {
 }
 
 // Follow calls FollowFunc.
-func (mock *UserUsecaseMock) Follow(ctx context.Context, req *dto.FollowUserRequest) error {
+func (mock *UserUsecaseMock) Follow(ctx context.Context, req dto.FollowUserRequest) error {
 	if mock.FollowFunc == nil {
 		panic("UserUsecaseMock.FollowFunc: method is nil but UserUsecase.Follow was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.FollowUserRequest
+		Req dto.FollowUserRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -276,11 +276,11 @@ func (mock *UserUsecaseMock) Follow(ctx context.Context, req *dto.FollowUserRequ
 //	len(mockedUserUsecase.FollowCalls())
 func (mock *UserUsecaseMock) FollowCalls() []struct {
 	Ctx context.Context
-	Req *dto.FollowUserRequest
+	Req dto.FollowUserRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.FollowUserRequest
+		Req dto.FollowUserRequest
 	}
 	mock.lockFollow.RLock()
 	calls = mock.calls.Follow
@@ -289,13 +289,13 @@ func (mock *UserUsecaseMock) FollowCalls() []struct {
 }
 
 // Login calls LoginFunc.
-func (mock *UserUsecaseMock) Login(ctx context.Context, req *dto.LoginUserRequest) (*dto.UserLoginResponse, error) {
+func (mock *UserUsecaseMock) Login(ctx context.Context, req dto.LoginUserRequest) (dto.UserLoginResponse, error) {
 	if mock.LoginFunc == nil {
 		panic("UserUsecaseMock.LoginFunc: method is nil but UserUsecase.Login was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.LoginUserRequest
+		Req dto.LoginUserRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -312,11 +312,11 @@ func (mock *UserUsecaseMock) Login(ctx context.Context, req *dto.LoginUserReques
 //	len(mockedUserUsecase.LoginCalls())
 func (mock *UserUsecaseMock) LoginCalls() []struct {
 	Ctx context.Context
-	Req *dto.LoginUserRequest
+	Req dto.LoginUserRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.LoginUserRequest
+		Req dto.LoginUserRequest
 	}
 	mock.lockLogin.RLock()
 	calls = mock.calls.Login
@@ -325,13 +325,13 @@ func (mock *UserUsecaseMock) LoginCalls() []struct {
 }
 
 // NotifyUserBeingFollowed calls NotifyUserBeingFollowedFunc.
-func (mock *UserUsecaseMock) NotifyUserBeingFollowed(ctx context.Context, req *dto.NotifyUserBeingFollowedRequest) error {
+func (mock *UserUsecaseMock) NotifyUserBeingFollowed(ctx context.Context, req dto.NotifyUserBeingFollowedRequest) error {
 	if mock.NotifyUserBeingFollowedFunc == nil {
 		panic("UserUsecaseMock.NotifyUserBeingFollowedFunc: method is nil but UserUsecase.NotifyUserBeingFollowed was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.NotifyUserBeingFollowedRequest
+		Req dto.NotifyUserBeingFollowedRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -348,11 +348,11 @@ func (mock *UserUsecaseMock) NotifyUserBeingFollowed(ctx context.Context, req *d
 //	len(mockedUserUsecase.NotifyUserBeingFollowedCalls())
 func (mock *UserUsecaseMock) NotifyUserBeingFollowedCalls() []struct {
 	Ctx context.Context
-	Req *dto.NotifyUserBeingFollowedRequest
+	Req dto.NotifyUserBeingFollowedRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.NotifyUserBeingFollowedRequest
+		Req dto.NotifyUserBeingFollowedRequest
 	}
 	mock.lockNotifyUserBeingFollowed.RLock()
 	calls = mock.calls.NotifyUserBeingFollowed
@@ -361,13 +361,13 @@ func (mock *UserUsecaseMock) NotifyUserBeingFollowedCalls() []struct {
 }
 
 // Update calls UpdateFunc.
-func (mock *UserUsecaseMock) Update(ctx context.Context, req *dto.UpdateUserRequest) (*dto.UserResponse, error) {
+func (mock *UserUsecaseMock) Update(ctx context.Context, req dto.UpdateUserRequest) (dto.UserResponse, error) {
 	if mock.UpdateFunc == nil {
 		panic("UserUsecaseMock.UpdateFunc: method is nil but UserUsecase.Update was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.UpdateUserRequest
+		Req dto.UpdateUserRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -384,11 +384,11 @@ func (mock *UserUsecaseMock) Update(ctx context.Context, req *dto.UpdateUserRequ
 //	len(mockedUserUsecase.UpdateCalls())
 func (mock *UserUsecaseMock) UpdateCalls() []struct {
 	Ctx context.Context
-	Req *dto.UpdateUserRequest
+	Req dto.UpdateUserRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.UpdateUserRequest
+		Req dto.UpdateUserRequest
 	}
 	mock.lockUpdate.RLock()
 	calls = mock.calls.Update
@@ -397,13 +397,13 @@ func (mock *UserUsecaseMock) UpdateCalls() []struct {
 }
 
 // Verify calls VerifyFunc.
-func (mock *UserUsecaseMock) Verify(ctx context.Context, req *dto.VerifyUserRequest) (*dto.UserAuth, error) {
+func (mock *UserUsecaseMock) Verify(ctx context.Context, req dto.VerifyUserRequest) (dto.UserAuth, error) {
 	if mock.VerifyFunc == nil {
 		panic("UserUsecaseMock.VerifyFunc: method is nil but UserUsecase.Verify was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Req *dto.VerifyUserRequest
+		Req dto.VerifyUserRequest
 	}{
 		Ctx: ctx,
 		Req: req,
@@ -420,11 +420,11 @@ func (mock *UserUsecaseMock) Verify(ctx context.Context, req *dto.VerifyUserRequ
 //	len(mockedUserUsecase.VerifyCalls())
 func (mock *UserUsecaseMock) VerifyCalls() []struct {
 	Ctx context.Context
-	Req *dto.VerifyUserRequest
+	Req dto.VerifyUserRequest
 } {
 	var calls []struct {
 		Ctx context.Context
-		Req *dto.VerifyUserRequest
+		Req dto.VerifyUserRequest
 	}
 	mock.lockVerify.RLock()
 	calls = mock.calls.Verify

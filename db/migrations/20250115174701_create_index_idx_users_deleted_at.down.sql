@@ -1,1 +1,0 @@
-drop index idx_users_deleted_at;

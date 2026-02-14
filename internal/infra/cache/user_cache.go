@@ -44,12 +44,13 @@ func (c *UserCacheImpl) Get(ctx context.Context, id int64) (*entity.User, error)
 		return nil, errkit.AddFuncName(err)
 	}
 
-	user := new(entity.User)
-	if err := json.Unmarshal([]byte(val), user); err != nil {
+	user := entity.User{}
+	err = json.Unmarshal([]byte(val), &user)
+	if err != nil {
 		return nil, errkit.AddFuncName(err)
 	}
 
-	return user, nil
+	return &user, nil
 }
 
 func (c *UserCacheImpl) Set(ctx context.Context, user *entity.User) error {
