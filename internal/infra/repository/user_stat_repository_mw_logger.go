@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/retrykit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
@@ -25,7 +26,9 @@ func (r *UserStatRepositoryMwLogger) IncrementFollowerCountAndFollowingCountByID
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := r.Next.IncrementFollowerCountAndFollowingCountByID(ctx, db, id, followerCount, followingCount)
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.IncrementFollowerCountAndFollowingCountByID(ctx, db, id, followerCount, followingCount)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
@@ -42,7 +45,9 @@ func (r *UserStatRepositoryMwLogger) IncrementFollowerCountByID(ctx context.Cont
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := r.Next.IncrementFollowerCountByID(ctx, db, id, count)
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.IncrementFollowerCountByID(ctx, db, id, count)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
@@ -58,7 +63,9 @@ func (r *UserStatRepositoryMwLogger) IncrementFollowingCountByID(ctx context.Con
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := r.Next.IncrementFollowingCountByID(ctx, db, id, count)
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.IncrementFollowingCountByID(ctx, db, id, count)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{

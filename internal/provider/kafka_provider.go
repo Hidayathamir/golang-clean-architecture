@@ -15,6 +15,7 @@ func NewKafkaClientProducer(cfg *config.Config) *kgo.Client {
 	opts := []kgo.Opt{
 		kgo.SeedBrokers(brokers...),
 		kgo.AllowAutoTopicCreation(),
+		kgo.RequestRetries(20),
 	}
 
 	tracer := kotel.NewTracer()

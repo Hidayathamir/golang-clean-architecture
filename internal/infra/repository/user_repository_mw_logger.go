@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/retrykit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
@@ -26,7 +27,9 @@ func (r *UserRepositoryMwLogger) CountByUsername(ctx context.Context, db *gorm.D
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	total, err := r.Next.CountByUsername(ctx, db, username)
+	total, err := retrykit.DBRetryWithData(ctx, func() (int64, error) {
+		return r.Next.CountByUsername(ctx, db, username)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
@@ -42,7 +45,9 @@ func (r *UserRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, user *
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := r.Next.Create(ctx, db, user)
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.Create(ctx, db, user)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
@@ -57,7 +62,9 @@ func (r *UserRepositoryMwLogger) FindByID(ctx context.Context, db *gorm.DB, user
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := r.Next.FindByID(ctx, db, user, id)
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.FindByID(ctx, db, user, id)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
@@ -73,7 +80,9 @@ func (r *UserRepositoryMwLogger) FindByUsername(ctx context.Context, db *gorm.DB
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := r.Next.FindByUsername(ctx, db, user, username)
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.FindByUsername(ctx, db, user, username)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
@@ -89,7 +98,9 @@ func (r *UserRepositoryMwLogger) Update(ctx context.Context, db *gorm.DB, user *
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := r.Next.Update(ctx, db, user)
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.Update(ctx, db, user)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{

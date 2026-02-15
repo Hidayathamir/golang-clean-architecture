@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/retrykit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
@@ -26,7 +27,9 @@ func (r *CommentRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, com
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := r.Next.Create(ctx, db, comment)
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.Create(ctx, db, comment)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
@@ -41,7 +44,9 @@ func (r *CommentRepositoryMwLogger) FindByImageID(ctx context.Context, db *gorm.
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := r.Next.FindByImageID(ctx, db, commentList, imageID)
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.FindByImageID(ctx, db, commentList, imageID)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{

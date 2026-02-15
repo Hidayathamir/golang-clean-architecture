@@ -17,6 +17,7 @@ func NewAWSS3Client(cfg *config.Config) *s3.Client {
 	awsConfig, err := awsconfig.LoadDefaultConfig(context.Background(),
 		awsconfig.WithRegion(region),
 		awsconfig.WithCredentialsProvider(credentials.NewStaticCredentialsProvider("test", "test", "")),
+		awsconfig.WithRetryMaxAttempts(3),
 	)
 	if err != nil {
 		x.Logger.Panic(err)

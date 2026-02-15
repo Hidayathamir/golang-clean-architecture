@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/retrykit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
@@ -26,7 +27,9 @@ func (r *ImageRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, image
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := r.Next.Create(ctx, db, image)
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.Create(ctx, db, image)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
@@ -41,7 +44,9 @@ func (r *ImageRepositoryMwLogger) FindByID(ctx context.Context, db *gorm.DB, ima
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := r.Next.FindByID(ctx, db, image, id)
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.FindByID(ctx, db, image, id)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
@@ -57,7 +62,9 @@ func (r *ImageRepositoryMwLogger) IncrementCommentCountByID(ctx context.Context,
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := r.Next.IncrementCommentCountByID(ctx, db, id, count)
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.IncrementCommentCountByID(ctx, db, id, count)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
@@ -73,7 +80,9 @@ func (r *ImageRepositoryMwLogger) IncrementLikeCountByID(ctx context.Context, db
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := r.Next.IncrementLikeCountByID(ctx, db, id, count)
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.IncrementLikeCountByID(ctx, db, id, count)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{

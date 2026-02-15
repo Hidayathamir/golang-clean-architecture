@@ -6,9 +6,10 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 )
 
-func NewelasticsearchClient(cfg *config.Config) *elasticsearch.Client {
+func NewElasticsearchClient(cfg *config.Config) *elasticsearch.Client {
 	client, err := elasticsearch.NewClient(elasticsearch.Config{
-		Addresses: []string{cfg.GetElasticsearchAddress()},
+		Addresses:  []string{cfg.GetElasticsearchAddress()},
+		MaxRetries: 3,
 	})
 	x.PanicIfErr(err)
 

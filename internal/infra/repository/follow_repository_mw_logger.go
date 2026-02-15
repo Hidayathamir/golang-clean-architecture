@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/retrykit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
@@ -26,7 +27,9 @@ func (r *FollowRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, foll
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := r.Next.Create(ctx, db, follow)
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.Create(ctx, db, follow)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
@@ -41,7 +44,9 @@ func (r *FollowRepositoryMwLogger) FindByFollowingID(ctx context.Context, db *go
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := r.Next.FindByFollowingID(ctx, db, followList, followingID)
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.FindByFollowingID(ctx, db, followList, followingID)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
