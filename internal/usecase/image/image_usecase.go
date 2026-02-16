@@ -50,7 +50,7 @@ type ImageUsecaseImpl struct {
 	S3Client storage.S3Client
 
 	// search
-	ImageSearch search.ImageSearch
+	ImageSearch search.ImageSearch2
 }
 
 func NewImageUsecase(
@@ -72,7 +72,7 @@ func NewImageUsecase(
 	S3Client storage.S3Client,
 
 	// search
-	ImageSearch search.ImageSearch,
+	ImageSearch search.ImageSearch2,
 ) *ImageUsecaseImpl {
 	return &ImageUsecaseImpl{
 		Cfg: Config,

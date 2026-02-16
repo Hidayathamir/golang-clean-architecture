@@ -29,6 +29,9 @@
   "elasticsearch": {
     "address": "http://localhost:9200"
   },
+  "opensearch": {
+    "address": "http://localhost:9201"
+  },
   "kafka": {
     "bootstrap": {
       "servers": "localhost:9093"

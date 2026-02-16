@@ -110,6 +110,10 @@ func (c *Config) GetElasticsearchAddress() string {
 	return c.GetString(ElasticsearchAddress)
 }
 
+func (c *Config) GetOpensearchAddress() string {
+	return c.GetString(OpensearchAddress)
+}
+
 func (c *Config) GetKafkaBootstrapServers() string {
 	return c.GetString(KafkaBootstrapServers)
 }

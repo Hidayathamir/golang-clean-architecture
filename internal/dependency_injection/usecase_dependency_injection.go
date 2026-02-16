@@ -11,7 +11,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/notif"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/elastic/go-elasticsearch/v8"
+	"github.com/opensearch-project/opensearch-go/v2"
 	"github.com/redis/go-redis/v9"
 	"github.com/twmb/franz-go/pkg/kgo"
 	"gorm.io/gorm"
@@ -29,7 +29,7 @@ func SetupUsecases(
 	producer *kgo.Client,
 	awsS3Client *s3.Client,
 	redisClient *redis.Client,
-	elasticsearchClient *elasticsearch.Client,
+	opensearchClient *opensearch.Client,
 ) *Usecases {
 	// setup repositories
 	var userRepository repository.UserRepository
@@ -80,9 +80,9 @@ func SetupUsecases(
 	userCache = cache.NewUserCacheMwLogger(userCache)
 
 	// setup search
-	var imageSearch search.ImageSearch
-	imageSearch = search.NewImageSearch(elasticsearchClient)
-	imageSearch = search.NewImageSearchMwLogger(imageSearch)
+	var imageSearch search.ImageSearch2
+	imageSearch = search.NewImageSearch2(opensearchClient)
+	imageSearch = search.NewImageSearch2MwLogger(imageSearch)
 
 	// setup use cases
 	var userUsecase user.UserUsecase

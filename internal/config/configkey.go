@@ -21,6 +21,7 @@ const (
 	DatabasePoolLifetime = "database.pool.lifetime"
 
 	ElasticsearchAddress = "elasticsearch.address"
+	OpensearchAddress    = "opensearch.address"
 
 	KafkaBootstrapServers = "kafka.bootstrap.servers"
 	KafkaAutoOffsetReset  = "kafka.auto.offset.reset"
