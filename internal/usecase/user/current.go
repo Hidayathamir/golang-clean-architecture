@@ -25,7 +25,7 @@ func (u *UserUsecaseImpl) Current(ctx context.Context, req dto.GetUserRequest) (
 	}
 
 	user := entity.User{}
-	err = u.UserRepository.FindByID(ctx, u.DB.WithContext(ctx), &user, req.ID)
+	err = u.UserRepository.FindByID(ctx, u.DB, &user, req.ID)
 	if err != nil {
 		return dto.UserResponse{}, errkit.AddFuncName(err)
 	}

@@ -18,7 +18,7 @@ func (u *UserUsecaseImpl) Login(ctx context.Context, req dto.LoginUserRequest) (
 	}
 
 	user := entity.User{}
-	err = u.UserRepository.FindByUsername(ctx, u.DB.WithContext(ctx), &user, req.Username)
+	err = u.UserRepository.FindByUsername(ctx, u.DB, &user, req.Username)
 	if err != nil {
 		err = errkit.Unauthorized(err)
 		return dto.UserLoginResponse{}, errkit.AddFuncName(err)

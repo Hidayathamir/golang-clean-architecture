@@ -26,7 +26,7 @@ func (u *UserUsecaseImpl) Create(ctx context.Context, req dto.RegisterUserReques
 	user := entity.User{}
 	converter.DtoRegisterUserRequestToEntityUser(req, &user, string(password))
 
-	err = u.UserRepository.Create(ctx, u.DB.WithContext(ctx), &user)
+	err = u.UserRepository.Create(ctx, u.DB, &user)
 	if err != nil {
 		return dto.UserResponse{}, errkit.AddFuncName(err)
 	}

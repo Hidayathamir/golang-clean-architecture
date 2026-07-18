@@ -30,7 +30,7 @@ func (u *UserUsecaseImpl) Verify(ctx context.Context, req dto.VerifyUserRequest)
 	}
 
 	user := entity.User{}
-	err = u.UserRepository.FindByID(ctx, u.DB.WithContext(ctx), &user, userID)
+	err = u.UserRepository.FindByID(ctx, u.DB, &user, userID)
 	if err != nil {
 		return dto.UserAuth{}, errkit.AddFuncName(err)
 	}

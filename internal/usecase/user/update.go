@@ -19,7 +19,7 @@ func (u *UserUsecaseImpl) Update(ctx context.Context, req dto.UpdateUserRequest)
 	}
 
 	user := entity.User{}
-	err = u.UserRepository.FindByID(ctx, u.DB.WithContext(ctx), &user, req.ID)
+	err = u.UserRepository.FindByID(ctx, u.DB, &user, req.ID)
 	if err != nil {
 		return dto.UserResponse{}, errkit.AddFuncName(err)
 	}
@@ -35,7 +35,7 @@ func (u *UserUsecaseImpl) Update(ctx context.Context, req dto.UpdateUserRequest)
 
 	converter.DtoUpdateUserRequestToEntityUser(req, &user, password)
 
-	err = u.UserRepository.Update(ctx, u.DB.WithContext(ctx), &user)
+	err = u.UserRepository.Update(ctx, u.DB, &user)
 	if err != nil {
 		return dto.UserResponse{}, errkit.AddFuncName(err)
 	}
