@@ -1,15 +1,23 @@
+// Consumer group naming convention:
+// <topic>.<role>-<detail>
+//
+// Roles:
+//   notify - per-record, real-time notification delivery
+//   batch  - aggregated batch counter/stat updates
+//   sync   - one-way data sync to external systems
+//   log    - debugging/dummy consumer
 package consumergroup
 
 const (
-	ImageUploadedGroup1  = "image.uploaded.group-1"
-	ImageUploadedGroup2  = "image.uploaded.group-2"
-	ImageLikedGroup1     = "image.liked.group-1"
-	ImageLikedGroup2     = "image.liked.group-2"
-	ImageCommentedGroup1 = "image.commented.group-1"
-	ImageCommentedGroup2 = "image.commented.group-2"
+	ImageUploadedNotifyFollowers = "image.uploaded.notify-followers"
+	ImageUploadedSyncSearch      = "image.uploaded.sync-search"
+	ImageLikedNotifyOwner        = "image.liked.notify-owner"
+	ImageLikedBatchCount         = "image.liked.batch-count"
+	ImageCommentedNotifyOwner    = "image.commented.notify-owner"
+	ImageCommentedBatchCount     = "image.commented.batch-count"
 
-	UserFollowedGroup1 = "user.followed.group-1"
-	UserFollowedGroup2 = "user.followed.group-2"
+	UserFollowedNotifyUser = "user.followed.notify-user"
+	UserFollowedBatchStats = "user.followed.batch-stats"
 
-	NotifGroup1 = "notif.group-1"
+	NotifLog = "notif.log"
 )
