@@ -1,0 +1,2 @@
+rename cmd/web to cmd/webserver
+rename cmd/worker to cmd/workerconsumer
