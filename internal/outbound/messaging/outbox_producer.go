@@ -12,28 +12,28 @@ import (
 	"gorm.io/gorm"
 )
 
-//go:generate moq -out=../../mock/MockOutboxPublisher.go -pkg=mock . OutboxPublisher
+//go:generate moq -out=../../mock/MockOutboxProducer.go -pkg=mock . OutboxProducer
 
-type OutboxPublisher interface {
-	PublishPending(ctx context.Context) error
+type OutboxProducer interface {
+	ProducePending(ctx context.Context) error
 }
 
-var _ OutboxPublisher = &OutboxPublisherImpl{}
+var _ OutboxProducer = &OutboxProducerImpl{}
 
-type OutboxPublisherImpl struct {
+type OutboxProducerImpl struct {
 	Cfg              *config.Config
 	DB               *gorm.DB
 	Client           *kgo.Client
 	OutboxRepository repository.OutboxRepository
 }
 
-func NewOutboxPublisher(
+func NewOutboxProducer(
 	cfg *config.Config,
 	db *gorm.DB,
 	client *kgo.Client,
 	outboxRepository repository.OutboxRepository,
-) *OutboxPublisherImpl {
-	return &OutboxPublisherImpl{
+) *OutboxProducerImpl {
+	return &OutboxProducerImpl{
 		Cfg:              cfg,
 		DB:               db,
 		Client:           client,
@@ -41,9 +41,9 @@ func NewOutboxPublisher(
 	}
 }
 
-func (p *OutboxPublisherImpl) PublishPending(ctx context.Context) error {
+func (p *OutboxProducerImpl) ProducePending(ctx context.Context) error {
 	if p.Client == nil {
-		logkit.Logger.WithContext(ctx).Warn("Kafka producer is disabled, skipping outbox publish")
+		logkit.Logger.WithContext(ctx).Warn("Kafka producer is disabled, skipping outbox produce")
 		return nil
 	}
 
@@ -51,14 +51,14 @@ func (p *OutboxPublisherImpl) PublishPending(ctx context.Context) error {
 		outboxes := entity.OutboxList{}
 		err := p.OutboxRepository.FindPending(ctx, tx, &outboxes, p.Cfg.GetOutboxBatchSize())
 		if err != nil {
-			return errkit.AddFuncName(err, "messaging.(*OutboxPublisherImpl).PublishPending")
+			return errkit.AddFuncName(err, "messaging.(*OutboxProducerImpl).ProducePending")
 		}
 
 		if len(outboxes) == 0 {
 			return nil
 		}
 
-		var publishedIDs []int64
+		var producedIDs []int64
 		for _, outbox := range outboxes {
 			record := &kgo.Record{
 				Topic: outbox.Topic,
@@ -70,24 +70,24 @@ func (p *OutboxPublisherImpl) PublishPending(ctx context.Context) error {
 			if err != nil {
 				logkit.Logger.WithContext(ctx).WithError(err).
 					WithField("outbox_id", outbox.ID).
-					Error("failed to publish outbox record to Kafka")
+					Error("failed to produce outbox record to Kafka")
 				continue
 			}
 
-			publishedIDs = append(publishedIDs, outbox.ID)
+			producedIDs = append(producedIDs, outbox.ID)
 		}
 
-		if len(publishedIDs) > 0 {
-			err = p.OutboxRepository.MarkPublished(ctx, tx, publishedIDs)
+		if len(producedIDs) > 0 {
+			err = p.OutboxRepository.MarkProduced(ctx, tx, producedIDs)
 			if err != nil {
-				return errkit.AddFuncName(err, "messaging.(*OutboxPublisherImpl).PublishPending")
+				return errkit.AddFuncName(err, "messaging.(*OutboxProducerImpl).ProducePending")
 			}
 		}
 
 		logkit.Logger.WithContext(ctx).
-			WithField("published", len(publishedIDs)).
+			WithField("produced", len(producedIDs)).
 			WithField("total", len(outboxes)).
-			Debug("outbox publish cycle complete")
+			Debug("outbox produce cycle complete")
 
 		return nil
 	})

@@ -8,23 +8,23 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var _ OutboxPublisher = &OutboxPublisherMwLogger{}
+var _ OutboxProducer = &OutboxProducerMwLogger{}
 
-type OutboxPublisherMwLogger struct {
-	Next OutboxPublisher
+type OutboxProducerMwLogger struct {
+	Next OutboxProducer
 }
 
-func NewOutboxPublisherMwLogger(next OutboxPublisher) *OutboxPublisherMwLogger {
-	return &OutboxPublisherMwLogger{
+func NewOutboxProducerMwLogger(next OutboxProducer) *OutboxProducerMwLogger {
+	return &OutboxProducerMwLogger{
 		Next: next,
 	}
 }
 
-func (p *OutboxPublisherMwLogger) PublishPending(ctx context.Context) error {
+func (p *OutboxProducerMwLogger) ProducePending(ctx context.Context) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := p.Next.PublishPending(ctx)
+	err := p.Next.ProducePending(ctx)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{}

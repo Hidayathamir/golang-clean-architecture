@@ -25,6 +25,6 @@ func (o *Outbox) TableName() string {
 type OutboxList []Outbox
 
 const (
-	OutboxStatusPending   = "pending"
-	OutboxStatusPublished = "published"
+	OutboxStatusPending  = "pending"
+	OutboxStatusProduced = "produced"
 )

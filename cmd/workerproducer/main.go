@@ -32,10 +32,10 @@ func main() {
 	outboxRepository = repository.NewOutboxRepository(cfg)
 	outboxRepository = repository.NewOutboxRepositoryMwLogger(outboxRepository)
 
-	// setup outbox publisher
-	var publisher messaging.OutboxPublisher
-	publisher = messaging.NewOutboxPublisher(cfg, db, producer, outboxRepository)
-	publisher = messaging.NewOutboxPublisherMwLogger(publisher)
+	// setup outbox producer
+	var outboxProducer messaging.OutboxProducer
+	outboxProducer = messaging.NewOutboxProducer(cfg, db, producer, outboxRepository)
+	outboxProducer = messaging.NewOutboxProducerMwLogger(outboxProducer)
 
 	stopTraceProvider := telemetry.InitTraceProvider(cfg)
 	defer stopTraceProvider()
@@ -45,14 +45,14 @@ func main() {
 	stopLogProvider := telemetry.InitLogProvider(cfg)
 	defer stopLogProvider()
 
-	runPublisherLoop(cfg, publisher)
+	runProducerLoop(cfg, outboxProducer)
 }
 
-func runPublisherLoop(cfg *config.Config, publisher messaging.OutboxPublisher) {
+func runProducerLoop(cfg *config.Config, producer messaging.OutboxProducer) {
 	ctx, cancel := context.WithCancel(context.Background())
 	wg := &sync.WaitGroup{}
 
-	logkit.Logger.Info("starting outbox publisher worker")
+	logkit.Logger.Info("starting outbox producer worker")
 
 	interval := time.Duration(cfg.GetOutboxPollIntervalSeconds()) * time.Second
 	ticker := time.NewTicker(interval)
@@ -64,15 +64,15 @@ func runPublisherLoop(cfg *config.Config, publisher messaging.OutboxPublisher) {
 		for {
 			select {
 			case <-ticker.C:
-				err := publisher.PublishPending(ctx)
+				err := producer.ProducePending(ctx)
 				if err != nil {
-					logkit.Logger.WithContext(ctx).WithError(err).Error("outbox publish failed")
+					logkit.Logger.WithContext(ctx).WithError(err).Error("outbox produce failed")
 				}
 			case <-ctx.Done():
 				// Process remaining pending records one last time before exit
-				err := publisher.PublishPending(context.Background())
+				err := producer.ProducePending(context.Background())
 				if err != nil {
-					logkit.Logger.WithError(err).Error("outbox final publish failed")
+					logkit.Logger.WithError(err).Error("outbox final produce failed")
 				}
 				return
 			}
@@ -83,15 +83,15 @@ func runPublisherLoop(cfg *config.Config, publisher messaging.OutboxPublisher) {
 	signal.Notify(terminateSignals, syscall.SIGINT, syscall.SIGTERM)
 
 	s := <-terminateSignals
-	logkit.Logger.Info("Got one of stop signals, shutting down outbox publisher, SIGNAL NAME :", s)
+	logkit.Logger.Info("Got one of stop signals, shutting down outbox producer, SIGNAL NAME :", s)
 
 	logkit.Logger.Info("canceling")
 	cancel()
 	logkit.Logger.Info("canceled")
 
-	logkit.Logger.Info("wait for all publisher cycle to finish")
+	logkit.Logger.Info("wait for all producer cycle to finish")
 	wg.Wait()
 	logkit.Logger.Info("done waiting")
 
-	logkit.Logger.Info("end process of outbox publisher")
+	logkit.Logger.Info("end process of outbox producer")
 }

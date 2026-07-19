@@ -58,12 +58,12 @@ func (r *OutboxRepositoryMwLogger) FindPending(ctx context.Context, db *gorm.DB,
 	return err
 }
 
-func (r *OutboxRepositoryMwLogger) MarkPublished(ctx context.Context, db *gorm.DB, ids []int64) error {
+func (r *OutboxRepositoryMwLogger) MarkProduced(ctx context.Context, db *gorm.DB, ids []int64) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
 	err := retrykit.DBRetry(ctx, func() error {
-		return r.Next.MarkPublished(ctx, db, ids)
+		return r.Next.MarkProduced(ctx, db, ids)
 	})
 	telemetry.RecordError(span, err)
 

@@ -16,7 +16,7 @@ import (
 type OutboxRepository interface {
 	Insert(ctx context.Context, db *gorm.DB, outbox *entity.Outbox) error
 	FindPending(ctx context.Context, db *gorm.DB, outboxes *entity.OutboxList, limit int) error
-	MarkPublished(ctx context.Context, db *gorm.DB, ids []int64) error
+	MarkProduced(ctx context.Context, db *gorm.DB, ids []int64) error
 }
 
 var _ OutboxRepository = &OutboxRepositoryImpl{}
@@ -52,13 +52,13 @@ func (r *OutboxRepositoryImpl) FindPending(ctx context.Context, db *gorm.DB, out
 	return nil
 }
 
-func (r *OutboxRepositoryImpl) MarkPublished(ctx context.Context, db *gorm.DB, ids []int64) error {
+func (r *OutboxRepositoryImpl) MarkProduced(ctx context.Context, db *gorm.DB, ids []int64) error {
 	err := db.WithContext(ctx).
 		Model(&entity.Outbox{}).
 		Where(column.ID.Eq(ids)).
-		Update(column.Status.Str(), entity.OutboxStatusPublished).Error
+		Update(column.Status.Str(), entity.OutboxStatusProduced).Error
 	if err != nil {
-		return errkit.AddFuncName(err, "repository.(*OutboxRepositoryImpl).MarkPublished")
+		return errkit.AddFuncName(err, "repository.(*OutboxRepositoryImpl).MarkProduced")
 	}
 	return nil
 }

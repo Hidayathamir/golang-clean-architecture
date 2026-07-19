@@ -27,8 +27,8 @@ var _ repository.OutboxRepository = &OutboxRepositoryMock{}
 //			InsertFunc: func(ctx context.Context, db *gorm.DB, outbox *entity.Outbox) error {
 //				panic("mock out the Insert method")
 //			},
-//			MarkPublishedFunc: func(ctx context.Context, db *gorm.DB, ids []int64) error {
-//				panic("mock out the MarkPublished method")
+//			MarkProducedFunc: func(ctx context.Context, db *gorm.DB, ids []int64) error {
+//				panic("mock out the MarkProduced method")
 //			},
 //		}
 //
@@ -43,8 +43,8 @@ type OutboxRepositoryMock struct {
 	// InsertFunc mocks the Insert method.
 	InsertFunc func(ctx context.Context, db *gorm.DB, outbox *entity.Outbox) error
 
-	// MarkPublishedFunc mocks the MarkPublished method.
-	MarkPublishedFunc func(ctx context.Context, db *gorm.DB, ids []int64) error
+	// MarkProducedFunc mocks the MarkProduced method.
+	MarkProducedFunc func(ctx context.Context, db *gorm.DB, ids []int64) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -68,8 +68,8 @@ type OutboxRepositoryMock struct {
 			// Outbox is the outbox argument value.
 			Outbox *entity.Outbox
 		}
-		// MarkPublished holds details about calls to the MarkPublished method.
-		MarkPublished []struct {
+		// MarkProduced holds details about calls to the MarkProduced method.
+		MarkProduced []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Db is the db argument value.
@@ -78,9 +78,9 @@ type OutboxRepositoryMock struct {
 			Ids []int64
 		}
 	}
-	lockFindPending   sync.RWMutex
-	lockInsert        sync.RWMutex
-	lockMarkPublished sync.RWMutex
+	lockFindPending  sync.RWMutex
+	lockInsert       sync.RWMutex
+	lockMarkProduced sync.RWMutex
 }
 
 // FindPending calls FindPendingFunc.
@@ -167,10 +167,10 @@ func (mock *OutboxRepositoryMock) InsertCalls() []struct {
 	return calls
 }
 
-// MarkPublished calls MarkPublishedFunc.
-func (mock *OutboxRepositoryMock) MarkPublished(ctx context.Context, db *gorm.DB, ids []int64) error {
-	if mock.MarkPublishedFunc == nil {
-		panic("OutboxRepositoryMock.MarkPublishedFunc: method is nil but OutboxRepository.MarkPublished was just called")
+// MarkProduced calls MarkProducedFunc.
+func (mock *OutboxRepositoryMock) MarkProduced(ctx context.Context, db *gorm.DB, ids []int64) error {
+	if mock.MarkProducedFunc == nil {
+		panic("OutboxRepositoryMock.MarkProducedFunc: method is nil but OutboxRepository.MarkProduced was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
@@ -181,17 +181,17 @@ func (mock *OutboxRepositoryMock) MarkPublished(ctx context.Context, db *gorm.DB
 		Db:  db,
 		Ids: ids,
 	}
-	mock.lockMarkPublished.Lock()
-	mock.calls.MarkPublished = append(mock.calls.MarkPublished, callInfo)
-	mock.lockMarkPublished.Unlock()
-	return mock.MarkPublishedFunc(ctx, db, ids)
+	mock.lockMarkProduced.Lock()
+	mock.calls.MarkProduced = append(mock.calls.MarkProduced, callInfo)
+	mock.lockMarkProduced.Unlock()
+	return mock.MarkProducedFunc(ctx, db, ids)
 }
 
-// MarkPublishedCalls gets all the calls that were made to MarkPublished.
+// MarkProducedCalls gets all the calls that were made to MarkProduced.
 // Check the length with:
 //
-//	len(mockedOutboxRepository.MarkPublishedCalls())
-func (mock *OutboxRepositoryMock) MarkPublishedCalls() []struct {
+//	len(mockedOutboxRepository.MarkProducedCalls())
+func (mock *OutboxRepositoryMock) MarkProducedCalls() []struct {
 	Ctx context.Context
 	Db  *gorm.DB
 	Ids []int64
@@ -201,8 +201,8 @@ func (mock *OutboxRepositoryMock) MarkPublishedCalls() []struct {
 		Db  *gorm.DB
 		Ids []int64
 	}
-	mock.lockMarkPublished.RLock()
-	calls = mock.calls.MarkPublished
-	mock.lockMarkPublished.RUnlock()
+	mock.lockMarkProduced.RLock()
+	calls = mock.calls.MarkProduced
+	mock.lockMarkProduced.RUnlock()
 	return calls
 }
