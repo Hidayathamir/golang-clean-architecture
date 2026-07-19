@@ -20,7 +20,7 @@ Follow these steps to set up and run the entire ecosystem (Web, Worker, and Obse
 
 #### Start Infrastructure
 
-Run the docker-compose to start Postgres, Kafka, SigNoz (Tracing), and AKHQ (Kafka UI).
+Run the docker-compose to start Postgres, Kafka, SigNoz (Tracing), and Redpanda Console (Kafka UI).
 
 ```bash
 make docker-compose-up
@@ -70,7 +70,7 @@ Once everything is running, you can monitor the system using these tools:
 | Tool | URL | Description |
 | :--- | :--- | :--- |
 | **SigNoz** | [http://localhost:3301](http://localhost:3301) | View distributed traces, logs, and application metrics. |
-| **AKHQ** | [http://localhost:8080](http://localhost:8080) | Manage Kafka topics, consumers, and view messages in real-time. |
+| **Redpanda Console** | [http://localhost:8080](http://localhost:8080) | Manage Kafka topics, consumers, and view messages in real-time. |
 | **Swagger** | [http://localhost:3000/swagger](http://localhost:3000/swagger) | Interactive API documentation and testing. |
 | **Kibana** | [http://localhost:5601](http://localhost:5601) | Explore, analyze, and visualize data stored in Elasticsearch |
 

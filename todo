@@ -1,3 +1,2 @@
 idempotent consumer
-migrate from akhq to redpanda
 downgrade mw logger level from info to debug
