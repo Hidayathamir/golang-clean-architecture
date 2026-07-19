@@ -1,5 +1,3 @@
-version: '3.8'
-
 x-signoz-common: &signoz-common
   networks:
     - signoz-net
