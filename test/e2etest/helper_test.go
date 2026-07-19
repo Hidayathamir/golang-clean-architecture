@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/inbound/http/response"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/stretchr/testify/require"
 )

@@ -6,7 +6,7 @@ package mock
 import (
 	"context"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/repository"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/repository"
 	"gorm.io/gorm"
 	"sync"
 )

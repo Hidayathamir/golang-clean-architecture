@@ -2,7 +2,7 @@ package dependency_injection
 
 import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/messaging"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/inbound/messaging"
 )
 
 type Consumers struct {

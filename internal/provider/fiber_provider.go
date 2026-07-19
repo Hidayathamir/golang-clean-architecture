@@ -2,7 +2,7 @@ package provider
 
 import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/inbound/http/response"
 	"github.com/gofiber/fiber/v2"
 )
 

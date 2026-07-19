@@ -5,8 +5,8 @@ import (
 	"sync"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dependency_injection"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/inbound/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/consumergroup"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/topic"
 )

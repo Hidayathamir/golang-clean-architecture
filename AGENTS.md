@@ -27,21 +27,21 @@ make swag             # Regenerate swagger docs in api/ (deletes dir first)
 ```
 cmd/              Entry points: web, worker, consumer, migrate
 internal/
-  delivery/       HTTP controllers (package http), Kafka consumers (package messaging)
+  inbound/        HTTP controllers (package http), Kafka consumers (package messaging)
   dto/            Request/response DTOs between layers
   converter/      Entity ↔ DTO transforms
   usecase/*usecase/   Business logic (package userusecase, imageusecase, notifusecase)
   entity/         Domain models (GORM structs)
-  infra/          External implementations: repository, cache, messaging, storage, search
-  provider/       Client initialization (DB, Redis, Kafka, S3, Elasticsearch)
+  outbound/       External implementations: repository, cache, messaging, storage, search
+  provider/       Component initialization (DB, Redis, Kafka, S3, Elasticsearch, Fiber)
   dependency_injection/   Wire everything together
   config/         Viper-based config from config.json
 pkg/              Shared utilities: logkit, errkit, telemetry, retrykit, validatorkit, caller, ctx, constant
 ```
 
-## Decorator pattern — mandatory for all infra interfaces
+## Decorator pattern — mandatory for all outbound interfaces
 
-Every infra interface (repository, cache, messaging, storage, search) **must** have a logger-middleware wrapper (`_mw_logger.go`) that:
+Every outbound interface (repository, cache, messaging, storage, search) **must** have a logger-middleware wrapper (`_mw_logger.go`) that:
 - Wraps the real implementation in a `{Interface}MwLogger` struct with a `Next {Interface}` field
 - Starts an OpenTelemetry span (`telemetry.Start`)
 - Calls `retrykit.DBRetry` (for DB) or the real method
@@ -97,11 +97,11 @@ VSCode auto-runs `addfuncname` on `.go` file save. If you add new Go files outsi
 1. Define entity in `internal/entity/`
 2. Define DTOs in `internal/dto/`
 3. Create interface + impl in `internal/usecase/<name>usecase/` — add `//go:generate moq` directive
-4. Create infra interface + impl in `internal/infra/<layer>/` — add `//go:generate moq` directive
+4. Create outbound interface + impl in `internal/outbound/<layer>/` — add `//go:generate moq` directive
 5. Add MwLogger decorators for both usecase and infra
 6. Wire in `internal/dependency_injection/`
-7. Create controller/consumer in `internal/delivery/<http|messaging>/`
-8. Register routes in `internal/delivery/<http|messaging>/route/`
+7. Create controller/consumer in `internal/inbound/<http|messaging>/`
+8. Register routes in `internal/inbound/<http|messaging>/route/`
 9. Run `make generate && make swag`
 
 ## Configuration

@@ -8,8 +8,8 @@ import (
 	"syscall"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/messaging/route"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dependency_injection"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/inbound/messaging/route"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/provider"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/otelkit"

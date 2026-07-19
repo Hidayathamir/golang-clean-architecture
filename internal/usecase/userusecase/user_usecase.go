@@ -5,10 +5,10 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/cache"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/messaging"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/repository"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/storage"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/cache"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/messaging"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/repository"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/storage"
 	"gorm.io/gorm"
 )
 

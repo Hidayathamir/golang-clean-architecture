@@ -6,7 +6,7 @@ package mock
 import (
 	"context"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/cache"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/cache"
 	"sync"
 )
 

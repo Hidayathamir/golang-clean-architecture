@@ -2,7 +2,7 @@ package dependency_injection
 
 import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/inbound/http"
 )
 
 type Controllers struct {

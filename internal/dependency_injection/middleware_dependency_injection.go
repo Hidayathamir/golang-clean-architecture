@@ -1,7 +1,7 @@
 package dependency_injection
 
 import (
-	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/middleware"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/inbound/http/middleware"
 	"github.com/gofiber/fiber/v2"
 )
 

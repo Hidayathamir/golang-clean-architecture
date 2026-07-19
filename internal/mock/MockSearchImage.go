@@ -6,7 +6,7 @@ package mock
 import (
 	"context"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/infra/search"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/search"
 	"sync"
 )
 
