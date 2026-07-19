@@ -42,7 +42,7 @@ func (c *NotifConsumer) notify(ctx context.Context, record *kgo.Record) error {
 	err := json.Unmarshal(record.Value, &event)
 	if err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "messaging.(*NotifConsumer).notify")
 	}
 
 	req := dto.NotifyRequest{}
@@ -51,7 +51,7 @@ func (c *NotifConsumer) notify(ctx context.Context, record *kgo.Record) error {
 	err = c.Usecase.Notify(ctx, req)
 	if err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "messaging.(*NotifConsumer).notify")
 	}
 
 	return nil

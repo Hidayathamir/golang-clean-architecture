@@ -1,0 +1,10 @@
+{
+    "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "match": "\\.go$",
+                "cmd": "go run ./pkg/errkit/cmd/addfuncname ${file}"
+            }
+        ]
+    }
+}

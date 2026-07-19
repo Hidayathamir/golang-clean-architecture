@@ -1,8 +1,8 @@
 package errkit
 
-import "github.com/Hidayathamir/golang-clean-architecture/pkg/caller"
-
-// AddFuncName wraps the error using the caller's function name automatically.
-func AddFuncName(err error) error {
-	return Wrap(err, caller.FuncName(caller.WithSkip(1)))
+func AddFuncName(err error, funcName ...string) error {
+	if len(funcName) > 0 {
+		return Wrap(err, funcName[0])
+	}
+	return Wrap(err, "no func name provided")
 }

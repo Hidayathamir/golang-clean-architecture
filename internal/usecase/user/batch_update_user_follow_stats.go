@@ -1,8 +1,8 @@
 package user
 
 import (
-	"net/http" 
 	"context"
+	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
@@ -13,7 +13,7 @@ func (u *UserUsecaseImpl) BatchUpdateUserFollowStats(ctx context.Context, req dt
 	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "user.(*UserUsecaseImpl).BatchUpdateUserFollowStats")
 	}
 
 	for _, v := range req.UserIncreaseFollowerFollowingCountList {

@@ -32,7 +32,7 @@ func NewLikeRepository(cfg *config.Config) *LikeRepositoryImpl {
 func (r *LikeRepositoryImpl) Create(ctx context.Context, db *gorm.DB, like *entity.Like) error {
 	err := db.WithContext(ctx).Create(like).Error
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "repository.(*LikeRepositoryImpl).Create")
 	}
 	return nil
 }
@@ -40,7 +40,7 @@ func (r *LikeRepositoryImpl) Create(ctx context.Context, db *gorm.DB, like *enti
 func (r *LikeRepositoryImpl) FindByImageID(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64) error {
 	err := db.WithContext(ctx).Where(column.ImageID.Eq(imageID)).Find(likeList).Error
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "repository.(*LikeRepositoryImpl).FindByImageID")
 	}
 	return nil
 }

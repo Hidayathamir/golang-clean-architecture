@@ -1,8 +1,8 @@
 package image
 
 import (
-	"net/http" 
 	"context"
+	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
@@ -16,25 +16,25 @@ func (u *ImageUsecaseImpl) Upload(ctx context.Context, req dto.UploadImageReques
 	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		return dto.ImageResponse{}, errkit.AddFuncName(err)
+		return dto.ImageResponse{}, errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).Upload")
 	}
 
 	s3UploadImgReq := dto.S3UploadImageRequest{}
 	err = converter.DtoUploadImageRequestToDtoS3UploadImageRequest(ctx, req, &s3UploadImgReq)
 	if err != nil {
-		return dto.ImageResponse{}, errkit.AddFuncName(err)
+		return dto.ImageResponse{}, errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).Upload")
 	}
 
 	url, err := u.S3Client.UploadImage(ctx, s3UploadImgReq)
 	if err != nil {
-		return dto.ImageResponse{}, errkit.AddFuncName(err)
+		return dto.ImageResponse{}, errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).Upload")
 	}
 
 	image := entity.Image{UserID: ctxuserauth.Get(ctx).ID, Caption: req.Caption, URL: url}
 
 	err = u.ImageRepository.Create(ctx, u.DB, &image)
 	if err != nil {
-		return dto.ImageResponse{}, errkit.AddFuncName(err)
+		return dto.ImageResponse{}, errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).Upload")
 	}
 
 	event := dto.ImageUploadedEvent{}
@@ -42,7 +42,7 @@ func (u *ImageUsecaseImpl) Upload(ctx context.Context, req dto.UploadImageReques
 
 	err = u.ImageProducer.SendImageUploaded(ctx, &event)
 	if err != nil {
-		return dto.ImageResponse{}, errkit.AddFuncName(err)
+		return dto.ImageResponse{}, errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).Upload")
 	}
 
 	res := dto.ImageResponse{}

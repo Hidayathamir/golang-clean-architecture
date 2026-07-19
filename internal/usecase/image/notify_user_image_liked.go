@@ -1,9 +1,9 @@
 package image
 
 import (
-	"net/http" 
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
@@ -15,28 +15,28 @@ func (u *ImageUsecaseImpl) NotifyUserImageLiked(ctx context.Context, req dto.Not
 	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).NotifyUserImageLiked")
 	}
 
 	image := entity.Image{}
 
 	err = u.ImageRepository.FindByID(ctx, u.DB, &image, req.ImageID)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).NotifyUserImageLiked")
 	}
 
 	uploader := entity.User{}
 
 	err = u.UserRepository.FindByID(ctx, u.DB, &uploader, image.UserID)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).NotifyUserImageLiked")
 	}
 
 	liker := entity.User{}
 
 	err = u.UserRepository.FindByID(ctx, u.DB, &liker, req.LikerUserID)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).NotifyUserImageLiked")
 	}
 
 	event := dto.NotifEvent{
@@ -46,7 +46,7 @@ func (u *ImageUsecaseImpl) NotifyUserImageLiked(ctx context.Context, req dto.Not
 
 	err = u.NotifProducer.SendNotif(ctx, &event)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).NotifyUserImageLiked")
 	}
 
 	return nil

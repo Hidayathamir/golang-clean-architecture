@@ -38,7 +38,7 @@ func (r *UserStatRepositoryImpl) IncrementFollowerCountByID(ctx context.Context,
 			column.FollowerCount.Str(): gorm.Expr(column.FollowerCount.Plus(count)),
 		}).Error
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "repository.(*UserStatRepositoryImpl).IncrementFollowerCountByID")
 	}
 	return nil
 }
@@ -51,7 +51,7 @@ func (r *UserStatRepositoryImpl) IncrementFollowingCountByID(ctx context.Context
 			column.FollowingCount.Str(): gorm.Expr(column.FollowingCount.Plus(count)),
 		}).Error
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "repository.(*UserStatRepositoryImpl).IncrementFollowingCountByID")
 	}
 	return nil
 }
@@ -65,7 +65,7 @@ func (r *UserStatRepositoryImpl) IncrementFollowerCountAndFollowingCountByID(ctx
 			column.FollowingCount.Str(): gorm.Expr(column.FollowingCount.Plus(followingCount)),
 		}).Error
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "repository.(*UserStatRepositoryImpl).IncrementFollowerCountAndFollowingCountByID")
 	}
 	return nil
 }

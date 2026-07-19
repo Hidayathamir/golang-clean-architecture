@@ -1,8 +1,8 @@
 package image
 
 import (
-	"net/http" 
 	"context"
+	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
@@ -15,13 +15,13 @@ func (u *ImageUsecaseImpl) GetImage(ctx context.Context, req dto.GetImageRequest
 	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		return dto.ImageResponse{}, errkit.AddFuncName(err)
+		return dto.ImageResponse{}, errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).GetImage")
 	}
 
 	image := entity.Image{}
 	err = u.ImageRepository.FindByID(ctx, u.DB, &image, req.ID)
 	if err != nil {
-		return dto.ImageResponse{}, errkit.AddFuncName(err)
+		return dto.ImageResponse{}, errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).GetImage")
 	}
 
 	res := dto.ImageResponse{}

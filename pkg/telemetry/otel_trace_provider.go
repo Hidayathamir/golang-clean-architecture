@@ -40,11 +40,11 @@ func InitTraceProvider(cfg *config.Config) Stop {
 	stop := func() {
 		err := tp.ForceFlush(context.Background())
 		if err != nil {
-			fmt.Println(errkit.AddFuncName(err))
+			fmt.Println(errkit.AddFuncName(err, "telemetry.InitTraceProvider"))
 		}
 		err = tp.Shutdown(context.Background())
 		if err != nil {
-			fmt.Println(errkit.AddFuncName(err))
+			fmt.Println(errkit.AddFuncName(err, "telemetry.InitTraceProvider"))
 		}
 	}
 

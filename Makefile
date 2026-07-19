@@ -60,6 +60,9 @@ generate:
 swag:
 	rm -rf api/ && swag fmt --exclude ./internal/mock && swag init --parseDependency --parseInternal --generalInfo ./cmd/web/main.go --output ./api/
 
+add-func-name:
+	@find ./internal ./pkg ./cmd -name '*.go' -not -path '*/mock/*' -not -path '*/pkg/errkit/cmd/*' | xargs go run ./pkg/errkit/cmd/addfuncname
+
 check-tools:
 	@echo "🔍 Checking required tools..."
 	@if command -v go >/dev/null 2>&1; then \

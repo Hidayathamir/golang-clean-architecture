@@ -1,8 +1,8 @@
 package image
 
 import (
-	"net/http" 
 	"context"
+	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
@@ -15,7 +15,7 @@ func (u *ImageUsecaseImpl) Like(ctx context.Context, req dto.LikeImageRequest) e
 	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).Like")
 	}
 
 	like := entity.Like{}
@@ -23,7 +23,7 @@ func (u *ImageUsecaseImpl) Like(ctx context.Context, req dto.LikeImageRequest) e
 
 	err = u.LikeRepository.Create(ctx, u.DB, &like)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).Like")
 	}
 
 	event := dto.ImageLikedEvent{}
@@ -31,7 +31,7 @@ func (u *ImageUsecaseImpl) Like(ctx context.Context, req dto.LikeImageRequest) e
 
 	err = u.ImageProducer.SendImageLiked(ctx, &event)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).Like")
 	}
 
 	return nil

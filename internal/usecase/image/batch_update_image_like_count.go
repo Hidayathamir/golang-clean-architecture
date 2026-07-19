@@ -1,8 +1,8 @@
 package image
 
 import (
-	"net/http" 
 	"context"
+	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
@@ -13,7 +13,7 @@ func (u *ImageUsecaseImpl) BatchUpdateImageLikeCount(ctx context.Context, req dt
 	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).BatchUpdateImageLikeCount")
 	}
 
 	for _, v := range req.ImageIncreaseLikeCountList {

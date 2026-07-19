@@ -1,9 +1,9 @@
 package image
 
 import (
-	"net/http" 
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
@@ -15,21 +15,21 @@ func (u *ImageUsecaseImpl) NotifyFollowerOnUpload(ctx context.Context, req dto.N
 	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).NotifyFollowerOnUpload")
 	}
 
 	user := entity.User{}
 
 	err = u.UserRepository.FindByID(ctx, u.DB, &user, req.UserID)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).NotifyFollowerOnUpload")
 	}
 
 	followList := entity.FollowList{}
 
 	err = u.FollowRepository.FindByFollowingID(ctx, u.DB, &followList, user.ID)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).NotifyFollowerOnUpload")
 	}
 
 	for _, follow := range followList {
@@ -40,7 +40,7 @@ func (u *ImageUsecaseImpl) NotifyFollowerOnUpload(ctx context.Context, req dto.N
 
 		err = u.NotifProducer.SendNotif(ctx, &event)
 		if err != nil {
-			return errkit.AddFuncName(err)
+			return errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).NotifyFollowerOnUpload")
 		}
 	}
 

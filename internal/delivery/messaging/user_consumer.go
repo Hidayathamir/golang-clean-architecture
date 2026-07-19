@@ -42,7 +42,7 @@ func (c *UserConsumer) notifyUserBeingFollowed(ctx context.Context, record *kgo.
 	err := json.Unmarshal(record.Value, &event)
 	if err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "messaging.(*UserConsumer).notifyUserBeingFollowed")
 	}
 
 	req := dto.NotifyUserBeingFollowedRequest{}
@@ -51,7 +51,7 @@ func (c *UserConsumer) notifyUserBeingFollowed(ctx context.Context, record *kgo.
 	err = c.Usecase.NotifyUserBeingFollowed(ctx, req)
 	if err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "messaging.(*UserConsumer).notifyUserBeingFollowed")
 	}
 
 	return nil
@@ -67,7 +67,7 @@ func (c *UserConsumer) BatchUpdateUserFollowStats(ctx context.Context, records [
 	err := c.Usecase.BatchUpdateUserFollowStats(ctx, req)
 	if err != nil {
 		x.Logger.WithContext(ctx).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "messaging.(*UserConsumer).BatchUpdateUserFollowStats")
 	}
 
 	return nil

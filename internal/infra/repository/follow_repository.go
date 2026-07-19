@@ -32,7 +32,7 @@ func NewFollowRepository(cfg *config.Config) *FollowRepositoryImpl {
 func (r *FollowRepositoryImpl) Create(ctx context.Context, db *gorm.DB, follow *entity.Follow) error {
 	err := db.WithContext(ctx).Create(follow).Error
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "repository.(*FollowRepositoryImpl).Create")
 	}
 	return nil
 }
@@ -40,7 +40,7 @@ func (r *FollowRepositoryImpl) Create(ctx context.Context, db *gorm.DB, follow *
 func (r *FollowRepositoryImpl) FindByFollowingID(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followingID int64) error {
 	err := db.WithContext(ctx).Where(column.FollowingID.Eq(followingID)).Find(followList).Error
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "repository.(*FollowRepositoryImpl).FindByFollowingID")
 	}
 	return nil
 }

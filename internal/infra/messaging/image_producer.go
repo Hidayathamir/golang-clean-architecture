@@ -37,7 +37,7 @@ func NewImageProducer(cfg *config.Config, client *kgo.Client) *ImageProducerImpl
 func (p *ImageProducerImpl) SendImageUploaded(ctx context.Context, event *dto.ImageUploadedEvent) error {
 	err := p.send(ctx, topic.ImageUploaded, event)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "messaging.(*ImageProducerImpl).SendImageUploaded")
 	}
 	return nil
 }
@@ -45,7 +45,7 @@ func (p *ImageProducerImpl) SendImageUploaded(ctx context.Context, event *dto.Im
 func (p *ImageProducerImpl) SendImageLiked(ctx context.Context, event *dto.ImageLikedEvent) error {
 	err := p.send(ctx, topic.ImageLiked, event)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "messaging.(*ImageProducerImpl).SendImageLiked")
 	}
 	return nil
 }
@@ -53,7 +53,7 @@ func (p *ImageProducerImpl) SendImageLiked(ctx context.Context, event *dto.Image
 func (p *ImageProducerImpl) SendImageCommented(ctx context.Context, event *dto.ImageCommentedEvent) error {
 	err := p.send(ctx, topic.ImageCommented, event)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "messaging.(*ImageProducerImpl).SendImageCommented")
 	}
 	return nil
 }
@@ -66,7 +66,7 @@ func (p *ImageProducerImpl) send(ctx context.Context, topicName string, event an
 
 	value, err := json.Marshal(event)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "messaging.(*ImageProducerImpl).send")
 	}
 
 	record := &kgo.Record{
@@ -76,7 +76,7 @@ func (p *ImageProducerImpl) send(ctx context.Context, topicName string, event an
 
 	err = p.Client.ProduceSync(ctx, record).FirstErr()
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "messaging.(*ImageProducerImpl).send")
 	}
 
 	x.Logger.WithContext(ctx).WithField("topic", topicName).Debug("message sent")

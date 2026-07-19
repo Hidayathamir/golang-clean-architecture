@@ -43,13 +43,13 @@ func (c *UserController) Register(ctx *fiber.Ctx) error {
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "http.(*UserController).Register")
 	}
 
 	res, err := c.Usecase.Create(ctx.UserContext(), req)
 	if err != nil {
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "http.(*UserController).Register")
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -72,13 +72,13 @@ func (c *UserController) Login(ctx *fiber.Ctx) error {
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "http.(*UserController).Login")
 	}
 
 	res, err := c.Usecase.Login(ctx.UserContext(), req)
 	if err != nil {
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "http.(*UserController).Login")
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -105,7 +105,7 @@ func (c *UserController) Current(ctx *fiber.Ctx) error {
 	res, err := c.Usecase.Current(ctx.UserContext(), req)
 	if err != nil {
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "http.(*UserController).Current")
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -131,14 +131,14 @@ func (c *UserController) Update(ctx *fiber.Ctx) error {
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "http.(*UserController).Update")
 	}
 
 	req.ID = userAuth.ID
 	res, err := c.Usecase.Update(ctx.UserContext(), req)
 	if err != nil {
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "http.(*UserController).Update")
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -162,13 +162,13 @@ func (c *UserController) Follow(ctx *fiber.Ctx) error {
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "http.(*UserController).Follow")
 	}
 
 	err = c.Usecase.Follow(ctx.UserContext(), req)
 	if err != nil {
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "http.(*UserController).Follow")
 	}
 
 	return response.Data(ctx, http.StatusOK, "ok")

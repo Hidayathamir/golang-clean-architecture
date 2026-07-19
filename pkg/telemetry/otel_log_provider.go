@@ -36,11 +36,11 @@ func InitLogProvider(cfg *config.Config) Stop {
 	stop := func() {
 		err := lp.ForceFlush(context.Background())
 		if err != nil {
-			fmt.Println(errkit.AddFuncName(err))
+			fmt.Println(errkit.AddFuncName(err, "telemetry.InitLogProvider"))
 		}
 		err = lp.Shutdown(context.Background())
 		if err != nil {
-			fmt.Println(errkit.AddFuncName(err))
+			fmt.Println(errkit.AddFuncName(err, "telemetry.InitLogProvider"))
 		}
 	}
 

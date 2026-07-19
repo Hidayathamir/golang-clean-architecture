@@ -1,8 +1,8 @@
 package image
 
 import (
-	"net/http" 
 	"context"
+	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
@@ -15,13 +15,13 @@ func (u *ImageUsecaseImpl) GetComment(ctx context.Context, req dto.GetCommentReq
 	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		return dto.CommentResponseList{}, errkit.AddFuncName(err)
+		return dto.CommentResponseList{}, errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).GetComment")
 	}
 
 	commentList := entity.CommentList{}
 	err = u.CommentRepository.FindByImageID(ctx, u.DB, &commentList, req.ImageID)
 	if err != nil {
-		return dto.CommentResponseList{}, errkit.AddFuncName(err)
+		return dto.CommentResponseList{}, errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).GetComment")
 	}
 
 	res := dto.CommentResponseList{}

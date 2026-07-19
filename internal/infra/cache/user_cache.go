@@ -41,13 +41,13 @@ func (c *UserCacheImpl) Get(ctx context.Context, id int64) (*entity.User, error)
 		return nil, nil
 	}
 	if err != nil {
-		return nil, errkit.AddFuncName(err)
+		return nil, errkit.AddFuncName(err, "cache.(*UserCacheImpl).Get")
 	}
 
 	user := entity.User{}
 	err = json.Unmarshal([]byte(val), &user)
 	if err != nil {
-		return nil, errkit.AddFuncName(err)
+		return nil, errkit.AddFuncName(err, "cache.(*UserCacheImpl).Get")
 	}
 
 	return &user, nil
@@ -56,12 +56,12 @@ func (c *UserCacheImpl) Get(ctx context.Context, id int64) (*entity.User, error)
 func (c *UserCacheImpl) Set(ctx context.Context, user *entity.User) error {
 	data, err := json.Marshal(user)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "cache.(*UserCacheImpl).Set")
 	}
 
 	err = c.client.Set(ctx, c.getKey(user.ID), data, 1*time.Hour).Err()
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "cache.(*UserCacheImpl).Set")
 	}
 
 	return nil
@@ -70,7 +70,7 @@ func (c *UserCacheImpl) Set(ctx context.Context, user *entity.User) error {
 func (c *UserCacheImpl) Delete(ctx context.Context, id int64) error {
 	err := c.client.Del(ctx, c.getKey(id)).Err()
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "cache.(*UserCacheImpl).Delete")
 	}
 	return nil
 }

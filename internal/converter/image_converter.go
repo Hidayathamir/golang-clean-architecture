@@ -22,7 +22,7 @@ func DtoUploadImageRequestToDtoS3UploadImageRequest(ctx context.Context, req dto
 	s3UploadImgReq.Key = fmt.Sprintf("%s/%v_%s", userAuth.Username, timenow, safeFilename)
 	file, err := req.File.Open()
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "converter.DtoUploadImageRequestToDtoS3UploadImageRequest")
 	}
 	defer x.LogIfErrForDeferContext(ctx, file.Close)
 	s3UploadImgReq.Body = file

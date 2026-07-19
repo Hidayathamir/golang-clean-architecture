@@ -36,7 +36,7 @@ func NewImageRepository(cfg *config.Config) *ImageRepositoryImpl {
 func (r *ImageRepositoryImpl) Create(ctx context.Context, db *gorm.DB, image *entity.Image) error {
 	err := db.WithContext(ctx).Create(image).Error
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "repository.(*ImageRepositoryImpl).Create")
 	}
 	return nil
 }
@@ -45,7 +45,7 @@ func (r *ImageRepositoryImpl) FindByID(ctx context.Context, db *gorm.DB, image *
 	err := db.WithContext(ctx).Where(column.ID.Eq(id)).Take(image).Error
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusNotFound)
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "repository.(*ImageRepositoryImpl).FindByID")
 	}
 	return nil
 }
@@ -58,7 +58,7 @@ func (r *ImageRepositoryImpl) IncrementCommentCountByID(ctx context.Context, db 
 			column.CommentCount.Str(): gorm.Expr(column.CommentCount.Plus(count)),
 		}).Error
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "repository.(*ImageRepositoryImpl).IncrementCommentCountByID")
 	}
 	return nil
 }
@@ -71,7 +71,7 @@ func (r *ImageRepositoryImpl) IncrementLikeCountByID(ctx context.Context, db *go
 			column.LikeCount.Str(): gorm.Expr(column.LikeCount.Plus(count)),
 		}).Error
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "repository.(*ImageRepositoryImpl).IncrementLikeCountByID")
 	}
 	return nil
 }

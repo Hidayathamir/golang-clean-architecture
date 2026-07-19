@@ -1,8 +1,8 @@
 package user
 
 import (
-	"net/http" 
 	"context"
+	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
@@ -15,12 +15,12 @@ func (u *UserUsecaseImpl) Verify(ctx context.Context, req dto.VerifyUserRequest)
 	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		return dto.UserAuth{}, errkit.AddFuncName(err)
+		return dto.UserAuth{}, errkit.AddFuncName(err, "user.(*UserUsecaseImpl).Verify")
 	}
 
 	userID, err := u.parseAccessToken(ctx, req.Token)
 	if err != nil {
-		return dto.UserAuth{}, errkit.AddFuncName(err)
+		return dto.UserAuth{}, errkit.AddFuncName(err, "user.(*UserUsecaseImpl).Verify")
 	}
 
 	cachedUser, err := u.UserCache.Get(ctx, userID)
@@ -33,7 +33,7 @@ func (u *UserUsecaseImpl) Verify(ctx context.Context, req dto.VerifyUserRequest)
 	user := entity.User{}
 	err = u.UserRepository.FindByID(ctx, u.DB, &user, userID)
 	if err != nil {
-		return dto.UserAuth{}, errkit.AddFuncName(err)
+		return dto.UserAuth{}, errkit.AddFuncName(err, "user.(*UserUsecaseImpl).Verify")
 	}
 
 	err = u.UserCache.Set(ctx, &user)

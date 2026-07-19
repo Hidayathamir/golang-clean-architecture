@@ -1,8 +1,8 @@
 package user
 
 import (
-	"net/http" 
 	"context"
+	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
@@ -16,12 +16,12 @@ func (u *UserUsecaseImpl) Create(ctx context.Context, req dto.RegisterUserReques
 	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		return dto.UserResponse{}, errkit.AddFuncName(err)
+		return dto.UserResponse{}, errkit.AddFuncName(err, "user.(*UserUsecaseImpl).Create")
 	}
 
 	password, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return dto.UserResponse{}, errkit.AddFuncName(err)
+		return dto.UserResponse{}, errkit.AddFuncName(err, "user.(*UserUsecaseImpl).Create")
 	}
 
 	user := entity.User{}
@@ -29,7 +29,7 @@ func (u *UserUsecaseImpl) Create(ctx context.Context, req dto.RegisterUserReques
 
 	err = u.UserRepository.Create(ctx, u.DB, &user)
 	if err != nil {
-		return dto.UserResponse{}, errkit.AddFuncName(err)
+		return dto.UserResponse{}, errkit.AddFuncName(err, "user.(*UserUsecaseImpl).Create")
 	}
 
 	res := dto.UserResponse{}

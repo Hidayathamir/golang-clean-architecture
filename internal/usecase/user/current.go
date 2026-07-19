@@ -1,8 +1,8 @@
 package user
 
 import (
-	"net/http" 
 	"context"
+	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
@@ -15,7 +15,7 @@ func (u *UserUsecaseImpl) Current(ctx context.Context, req dto.GetUserRequest) (
 	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		return dto.UserResponse{}, errkit.AddFuncName(err)
+		return dto.UserResponse{}, errkit.AddFuncName(err, "user.(*UserUsecaseImpl).Current")
 	}
 
 	cachedUser, err := u.UserCache.Get(ctx, req.ID)
@@ -28,7 +28,7 @@ func (u *UserUsecaseImpl) Current(ctx context.Context, req dto.GetUserRequest) (
 	user := entity.User{}
 	err = u.UserRepository.FindByID(ctx, u.DB, &user, req.ID)
 	if err != nil {
-		return dto.UserResponse{}, errkit.AddFuncName(err)
+		return dto.UserResponse{}, errkit.AddFuncName(err, "user.(*UserUsecaseImpl).Current")
 	}
 
 	err = u.UserCache.Set(ctx, &user)

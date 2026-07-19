@@ -18,7 +18,7 @@ func NewAuth(userUserCase user.UserUsecase) fiber.Handler {
 		if headerAuth == "" {
 			err := fmt.Errorf("header auth not found")
 			err = errkit.SetCode(err, http.StatusUnauthorized)
-			return errkit.AddFuncName(err)
+			return errkit.AddFuncName(err, "middleware.NewAuth")
 		}
 
 		var token string
@@ -31,14 +31,14 @@ func NewAuth(userUserCase user.UserUsecase) fiber.Handler {
 		default:
 			err := fmt.Errorf("authorization header format invalid")
 			err = errkit.SetCode(err, http.StatusUnauthorized)
-			return errkit.AddFuncName(err)
+			return errkit.AddFuncName(err, "middleware.NewAuth")
 		}
 
 		req := dto.VerifyUserRequest{Token: token}
 		userAuth, err := userUserCase.Verify(ctx.UserContext(), req)
 		if err != nil {
 			err = errkit.SetCode(err, http.StatusUnauthorized)
-			return errkit.AddFuncName(err)
+			return errkit.AddFuncName(err, "middleware.NewAuth")
 		}
 
 		ctx.SetUserContext(ctxuserauth.Set(ctx.UserContext(), &userAuth))

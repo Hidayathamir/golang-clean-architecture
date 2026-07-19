@@ -1,8 +1,8 @@
 package image
 
 import (
-	"net/http" 
 	"context"
+	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
@@ -15,13 +15,13 @@ func (u *ImageUsecaseImpl) GetLike(ctx context.Context, req dto.GetLikeRequest) 
 	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		return dto.LikeResponseList{}, errkit.AddFuncName(err)
+		return dto.LikeResponseList{}, errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).GetLike")
 	}
 
 	likeList := entity.LikeList{}
 	err = u.LikeRepository.FindByImageID(ctx, u.DB, &likeList, req.ImageID)
 	if err != nil {
-		return dto.LikeResponseList{}, errkit.AddFuncName(err)
+		return dto.LikeResponseList{}, errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).GetLike")
 	}
 
 	res := dto.LikeResponseList{}

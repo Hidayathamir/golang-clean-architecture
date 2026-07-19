@@ -34,19 +34,19 @@ func NewImageSearch(client *elasticsearch.Client) ImageSearch {
 func (i *ImageSearchImpl) IndexImage(ctx context.Context, document *dto.ImageDocument) error {
 	jsonByte, err := json.Marshal(document)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "search.(*ImageSearchImpl).IndexImage")
 	}
 
 	res, err := i.client.Index(indexname.Images, bytes.NewReader(jsonByte))
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "search.(*ImageSearchImpl).IndexImage")
 	}
 	defer x.LogIfErrForDeferContext(ctx, res.Body.Close)
 
 	if res.IsError() {
 		err := errors.New(res.String())
 		err = errkit.Wrap(err, "indexing error")
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "search.(*ImageSearchImpl).IndexImage")
 	}
 
 	return nil

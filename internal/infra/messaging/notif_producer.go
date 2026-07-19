@@ -35,7 +35,7 @@ func NewNotifProducer(cfg *config.Config, client *kgo.Client) *NotifProducerImpl
 func (p *NotifProducerImpl) SendNotif(ctx context.Context, event *dto.NotifEvent) error {
 	err := p.send(ctx, topic.Notif, event)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "messaging.(*NotifProducerImpl).SendNotif")
 	}
 	return nil
 }
@@ -48,7 +48,7 @@ func (p *NotifProducerImpl) send(ctx context.Context, topicName string, event an
 
 	value, err := json.Marshal(event)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "messaging.(*NotifProducerImpl).send")
 	}
 
 	record := &kgo.Record{
@@ -58,7 +58,7 @@ func (p *NotifProducerImpl) send(ctx context.Context, topicName string, event an
 
 	err = p.Client.ProduceSync(ctx, record).FirstErr()
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "messaging.(*NotifProducerImpl).send")
 	}
 
 	x.Logger.WithContext(ctx).WithField("topic", topicName).Debug("message sent")

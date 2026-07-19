@@ -45,7 +45,7 @@ func (c *ImageController) Upload(ctx *fiber.Ctx) error {
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "http.(*ImageController).Upload")
 	}
 
 	req := dto.UploadImageRequest{}
@@ -55,7 +55,7 @@ func (c *ImageController) Upload(ctx *fiber.Ctx) error {
 	res, err := c.Usecase.Upload(ctx.UserContext(), req)
 	if err != nil {
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "http.(*ImageController).Upload")
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -81,13 +81,13 @@ func (c *ImageController) Like(ctx *fiber.Ctx) error {
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "http.(*ImageController).Like")
 	}
 
 	err = c.Usecase.Like(ctx.UserContext(), req)
 	if err != nil {
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "http.(*ImageController).Like")
 	}
 
 	return response.Data(ctx, http.StatusOK, "ok")
@@ -113,13 +113,13 @@ func (c *ImageController) Comment(ctx *fiber.Ctx) error {
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "http.(*ImageController).Comment")
 	}
 
 	err = c.Usecase.Comment(ctx.UserContext(), req)
 	if err != nil {
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "http.(*ImageController).Comment")
 	}
 
 	return response.Data(ctx, http.StatusOK, "ok")
@@ -143,7 +143,7 @@ func (c *ImageController) GetLike(ctx *fiber.Ctx) error {
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "http.(*ImageController).GetLike")
 	}
 
 	req := dto.GetLikeRequest{
@@ -153,7 +153,7 @@ func (c *ImageController) GetLike(ctx *fiber.Ctx) error {
 	res, err := c.Usecase.GetLike(ctx.UserContext(), req)
 	if err != nil {
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "http.(*ImageController).GetLike")
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
@@ -177,7 +177,7 @@ func (c *ImageController) GetComment(ctx *fiber.Ctx) error {
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "http.(*ImageController).GetComment")
 	}
 
 	req := dto.GetCommentRequest{
@@ -187,7 +187,7 @@ func (c *ImageController) GetComment(ctx *fiber.Ctx) error {
 	res, err := c.Usecase.GetComment(ctx.UserContext(), req)
 	if err != nil {
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "http.(*ImageController).GetComment")
 	}
 
 	return response.Data(ctx, http.StatusOK, res)

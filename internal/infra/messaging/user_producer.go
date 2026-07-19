@@ -35,7 +35,7 @@ func NewUserProducer(cfg *config.Config, client *kgo.Client) *UserProducerImpl {
 func (p *UserProducerImpl) SendUserFollowed(ctx context.Context, event *dto.UserFollowedEvent) error {
 	err := p.send(ctx, topic.UserFollowed, event)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "messaging.(*UserProducerImpl).SendUserFollowed")
 	}
 	return nil
 }
@@ -48,7 +48,7 @@ func (p *UserProducerImpl) send(ctx context.Context, topicName string, event any
 
 	value, err := json.Marshal(event)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "messaging.(*UserProducerImpl).send")
 	}
 
 	record := &kgo.Record{
@@ -58,7 +58,7 @@ func (p *UserProducerImpl) send(ctx context.Context, topicName string, event any
 
 	err = p.Client.ProduceSync(ctx, record).FirstErr()
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "messaging.(*UserProducerImpl).send")
 	}
 
 	x.Logger.WithContext(ctx).WithField("topic", topicName).Debug("message sent")

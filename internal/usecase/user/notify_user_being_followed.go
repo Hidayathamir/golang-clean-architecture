@@ -1,9 +1,9 @@
 package user
 
 import (
-	"net/http" 
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
@@ -15,14 +15,14 @@ func (u *UserUsecaseImpl) NotifyUserBeingFollowed(ctx context.Context, req dto.N
 	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "user.(*UserUsecaseImpl).NotifyUserBeingFollowed")
 	}
 
 	followerUser := entity.User{}
 
 	err = u.UserRepository.FindByID(ctx, u.DB, &followerUser, req.FollowerID)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "user.(*UserUsecaseImpl).NotifyUserBeingFollowed")
 	}
 
 	event := dto.NotifEvent{
@@ -32,7 +32,7 @@ func (u *UserUsecaseImpl) NotifyUserBeingFollowed(ctx context.Context, req dto.N
 
 	err = u.NotifProducer.SendNotif(ctx, &event)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "user.(*UserUsecaseImpl).NotifyUserBeingFollowed")
 	}
 
 	return nil

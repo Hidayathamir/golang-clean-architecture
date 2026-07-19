@@ -1,8 +1,8 @@
 package user
 
 import (
-	"net/http" 
 	"context"
+	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
@@ -15,7 +15,7 @@ func (u *UserUsecaseImpl) Follow(ctx context.Context, req dto.FollowUserRequest)
 	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "user.(*UserUsecaseImpl).Follow")
 	}
 
 	follow := entity.Follow{}
@@ -23,7 +23,7 @@ func (u *UserUsecaseImpl) Follow(ctx context.Context, req dto.FollowUserRequest)
 
 	err = u.FollowRepository.Create(ctx, u.DB, &follow)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "user.(*UserUsecaseImpl).Follow")
 	}
 
 	event := dto.UserFollowedEvent{}
@@ -31,7 +31,7 @@ func (u *UserUsecaseImpl) Follow(ctx context.Context, req dto.FollowUserRequest)
 
 	err = u.UserProducer.SendUserFollowed(ctx, &event)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "user.(*UserUsecaseImpl).Follow")
 	}
 
 	return nil

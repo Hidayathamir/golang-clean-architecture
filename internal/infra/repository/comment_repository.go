@@ -32,7 +32,7 @@ func NewCommentRepository(cfg *config.Config) *CommentRepositoryImpl {
 func (r *CommentRepositoryImpl) Create(ctx context.Context, db *gorm.DB, comment *entity.Comment) error {
 	err := db.WithContext(ctx).Create(comment).Error
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "repository.(*CommentRepositoryImpl).Create")
 	}
 	return nil
 }
@@ -40,7 +40,7 @@ func (r *CommentRepositoryImpl) Create(ctx context.Context, db *gorm.DB, comment
 func (r *CommentRepositoryImpl) FindByImageID(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64) error {
 	err := db.WithContext(ctx).Where(column.ImageID.Eq(imageID)).Find(commentList).Error
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "repository.(*CommentRepositoryImpl).FindByImageID")
 	}
 	return nil
 }

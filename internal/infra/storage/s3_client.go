@@ -40,7 +40,7 @@ func (c *S3ClientImpl) UploadImage(ctx context.Context, req dto.S3UploadImageReq
 		Body:   req.Body,
 	})
 	if err != nil {
-		return "", errkit.AddFuncName(err)
+		return "", errkit.AddFuncName(err, "storage.(*S3ClientImpl).UploadImage")
 	}
 
 	baseEndpoint := c.Cfg.GetAWSBaseEndpoint()

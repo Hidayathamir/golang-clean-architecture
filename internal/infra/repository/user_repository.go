@@ -40,7 +40,7 @@ func (r *UserRepositoryImpl) Create(ctx context.Context, db *gorm.DB, user *enti
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
 			err = errkit.SetCode(err, http.StatusConflict)
 		}
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "repository.(*UserRepositoryImpl).Create")
 	}
 	return nil
 }
@@ -48,7 +48,7 @@ func (r *UserRepositoryImpl) Create(ctx context.Context, db *gorm.DB, user *enti
 func (r *UserRepositoryImpl) Update(ctx context.Context, db *gorm.DB, user *entity.User) error {
 	err := db.WithContext(ctx).Save(user).Error
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "repository.(*UserRepositoryImpl).Update")
 	}
 	return nil
 }
@@ -56,7 +56,7 @@ func (r *UserRepositoryImpl) Update(ctx context.Context, db *gorm.DB, user *enti
 func (r *UserRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, user *entity.User) error {
 	err := db.WithContext(ctx).Delete(user).Error
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "repository.(*UserRepositoryImpl).Delete")
 	}
 	return nil
 }
@@ -65,7 +65,7 @@ func (r *UserRepositoryImpl) CountByUsername(ctx context.Context, db *gorm.DB, u
 	var total int64
 	err := db.WithContext(ctx).Model(&entity.User{}).Where(column.Username.Eq(username)).Count(&total).Error
 	if err != nil {
-		return 0, errkit.AddFuncName(err)
+		return 0, errkit.AddFuncName(err, "repository.(*UserRepositoryImpl).CountByUsername")
 	}
 	return total, nil
 }
@@ -74,7 +74,7 @@ func (r *UserRepositoryImpl) FindByID(ctx context.Context, db *gorm.DB, user *en
 	err := db.WithContext(ctx).Where(column.ID.Eq(id)).Take(user).Error
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusNotFound)
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "repository.(*UserRepositoryImpl).FindByID")
 	}
 	return nil
 }
@@ -83,7 +83,7 @@ func (r *UserRepositoryImpl) FindByUsername(ctx context.Context, db *gorm.DB, us
 	err := db.WithContext(ctx).Where(column.Username.Eq(username)).Take(user).Error
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusNotFound)
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "repository.(*UserRepositoryImpl).FindByUsername")
 	}
 	return nil
 }

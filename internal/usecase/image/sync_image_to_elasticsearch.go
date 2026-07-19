@@ -1,8 +1,8 @@
 package image
 
 import (
-	"net/http" 
 	"context"
+	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
@@ -14,7 +14,7 @@ func (u *ImageUsecaseImpl) SyncImageToElasticsearch(ctx context.Context, req dto
 	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).SyncImageToElasticsearch")
 	}
 
 	imageDocument := dto.ImageDocument{}
@@ -22,7 +22,7 @@ func (u *ImageUsecaseImpl) SyncImageToElasticsearch(ctx context.Context, req dto
 
 	err = u.ImageSearch.IndexImage(ctx, &imageDocument)
 	if err != nil {
-		return errkit.AddFuncName(err)
+		return errkit.AddFuncName(err, "image.(*ImageUsecaseImpl).SyncImageToElasticsearch")
 	}
 
 	return nil

@@ -1,8 +1,8 @@
 package user
 
 import (
-	"net/http" 
 	"context"
+	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
@@ -16,20 +16,20 @@ func (u *UserUsecaseImpl) Update(ctx context.Context, req dto.UpdateUserRequest)
 	err := x.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		return dto.UserResponse{}, errkit.AddFuncName(err)
+		return dto.UserResponse{}, errkit.AddFuncName(err, "user.(*UserUsecaseImpl).Update")
 	}
 
 	user := entity.User{}
 	err = u.UserRepository.FindByID(ctx, u.DB, &user, req.ID)
 	if err != nil {
-		return dto.UserResponse{}, errkit.AddFuncName(err)
+		return dto.UserResponse{}, errkit.AddFuncName(err, "user.(*UserUsecaseImpl).Update")
 	}
 
 	var password string
 	if req.Password != "" {
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 		if err != nil {
-			return dto.UserResponse{}, errkit.AddFuncName(err)
+			return dto.UserResponse{}, errkit.AddFuncName(err, "user.(*UserUsecaseImpl).Update")
 		}
 		password = string(hashedPassword)
 	}
@@ -38,7 +38,7 @@ func (u *UserUsecaseImpl) Update(ctx context.Context, req dto.UpdateUserRequest)
 
 	err = u.UserRepository.Update(ctx, u.DB, &user)
 	if err != nil {
-		return dto.UserResponse{}, errkit.AddFuncName(err)
+		return dto.UserResponse{}, errkit.AddFuncName(err, "user.(*UserUsecaseImpl).Update")
 	}
 
 	err = u.UserCache.Delete(ctx, req.ID)
