@@ -21,7 +21,7 @@ func LogMw(ctx context.Context, fields logrus.Fields, err error) {
 }
 
 func GetLevelAndErrMsg(err error) (logrus.Level, string) {
-	level := logrus.InfoLevel
+	level := logrus.DebugLevel
 	errMsg := ""
 	if err != nil {
 		level = logrus.ErrorLevel
