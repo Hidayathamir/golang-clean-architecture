@@ -196,6 +196,9 @@ services:
   clickhouse:
     <<: *signoz-clickhouse-defaults
     container_name: clickhouse-clean-arch
+    ports:
+      - "8123:8123"
+      - "9000:9000"
     volumes:
       - ./signoz/deploy/common/clickhouse/config.xml:/etc/clickhouse-server/config.xml
       - ./signoz/deploy/common/clickhouse/users.xml:/etc/clickhouse-server/users.xml
