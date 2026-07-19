@@ -126,7 +126,7 @@ make migrate
 
 #### Run Application Servers
 
-You usually need to run both the Web server (for APIs) and the Worker (for background jobs/Kafka consumers).
+Run both the Web server (for APIs) and the Worker (for background jobs/Kafka consumers).
 
 **Terminal A: Run Web Server**
 ```bash
@@ -134,11 +134,15 @@ make run
 ```
 *   **Swagger UI**: [http://localhost:3000/swagger](http://localhost:3000/swagger)
 
+The log can be seen in logs/web_log.jsonl
+
 **Terminal B: Run Worker**
 ```bash
 make run-worker
 ```
 *   This handles async tasks like sending notifications or processing image uploads from Kafka topics.
+
+The log can be seen in logs/worker_log.jsonl
 
 ### 3. Observability & Management Tools
 
