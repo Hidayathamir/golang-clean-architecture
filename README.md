@@ -26,10 +26,7 @@ Run the docker-compose to start Postgres, Kafka, SigNoz (Tracing), and AKHQ (Kaf
 make docker-compose-up
 ```
 
-Wait until all containers are healthy. You can check the status using:
-```bash
-make docker-validate
-```
+Wait for the command to finish before proceeding to the next step.
 
 #### Run Database Migrations
 

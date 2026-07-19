@@ -1,29 +1,38 @@
 .SILENT:
 
+HAS_TUISTORY := $(shell command -v tuistory 2>/dev/null)
+ifeq ($(HAS_TUISTORY),)
+  RUN_CMD = go run
+  TEST_CMD = go test
+else
+  RUN_CMD = tuistory -- go run
+  TEST_CMD = tuistory -- go test
+endif
+
 run-webserver:
 	mkdir -p logs
-	go run cmd/webserver/main.go >> logs/webserver_log.jsonl 2>&1
+	$(RUN_CMD) cmd/webserver/main.go >> logs/webserver_log.jsonl 2>&1
 
 run-workerconsumer:
 	mkdir -p logs
-	go run cmd/workerconsumer/main.go >> logs/workerconsumer_log.jsonl 2>&1
+	$(RUN_CMD) cmd/workerconsumer/main.go >> logs/workerconsumer_log.jsonl 2>&1
 
 run-workerproducer:
 	mkdir -p logs
-	go run cmd/workerproducer/main.go >> logs/workerproducer_log.jsonl 2>&1
+	$(RUN_CMD) cmd/workerproducer/main.go >> logs/workerproducer_log.jsonl 2>&1
 
 go-test:
-	go test -count=1 -v ./internal/... >> logs/go_test.jsonl 2>&1
+	$(TEST_CMD) -count=1 -v ./internal/... >> logs/go_test.jsonl 2>&1
 
 go-e2e-test:
-	go test -count=1 -v ./test/e2etest/... >> logs/go_e2e_test.jsonl 2>&1
+	$(TEST_CMD) -count=1 -v ./test/e2etest/... >> logs/go_e2e_test.jsonl 2>&1
 
 #################################### 
 
 migrate:
-	go run cmd/migrate/main.go
+	$(RUN_CMD) cmd/migrate/main.go
 
-migrate-new:
+new-migration:
 	sql-migrate new -config=dbconfig.yml -env=local
 
 migrate-status:
@@ -42,9 +51,6 @@ docker-compose-up:
 
 docker-compose-down:
 	docker compose down -v
-
-docker-validate:
-	docker ps --format "{{.Names}}\t{{.Status}}"
 
 #################################### 
 
