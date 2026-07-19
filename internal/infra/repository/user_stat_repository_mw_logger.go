@@ -3,9 +3,9 @@ package repository
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/retrykit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -36,7 +36,7 @@ func (r *UserStatRepositoryMwLogger) IncrementFollowerCountAndFollowingCountByID
 		"followerCount":  followerCount,
 		"followingCount": followingCount,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -54,7 +54,7 @@ func (r *UserStatRepositoryMwLogger) IncrementFollowerCountByID(ctx context.Cont
 		"id":    id,
 		"count": count,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -72,7 +72,7 @@ func (r *UserStatRepositoryMwLogger) IncrementFollowingCountByID(ctx context.Con
 		"id":    id,
 		"count": count,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }

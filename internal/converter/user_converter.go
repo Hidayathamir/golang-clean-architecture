@@ -7,7 +7,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/twmb/franz-go/pkg/kgo"
 )
 
@@ -80,7 +80,7 @@ func KGoRecordListToDtoBatchUpdateUserFollowStatsRequest(ctx context.Context, re
 		event := dto.UserFollowedEvent{}
 		err := json.Unmarshal(record.Value, &event)
 		if err != nil {
-			x.Logger.WithContext(ctx).WithError(err).Warn("Failed to unmarshal user followed event")
+			logkit.Logger.WithContext(ctx).WithError(err).Warn("Failed to unmarshal user followed event")
 			continue
 		}
 		userFollowerCounts[event.FollowingID]++

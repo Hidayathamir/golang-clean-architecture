@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
 )
 
@@ -31,7 +31,7 @@ func (i *ImageSearchMwLogger) IndexImage(ctx context.Context, document *dto.Imag
 	fields := logrus.Fields{
 		"document": document,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }

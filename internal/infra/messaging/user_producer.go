@@ -8,7 +8,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/topic"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/twmb/franz-go/pkg/kgo"
 )
 
@@ -42,7 +42,7 @@ func (p *UserProducerImpl) SendUserFollowed(ctx context.Context, event *dto.User
 
 func (p *UserProducerImpl) send(ctx context.Context, topicName string, event any) error {
 	if p.Client == nil {
-		x.Logger.WithContext(ctx).Warn("Kafka producer is disabled")
+		logkit.Logger.WithContext(ctx).Warn("Kafka producer is disabled")
 		return nil
 	}
 
@@ -61,7 +61,7 @@ func (p *UserProducerImpl) send(ctx context.Context, topicName string, event any
 		return errkit.AddFuncName(err, "messaging.(*UserProducerImpl).send")
 	}
 
-	x.Logger.WithContext(ctx).WithField("topic", topicName).Debug("message sent")
+	logkit.Logger.WithContext(ctx).WithField("topic", topicName).Debug("message sent")
 
 	return nil
 }

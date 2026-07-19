@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/retrykit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -36,7 +36,7 @@ func (r *UserRepositoryMwLogger) CountByUsername(ctx context.Context, db *gorm.D
 		"username": username,
 		"total":    total,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return total, err
 }
@@ -53,7 +53,7 @@ func (r *UserRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, user *
 	fields := logrus.Fields{
 		"user": user,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -71,7 +71,7 @@ func (r *UserRepositoryMwLogger) FindByID(ctx context.Context, db *gorm.DB, user
 		"id":   id,
 		"user": user,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -89,7 +89,7 @@ func (r *UserRepositoryMwLogger) FindByUsername(ctx context.Context, db *gorm.DB
 		"username": username,
 		"user":     user,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -106,7 +106,7 @@ func (r *UserRepositoryMwLogger) Update(ctx context.Context, db *gorm.DB, user *
 	fields := logrus.Fields{
 		"user": user,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }

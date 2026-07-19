@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
 )
 
@@ -31,7 +31,7 @@ func (u *NotifUsecaseMwLogger) Notify(ctx context.Context, req dto.NotifyRequest
 	fields := logrus.Fields{
 		"req": req,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }

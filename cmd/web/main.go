@@ -11,9 +11,11 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/route"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dependency_injection"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/provider"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/otelkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/validatorkit"
 )
 
 // General API Info
@@ -29,7 +31,8 @@ import (
 func main() {
 	cfg := config.NewConfig()
 
-	x.SetupAll(cfg)
+	logkit.SetupLogger(cfg)
+	validatorkit.SetupValidator(cfg)
 
 	db := provider.NewDatabase(cfg)
 	awsS3Client := provider.NewAWSS3Client(cfg)
@@ -64,11 +67,11 @@ func runHTTPServer(cfg *config.Config, controllers *dependency_injection.Control
 	go func() {
 		<-ctx.Done()          // Block until a termination signal arrives, then trigger a graceful shutdown.
 		err := app.Shutdown() // Stop accepting new requests and wait for in-flight handlers to finish.
-		x.PanicIfErr(err)
+		errkit.PanicIfErr(err)
 	}()
 
 	webPort := cfg.GetWebPort()
 	fmt.Printf("Go to swagger http://localhost:%s/swagger\n", webPort)
 	err := app.Listen(":" + webPort) // Start the HTTP server and block until app shutdown.
-	x.PanicIfErr(err)
+	errkit.PanicIfErr(err)
 }

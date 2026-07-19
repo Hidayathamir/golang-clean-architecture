@@ -11,15 +11,17 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/messaging/route"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dependency_injection"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/provider"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/otelkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/validatorkit"
 )
 
 func main() {
 	cfg := config.NewConfig()
 
-	x.SetupAll(cfg)
+	logkit.SetupLogger(cfg)
+	validatorkit.SetupValidator(cfg)
 
 	db := provider.NewDatabase(cfg)
 	s3Client := provider.NewAWSS3Client(cfg)
@@ -46,7 +48,7 @@ func runConsumers(cfg *config.Config, consumers *dependency_injection.Consumers)
 	ctx, cancel := context.WithCancel(context.Background())
 	wg := &sync.WaitGroup{}
 
-	x.Logger.Info("starting worker service")
+	logkit.Logger.Info("starting worker service")
 
 	route.Setup(ctx, cfg, consumers, wg)
 
@@ -54,15 +56,15 @@ func runConsumers(cfg *config.Config, consumers *dependency_injection.Consumers)
 	signal.Notify(terminateSignals, syscall.SIGINT, syscall.SIGTERM)
 
 	s := <-terminateSignals
-	x.Logger.Info("Got one of stop signals, shutting down worker gracefully, SIGNAL NAME :", s)
+	logkit.Logger.Info("Got one of stop signals, shutting down worker gracefully, SIGNAL NAME :", s)
 
-	x.Logger.Info("canceling")
+	logkit.Logger.Info("canceling")
 	cancel()
-	x.Logger.Info("canceled")
+	logkit.Logger.Info("canceled")
 
-	x.Logger.Info("wait for all consumer to finish processing")
+	logkit.Logger.Info("wait for all consumer to finish processing")
 	wg.Wait()
-	x.Logger.Info("done waiting")
+	logkit.Logger.Info("done waiting")
 
-	x.Logger.Info("end process of worker")
+	logkit.Logger.Info("end process of worker")
 }

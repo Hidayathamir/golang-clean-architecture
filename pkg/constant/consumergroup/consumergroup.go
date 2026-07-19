@@ -2,10 +2,11 @@
 // <topic>.<role>-<detail>
 //
 // Roles:
-//   notify - per-record, real-time notification delivery
-//   batch  - aggregated batch counter/stat updates
-//   sync   - one-way data sync to external systems
-//   log    - debugging/dummy consumer
+//
+//	notify - per-record, real-time notification delivery
+//	batch  - aggregated batch counter/stat updates
+//	sync   - one-way data sync to external systems
+//	log    - debugging/dummy consumer
 package consumergroup
 
 const (

@@ -1,4 +1,4 @@
-package x
+package validatorkit
 
 import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"

@@ -8,8 +8,8 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/userusecase"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/twmb/franz-go/pkg/kgo"
 )
 
@@ -27,7 +27,7 @@ func (c *UserConsumer) NotifyUserBeingFollowed(ctx context.Context, records []*k
 	for _, record := range records {
 		err := c.notifyUserBeingFollowed(ctx, record)
 		if err != nil {
-			x.Logger.WithContext(ctx).WithError(err).Error()
+			logkit.Logger.WithContext(ctx).WithError(err).Error()
 			continue
 		}
 	}
@@ -41,7 +41,7 @@ func (c *UserConsumer) notifyUserBeingFollowed(ctx context.Context, record *kgo.
 	event := dto.UserFollowedEvent{}
 	err := json.Unmarshal(record.Value, &event)
 	if err != nil {
-		x.Logger.WithContext(ctx).WithError(err).Error()
+		logkit.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err, "messaging.(*UserConsumer).notifyUserBeingFollowed")
 	}
 
@@ -50,7 +50,7 @@ func (c *UserConsumer) notifyUserBeingFollowed(ctx context.Context, record *kgo.
 
 	err = c.Usecase.NotifyUserBeingFollowed(ctx, req)
 	if err != nil {
-		x.Logger.WithContext(ctx).WithError(err).Error()
+		logkit.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err, "messaging.(*UserConsumer).notifyUserBeingFollowed")
 	}
 
@@ -66,7 +66,7 @@ func (c *UserConsumer) BatchUpdateUserFollowStats(ctx context.Context, records [
 
 	err := c.Usecase.BatchUpdateUserFollowStats(ctx, req)
 	if err != nil {
-		x.Logger.WithContext(ctx).WithError(err).Error()
+		logkit.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err, "messaging.(*UserConsumer).BatchUpdateUserFollowStats")
 	}
 

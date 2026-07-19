@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
 )
 
@@ -31,7 +31,7 @@ func (p *ImageProducerMwLogger) SendImageUploaded(ctx context.Context, event *dt
 	fields := logrus.Fields{
 		"event": event,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -46,7 +46,7 @@ func (p *ImageProducerMwLogger) SendImageLiked(ctx context.Context, event *dto.I
 	fields := logrus.Fields{
 		"event": event,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -61,7 +61,7 @@ func (p *ImageProducerMwLogger) SendImageCommented(ctx context.Context, event *d
 	fields := logrus.Fields{
 		"event": event,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }

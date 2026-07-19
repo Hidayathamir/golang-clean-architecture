@@ -8,11 +8,12 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/validatorkit"
 )
 
 func (u *UserUsecaseImpl) Current(ctx context.Context, req dto.GetUserRequest) (dto.UserResponse, error) {
-	err := x.Validate.Struct(&req)
+	err := validatorkit.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
 		return dto.UserResponse{}, errkit.AddFuncName(err, "userusecase.(*UserUsecaseImpl).Current")
@@ -32,7 +33,7 @@ func (u *UserUsecaseImpl) Current(ctx context.Context, req dto.GetUserRequest) (
 	}
 
 	err = u.UserCache.Set(ctx, &user)
-	x.LogIfErr(err)
+	logkit.LogIfErr(err)
 
 	res := dto.UserResponse{}
 	converter.EntityUserToDtoUserResponse(user, &res)

@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/retrykit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -35,7 +35,7 @@ func (r *FollowRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, foll
 	fields := logrus.Fields{
 		"follow": follow,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -53,7 +53,7 @@ func (r *FollowRepositoryMwLogger) FindByFollowingID(ctx context.Context, db *go
 		"followList":  followList,
 		"followingID": followingID,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }

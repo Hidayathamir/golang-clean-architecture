@@ -9,8 +9,8 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/imageusecase"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -44,7 +44,7 @@ func (c *ImageController) Upload(ctx *fiber.Ctx) error {
 	file, err := ctx.FormFile("image")
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err, "http.(*ImageController).Upload")
 	}
 
@@ -54,7 +54,7 @@ func (c *ImageController) Upload(ctx *fiber.Ctx) error {
 
 	res, err := c.Usecase.Upload(ctx.UserContext(), req)
 	if err != nil {
-		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err, "http.(*ImageController).Upload")
 	}
 
@@ -80,13 +80,13 @@ func (c *ImageController) Like(ctx *fiber.Ctx) error {
 	err := ctx.BodyParser(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err, "http.(*ImageController).Like")
 	}
 
 	err = c.Usecase.Like(ctx.UserContext(), req)
 	if err != nil {
-		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err, "http.(*ImageController).Like")
 	}
 
@@ -112,13 +112,13 @@ func (c *ImageController) Comment(ctx *fiber.Ctx) error {
 	err := ctx.BodyParser(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err, "http.(*ImageController).Comment")
 	}
 
 	err = c.Usecase.Comment(ctx.UserContext(), req)
 	if err != nil {
-		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err, "http.(*ImageController).Comment")
 	}
 
@@ -142,7 +142,7 @@ func (c *ImageController) GetLike(ctx *fiber.Ctx) error {
 	imageID, err := strconv.ParseInt(ctx.Params("imageId"), 10, 64)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err, "http.(*ImageController).GetLike")
 	}
 
@@ -152,7 +152,7 @@ func (c *ImageController) GetLike(ctx *fiber.Ctx) error {
 
 	res, err := c.Usecase.GetLike(ctx.UserContext(), req)
 	if err != nil {
-		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err, "http.(*ImageController).GetLike")
 	}
 
@@ -176,7 +176,7 @@ func (c *ImageController) GetComment(ctx *fiber.Ctx) error {
 	imageID, err := strconv.ParseInt(ctx.Params("imageId"), 10, 64)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err, "http.(*ImageController).GetComment")
 	}
 
@@ -186,7 +186,7 @@ func (c *ImageController) GetComment(ctx *fiber.Ctx) error {
 
 	res, err := c.Usecase.GetComment(ctx.UserContext(), req)
 	if err != nil {
-		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err, "http.(*ImageController).GetComment")
 	}
 

@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
 )
 
@@ -31,7 +31,7 @@ func (u *UserUsecaseMwLogger) Follow(ctx context.Context, req dto.FollowUserRequ
 	fields := logrus.Fields{
 		"req": req,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -47,7 +47,7 @@ func (u *UserUsecaseMwLogger) Create(ctx context.Context, req dto.RegisterUserRe
 		"req": req,
 		"res": res,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return res, err
 }
@@ -63,7 +63,7 @@ func (u *UserUsecaseMwLogger) Current(ctx context.Context, req dto.GetUserReques
 		"req": req,
 		"res": res,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return res, err
 }
@@ -79,7 +79,7 @@ func (u *UserUsecaseMwLogger) Login(ctx context.Context, req dto.LoginUserReques
 		"req": req,
 		"res": res,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return res, err
 }
@@ -95,7 +95,7 @@ func (u *UserUsecaseMwLogger) Update(ctx context.Context, req dto.UpdateUserRequ
 		"req": req,
 		"res": res,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return res, err
 }
@@ -111,7 +111,7 @@ func (u *UserUsecaseMwLogger) Verify(ctx context.Context, req dto.VerifyUserRequ
 		"req": req,
 		"res": res,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return res, err
 }
@@ -126,7 +126,7 @@ func (u *UserUsecaseMwLogger) NotifyUserBeingFollowed(ctx context.Context, req d
 	fields := logrus.Fields{
 		"req": req,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -141,7 +141,7 @@ func (u *UserUsecaseMwLogger) BatchUpdateUserFollowStats(ctx context.Context, re
 	fields := logrus.Fields{
 		"req": req,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }

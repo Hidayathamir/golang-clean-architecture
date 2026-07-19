@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
 )
 
@@ -32,7 +32,7 @@ func (c *S3ClientMwLogger) UploadImage(ctx context.Context, req dto.S3UploadImag
 		"key": req.Key,
 		"url": url,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return url, err
 }
@@ -49,7 +49,7 @@ func (c *S3ClientMwLogger) Download(ctx context.Context, req dto.S3DownloadReque
 		"key":    req.Key,
 		"data":   res.Data,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return res, err
 }
@@ -66,7 +66,7 @@ func (c *S3ClientMwLogger) DeleteObject(ctx context.Context, req dto.S3DeleteObj
 		"key":     req.Key,
 		"deleted": res.Deleted,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return res, err
 }

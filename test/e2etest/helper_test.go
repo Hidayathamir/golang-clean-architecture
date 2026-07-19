@@ -12,7 +12,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/stretchr/testify/require"
 )
 
@@ -242,28 +242,28 @@ func ClearAll() {
 func ClearUsers() {
 	err := db.Unscoped().Where("id is not null").Delete(&entity.User{}).Error
 	if err != nil {
-		x.Logger.Panicf("Failed clear user data : %+v", err)
+		logkit.Logger.Panicf("Failed clear user data : %+v", err)
 	}
 }
 
 func ClearImages() {
 	err := db.Unscoped().Where("id is not null").Delete(&entity.Image{}).Error
 	if err != nil {
-		x.Logger.Panicf("Failed clear image data : %+v", err)
+		logkit.Logger.Panicf("Failed clear image data : %+v", err)
 	}
 }
 
 func ClearLikes() {
 	err := db.Unscoped().Where("id is not null").Delete(&entity.Like{}).Error
 	if err != nil {
-		x.Logger.Panicf("Failed clear like data : %+v", err)
+		logkit.Logger.Panicf("Failed clear like data : %+v", err)
 	}
 }
 
 func ClearComments() {
 	err := db.Unscoped().Where("id is not null").Delete(&entity.Comment{}).Error
 	if err != nil {
-		x.Logger.Panicf("Failed clear comment data : %+v", err)
+		logkit.Logger.Panicf("Failed clear comment data : %+v", err)
 	}
 }
 

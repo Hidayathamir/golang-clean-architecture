@@ -5,7 +5,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/provider"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/sirupsen/logrus"
 	"github.com/twmb/franz-go/pkg/kgo"
 )
@@ -13,7 +13,7 @@ import (
 type ConsumerHandler func(ctx context.Context, records []*kgo.Record) error
 
 func ConsumeEvent(ctx context.Context, cfg *config.Config, consumerGroup string, topic string, handler ConsumerHandler) {
-	localLogger := x.Logger.WithContext(ctx).WithFields(logrus.Fields{
+	localLogger := logkit.Logger.WithContext(ctx).WithFields(logrus.Fields{
 		"consumerGroup": consumerGroup,
 		"topic":         topic,
 	})

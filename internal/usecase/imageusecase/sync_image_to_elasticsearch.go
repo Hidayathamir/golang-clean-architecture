@@ -7,11 +7,11 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/validatorkit"
 )
 
 func (u *ImageUsecaseImpl) SyncImageToElasticsearch(ctx context.Context, req dto.SyncImageToElasticsearchRequest) error {
-	err := x.Validate.Struct(&req)
+	err := validatorkit.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
 		return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).SyncImageToElasticsearch")

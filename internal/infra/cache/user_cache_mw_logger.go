@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
 )
 
@@ -32,7 +32,7 @@ func (u *UserCacheMwLogger) Get(ctx context.Context, id int64) (*entity.User, er
 		"id":   id,
 		"user": user,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return user, err
 }
@@ -47,7 +47,7 @@ func (u *UserCacheMwLogger) Set(ctx context.Context, user *entity.User) error {
 	fields := logrus.Fields{
 		"user": user,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -62,7 +62,7 @@ func (u *UserCacheMwLogger) Delete(ctx context.Context, id int64) error {
 	fields := logrus.Fields{
 		"id": id,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }

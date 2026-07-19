@@ -9,8 +9,8 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/userusecase"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -42,13 +42,13 @@ func (c *UserController) Register(ctx *fiber.Ctx) error {
 	err := ctx.BodyParser(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err, "http.(*UserController).Register")
 	}
 
 	res, err := c.Usecase.Create(ctx.UserContext(), req)
 	if err != nil {
-		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err, "http.(*UserController).Register")
 	}
 
@@ -71,13 +71,13 @@ func (c *UserController) Login(ctx *fiber.Ctx) error {
 	err := ctx.BodyParser(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err, "http.(*UserController).Login")
 	}
 
 	res, err := c.Usecase.Login(ctx.UserContext(), req)
 	if err != nil {
-		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err, "http.(*UserController).Login")
 	}
 
@@ -104,7 +104,7 @@ func (c *UserController) Current(ctx *fiber.Ctx) error {
 
 	res, err := c.Usecase.Current(ctx.UserContext(), req)
 	if err != nil {
-		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err, "http.(*UserController).Current")
 	}
 
@@ -130,14 +130,14 @@ func (c *UserController) Update(ctx *fiber.Ctx) error {
 	err := ctx.BodyParser(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err, "http.(*UserController).Update")
 	}
 
 	req.ID = userAuth.ID
 	res, err := c.Usecase.Update(ctx.UserContext(), req)
 	if err != nil {
-		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err, "http.(*UserController).Update")
 	}
 
@@ -161,13 +161,13 @@ func (c *UserController) Follow(ctx *fiber.Ctx) error {
 	err := ctx.BodyParser(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
-		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err, "http.(*UserController).Follow")
 	}
 
 	err = c.Usecase.Follow(ctx.UserContext(), req)
 	if err != nil {
-		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err, "http.(*UserController).Follow")
 	}
 

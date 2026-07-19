@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
@@ -20,7 +20,7 @@ func NewAWSS3Client(cfg *config.Config) *s3.Client {
 		awsconfig.WithRetryMaxAttempts(3),
 	)
 	if err != nil {
-		x.Logger.Panic(err)
+		logkit.Logger.Panic(err)
 	}
 
 	baseEndpoint := cfg.GetAWSBaseEndpoint()

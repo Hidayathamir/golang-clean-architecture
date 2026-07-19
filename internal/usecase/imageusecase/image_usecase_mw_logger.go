@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/sirupsen/logrus"
 )
 
@@ -31,7 +31,7 @@ func (u *ImageUsecaseMwLogger) Comment(ctx context.Context, req dto.CommentImage
 	fields := logrus.Fields{
 		"req": req,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -46,7 +46,7 @@ func (u *ImageUsecaseMwLogger) Like(ctx context.Context, req dto.LikeImageReques
 	fields := logrus.Fields{
 		"req": req,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -62,7 +62,7 @@ func (u *ImageUsecaseMwLogger) Upload(ctx context.Context, req dto.UploadImageRe
 		"req": req,
 		"res": res,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return res, err
 }
@@ -78,7 +78,7 @@ func (u *ImageUsecaseMwLogger) GetImage(ctx context.Context, req dto.GetImageReq
 		"req": req,
 		"res": res,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return res, err
 }
@@ -94,7 +94,7 @@ func (u *ImageUsecaseMwLogger) GetComment(ctx context.Context, req dto.GetCommen
 		"req": req,
 		"res": res,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return res, err
 }
@@ -110,7 +110,7 @@ func (u *ImageUsecaseMwLogger) GetLike(ctx context.Context, req dto.GetLikeReque
 		"req": req,
 		"res": res,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return res, err
 }
@@ -125,7 +125,7 @@ func (u *ImageUsecaseMwLogger) NotifyFollowerOnUpload(ctx context.Context, req d
 	fields := logrus.Fields{
 		"req": req,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -140,7 +140,7 @@ func (u *ImageUsecaseMwLogger) SyncImageToElasticsearch(ctx context.Context, req
 	fields := logrus.Fields{
 		"req": req,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -155,7 +155,7 @@ func (u *ImageUsecaseMwLogger) NotifyUserImageCommented(ctx context.Context, req
 	fields := logrus.Fields{
 		"req": req,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -170,7 +170,7 @@ func (u *ImageUsecaseMwLogger) BatchUpdateImageCommentCount(ctx context.Context,
 	fields := logrus.Fields{
 		"req": req,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -185,7 +185,7 @@ func (u *ImageUsecaseMwLogger) NotifyUserImageLiked(ctx context.Context, req dto
 	fields := logrus.Fields{
 		"req": req,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }
@@ -200,7 +200,7 @@ func (u *ImageUsecaseMwLogger) BatchUpdateImageLikeCount(ctx context.Context, re
 	fields := logrus.Fields{
 		"req": req,
 	}
-	x.LogMw(ctx, fields, err)
+	logkit.LogMw(ctx, fields, err)
 
 	return err
 }

@@ -36,7 +36,7 @@ internal/
   provider/       Client initialization (DB, Redis, Kafka, S3, Elasticsearch)
   dependency_injection/   Wire everything together
   config/         Viper-based config from config.json
-pkg/              Shared utilities: errkit, telemetry, retrykit, x (logger), caller, ctx, constant
+pkg/              Shared utilities: logkit, errkit, telemetry, retrykit, validatorkit, caller, ctx, constant
 ```
 
 ## Decorator pattern — mandatory for all infra interfaces
@@ -46,7 +46,7 @@ Every infra interface (repository, cache, messaging, storage, search) **must** h
 - Starts an OpenTelemetry span (`telemetry.Start`)
 - Calls `retrykit.DBRetry` (for DB) or the real method
 - Records errors to the span (`telemetry.RecordError`)
-- Emits structured log via `x.LogMw(ctx, logrus.Fields{...}, err)`
+- Emits structured log via `logkit.LogMw(ctx, logrus.Fields{...}, err)`
 - Satisfies the interface (`var _ Interface = &InterfaceMwLogger{}`)
 
 Same pattern applies to usecases: `usecase → UserUsecaseMwLogger(UserUsecase)`.

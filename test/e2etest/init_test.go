@@ -6,8 +6,9 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/provider"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/migrate"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/validatorkit"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
@@ -24,7 +25,8 @@ var redisClient *redis.Client
 // executes test, and finally terminates the container before exiting.
 func TestMain(m *testing.M) {
 	cfg = config.NewConfig()
-	x.SetupAll(cfg)
+	logkit.SetupLogger(cfg)
+	validatorkit.SetupValidator(cfg)
 	db = provider.NewDatabase(cfg)
 	db.Exec(`DROP SCHEMA public CASCADE`)
 	db.Exec(`CREATE SCHEMA public`)

@@ -9,7 +9,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/indexname"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/elastic/go-elasticsearch/v8"
 )
 
@@ -41,7 +41,7 @@ func (i *ImageSearchImpl) IndexImage(ctx context.Context, document *dto.ImageDoc
 	if err != nil {
 		return errkit.AddFuncName(err, "search.(*ImageSearchImpl).IndexImage")
 	}
-	defer x.LogIfErrForDeferContext(ctx, res.Body.Close)
+	defer logkit.LogIfErrForDeferContext(ctx, res.Body.Close)
 
 	if res.IsError() {
 		err := errors.New(res.String())

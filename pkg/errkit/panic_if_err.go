@@ -1,4 +1,4 @@
-package x
+package errkit
 
 func PanicIfErr(err error) {
 	if err != nil {

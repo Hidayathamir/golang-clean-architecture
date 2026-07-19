@@ -6,11 +6,12 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/validatorkit"
 )
 
 func (u *UserUsecaseImpl) BatchUpdateUserFollowStats(ctx context.Context, req dto.BatchUpdateUserFollowStatsRequest) error {
-	err := x.Validate.Struct(&req)
+	err := validatorkit.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
 		return errkit.AddFuncName(err, "userusecase.(*UserUsecaseImpl).BatchUpdateUserFollowStats")
@@ -26,10 +27,10 @@ func (u *UserUsecaseImpl) BatchUpdateUserFollowStats(ctx context.Context, req dt
 		case v.HasFollowingCount():
 			err = u.UserStatRepository.IncrementFollowingCountByID(ctx, u.DB, v.UserID, v.FollowingCount)
 		default:
-			x.Logger.WithContext(ctx).WithField("v", v).Warn("invalid follower count and following count")
+			logkit.Logger.WithContext(ctx).WithField("v", v).Warn("invalid follower count and following count")
 		}
 		if err != nil {
-			x.Logger.WithContext(ctx).WithError(err).Warn()
+			logkit.Logger.WithContext(ctx).WithError(err).Warn()
 		}
 	}
 

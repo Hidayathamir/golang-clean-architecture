@@ -8,11 +8,11 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/validatorkit"
 )
 
 func (u *ImageUsecaseImpl) GetLike(ctx context.Context, req dto.GetLikeRequest) (dto.LikeResponseList, error) {
-	err := x.Validate.Struct(&req)
+	err := validatorkit.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
 		return dto.LikeResponseList{}, errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).GetLike")

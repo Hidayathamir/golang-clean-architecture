@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/trace"
@@ -24,8 +24,8 @@ func ValidateAbleToExportSpan() {
 		err := tp.ForceFlush(flushCtx)
 		if err != nil {
 			err = errkit.SetMessage(err, "error export span, wait a little longer, or check is the collector ready")
-			x.Logger.WithError(err).Panic()
+			logkit.Logger.WithError(err).Panic()
 		}
-		x.Logger.Info("Successfully sent manual trace for web")
+		logkit.Logger.Info("Successfully sent manual trace for web")
 	}
 }

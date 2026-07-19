@@ -8,8 +8,8 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/notifusecase"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
 	"github.com/twmb/franz-go/pkg/kgo"
 )
 
@@ -27,7 +27,7 @@ func (c *NotifConsumer) Notify(ctx context.Context, records []*kgo.Record) error
 	for _, record := range records {
 		err := c.notify(ctx, record)
 		if err != nil {
-			x.Logger.WithContext(ctx).WithError(err).Error()
+			logkit.Logger.WithContext(ctx).WithError(err).Error()
 			continue
 		}
 	}
@@ -41,7 +41,7 @@ func (c *NotifConsumer) notify(ctx context.Context, record *kgo.Record) error {
 	event := dto.NotifEvent{}
 	err := json.Unmarshal(record.Value, &event)
 	if err != nil {
-		x.Logger.WithContext(ctx).WithError(err).Error()
+		logkit.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err, "messaging.(*NotifConsumer).notify")
 	}
 
@@ -50,7 +50,7 @@ func (c *NotifConsumer) notify(ctx context.Context, record *kgo.Record) error {
 
 	err = c.Usecase.Notify(ctx, req)
 	if err != nil {
-		x.Logger.WithContext(ctx).WithError(err).Error()
+		logkit.Logger.WithContext(ctx).WithError(err).Error()
 		return errkit.AddFuncName(err, "messaging.(*NotifConsumer).notify")
 	}
 

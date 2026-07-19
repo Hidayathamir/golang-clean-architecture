@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -37,25 +37,25 @@ func NewDatabase(cfg *config.Config) *gorm.DB {
 		if err == nil {
 			break
 		}
-		x.Logger.Warnf("database connection attempt %d/%d failed: %v", attempt, maxAttempts, err)
+		logkit.Logger.Warnf("database connection attempt %d/%d failed: %v", attempt, maxAttempts, err)
 		time.Sleep(1 * time.Second)
 	}
 	if err != nil {
-		x.Logger.Panicf("failed to connect database: %v", err)
+		logkit.Logger.Panicf("failed to connect database: %v", err)
 	}
 
 	connection, err := db.DB()
 	if err != nil {
-		x.Logger.Panicf("failed to connect database: %v", err)
+		logkit.Logger.Panicf("failed to connect database: %v", err)
 	}
 
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
 		if pingErr := connection.Ping(); pingErr == nil {
 			break
 		} else if attempt == maxAttempts {
-			x.Logger.Panicf("failed to connect database: %v", pingErr)
+			logkit.Logger.Panicf("failed to connect database: %v", pingErr)
 		} else {
-			x.Logger.Warnf("database ping attempt %d/%d failed: %v", attempt, maxAttempts, pingErr)
+			logkit.Logger.Warnf("database ping attempt %d/%d failed: %v", attempt, maxAttempts, pingErr)
 			time.Sleep(1 * time.Second)
 		}
 	}
@@ -74,20 +74,20 @@ func (l *gormLogger) LogMode(level logger.LogLevel) logger.Interface {
 }
 
 func (l *gormLogger) Info(ctx context.Context, msg string, data ...any) {
-	x.Logger.WithContext(ctx).Infof(msg, data...)
+	logkit.Logger.WithContext(ctx).Infof(msg, data...)
 }
 
 func (l *gormLogger) Warn(ctx context.Context, msg string, data ...any) {
-	x.Logger.WithContext(ctx).Warnf(msg, data...)
+	logkit.Logger.WithContext(ctx).Warnf(msg, data...)
 }
 
 func (l *gormLogger) Error(ctx context.Context, msg string, data ...any) {
-	x.Logger.WithContext(ctx).Errorf(msg, data...)
+	logkit.Logger.WithContext(ctx).Errorf(msg, data...)
 }
 
 func (l *gormLogger) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
 	sql, rows := fc()
-	entry := x.Logger.WithContext(ctx).WithFields(logrus.Fields{
+	entry := logkit.Logger.WithContext(ctx).WithFields(logrus.Fields{
 		"elapsed": time.Since(begin),
 		"rows":    rows,
 	})

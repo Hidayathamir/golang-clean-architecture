@@ -7,7 +7,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/avast/retry-go/v5"
 )
 
@@ -16,7 +16,7 @@ func DBRetry(ctx context.Context, operation func() error) error {
 		retryOption,
 		retry.Context(ctx),
 		retry.OnRetry(func(n uint, err error) {
-			x.Logger.WithError(err).WithField("attempt", n+1).Warn("DBRetry")
+			logkit.Logger.WithError(err).WithField("attempt", n+1).Warn("DBRetry")
 		}),
 	)
 	return retry.New(opts...).Do(func() error { return operation() })
@@ -27,7 +27,7 @@ func DBRetryWithData[T any](ctx context.Context, operation func() (T, error)) (T
 		retryOption,
 		retry.Context(ctx),
 		retry.OnRetry(func(n uint, err error) {
-			x.Logger.WithError(err).WithField("attempt", n+1).Warn("DBRetryWithData")
+			logkit.Logger.WithError(err).WithField("attempt", n+1).Warn("DBRetryWithData")
 		}),
 	)
 	return retry.NewWithData[T](opts...).Do(func() (T, error) { return operation() })

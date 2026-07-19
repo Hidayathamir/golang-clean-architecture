@@ -6,11 +6,12 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/validatorkit"
 )
 
 func (u *ImageUsecaseImpl) BatchUpdateImageCommentCount(ctx context.Context, req dto.BatchUpdateImageCommentCountRequest) error {
-	err := x.Validate.Struct(&req)
+	err := validatorkit.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
 		return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).BatchUpdateImageCommentCount")
@@ -19,7 +20,7 @@ func (u *ImageUsecaseImpl) BatchUpdateImageCommentCount(ctx context.Context, req
 	for _, v := range req.ImageIncreaseCommentCountList {
 		err = u.ImageRepository.IncrementCommentCountByID(ctx, u.DB, v.ImageID, v.Count)
 		if err != nil {
-			x.Logger.WithContext(ctx).WithError(err).WithField("v", v).Warn()
+			logkit.Logger.WithContext(ctx).WithError(err).WithField("v", v).Warn()
 		}
 	}
 

@@ -11,7 +11,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/twmb/franz-go/pkg/kgo"
 )
 
@@ -24,7 +24,7 @@ func DtoUploadImageRequestToDtoS3UploadImageRequest(ctx context.Context, req dto
 	if err != nil {
 		return errkit.AddFuncName(err, "converter.DtoUploadImageRequestToDtoS3UploadImageRequest")
 	}
-	defer x.LogIfErrForDeferContext(ctx, file.Close)
+	defer logkit.LogIfErrForDeferContext(ctx, file.Close)
 	s3UploadImgReq.Body = file
 	return nil
 }
@@ -160,7 +160,7 @@ func KGoRecordListToDtoBatchUpdateImageCommentCountRequest(ctx context.Context, 
 		event := dto.ImageCommentedEvent{}
 		err := json.Unmarshal(record.Value, &event)
 		if err != nil {
-			x.Logger.WithContext(ctx).WithError(err).Warn("Failed to unmarshal image commented event")
+			logkit.Logger.WithContext(ctx).WithError(err).Warn("Failed to unmarshal image commented event")
 			continue
 		}
 		mapCounter[event.ImageID]++
@@ -186,7 +186,7 @@ func KGoRecordListToDtoBatchUpdateImageLikeCountRequest(ctx context.Context, rec
 		event := dto.ImageLikedEvent{}
 		err := json.Unmarshal(record.Value, &event)
 		if err != nil {
-			x.Logger.WithContext(ctx).WithError(err).Warn("Failed to unmarshal image liked event")
+			logkit.Logger.WithContext(ctx).WithError(err).Warn("Failed to unmarshal image liked event")
 			continue
 		}
 		mapCounter[event.ImageID]++

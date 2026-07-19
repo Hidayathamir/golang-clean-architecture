@@ -9,11 +9,11 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/validatorkit"
 )
 
 func (u *ImageUsecaseImpl) Upload(ctx context.Context, req dto.UploadImageRequest) (dto.ImageResponse, error) {
-	err := x.Validate.Struct(&req)
+	err := validatorkit.Validate.Struct(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
 		return dto.ImageResponse{}, errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).Upload")

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/twmb/franz-go/pkg/kgo"
 	"github.com/twmb/franz-go/plugin/kotel"
 )
@@ -22,7 +22,7 @@ func NewKafkaClientProducer(cfg *config.Config) *kgo.Client {
 	opts = append(opts, kgo.WithHooks(tracer))
 
 	client, err := kgo.NewClient(opts...)
-	x.PanicIfErr(err)
+	errkit.PanicIfErr(err)
 
 	return client
 }
@@ -44,7 +44,7 @@ func NewKafkaClientConsumer(cfg *config.Config, consumerGroup string, topic stri
 	opts = append(opts, kgo.WithHooks(tracer))
 
 	client, err := kgo.NewClient(opts...)
-	x.PanicIfErr(err)
+	errkit.PanicIfErr(err)
 
 	return client
 }
