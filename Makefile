@@ -1,8 +1,8 @@
 .SILENT:
 
-run:
+run-webserver:
 	mkdir -p logs
-	go run cmd/webserver/main.go >> logs/web_log.jsonl 2>&1
+	go run cmd/webserver/main.go >> logs/webserver_log.jsonl 2>&1
 
 run-workerconsumer:
 	mkdir -p logs

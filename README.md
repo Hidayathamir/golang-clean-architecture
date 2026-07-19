@@ -45,10 +45,10 @@ Run both the Web server (for APIs) and the Worker (for background Kafka consumer
 
 **Terminal A: Run Web Server**
 ```bash
-make run
+make run-webserver
 ```
 
-The log can be seen in `logs/web_log.jsonl`
+The log can be seen in `logs/webserver_log.jsonl`
 
 **Terminal B: Run Worker**
 ```bash
