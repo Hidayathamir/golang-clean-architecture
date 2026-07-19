@@ -1,0 +1,56 @@
+flowchart LR
+
+%% External Inputs
+US[Upstream Service]
+KF[Kafka]
+
+subgraph INBOUND["Inbound"]
+    HTTP[HTTP]
+    MSGIN[Messaging]
+end
+
+subgraph APPLICATION["Application"]
+    UC[Use Case]
+end
+
+subgraph OUTBOUND["Outbound"]
+    REPO[Repository]
+    CACHE[Cache]
+    STORE[Storage]
+    MSGOUT[Messaging]
+end
+
+DB[(Database)]
+REDIS[(Redis)]
+S3[(S3)]
+KP[(Kafka)]
+
+%% Input
+US --> HTTP
+KF --> MSGIN
+
+HTTP --> UC
+MSGIN --> UC
+
+%% Outbound
+UC --> REPO
+UC --> CACHE
+UC --> STORE
+UC --> MSGOUT
+
+REPO --> DB
+CACHE --> REDIS
+STORE --> S3
+MSGOUT --> KP
+
+%% Styles
+classDef Inbound fill:#6C63FF,stroke:#4F46E5,color:#fff,stroke-width:2px;
+classDef app fill:#8B2E2E,stroke:#5C1D1D,color:#fff,stroke-width:2px;
+classDef OUTBOUND fill:#8B2E2E,stroke:#5C1D1D,color:#fff,stroke-width:2px;
+classDef external fill:#2563EB,stroke:#1D4ED8,color:#fff,stroke-width:2px;
+classDef storage fill:#0F766E,stroke:#115E59,color:#fff,stroke-width:2px;
+
+class HTTP,MSGIN Inbound;
+class UC,REPO,CACHE,STORE,MSGOUT app;
+class US,KF,SCH,KP external;
+class DB,REDIS,S3,KP storage;

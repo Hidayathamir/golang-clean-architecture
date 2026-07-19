@@ -8,10 +8,6 @@ run-worker:
 	mkdir -p logs
 	go run cmd/worker/main.go >> logs/worker_log.jsonl 2>&1
 
-run-cron:
-	mkdir -p logs
-	go run cmd/cron/main.go >> logs/cron_log.jsonl 2>&1
-
 go-test:
 	go test -count=1 -v ./internal/... >> logs/go_test.jsonl 2>&1
 
@@ -37,8 +33,11 @@ migrate-down:
 
 #################################### 
 
-docker-compose:
+docker-compose-up:
 	docker compose down -v && docker compose up
+
+docker-compose-down:
+	docker compose down -v
 
 docker-validate:
 	docker ps --format "{{.Names}}\t{{.Status}}"
