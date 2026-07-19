@@ -6,19 +6,19 @@ package mock
 import (
 	"context"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/userusecase"
 	"sync"
 )
 
-// Ensure, that UserUsecaseMock does implement user.UserUsecase.
+// Ensure, that UserUsecaseMock does implement userusecase.UserUsecase.
 // If this is not the case, regenerate this file with moq.
-var _ user.UserUsecase = &UserUsecaseMock{}
+var _ userusecase.UserUsecase = &UserUsecaseMock{}
 
-// UserUsecaseMock is a mock implementation of user.UserUsecase.
+// UserUsecaseMock is a mock implementation of userusecase.UserUsecase.
 //
 //	func TestSomethingThatUsesUserUsecase(t *testing.T) {
 //
-//		// make and configure a mocked user.UserUsecase
+//		// make and configure a mocked userusecase.UserUsecase
 //		mockedUserUsecase := &UserUsecaseMock{
 //			BatchUpdateUserFollowStatsFunc: func(ctx context.Context, req dto.BatchUpdateUserFollowStatsRequest) error {
 //				panic("mock out the BatchUpdateUserFollowStats method")
@@ -46,7 +46,7 @@ var _ user.UserUsecase = &UserUsecaseMock{}
 //			},
 //		}
 //
-//		// use mockedUserUsecase in code that requires user.UserUsecase
+//		// use mockedUserUsecase in code that requires userusecase.UserUsecase
 //		// and then make assertions.
 //
 //	}

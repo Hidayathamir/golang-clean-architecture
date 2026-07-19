@@ -6,7 +6,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/image"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/imageusecase"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
@@ -14,10 +14,10 @@ import (
 )
 
 type ImageConsumer struct {
-	Usecase image.ImageUsecase
+	Usecase imageusecase.ImageUsecase
 }
 
-func NewImageConsumer(usecase image.ImageUsecase) *ImageConsumer {
+func NewImageConsumer(usecase imageusecase.ImageUsecase) *ImageConsumer {
 	return &ImageConsumer{
 		Usecase: usecase,
 	}

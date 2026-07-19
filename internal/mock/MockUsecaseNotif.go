@@ -6,26 +6,26 @@ package mock
 import (
 	"context"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/notif"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/notifusecase"
 	"sync"
 )
 
-// Ensure, that NotifUsecaseMock does implement notif.NotifUsecase.
+// Ensure, that NotifUsecaseMock does implement notifusecase.NotifUsecase.
 // If this is not the case, regenerate this file with moq.
-var _ notif.NotifUsecase = &NotifUsecaseMock{}
+var _ notifusecase.NotifUsecase = &NotifUsecaseMock{}
 
-// NotifUsecaseMock is a mock implementation of notif.NotifUsecase.
+// NotifUsecaseMock is a mock implementation of notifusecase.NotifUsecase.
 //
 //	func TestSomethingThatUsesNotifUsecase(t *testing.T) {
 //
-//		// make and configure a mocked notif.NotifUsecase
+//		// make and configure a mocked notifusecase.NotifUsecase
 //		mockedNotifUsecase := &NotifUsecaseMock{
 //			NotifyFunc: func(ctx context.Context, req dto.NotifyRequest) error {
 //				panic("mock out the Notify method")
 //			},
 //		}
 //
-//		// use mockedNotifUsecase in code that requires notif.NotifUsecase
+//		// use mockedNotifUsecase in code that requires notifusecase.NotifUsecase
 //		// and then make assertions.
 //
 //	}

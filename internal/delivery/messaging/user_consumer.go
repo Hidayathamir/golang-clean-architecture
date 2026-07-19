@@ -6,7 +6,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/userusecase"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
@@ -14,10 +14,10 @@ import (
 )
 
 type UserConsumer struct {
-	Usecase user.UserUsecase
+	Usecase userusecase.UserUsecase
 }
 
-func NewUserConsumer(usecase user.UserUsecase) *UserConsumer {
+func NewUserConsumer(usecase userusecase.UserUsecase) *UserConsumer {
 	return &UserConsumer{
 		Usecase: usecase,
 	}

@@ -6,13 +6,13 @@ import (
 	"strings"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/userusecase"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/gofiber/fiber/v2"
 )
 
-func NewAuth(userUserCase user.UserUsecase) fiber.Handler {
+func NewAuth(userUserCase userusecase.UserUsecase) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		headerAuth := strings.TrimSpace(ctx.Get("Authorization"))
 		if headerAuth == "" {

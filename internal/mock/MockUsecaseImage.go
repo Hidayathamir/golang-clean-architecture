@@ -6,19 +6,19 @@ package mock
 import (
 	"context"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/image"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/imageusecase"
 	"sync"
 )
 
-// Ensure, that ImageUsecaseMock does implement image.ImageUsecase.
+// Ensure, that ImageUsecaseMock does implement imageusecase.ImageUsecase.
 // If this is not the case, regenerate this file with moq.
-var _ image.ImageUsecase = &ImageUsecaseMock{}
+var _ imageusecase.ImageUsecase = &ImageUsecaseMock{}
 
-// ImageUsecaseMock is a mock implementation of image.ImageUsecase.
+// ImageUsecaseMock is a mock implementation of imageusecase.ImageUsecase.
 //
 //	func TestSomethingThatUsesImageUsecase(t *testing.T) {
 //
-//		// make and configure a mocked image.ImageUsecase
+//		// make and configure a mocked imageusecase.ImageUsecase
 //		mockedImageUsecase := &ImageUsecaseMock{
 //			BatchUpdateImageCommentCountFunc: func(ctx context.Context, req dto.BatchUpdateImageCommentCountRequest) error {
 //				panic("mock out the BatchUpdateImageCommentCount method")
@@ -58,7 +58,7 @@ var _ image.ImageUsecase = &ImageUsecaseMock{}
 //			},
 //		}
 //
-//		// use mockedImageUsecase in code that requires image.ImageUsecase
+//		// use mockedImageUsecase in code that requires imageusecase.ImageUsecase
 //		// and then make assertions.
 //
 //	}

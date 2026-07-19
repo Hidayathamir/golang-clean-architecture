@@ -6,7 +6,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/notif"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/notifusecase"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
@@ -14,10 +14,10 @@ import (
 )
 
 type NotifConsumer struct {
-	Usecase notif.NotifUsecase
+	Usecase notifusecase.NotifUsecase
 }
 
-func NewNotifConsumer(usecase notif.NotifUsecase) *NotifConsumer {
+func NewNotifConsumer(usecase notifusecase.NotifUsecase) *NotifConsumer {
 	return &NotifConsumer{
 		Usecase: usecase,
 	}

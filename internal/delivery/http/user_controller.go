@@ -6,7 +6,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/user"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/userusecase"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
@@ -16,10 +16,10 @@ import (
 
 type UserController struct {
 	Cfg     *config.Config
-	Usecase user.UserUsecase
+	Usecase userusecase.UserUsecase
 }
 
-func NewUserController(cfg *config.Config, usecase user.UserUsecase) *UserController {
+func NewUserController(cfg *config.Config, usecase userusecase.UserUsecase) *UserController {
 	return &UserController{
 		Cfg:     cfg,
 		Usecase: usecase,

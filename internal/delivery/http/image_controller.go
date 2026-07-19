@@ -7,7 +7,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/delivery/http/response"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/image"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/imageusecase"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/x"
@@ -16,10 +16,10 @@ import (
 
 type ImageController struct {
 	Cfg     *config.Config
-	Usecase image.ImageUsecase
+	Usecase imageusecase.ImageUsecase
 }
 
-func NewImageController(cfg *config.Config, usecase image.ImageUsecase) *ImageController {
+func NewImageController(cfg *config.Config, usecase imageusecase.ImageUsecase) *ImageController {
 	return &ImageController{
 		Cfg:     cfg,
 		Usecase: usecase,
