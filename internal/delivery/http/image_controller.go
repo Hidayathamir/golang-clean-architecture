@@ -43,7 +43,7 @@ func (c *ImageController) Upload(ctx *fiber.Ctx) error {
 
 	file, err := ctx.FormFile("image")
 	if err != nil {
-		err = errkit.BadRequest(err)
+		err = errkit.SetCode(err, http.StatusBadRequest)
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
@@ -79,7 +79,7 @@ func (c *ImageController) Like(ctx *fiber.Ctx) error {
 	req := dto.LikeImageRequest{}
 	err := ctx.BodyParser(&req)
 	if err != nil {
-		err = errkit.BadRequest(err)
+		err = errkit.SetCode(err, http.StatusBadRequest)
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
@@ -111,7 +111,7 @@ func (c *ImageController) Comment(ctx *fiber.Ctx) error {
 	req := dto.CommentImageRequest{}
 	err := ctx.BodyParser(&req)
 	if err != nil {
-		err = errkit.BadRequest(err)
+		err = errkit.SetCode(err, http.StatusBadRequest)
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
@@ -141,7 +141,7 @@ func (c *ImageController) GetLike(ctx *fiber.Ctx) error {
 
 	imageID, err := strconv.ParseInt(ctx.Params("imageId"), 10, 64)
 	if err != nil {
-		err = errkit.BadRequest(err)
+		err = errkit.SetCode(err, http.StatusBadRequest)
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
@@ -175,7 +175,7 @@ func (c *ImageController) GetComment(ctx *fiber.Ctx) error {
 
 	imageID, err := strconv.ParseInt(ctx.Params("imageId"), 10, 64)
 	if err != nil {
-		err = errkit.BadRequest(err)
+		err = errkit.SetCode(err, http.StatusBadRequest)
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}

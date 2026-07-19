@@ -1,6 +1,7 @@
 package image
 
 import (
+	"net/http" 
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
@@ -13,7 +14,7 @@ import (
 func (u *ImageUsecaseImpl) GetImage(ctx context.Context, req dto.GetImageRequest) (dto.ImageResponse, error) {
 	err := x.Validate.Struct(&req)
 	if err != nil {
-		err = errkit.BadRequest(err)
+		err = errkit.SetCode(err, http.StatusBadRequest)
 		return dto.ImageResponse{}, errkit.AddFuncName(err)
 	}
 

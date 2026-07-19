@@ -1,6 +1,7 @@
 package user
 
 import (
+	"net/http" 
 	"context"
 	"fmt"
 	"strconv"
@@ -15,14 +16,14 @@ func (u *UserUsecaseImpl) signAccessToken(ctx context.Context, userID int64) (st
 	secret := u.Config.GetAuthJWTSecret()
 	if secret == "" {
 		err := fmt.Errorf("jwt secret is not configured")
-		err = errkit.InternalServerError(err)
+		err = errkit.SetCode(err, http.StatusInternalServerError)
 		return "", errkit.AddFuncName(err)
 	}
 
 	expireSeconds := u.Config.GetAuthJWTExpireSeconds()
 	if expireSeconds <= 0 {
 		err := fmt.Errorf("jwt expire seconds must be greater than zero")
-		err = errkit.InternalServerError(err)
+		err = errkit.SetCode(err, http.StatusInternalServerError)
 		return "", errkit.AddFuncName(err)
 	}
 
@@ -38,7 +39,7 @@ func (u *UserUsecaseImpl) signAccessToken(ctx context.Context, userID int64) (st
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(secret))
 	if err != nil {
-		err = errkit.InternalServerError(err)
+		err = errkit.SetCode(err, http.StatusInternalServerError)
 		return "", errkit.AddFuncName(err)
 	}
 
@@ -48,14 +49,14 @@ func (u *UserUsecaseImpl) signAccessToken(ctx context.Context, userID int64) (st
 func (u *UserUsecaseImpl) parseAccessToken(ctx context.Context, tokenString string) (int64, error) {
 	if tokenString == "" {
 		err := fmt.Errorf("token is empty")
-		err = errkit.Unauthorized(err)
+		err = errkit.SetCode(err, http.StatusUnauthorized)
 		return 0, errkit.AddFuncName(err)
 	}
 
 	secret := u.Config.GetAuthJWTSecret()
 	if secret == "" {
 		err := fmt.Errorf("jwt secret is not configured")
-		err = errkit.InternalServerError(err)
+		err = errkit.SetCode(err, http.StatusInternalServerError)
 		return 0, errkit.AddFuncName(err)
 	}
 
@@ -67,25 +68,25 @@ func (u *UserUsecaseImpl) parseAccessToken(ctx context.Context, tokenString stri
 		return []byte(secret), nil
 	})
 	if err != nil {
-		err = errkit.Unauthorized(err)
+		err = errkit.SetCode(err, http.StatusUnauthorized)
 		return 0, errkit.AddFuncName(err)
 	}
 
 	if !token.Valid {
 		err := fmt.Errorf("token is invalid")
-		err = errkit.Unauthorized(err)
+		err = errkit.SetCode(err, http.StatusUnauthorized)
 		return 0, errkit.AddFuncName(err)
 	}
 
 	if claims.Subject == "" {
 		err := fmt.Errorf("token subject is empty")
-		err = errkit.Unauthorized(err)
+		err = errkit.SetCode(err, http.StatusUnauthorized)
 		return 0, errkit.AddFuncName(err)
 	}
 
 	userID, err := strconv.ParseInt(claims.Subject, 10, 64)
 	if err != nil {
-		err = errkit.Unauthorized(err)
+		err = errkit.SetCode(err, http.StatusUnauthorized)
 		return 0, errkit.AddFuncName(err)
 	}
 

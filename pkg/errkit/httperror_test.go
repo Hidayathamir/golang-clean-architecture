@@ -11,7 +11,7 @@ import (
 func TestSetMessage(t *testing.T) {
 	baseErr := errors.New("base")
 
-	err := SetHTTPError(baseErr, http.StatusBadRequest)
+	err := SetCode(baseErr, http.StatusBadRequest)
 	err = SetMessage(err, "custom message")
 
 	httpErr := GetHTTPError(err)
@@ -24,7 +24,7 @@ func TestSetMessage(t *testing.T) {
 func TestSetCode(t *testing.T) {
 	baseErr := errors.New("base")
 
-	err := SetHTTPError(baseErr, http.StatusBadRequest)
+	err := SetCode(baseErr, http.StatusBadRequest)
 	err = SetMessage(err, "custom message")
 	err = SetCode(err, http.StatusConflict)
 
@@ -39,12 +39,12 @@ func TestLoadErrAsHTTPError_1(t *testing.T) {
 	var err error
 	err = errors.New("dummy err 1")
 	err = Wrap(err, "wrap")
-	err = Unauthorized(err)
+	err = SetCode(err, http.StatusUnauthorized)
 	err = Wrap(err, "wrap2")
 
 	httpErr := GetHTTPError(err)
 
-	require.Equal(t, "Unauthorized", httpErr.Message)
+	require.Equal(t, "internal server error", httpErr.Message)
 }
 
 func TestLoadErrAsHTTPError_2(t *testing.T) {
@@ -62,27 +62,27 @@ func TestLoadErrAsHTTPError_3(t *testing.T) {
 	var err error
 	err = errors.New("dummy err 1")
 	err = Wrap(err, "wrap")
-	err = Unauthorized(err)
+	err = SetCode(err, http.StatusUnauthorized)
 	err = Wrap(err, "wrap2")
-	err = InternalServerError(err)
+	err = SetCode(err, http.StatusInternalServerError)
 
 	httpErr := GetHTTPError(err)
 
-	require.Equal(t, "Internal Server Error", httpErr.Message)
+	require.Equal(t, "internal server error", httpErr.Message)
 }
 
 func TestLoadErrAsHTTPError_4(t *testing.T) {
 	var err error
 	err = errors.New("dummy err 1")
 	err = Wrap(err, "wrap")
-	err = Unauthorized(err)
+	err = SetCode(err, http.StatusUnauthorized)
 	err = Wrap(err, "wrap2")
-	err = InternalServerError(err)
-	err = Unauthorized(err)
+	err = SetCode(err, http.StatusInternalServerError)
+	err = SetCode(err, http.StatusUnauthorized)
 
 	httpErr := GetHTTPError(err)
 
-	require.Equal(t, "Unauthorized", httpErr.Message)
+	require.Equal(t, "internal server error", httpErr.Message)
 }
 
 func TestLoadErrAsHTTPError_5(t *testing.T) {

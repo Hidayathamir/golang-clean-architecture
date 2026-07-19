@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
@@ -16,7 +17,7 @@ func NewAuth(userUserCase user.UserUsecase) fiber.Handler {
 		headerAuth := strings.TrimSpace(ctx.Get("Authorization"))
 		if headerAuth == "" {
 			err := fmt.Errorf("header auth not found")
-			err = errkit.Unauthorized(err)
+			err = errkit.SetCode(err, http.StatusUnauthorized)
 			return errkit.AddFuncName(err)
 		}
 
@@ -29,14 +30,14 @@ func NewAuth(userUserCase user.UserUsecase) fiber.Handler {
 			token = parts[1]
 		default:
 			err := fmt.Errorf("authorization header format invalid")
-			err = errkit.Unauthorized(err)
+			err = errkit.SetCode(err, http.StatusUnauthorized)
 			return errkit.AddFuncName(err)
 		}
 
 		req := dto.VerifyUserRequest{Token: token}
 		userAuth, err := userUserCase.Verify(ctx.UserContext(), req)
 		if err != nil {
-			err = errkit.Unauthorized(err)
+			err = errkit.SetCode(err, http.StatusUnauthorized)
 			return errkit.AddFuncName(err)
 		}
 

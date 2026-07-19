@@ -38,7 +38,7 @@ func (r *UserRepositoryImpl) Create(ctx context.Context, db *gorm.DB, user *enti
 	err := db.WithContext(ctx).Create(user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
-			err = errkit.SetHTTPError(err, http.StatusConflict)
+			err = errkit.SetCode(err, http.StatusConflict)
 		}
 		return errkit.AddFuncName(err)
 	}
@@ -73,7 +73,7 @@ func (r *UserRepositoryImpl) CountByUsername(ctx context.Context, db *gorm.DB, u
 func (r *UserRepositoryImpl) FindByID(ctx context.Context, db *gorm.DB, user *entity.User, id int64) error {
 	err := db.WithContext(ctx).Where(column.ID.Eq(id)).Take(user).Error
 	if err != nil {
-		err = errkit.NotFound(err)
+		err = errkit.SetCode(err, http.StatusNotFound)
 		return errkit.AddFuncName(err)
 	}
 	return nil
@@ -82,7 +82,7 @@ func (r *UserRepositoryImpl) FindByID(ctx context.Context, db *gorm.DB, user *en
 func (r *UserRepositoryImpl) FindByUsername(ctx context.Context, db *gorm.DB, user *entity.User, username string) error {
 	err := db.WithContext(ctx).Where(column.Username.Eq(username)).Take(user).Error
 	if err != nil {
-		err = errkit.NotFound(err)
+		err = errkit.SetCode(err, http.StatusNotFound)
 		return errkit.AddFuncName(err)
 	}
 	return nil

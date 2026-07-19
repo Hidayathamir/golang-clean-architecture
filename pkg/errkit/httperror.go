@@ -26,16 +26,6 @@ func GetHTTPError(err error) *HTTPError {
 	return httpErr
 }
 
-func SetHTTPError(err error, code int) error {
-	return WrapE(
-		err,
-		&HTTPError{
-			HTTPCode: code,
-			Message:  http.StatusText(code),
-		},
-	)
-}
-
 func SetMessage(err error, message string) error {
 	httpErr := GetHTTPError(err)
 

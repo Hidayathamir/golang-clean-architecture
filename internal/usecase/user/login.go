@@ -1,6 +1,7 @@
 package user
 
 import (
+	"net/http" 
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/converter"
@@ -13,20 +14,20 @@ import (
 func (u *UserUsecaseImpl) Login(ctx context.Context, req dto.LoginUserRequest) (dto.UserLoginResponse, error) {
 	err := x.Validate.Struct(&req)
 	if err != nil {
-		err = errkit.BadRequest(err)
+		err = errkit.SetCode(err, http.StatusBadRequest)
 		return dto.UserLoginResponse{}, errkit.AddFuncName(err)
 	}
 
 	user := entity.User{}
 	err = u.UserRepository.FindByUsername(ctx, u.DB, &user, req.Username)
 	if err != nil {
-		err = errkit.Unauthorized(err)
+		err = errkit.SetCode(err, http.StatusUnauthorized)
 		return dto.UserLoginResponse{}, errkit.AddFuncName(err)
 	}
 
 	err = user.ValidatePassword(req.Password)
 	if err != nil {
-		err = errkit.Unauthorized(err)
+		err = errkit.SetCode(err, http.StatusUnauthorized)
 		return dto.UserLoginResponse{}, errkit.AddFuncName(err)
 	}
 

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
@@ -43,7 +44,7 @@ func (r *ImageRepositoryImpl) Create(ctx context.Context, db *gorm.DB, image *en
 func (r *ImageRepositoryImpl) FindByID(ctx context.Context, db *gorm.DB, image *entity.Image, id int64) error {
 	err := db.WithContext(ctx).Where(column.ID.Eq(id)).Take(image).Error
 	if err != nil {
-		err = errkit.NotFound(err)
+		err = errkit.SetCode(err, http.StatusNotFound)
 		return errkit.AddFuncName(err)
 	}
 	return nil

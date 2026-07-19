@@ -41,7 +41,7 @@ func (c *UserController) Register(ctx *fiber.Ctx) error {
 	req := dto.RegisterUserRequest{}
 	err := ctx.BodyParser(&req)
 	if err != nil {
-		err = errkit.BadRequest(err)
+		err = errkit.SetCode(err, http.StatusBadRequest)
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
@@ -70,7 +70,7 @@ func (c *UserController) Login(ctx *fiber.Ctx) error {
 	req := dto.LoginUserRequest{}
 	err := ctx.BodyParser(&req)
 	if err != nil {
-		err = errkit.BadRequest(err)
+		err = errkit.SetCode(err, http.StatusBadRequest)
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
@@ -129,7 +129,7 @@ func (c *UserController) Update(ctx *fiber.Ctx) error {
 	req := dto.UpdateUserRequest{}
 	err := ctx.BodyParser(&req)
 	if err != nil {
-		err = errkit.BadRequest(err)
+		err = errkit.SetCode(err, http.StatusBadRequest)
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}
@@ -160,7 +160,7 @@ func (c *UserController) Follow(ctx *fiber.Ctx) error {
 	req := dto.FollowUserRequest{}
 	err := ctx.BodyParser(&req)
 	if err != nil {
-		err = errkit.BadRequest(err)
+		err = errkit.SetCode(err, http.StatusBadRequest)
 		x.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err)
 	}

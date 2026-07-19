@@ -1,6 +1,7 @@
 package image
 
 import (
+	"net/http" 
 	"context"
 	"fmt"
 
@@ -13,7 +14,7 @@ import (
 func (u *ImageUsecaseImpl) NotifyUserImageLiked(ctx context.Context, req dto.NotifyUserImageLikedRequest) error {
 	err := x.Validate.Struct(&req)
 	if err != nil {
-		err = errkit.BadRequest(err)
+		err = errkit.SetCode(err, http.StatusBadRequest)
 		return errkit.AddFuncName(err)
 	}
 
