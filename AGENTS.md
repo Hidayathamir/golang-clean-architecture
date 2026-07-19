@@ -4,7 +4,7 @@
 
 ```bash
 make run               # Web server (port 3000)
-make run-worker        # Kafka consumer worker
+make run-workerconsumer        # Kafka consumer worker
 make run-workerpublisher # Outbox publisher (polls outbox table, sends to Kafka)
 make go-test           # Unit tests (./internal/...)
 make go-e2e-test       # E2E tests (./test/e2etest/...)
@@ -25,7 +25,7 @@ make swag             # Regenerate swagger docs in api/ (deletes dir first)
 ## Architecture layers (top → bottom)
 
 ```
-cmd/              Entry points: web, worker, consumer, migrate
+cmd/              Entry points: web, workerconsumer, consumer, migrate
 internal/
   inbound/        HTTP controllers (package http), Kafka consumers (package messaging)
   dto/            Request/response DTOs between layers

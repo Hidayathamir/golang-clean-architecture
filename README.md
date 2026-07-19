@@ -52,11 +52,11 @@ The log can be seen in `logs/web_log.jsonl`
 
 **Terminal B: Run Worker**
 ```bash
-make run-worker
+make run-workerconsumer
 ```
 *   This handles async tasks like sending notifications or processing image uploads from Kafka topics.
 
-The log can be seen in `logs/worker_log.jsonl`
+The log can be seen in `logs/workerconsumer_log.jsonl`
 
 **Terminal C: Run Outbox Publisher**
 ```bash

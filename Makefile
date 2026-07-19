@@ -4,9 +4,9 @@ run:
 	mkdir -p logs
 	go run cmd/web/main.go >> logs/web_log.jsonl 2>&1
 
-run-worker:
+run-workerconsumer:
 	mkdir -p logs
-	go run cmd/worker/main.go >> logs/worker_log.jsonl 2>&1
+	go run cmd/workerconsumer/main.go >> logs/workerconsumer_log.jsonl 2>&1
 
 run-workerpublisher:
 	mkdir -p logs
