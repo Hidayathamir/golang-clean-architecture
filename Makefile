@@ -2,7 +2,7 @@
 
 run:
 	mkdir -p logs
-	go run cmd/web/main.go >> logs/web_log.jsonl 2>&1
+	go run cmd/webserver/main.go >> logs/web_log.jsonl 2>&1
 
 run-workerconsumer:
 	mkdir -p logs
@@ -61,7 +61,7 @@ generate:
 	rm -rf internal/mock &&	go generate ./internal/...
 
 swag:
-	rm -rf api/ && swag fmt --exclude ./internal/mock && swag init --parseDependency --parseInternal --generalInfo ./cmd/web/main.go --output ./api/
+	rm -rf api/ && swag fmt --exclude ./internal/mock && swag init --parseDependency --parseInternal --generalInfo ./cmd/webserver/main.go --output ./api/
 
 add-func-name:
 	@find ./internal ./pkg ./cmd -name '*.go' -not -path '*/mock/*' -not -path '*/pkg/errkit/cmd/*' | xargs go run ./pkg/errkit/cmd/addfuncname
