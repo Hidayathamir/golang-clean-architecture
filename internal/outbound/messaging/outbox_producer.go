@@ -8,6 +8,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/twmb/franz-go/pkg/kgo"
 	"gorm.io/gorm"
 )
@@ -60,12 +61,13 @@ func (p *OutboxProducerImpl) ProducePending(ctx context.Context) error {
 
 		var producedIDs []int64
 		for _, outbox := range outboxes {
+			recordCtx := telemetry.ExtractTraceContext(ctx, outbox.TraceContext)
 			record := &kgo.Record{
 				Topic: outbox.Topic,
 				Value: outbox.Payload,
 			}
 
-			result := p.Client.ProduceSync(ctx, record)
+			result := p.Client.ProduceSync(recordCtx, record)
 			err = result.FirstErr()
 			if err != nil {
 				logkit.Logger.WithContext(ctx).WithError(err).

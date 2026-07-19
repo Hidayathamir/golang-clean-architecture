@@ -11,6 +11,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/topic"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"gorm.io/gorm"
 )
 
@@ -54,9 +55,10 @@ func (p *UserProducerImpl) send(ctx context.Context, db *gorm.DB, topicName stri
 	}
 
 	outbox := entity.Outbox{
-		Topic:   topicName,
-		Payload: value,
-		Status:  entity.OutboxStatusPending,
+		Topic:        topicName,
+		Payload:      value,
+		TraceContext: telemetry.InjectTraceContext(ctx),
+		Status:       entity.OutboxStatusPending,
 	}
 
 	err = p.OutboxRepository.Insert(ctx, db, &outbox)

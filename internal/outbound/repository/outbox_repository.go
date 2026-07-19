@@ -55,7 +55,7 @@ func (r *OutboxRepositoryImpl) FindPending(ctx context.Context, db *gorm.DB, out
 func (r *OutboxRepositoryImpl) MarkProduced(ctx context.Context, db *gorm.DB, ids []int64) error {
 	err := db.WithContext(ctx).
 		Model(&entity.Outbox{}).
-		Where(column.ID.Eq(ids)).
+		Where(column.ID.In(ids)).
 		Update(column.Status.Str(), entity.OutboxStatusProduced).Error
 	if err != nil {
 		return errkit.AddFuncName(err, "repository.(*OutboxRepositoryImpl).MarkProduced")

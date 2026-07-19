@@ -10,6 +10,10 @@ func (c Column) Eq(value any) (string, any) {
 	return string(c) + " = ?", value
 }
 
+func (c Column) In(value any) (string, any) {
+	return string(c) + " IN ?", value
+}
+
 func (c Column) Plus(value any) (string, any) {
 	return string(c) + " + ?", value
 }
