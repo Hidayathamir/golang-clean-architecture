@@ -1,0 +1,4 @@
+[[sources]]
+id = "main"
+dsn = "postgres://postgres:postgres@localhost:5432/golang_clean_architecture?sslmode=disable"
+lazy = true

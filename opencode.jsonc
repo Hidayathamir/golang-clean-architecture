@@ -1,0 +1,43 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "dbhub": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@bytebase/dbhub@latest",
+        "--transport",
+        "stdio",
+        "--config",
+        "dbhub.toml"
+      ]
+    },
+    "kafka": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@infoinlet/mcp-kafka"
+      ],
+      "environment": {
+        "KAFKA_BROKERS": "localhost:9093"
+      }
+    },
+    "clickhouse": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@arvoretech/clickhouse-mcp"
+      ],
+      "env": {
+        "CLICKHOUSE_URL": "http://localhost:8123",
+        "CLICKHOUSE_USER": "default",
+        "CLICKHOUSE_PASSWORD": "",
+        "CLICKHOUSE_DATABASE": "signoz_traces"
+      },
+      "enabled": true
+    }
+  }
+}
