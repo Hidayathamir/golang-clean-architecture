@@ -1,9 +1,9 @@
 package user
 
 import (
-	"net/http" 
 	"context"
 	"fmt"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -12,7 +12,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 )
 
-func (u *UserUsecaseImpl) signAccessToken(ctx context.Context, userID int64) (string, error) {
+func (u *UserUsecaseImpl) signAccessToken(_ context.Context, userID int64) (string, error) {
 	secret := u.Config.GetAuthJWTSecret()
 	if secret == "" {
 		err := fmt.Errorf("jwt secret is not configured")
@@ -46,7 +46,7 @@ func (u *UserUsecaseImpl) signAccessToken(ctx context.Context, userID int64) (st
 	return tokenString, nil
 }
 
-func (u *UserUsecaseImpl) parseAccessToken(ctx context.Context, tokenString string) (int64, error) {
+func (u *UserUsecaseImpl) parseAccessToken(_ context.Context, tokenString string) (int64, error) {
 	if tokenString == "" {
 		err := fmt.Errorf("token is empty")
 		err = errkit.SetCode(err, http.StatusUnauthorized)
