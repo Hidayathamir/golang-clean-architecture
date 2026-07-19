@@ -5,7 +5,7 @@
 ```bash
 make run               # Web server (port 3000)
 make run-worker        # Kafka consumer worker
-make run-cron          # Cron scheduler
+make run-workerpublisher # Outbox publisher (polls outbox table, sends to Kafka)
 make go-test           # Unit tests (./internal/...)
 make go-e2e-test       # E2E tests (./test/e2etest/...)
 make docker-compose-up # Start Postgres, Kafka, SigNoz, AKHQ (docker compose down -v first)

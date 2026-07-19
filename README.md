@@ -58,6 +58,14 @@ make run-worker
 
 The log can be seen in `logs/worker_log.jsonl`
 
+**Terminal C: Run Outbox Publisher**
+```bash
+make run-workerpublisher
+```
+*   Polls the `outboxes` table for pending event records and publishes them to Kafka, ensuring at-least-once delivery with crash recovery via DB transactions.
+
+The log can be seen in `logs/workerpublisher_log.jsonl`
+
 ### 3. Observability & Management Tools
 
 Once everything is running, you can monitor the system using these tools:

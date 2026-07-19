@@ -26,6 +26,9 @@ const (
 	KafkaAutoOffsetReset  = "kafka.auto.offset.reset"
 	KafkaProducerEnabled  = "kafka.producer.enabled"
 
+	OutboxPollIntervalSeconds = "outbox.poll_interval_seconds"
+	OutboxBatchSize           = "outbox.batch_size"
+
 	LogLevel = "log.level"
 
 	RedisHost     = "redis.host"

@@ -6,60 +6,62 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/topic"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
-	"github.com/twmb/franz-go/pkg/kgo"
+	"gorm.io/gorm"
 )
 
 //go:generate moq -out=../../mock/MockProducerImage2.go -pkg=mock . ImageProducer
 
 type ImageProducer interface {
-	SendImageUploaded(ctx context.Context, event *dto.ImageUploadedEvent) error
-	SendImageLiked(ctx context.Context, event *dto.ImageLikedEvent) error
-	SendImageCommented(ctx context.Context, event *dto.ImageCommentedEvent) error
+	SendImageUploaded(ctx context.Context, db *gorm.DB, event *dto.ImageUploadedEvent) error
+	SendImageLiked(ctx context.Context, db *gorm.DB, event *dto.ImageLikedEvent) error
+	SendImageCommented(ctx context.Context, db *gorm.DB, event *dto.ImageCommentedEvent) error
 }
 
 var _ ImageProducer = &ImageProducerImpl{}
 
 type ImageProducerImpl struct {
-	Cfg    *config.Config
-	Client *kgo.Client
+	Cfg             *config.Config
+	OutboxRepository repository.OutboxRepository
 }
 
-func NewImageProducer(cfg *config.Config, client *kgo.Client) *ImageProducerImpl {
+func NewImageProducer(cfg *config.Config, outboxRepository repository.OutboxRepository) *ImageProducerImpl {
 	return &ImageProducerImpl{
-		Cfg:    cfg,
-		Client: client,
+		Cfg:              cfg,
+		OutboxRepository: outboxRepository,
 	}
 }
 
-func (p *ImageProducerImpl) SendImageUploaded(ctx context.Context, event *dto.ImageUploadedEvent) error {
-	err := p.send(ctx, topic.ImageUploaded, event)
+func (p *ImageProducerImpl) SendImageUploaded(ctx context.Context, db *gorm.DB, event *dto.ImageUploadedEvent) error {
+	err := p.send(ctx, db, topic.ImageUploaded, event)
 	if err != nil {
 		return errkit.AddFuncName(err, "messaging.(*ImageProducerImpl).SendImageUploaded")
 	}
 	return nil
 }
 
-func (p *ImageProducerImpl) SendImageLiked(ctx context.Context, event *dto.ImageLikedEvent) error {
-	err := p.send(ctx, topic.ImageLiked, event)
+func (p *ImageProducerImpl) SendImageLiked(ctx context.Context, db *gorm.DB, event *dto.ImageLikedEvent) error {
+	err := p.send(ctx, db, topic.ImageLiked, event)
 	if err != nil {
 		return errkit.AddFuncName(err, "messaging.(*ImageProducerImpl).SendImageLiked")
 	}
 	return nil
 }
 
-func (p *ImageProducerImpl) SendImageCommented(ctx context.Context, event *dto.ImageCommentedEvent) error {
-	err := p.send(ctx, topic.ImageCommented, event)
+func (p *ImageProducerImpl) SendImageCommented(ctx context.Context, db *gorm.DB, event *dto.ImageCommentedEvent) error {
+	err := p.send(ctx, db, topic.ImageCommented, event)
 	if err != nil {
 		return errkit.AddFuncName(err, "messaging.(*ImageProducerImpl).SendImageCommented")
 	}
 	return nil
 }
 
-func (p *ImageProducerImpl) send(ctx context.Context, topicName string, event any) error {
-	if p.Client == nil {
+func (p *ImageProducerImpl) send(ctx context.Context, db *gorm.DB, topicName string, event any) error {
+	if !p.Cfg.GetKafkaProducerEnabled() {
 		logkit.Logger.WithContext(ctx).Warn("Kafka producer is disabled")
 		return nil
 	}
@@ -69,17 +71,18 @@ func (p *ImageProducerImpl) send(ctx context.Context, topicName string, event an
 		return errkit.AddFuncName(err, "messaging.(*ImageProducerImpl).send")
 	}
 
-	record := &kgo.Record{
-		Topic: topicName,
-		Value: value,
+	outbox := entity.Outbox{
+		Topic:   topicName,
+		Payload: value,
+		Status:  entity.OutboxStatusPending,
 	}
 
-	err = p.Client.ProduceSync(ctx, record).FirstErr()
+	err = p.OutboxRepository.Insert(ctx, db, &outbox)
 	if err != nil {
 		return errkit.AddFuncName(err, "messaging.(*ImageProducerImpl).send")
 	}
 
-	logkit.Logger.WithContext(ctx).WithField("topic", topicName).Debug("message sent")
+	logkit.Logger.WithContext(ctx).WithField("topic", topicName).Debug("outbox record inserted")
 
 	return nil
 }

@@ -56,17 +56,21 @@ func SetupUsecases(
 	followRepository = repository.NewFollowRepository(cfg)
 	followRepository = repository.NewFollowRepositoryMwLogger(followRepository)
 
+	var outboxRepository repository.OutboxRepository
+	outboxRepository = repository.NewOutboxRepository(cfg)
+	outboxRepository = repository.NewOutboxRepositoryMwLogger(outboxRepository)
+
 	// setup producer
 	var userProducer messaging.UserProducer
-	userProducer = messaging.NewUserProducer(cfg, producer)
+	userProducer = messaging.NewUserProducer(cfg, outboxRepository)
 	userProducer = messaging.NewUserProducerMwLogger(userProducer)
 
 	var imageProducer messaging.ImageProducer
-	imageProducer = messaging.NewImageProducer(cfg, producer)
+	imageProducer = messaging.NewImageProducer(cfg, outboxRepository)
 	imageProducer = messaging.NewImageProducerMwLogger(imageProducer)
 
 	var notifProducer messaging.NotifProducer
-	notifProducer = messaging.NewNotifProducer(cfg, producer)
+	notifProducer = messaging.NewNotifProducer(cfg, outboxRepository)
 	notifProducer = messaging.NewNotifProducerMwLogger(notifProducer)
 
 	// setup client

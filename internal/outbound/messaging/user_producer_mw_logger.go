@@ -7,6 +7,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 var _ UserProducer = &UserProducerMwLogger{}
@@ -21,11 +22,11 @@ func NewUserProducerMwLogger(next UserProducer) *UserProducerMwLogger {
 	}
 }
 
-func (p *UserProducerMwLogger) SendUserFollowed(ctx context.Context, event *dto.UserFollowedEvent) error {
+func (p *UserProducerMwLogger) SendUserFollowed(ctx context.Context, db *gorm.DB, event *dto.UserFollowedEvent) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := p.Next.SendUserFollowed(ctx, event)
+	err := p.Next.SendUserFollowed(ctx, db, event)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{

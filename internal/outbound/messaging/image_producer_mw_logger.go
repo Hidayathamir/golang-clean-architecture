@@ -7,6 +7,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 var _ ImageProducer = &ImageProducerMwLogger{}
@@ -21,11 +22,11 @@ func NewImageProducerMwLogger(next ImageProducer) *ImageProducerMwLogger {
 	}
 }
 
-func (p *ImageProducerMwLogger) SendImageUploaded(ctx context.Context, event *dto.ImageUploadedEvent) error {
+func (p *ImageProducerMwLogger) SendImageUploaded(ctx context.Context, db *gorm.DB, event *dto.ImageUploadedEvent) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := p.Next.SendImageUploaded(ctx, event)
+	err := p.Next.SendImageUploaded(ctx, db, event)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
@@ -36,11 +37,11 @@ func (p *ImageProducerMwLogger) SendImageUploaded(ctx context.Context, event *dt
 	return err
 }
 
-func (p *ImageProducerMwLogger) SendImageLiked(ctx context.Context, event *dto.ImageLikedEvent) error {
+func (p *ImageProducerMwLogger) SendImageLiked(ctx context.Context, db *gorm.DB, event *dto.ImageLikedEvent) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := p.Next.SendImageLiked(ctx, event)
+	err := p.Next.SendImageLiked(ctx, db, event)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
@@ -51,11 +52,11 @@ func (p *ImageProducerMwLogger) SendImageLiked(ctx context.Context, event *dto.I
 	return err
 }
 
-func (p *ImageProducerMwLogger) SendImageCommented(ctx context.Context, event *dto.ImageCommentedEvent) error {
+func (p *ImageProducerMwLogger) SendImageCommented(ctx context.Context, db *gorm.DB, event *dto.ImageCommentedEvent) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := p.Next.SendImageCommented(ctx, event)
+	err := p.Next.SendImageCommented(ctx, db, event)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{

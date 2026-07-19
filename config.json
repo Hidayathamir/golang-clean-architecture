@@ -42,6 +42,10 @@
       "enabled": true
     }
   },
+  "outbox": {
+    "poll_interval_seconds": 5,
+    "batch_size": 100
+  },
   "log": {
     "level": "trace"
   },

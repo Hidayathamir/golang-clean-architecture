@@ -7,6 +7,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 var _ NotifProducer = &NotifProducerMwLogger{}
@@ -21,11 +22,11 @@ func NewNotifProducerMwLogger(next NotifProducer) *NotifProducerMwLogger {
 	}
 }
 
-func (p *NotifProducerMwLogger) SendNotif(ctx context.Context, event *dto.NotifEvent) error {
+func (p *NotifProducerMwLogger) SendNotif(ctx context.Context, db *gorm.DB, event *dto.NotifEvent) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := p.Next.SendNotif(ctx, event)
+	err := p.Next.SendNotif(ctx, db, event)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{

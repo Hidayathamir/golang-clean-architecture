@@ -16,7 +16,7 @@ import (
 )
 
 func TestImageUsecaseImpl_Like_Success(t *testing.T) {
-	gormDB, _ := newFakeDB(t)
+	gormDB, mockDB := newFakeDB(t)
 	LikeRepository := &mock.LikeRepositoryMock{}
 	ImageProducer := &mock.ImageProducerMock{}
 
@@ -34,12 +34,15 @@ func TestImageUsecaseImpl_Like_Success(t *testing.T) {
 		return nil
 	}
 
-	ImageProducer.SendImageLikedFunc = func(ctx context.Context, event *dto.ImageLikedEvent) error {
+	ImageProducer.SendImageLikedFunc = func(ctx context.Context, db *gorm.DB, event *dto.ImageLikedEvent) error {
 		return nil
 	}
 
 	ctx := context.Background()
 	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1})
+
+	mockDB.ExpectBegin()
+	mockDB.ExpectCommit()
 
 	err := u.Like(ctx, *req)
 
@@ -62,7 +65,7 @@ func TestImageUsecaseImpl_Like_Fail_ValidateStruct(t *testing.T) {
 }
 
 func TestImageUsecaseImpl_Like_Fail_Create(t *testing.T) {
-	gormDB, _ := newFakeDB(t)
+	gormDB, mockDB := newFakeDB(t)
 	LikeRepository := &mock.LikeRepositoryMock{}
 
 	u := &imageusecase.ImageUsecaseImpl{
@@ -81,6 +84,9 @@ func TestImageUsecaseImpl_Like_Fail_Create(t *testing.T) {
 	ctx := context.Background()
 	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1})
 
+	mockDB.ExpectBegin()
+	mockDB.ExpectRollback()
+
 	err := u.Like(ctx, *req)
 
 	require.NotNil(t, err)
@@ -88,7 +94,7 @@ func TestImageUsecaseImpl_Like_Fail_Create(t *testing.T) {
 }
 
 func TestImageUsecaseImpl_Like_Fail_Send(t *testing.T) {
-	gormDB, _ := newFakeDB(t)
+	gormDB, mockDB := newFakeDB(t)
 	LikeRepository := &mock.LikeRepositoryMock{}
 	ImageProducer := &mock.ImageProducerMock{}
 
@@ -106,12 +112,15 @@ func TestImageUsecaseImpl_Like_Fail_Send(t *testing.T) {
 		return nil
 	}
 
-	ImageProducer.SendImageLikedFunc = func(ctx context.Context, event *dto.ImageLikedEvent) error {
+	ImageProducer.SendImageLikedFunc = func(ctx context.Context, db *gorm.DB, event *dto.ImageLikedEvent) error {
 		return assert.AnError
 	}
 
 	ctx := context.Background()
 	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1})
+
+	mockDB.ExpectBegin()
+	mockDB.ExpectRollback()
 
 	err := u.Like(ctx, *req)
 

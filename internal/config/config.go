@@ -122,6 +122,14 @@ func (c *Config) GetKafkaProducerEnabled() bool {
 	return c.GetBool(KafkaProducerEnabled)
 }
 
+func (c *Config) GetOutboxPollIntervalSeconds() int {
+	return c.GetInt(OutboxPollIntervalSeconds)
+}
+
+func (c *Config) GetOutboxBatchSize() int {
+	return c.GetInt(OutboxBatchSize)
+}
+
 func (c *Config) GetLogLevel() string {
 	return c.GetString(LogLevel)
 }

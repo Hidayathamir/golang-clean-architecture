@@ -8,6 +8,10 @@ run-worker:
 	mkdir -p logs
 	go run cmd/worker/main.go >> logs/worker_log.jsonl 2>&1
 
+run-workerpublisher:
+	mkdir -p logs
+	go run cmd/workerpublisher/main.go >> logs/workerpublisher_log.jsonl 2>&1
+
 go-test:
 	go test -count=1 -v ./internal/... >> logs/go_test.jsonl 2>&1
 

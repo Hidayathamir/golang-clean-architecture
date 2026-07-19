@@ -9,6 +9,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/validatorkit"
+	"gorm.io/gorm"
 )
 
 func (u *ImageUsecaseImpl) Comment(ctx context.Context, req dto.CommentImageRequest) error {
@@ -21,17 +22,24 @@ func (u *ImageUsecaseImpl) Comment(ctx context.Context, req dto.CommentImageRequ
 	comment := entity.Comment{}
 	converter.DtoCommentImageRequestToEntityComment(ctx, req, &comment)
 
-	err = u.CommentRepository.Create(ctx, u.DB, &comment)
-	if err != nil {
-		return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).Comment")
-	}
-
 	event := dto.ImageCommentedEvent{}
 	converter.EntityCommentToDtoImageCommentedEvent(comment, &event)
 
-	err = u.ImageProducer.SendImageCommented(ctx, &event)
+	err = u.DB.Transaction(func(tx *gorm.DB) error {
+		err := u.CommentRepository.Create(ctx, tx, &comment)
+		if err != nil {
+			return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).Comment")
+		}
+
+		err = u.ImageProducer.SendImageCommented(ctx, tx, &event)
+		if err != nil {
+			return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).Comment")
+		}
+
+		return nil
+	})
 	if err != nil {
-		return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).Comment")
+		return err
 	}
 
 	return nil

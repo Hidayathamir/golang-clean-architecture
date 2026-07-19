@@ -17,7 +17,7 @@ import (
 )
 
 func TestImageUsecaseImpl_Upload_Success(t *testing.T) {
-	gormDB, _ := newFakeDB(t)
+	gormDB, mockDB := newFakeDB(t)
 	ImageRepository := &mock.ImageRepositoryMock{}
 	ImageProducer := &mock.ImageProducerMock{}
 	S3Client := &mock.S3ClientMock{}
@@ -44,7 +44,7 @@ func TestImageUsecaseImpl_Upload_Success(t *testing.T) {
 		return nil
 	}
 
-	ImageProducer.SendImageUploadedFunc = func(ctx context.Context, event *dto.ImageUploadedEvent) error {
+	ImageProducer.SendImageUploadedFunc = func(ctx context.Context, db *gorm.DB, event *dto.ImageUploadedEvent) error {
 		return nil
 	}
 
@@ -52,6 +52,9 @@ func TestImageUsecaseImpl_Upload_Success(t *testing.T) {
 
 	ctx := context.Background()
 	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1, Username: "user1"})
+
+	mockDB.ExpectBegin()
+	mockDB.ExpectCommit()
 
 	res, err := u.Upload(ctx, *req)
 
@@ -113,7 +116,7 @@ func TestImageUsecaseImpl_Upload_Fail_S3Upload(t *testing.T) {
 }
 
 func TestImageUsecaseImpl_Upload_Fail_Create(t *testing.T) {
-	gormDB, _ := newFakeDB(t)
+	gormDB, mockDB := newFakeDB(t)
 	ImageRepository := &mock.ImageRepositoryMock{}
 	S3Client := &mock.S3ClientMock{}
 
@@ -138,6 +141,9 @@ func TestImageUsecaseImpl_Upload_Fail_Create(t *testing.T) {
 	ctx := context.Background()
 	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1, Username: "user1"})
 
+	mockDB.ExpectBegin()
+	mockDB.ExpectRollback()
+
 	res, err := u.Upload(ctx, *req)
 
 	require.Equal(t, dto.ImageResponse{}, res)
@@ -146,7 +152,7 @@ func TestImageUsecaseImpl_Upload_Fail_Create(t *testing.T) {
 }
 
 func TestImageUsecaseImpl_Upload_Fail_Send(t *testing.T) {
-	gormDB, _ := newFakeDB(t)
+	gormDB, mockDB := newFakeDB(t)
 	ImageRepository := &mock.ImageRepositoryMock{}
 	ImageProducer := &mock.ImageProducerMock{}
 	S3Client := &mock.S3ClientMock{}
@@ -170,12 +176,15 @@ func TestImageUsecaseImpl_Upload_Fail_Send(t *testing.T) {
 		return nil
 	}
 
-	ImageProducer.SendImageUploadedFunc = func(ctx context.Context, event *dto.ImageUploadedEvent) error {
+	ImageProducer.SendImageUploadedFunc = func(ctx context.Context, db *gorm.DB, event *dto.ImageUploadedEvent) error {
 		return assert.AnError
 	}
 
 	ctx := context.Background()
 	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1, Username: "user1"})
+
+	mockDB.ExpectBegin()
+	mockDB.ExpectRollback()
 
 	res, err := u.Upload(ctx, *req)
 

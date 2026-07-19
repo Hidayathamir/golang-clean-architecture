@@ -42,7 +42,7 @@ func TestUserUsecaseImpl_Create_Success(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *dto.UserFollowedEvent) error {
+	UserProducer.SendUserFollowedFunc = func(ctx context.Context, db *gorm.DB, event *dto.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -91,7 +91,7 @@ func TestUserUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 		return nil
 	}
 
-	UserProducer.SendUserFollowedFunc = func(ctx context.Context, event *dto.UserFollowedEvent) error {
+	UserProducer.SendUserFollowedFunc = func(ctx context.Context, db *gorm.DB, event *dto.UserFollowedEvent) error {
 		return nil
 	}
 

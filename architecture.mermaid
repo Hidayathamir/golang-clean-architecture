@@ -20,6 +20,8 @@ subgraph OUTBOUND["Outbound"]
     MSGOUT[Messaging]
 end
 
+WP[Worker Publisher]
+
 DB[(Database)]
 REDIS[(Redis)]
 S3[(S3)]
@@ -41,7 +43,10 @@ UC --> MSGOUT
 REPO --> DB
 CACHE --> REDIS
 STORE --> S3
-MSGOUT --> KP
+MSGOUT --> DB
+
+DB --> WP
+WP --> KP
 
 %% Styles
 classDef Inbound fill:#6C63FF,stroke:#4F46E5,color:#fff,stroke-width:2px;

@@ -10,6 +10,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/validatorkit"
+	"gorm.io/gorm"
 )
 
 func (u *ImageUsecaseImpl) Upload(ctx context.Context, req dto.UploadImageRequest) (dto.ImageResponse, error) {
@@ -32,17 +33,24 @@ func (u *ImageUsecaseImpl) Upload(ctx context.Context, req dto.UploadImageReques
 
 	image := entity.Image{UserID: ctxuserauth.Get(ctx).ID, Caption: req.Caption, URL: url}
 
-	err = u.ImageRepository.Create(ctx, u.DB, &image)
-	if err != nil {
-		return dto.ImageResponse{}, errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).Upload")
-	}
+	err = u.DB.Transaction(func(tx *gorm.DB) error {
+		err := u.ImageRepository.Create(ctx, tx, &image)
+		if err != nil {
+			return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).Upload")
+		}
 
-	event := dto.ImageUploadedEvent{}
-	converter.EntityImageToDtoImageUploadedEvent(image, &event)
+		event := dto.ImageUploadedEvent{}
+		converter.EntityImageToDtoImageUploadedEvent(image, &event)
 
-	err = u.ImageProducer.SendImageUploaded(ctx, &event)
+		err = u.ImageProducer.SendImageUploaded(ctx, tx, &event)
+		if err != nil {
+			return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).Upload")
+		}
+
+		return nil
+	})
 	if err != nil {
-		return dto.ImageResponse{}, errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).Upload")
+		return dto.ImageResponse{}, err
 	}
 
 	res := dto.ImageResponse{}

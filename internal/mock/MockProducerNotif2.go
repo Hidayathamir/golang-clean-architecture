@@ -7,6 +7,7 @@ import (
 	"context"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/messaging"
+	"gorm.io/gorm"
 	"sync"
 )
 
@@ -20,7 +21,7 @@ var _ messaging.NotifProducer = &NotifProducerMock{}
 //
 //		// make and configure a mocked messaging.NotifProducer
 //		mockedNotifProducer := &NotifProducerMock{
-//			SendNotifFunc: func(ctx context.Context, event *dto.NotifEvent) error {
+//			SendNotifFunc: func(ctx context.Context, db *gorm.DB, event *dto.NotifEvent) error {
 //				panic("mock out the SendNotif method")
 //			},
 //		}
@@ -31,7 +32,7 @@ var _ messaging.NotifProducer = &NotifProducerMock{}
 //	}
 type NotifProducerMock struct {
 	// SendNotifFunc mocks the SendNotif method.
-	SendNotifFunc func(ctx context.Context, event *dto.NotifEvent) error
+	SendNotifFunc func(ctx context.Context, db *gorm.DB, event *dto.NotifEvent) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -39,6 +40,8 @@ type NotifProducerMock struct {
 		SendNotif []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
 			// Event is the event argument value.
 			Event *dto.NotifEvent
 		}
@@ -47,21 +50,23 @@ type NotifProducerMock struct {
 }
 
 // SendNotif calls SendNotifFunc.
-func (mock *NotifProducerMock) SendNotif(ctx context.Context, event *dto.NotifEvent) error {
+func (mock *NotifProducerMock) SendNotif(ctx context.Context, db *gorm.DB, event *dto.NotifEvent) error {
 	if mock.SendNotifFunc == nil {
 		panic("NotifProducerMock.SendNotifFunc: method is nil but NotifProducer.SendNotif was just called")
 	}
 	callInfo := struct {
 		Ctx   context.Context
+		Db    *gorm.DB
 		Event *dto.NotifEvent
 	}{
 		Ctx:   ctx,
+		Db:    db,
 		Event: event,
 	}
 	mock.lockSendNotif.Lock()
 	mock.calls.SendNotif = append(mock.calls.SendNotif, callInfo)
 	mock.lockSendNotif.Unlock()
-	return mock.SendNotifFunc(ctx, event)
+	return mock.SendNotifFunc(ctx, db, event)
 }
 
 // SendNotifCalls gets all the calls that were made to SendNotif.
@@ -70,10 +75,12 @@ func (mock *NotifProducerMock) SendNotif(ctx context.Context, event *dto.NotifEv
 //	len(mockedNotifProducer.SendNotifCalls())
 func (mock *NotifProducerMock) SendNotifCalls() []struct {
 	Ctx   context.Context
+	Db    *gorm.DB
 	Event *dto.NotifEvent
 } {
 	var calls []struct {
 		Ctx   context.Context
+		Db    *gorm.DB
 		Event *dto.NotifEvent
 	}
 	mock.lockSendNotif.RLock()

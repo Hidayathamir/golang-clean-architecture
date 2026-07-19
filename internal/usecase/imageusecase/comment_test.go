@@ -16,7 +16,7 @@ import (
 )
 
 func TestImageUsecaseImpl_Comment_Success(t *testing.T) {
-	gormDB, _ := newFakeDB(t)
+	gormDB, mockDB := newFakeDB(t)
 	CommentRepository := &mock.CommentRepositoryMock{}
 	ImageProducer := &mock.ImageProducerMock{}
 
@@ -35,12 +35,15 @@ func TestImageUsecaseImpl_Comment_Success(t *testing.T) {
 		return nil
 	}
 
-	ImageProducer.SendImageCommentedFunc = func(ctx context.Context, event *dto.ImageCommentedEvent) error {
+	ImageProducer.SendImageCommentedFunc = func(ctx context.Context, db *gorm.DB, event *dto.ImageCommentedEvent) error {
 		return nil
 	}
 
 	ctx := context.Background()
 	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1})
+
+	mockDB.ExpectBegin()
+	mockDB.ExpectCommit()
 
 	err := u.Comment(ctx, *req)
 
@@ -63,7 +66,7 @@ func TestImageUsecaseImpl_Comment_Fail_ValidateStruct(t *testing.T) {
 }
 
 func TestImageUsecaseImpl_Comment_Fail_Create(t *testing.T) {
-	gormDB, _ := newFakeDB(t)
+	gormDB, mockDB := newFakeDB(t)
 	CommentRepository := &mock.CommentRepositoryMock{}
 
 	u := &imageusecase.ImageUsecaseImpl{
@@ -83,6 +86,9 @@ func TestImageUsecaseImpl_Comment_Fail_Create(t *testing.T) {
 	ctx := context.Background()
 	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1})
 
+	mockDB.ExpectBegin()
+	mockDB.ExpectRollback()
+
 	err := u.Comment(ctx, *req)
 
 	require.NotNil(t, err)
@@ -90,7 +96,7 @@ func TestImageUsecaseImpl_Comment_Fail_Create(t *testing.T) {
 }
 
 func TestImageUsecaseImpl_Comment_Fail_Send(t *testing.T) {
-	gormDB, _ := newFakeDB(t)
+	gormDB, mockDB := newFakeDB(t)
 	CommentRepository := &mock.CommentRepositoryMock{}
 	ImageProducer := &mock.ImageProducerMock{}
 
@@ -109,12 +115,15 @@ func TestImageUsecaseImpl_Comment_Fail_Send(t *testing.T) {
 		return nil
 	}
 
-	ImageProducer.SendImageCommentedFunc = func(ctx context.Context, event *dto.ImageCommentedEvent) error {
+	ImageProducer.SendImageCommentedFunc = func(ctx context.Context, db *gorm.DB, event *dto.ImageCommentedEvent) error {
 		return assert.AnError
 	}
 
 	ctx := context.Background()
 	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1})
+
+	mockDB.ExpectBegin()
+	mockDB.ExpectRollback()
 
 	err := u.Comment(ctx, *req)
 

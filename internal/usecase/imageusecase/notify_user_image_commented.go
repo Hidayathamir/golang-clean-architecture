@@ -44,7 +44,7 @@ func (u *ImageUsecaseImpl) NotifyUserImageCommented(ctx context.Context, req dto
 		Message: fmt.Sprintf("%s just comment on your post", commenter.Name),
 	}
 
-	err = u.NotifProducer.SendNotif(ctx, &event)
+	err = u.NotifProducer.SendNotif(ctx, u.DB, &event)
 	if err != nil {
 		return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).NotifyUserImageCommented")
 	}

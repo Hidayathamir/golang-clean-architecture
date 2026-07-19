@@ -7,6 +7,7 @@ import (
 	"context"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/messaging"
+	"gorm.io/gorm"
 	"sync"
 )
 
@@ -20,13 +21,13 @@ var _ messaging.ImageProducer = &ImageProducerMock{}
 //
 //		// make and configure a mocked messaging.ImageProducer
 //		mockedImageProducer := &ImageProducerMock{
-//			SendImageCommentedFunc: func(ctx context.Context, event *dto.ImageCommentedEvent) error {
+//			SendImageCommentedFunc: func(ctx context.Context, db *gorm.DB, event *dto.ImageCommentedEvent) error {
 //				panic("mock out the SendImageCommented method")
 //			},
-//			SendImageLikedFunc: func(ctx context.Context, event *dto.ImageLikedEvent) error {
+//			SendImageLikedFunc: func(ctx context.Context, db *gorm.DB, event *dto.ImageLikedEvent) error {
 //				panic("mock out the SendImageLiked method")
 //			},
-//			SendImageUploadedFunc: func(ctx context.Context, event *dto.ImageUploadedEvent) error {
+//			SendImageUploadedFunc: func(ctx context.Context, db *gorm.DB, event *dto.ImageUploadedEvent) error {
 //				panic("mock out the SendImageUploaded method")
 //			},
 //		}
@@ -37,13 +38,13 @@ var _ messaging.ImageProducer = &ImageProducerMock{}
 //	}
 type ImageProducerMock struct {
 	// SendImageCommentedFunc mocks the SendImageCommented method.
-	SendImageCommentedFunc func(ctx context.Context, event *dto.ImageCommentedEvent) error
+	SendImageCommentedFunc func(ctx context.Context, db *gorm.DB, event *dto.ImageCommentedEvent) error
 
 	// SendImageLikedFunc mocks the SendImageLiked method.
-	SendImageLikedFunc func(ctx context.Context, event *dto.ImageLikedEvent) error
+	SendImageLikedFunc func(ctx context.Context, db *gorm.DB, event *dto.ImageLikedEvent) error
 
 	// SendImageUploadedFunc mocks the SendImageUploaded method.
-	SendImageUploadedFunc func(ctx context.Context, event *dto.ImageUploadedEvent) error
+	SendImageUploadedFunc func(ctx context.Context, db *gorm.DB, event *dto.ImageUploadedEvent) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -51,6 +52,8 @@ type ImageProducerMock struct {
 		SendImageCommented []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
 			// Event is the event argument value.
 			Event *dto.ImageCommentedEvent
 		}
@@ -58,6 +61,8 @@ type ImageProducerMock struct {
 		SendImageLiked []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
 			// Event is the event argument value.
 			Event *dto.ImageLikedEvent
 		}
@@ -65,6 +70,8 @@ type ImageProducerMock struct {
 		SendImageUploaded []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
 			// Event is the event argument value.
 			Event *dto.ImageUploadedEvent
 		}
@@ -75,21 +82,23 @@ type ImageProducerMock struct {
 }
 
 // SendImageCommented calls SendImageCommentedFunc.
-func (mock *ImageProducerMock) SendImageCommented(ctx context.Context, event *dto.ImageCommentedEvent) error {
+func (mock *ImageProducerMock) SendImageCommented(ctx context.Context, db *gorm.DB, event *dto.ImageCommentedEvent) error {
 	if mock.SendImageCommentedFunc == nil {
 		panic("ImageProducerMock.SendImageCommentedFunc: method is nil but ImageProducer.SendImageCommented was just called")
 	}
 	callInfo := struct {
 		Ctx   context.Context
+		Db    *gorm.DB
 		Event *dto.ImageCommentedEvent
 	}{
 		Ctx:   ctx,
+		Db:    db,
 		Event: event,
 	}
 	mock.lockSendImageCommented.Lock()
 	mock.calls.SendImageCommented = append(mock.calls.SendImageCommented, callInfo)
 	mock.lockSendImageCommented.Unlock()
-	return mock.SendImageCommentedFunc(ctx, event)
+	return mock.SendImageCommentedFunc(ctx, db, event)
 }
 
 // SendImageCommentedCalls gets all the calls that were made to SendImageCommented.
@@ -98,10 +107,12 @@ func (mock *ImageProducerMock) SendImageCommented(ctx context.Context, event *dt
 //	len(mockedImageProducer.SendImageCommentedCalls())
 func (mock *ImageProducerMock) SendImageCommentedCalls() []struct {
 	Ctx   context.Context
+	Db    *gorm.DB
 	Event *dto.ImageCommentedEvent
 } {
 	var calls []struct {
 		Ctx   context.Context
+		Db    *gorm.DB
 		Event *dto.ImageCommentedEvent
 	}
 	mock.lockSendImageCommented.RLock()
@@ -111,21 +122,23 @@ func (mock *ImageProducerMock) SendImageCommentedCalls() []struct {
 }
 
 // SendImageLiked calls SendImageLikedFunc.
-func (mock *ImageProducerMock) SendImageLiked(ctx context.Context, event *dto.ImageLikedEvent) error {
+func (mock *ImageProducerMock) SendImageLiked(ctx context.Context, db *gorm.DB, event *dto.ImageLikedEvent) error {
 	if mock.SendImageLikedFunc == nil {
 		panic("ImageProducerMock.SendImageLikedFunc: method is nil but ImageProducer.SendImageLiked was just called")
 	}
 	callInfo := struct {
 		Ctx   context.Context
+		Db    *gorm.DB
 		Event *dto.ImageLikedEvent
 	}{
 		Ctx:   ctx,
+		Db:    db,
 		Event: event,
 	}
 	mock.lockSendImageLiked.Lock()
 	mock.calls.SendImageLiked = append(mock.calls.SendImageLiked, callInfo)
 	mock.lockSendImageLiked.Unlock()
-	return mock.SendImageLikedFunc(ctx, event)
+	return mock.SendImageLikedFunc(ctx, db, event)
 }
 
 // SendImageLikedCalls gets all the calls that were made to SendImageLiked.
@@ -134,10 +147,12 @@ func (mock *ImageProducerMock) SendImageLiked(ctx context.Context, event *dto.Im
 //	len(mockedImageProducer.SendImageLikedCalls())
 func (mock *ImageProducerMock) SendImageLikedCalls() []struct {
 	Ctx   context.Context
+	Db    *gorm.DB
 	Event *dto.ImageLikedEvent
 } {
 	var calls []struct {
 		Ctx   context.Context
+		Db    *gorm.DB
 		Event *dto.ImageLikedEvent
 	}
 	mock.lockSendImageLiked.RLock()
@@ -147,21 +162,23 @@ func (mock *ImageProducerMock) SendImageLikedCalls() []struct {
 }
 
 // SendImageUploaded calls SendImageUploadedFunc.
-func (mock *ImageProducerMock) SendImageUploaded(ctx context.Context, event *dto.ImageUploadedEvent) error {
+func (mock *ImageProducerMock) SendImageUploaded(ctx context.Context, db *gorm.DB, event *dto.ImageUploadedEvent) error {
 	if mock.SendImageUploadedFunc == nil {
 		panic("ImageProducerMock.SendImageUploadedFunc: method is nil but ImageProducer.SendImageUploaded was just called")
 	}
 	callInfo := struct {
 		Ctx   context.Context
+		Db    *gorm.DB
 		Event *dto.ImageUploadedEvent
 	}{
 		Ctx:   ctx,
+		Db:    db,
 		Event: event,
 	}
 	mock.lockSendImageUploaded.Lock()
 	mock.calls.SendImageUploaded = append(mock.calls.SendImageUploaded, callInfo)
 	mock.lockSendImageUploaded.Unlock()
-	return mock.SendImageUploadedFunc(ctx, event)
+	return mock.SendImageUploadedFunc(ctx, db, event)
 }
 
 // SendImageUploadedCalls gets all the calls that were made to SendImageUploaded.
@@ -170,10 +187,12 @@ func (mock *ImageProducerMock) SendImageUploaded(ctx context.Context, event *dto
 //	len(mockedImageProducer.SendImageUploadedCalls())
 func (mock *ImageProducerMock) SendImageUploadedCalls() []struct {
 	Ctx   context.Context
+	Db    *gorm.DB
 	Event *dto.ImageUploadedEvent
 } {
 	var calls []struct {
 		Ctx   context.Context
+		Db    *gorm.DB
 		Event *dto.ImageUploadedEvent
 	}
 	mock.lockSendImageUploaded.RLock()

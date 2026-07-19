@@ -9,6 +9,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/validatorkit"
+	"gorm.io/gorm"
 )
 
 func (u *ImageUsecaseImpl) Like(ctx context.Context, req dto.LikeImageRequest) error {
@@ -21,17 +22,24 @@ func (u *ImageUsecaseImpl) Like(ctx context.Context, req dto.LikeImageRequest) e
 	like := entity.Like{}
 	converter.DtoLikeImageRequestToEntityLike(ctx, req, &like)
 
-	err = u.LikeRepository.Create(ctx, u.DB, &like)
-	if err != nil {
-		return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).Like")
-	}
-
 	event := dto.ImageLikedEvent{}
 	converter.EntityLikeToDtoImageLikedEvent(like, &event)
 
-	err = u.ImageProducer.SendImageLiked(ctx, &event)
+	err = u.DB.Transaction(func(tx *gorm.DB) error {
+		err := u.LikeRepository.Create(ctx, tx, &like)
+		if err != nil {
+			return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).Like")
+		}
+
+		err = u.ImageProducer.SendImageLiked(ctx, tx, &event)
+		if err != nil {
+			return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).Like")
+		}
+
+		return nil
+	})
 	if err != nil {
-		return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).Like")
+		return err
 	}
 
 	return nil

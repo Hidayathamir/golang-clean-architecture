@@ -32,4 +32,7 @@ const (
 	Name           Column = "name"
 	FollowerCount  Column = "follower_count"
 	FollowingCount Column = "following_count"
+	Topic          Column = "topic"
+	Payload        Column = "payload"
+	Status         Column = "status"
 )

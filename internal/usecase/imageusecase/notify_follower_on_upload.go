@@ -38,7 +38,7 @@ func (u *ImageUsecaseImpl) NotifyFollowerOnUpload(ctx context.Context, req dto.N
 			Message: fmt.Sprintf("%s just upload an image", user.Name),
 		}
 
-		err = u.NotifProducer.SendNotif(ctx, &event)
+		err = u.NotifProducer.SendNotif(ctx, u.DB, &event)
 		if err != nil {
 			return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).NotifyFollowerOnUpload")
 		}

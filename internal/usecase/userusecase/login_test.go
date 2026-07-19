@@ -59,7 +59,7 @@ func TestUserUsecaseImpl_Login_Success(t *testing.T) {
 		return nil
 	}
 
-	producer.SendUserFollowedFunc = func(ctx context.Context, event *dto.UserFollowedEvent) error {
+	producer.SendUserFollowedFunc = func(ctx context.Context, db *gorm.DB, event *dto.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -97,7 +97,7 @@ func TestUserUsecaseImpl_Login_Fail_ValidateStruct(t *testing.T) {
 		return nil
 	}
 
-	producer.SendUserFollowedFunc = func(ctx context.Context, event *dto.UserFollowedEvent) error {
+	producer.SendUserFollowedFunc = func(ctx context.Context, db *gorm.DB, event *dto.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -121,7 +121,7 @@ func TestUserUsecaseImpl_Login_Fail_FindByUsername(t *testing.T) {
 		return assert.AnError
 	}
 
-	producer.SendUserFollowedFunc = func(ctx context.Context, event *dto.UserFollowedEvent) error {
+	producer.SendUserFollowedFunc = func(ctx context.Context, db *gorm.DB, event *dto.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -149,7 +149,7 @@ func TestUserUsecaseImpl_Login_Fail_CompareHashAndPassword(t *testing.T) {
 		return nil
 	}
 
-	producer.SendUserFollowedFunc = func(ctx context.Context, event *dto.UserFollowedEvent) error {
+	producer.SendUserFollowedFunc = func(ctx context.Context, db *gorm.DB, event *dto.UserFollowedEvent) error {
 		return nil
 	}
 
@@ -191,7 +191,7 @@ func TestUserUsecaseImpl_Login_Fail_SignAccessToken(t *testing.T) {
 		return nil
 	}
 
-	producer.SendUserFollowedFunc = func(ctx context.Context, event *dto.UserFollowedEvent) error {
+	producer.SendUserFollowedFunc = func(ctx context.Context, db *gorm.DB, event *dto.UserFollowedEvent) error {
 		return nil
 	}
 

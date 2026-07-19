@@ -7,6 +7,7 @@ import (
 	"context"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/messaging"
+	"gorm.io/gorm"
 	"sync"
 )
 
@@ -20,7 +21,7 @@ var _ messaging.UserProducer = &UserProducerMock{}
 //
 //		// make and configure a mocked messaging.UserProducer
 //		mockedUserProducer := &UserProducerMock{
-//			SendUserFollowedFunc: func(ctx context.Context, event *dto.UserFollowedEvent) error {
+//			SendUserFollowedFunc: func(ctx context.Context, db *gorm.DB, event *dto.UserFollowedEvent) error {
 //				panic("mock out the SendUserFollowed method")
 //			},
 //		}
@@ -31,7 +32,7 @@ var _ messaging.UserProducer = &UserProducerMock{}
 //	}
 type UserProducerMock struct {
 	// SendUserFollowedFunc mocks the SendUserFollowed method.
-	SendUserFollowedFunc func(ctx context.Context, event *dto.UserFollowedEvent) error
+	SendUserFollowedFunc func(ctx context.Context, db *gorm.DB, event *dto.UserFollowedEvent) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -39,6 +40,8 @@ type UserProducerMock struct {
 		SendUserFollowed []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
 			// Event is the event argument value.
 			Event *dto.UserFollowedEvent
 		}
@@ -47,21 +50,23 @@ type UserProducerMock struct {
 }
 
 // SendUserFollowed calls SendUserFollowedFunc.
-func (mock *UserProducerMock) SendUserFollowed(ctx context.Context, event *dto.UserFollowedEvent) error {
+func (mock *UserProducerMock) SendUserFollowed(ctx context.Context, db *gorm.DB, event *dto.UserFollowedEvent) error {
 	if mock.SendUserFollowedFunc == nil {
 		panic("UserProducerMock.SendUserFollowedFunc: method is nil but UserProducer.SendUserFollowed was just called")
 	}
 	callInfo := struct {
 		Ctx   context.Context
+		Db    *gorm.DB
 		Event *dto.UserFollowedEvent
 	}{
 		Ctx:   ctx,
+		Db:    db,
 		Event: event,
 	}
 	mock.lockSendUserFollowed.Lock()
 	mock.calls.SendUserFollowed = append(mock.calls.SendUserFollowed, callInfo)
 	mock.lockSendUserFollowed.Unlock()
-	return mock.SendUserFollowedFunc(ctx, event)
+	return mock.SendUserFollowedFunc(ctx, db, event)
 }
 
 // SendUserFollowedCalls gets all the calls that were made to SendUserFollowed.
@@ -70,10 +75,12 @@ func (mock *UserProducerMock) SendUserFollowed(ctx context.Context, event *dto.U
 //	len(mockedUserProducer.SendUserFollowedCalls())
 func (mock *UserProducerMock) SendUserFollowedCalls() []struct {
 	Ctx   context.Context
+	Db    *gorm.DB
 	Event *dto.UserFollowedEvent
 } {
 	var calls []struct {
 		Ctx   context.Context
+		Db    *gorm.DB
 		Event *dto.UserFollowedEvent
 	}
 	mock.lockSendUserFollowed.RLock()

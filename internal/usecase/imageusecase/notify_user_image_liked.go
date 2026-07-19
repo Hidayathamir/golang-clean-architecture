@@ -44,7 +44,7 @@ func (u *ImageUsecaseImpl) NotifyUserImageLiked(ctx context.Context, req dto.Not
 		Message: fmt.Sprintf("%s just liked your post", liker.Name),
 	}
 
-	err = u.NotifProducer.SendNotif(ctx, &event)
+	err = u.NotifProducer.SendNotif(ctx, u.DB, &event)
 	if err != nil {
 		return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).NotifyUserImageLiked")
 	}

@@ -30,7 +30,7 @@ func (u *UserUsecaseImpl) NotifyUserBeingFollowed(ctx context.Context, req dto.N
 		Message: fmt.Sprintf("%s just follow you", followerUser.Name),
 	}
 
-	err = u.NotifProducer.SendNotif(ctx, &event)
+	err = u.NotifProducer.SendNotif(ctx, u.DB, &event)
 	if err != nil {
 		return errkit.AddFuncName(err, "userusecase.(*UserUsecaseImpl).NotifyUserBeingFollowed")
 	}
