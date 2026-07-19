@@ -2,7 +2,6 @@ package errkit
 
 import (
 	"fmt"
-	"strings"
 )
 
 func Wrap(originalErr error, s string) error {
@@ -11,11 +10,4 @@ func Wrap(originalErr error, s string) error {
 
 func WrapE(originalErr error, wrapperErr error) error {
 	return fmt.Errorf("%w:: %w", wrapperErr, originalErr)
-}
-
-func Split(err error) []string {
-	if err == nil {
-		return nil
-	}
-	return strings.Split(err.Error(), ":: ")
 }
