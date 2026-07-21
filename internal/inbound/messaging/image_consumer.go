@@ -108,6 +108,10 @@ func (c *ImageConsumer) BatchUpdateImageLikeCount(originalCtx context.Context, r
 	return nil
 }
 
+func (c *ImageConsumer) BatchUpdateImageLikeCountRetry(ctx context.Context, record *kgo.Record) error {
+	return c.BatchUpdateImageLikeCount(ctx, []*kgo.Record{record})
+}
+
 func (c *ImageConsumer) NotifyUserImageCommented(ctx context.Context, record *kgo.Record) error {
 	ctx, span := telemetry.StartConsumer(ctx, record)
 	defer span.End()
@@ -145,4 +149,8 @@ func (c *ImageConsumer) BatchUpdateImageCommentCount(ctx context.Context, record
 	}
 
 	return nil
+}
+
+func (c *ImageConsumer) BatchUpdateImageCommentCountRetry(ctx context.Context, record *kgo.Record) error {
+	return c.BatchUpdateImageCommentCount(ctx, []*kgo.Record{record})
 }

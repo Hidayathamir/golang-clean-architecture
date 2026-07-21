@@ -38,6 +38,9 @@
         "reset": "earliest"
       }
     },
+    "consumer": {
+      "max_retries": 3
+    },
     "producer": {
       "enabled": true
     }

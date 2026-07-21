@@ -21,4 +21,16 @@ const (
 	UserFollowedBatchStats = "user.followed.batch-stats"
 
 	NotifLog = "notif.log"
+
+	ImageUploadedNotifyFollowersRetry = "image.uploaded.notify-followers.retry"
+	ImageUploadedSyncSearchRetry      = "image.uploaded.sync-search.retry"
+	ImageLikedNotifyOwnerRetry        = "image.liked.notify-owner.retry"
+	ImageLikedBatchCountRetry         = "image.liked.batch-count.retry"
+	ImageCommentedNotifyOwnerRetry    = "image.commented.notify-owner.retry"
+	ImageCommentedBatchCountRetry     = "image.commented.batch-count.retry"
+
+	UserFollowedNotifyUserRetry = "user.followed.notify-user.retry"
+	UserFollowedBatchStatsRetry = "user.followed.batch-stats.retry"
+
+	NotifLogRetry = "notif.log.retry"
 )

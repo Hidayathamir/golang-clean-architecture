@@ -49,12 +49,12 @@ func NewKafkaClientConsumerBatch(cfg *config.Config, consumerGroup string, topic
 	return client
 }
 
-func NewKafkaClientConsumerSingle(cfg *config.Config, consumerGroup string, topic string) *kgo.Client {
+func NewKafkaClientConsumerSingle(cfg *config.Config, consumerGroup string, topics ...string) *kgo.Client {
 	brokers := strings.Split(cfg.GetKafkaBootstrapServers(), ",")
 	opts := []kgo.Opt{
 		kgo.SeedBrokers(brokers...),
 		kgo.ConsumerGroup(consumerGroup),
-		kgo.ConsumeTopics(topic),
+		kgo.ConsumeTopics(topics...),
 		kgo.ConsumeResetOffset(kgo.NewOffset().AtStart()),
 		kgo.DisableAutoCommit(),
 		kgo.FetchMaxWait(5 * time.Second),

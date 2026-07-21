@@ -61,3 +61,7 @@ func (c *UserConsumer) BatchUpdateUserFollowStats(ctx context.Context, records [
 
 	return nil
 }
+
+func (c *UserConsumer) BatchUpdateUserFollowStatsRetry(ctx context.Context, record *kgo.Record) error {
+	return c.BatchUpdateUserFollowStats(ctx, []*kgo.Record{record})
+}

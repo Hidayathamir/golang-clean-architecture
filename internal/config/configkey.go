@@ -22,9 +22,10 @@ const (
 
 	ElasticsearchAddress = "elasticsearch.address"
 
-	KafkaBootstrapServers = "kafka.bootstrap.servers"
-	KafkaAutoOffsetReset  = "kafka.auto.offset.reset"
-	KafkaProducerEnabled  = "kafka.producer.enabled"
+	KafkaBootstrapServers   = "kafka.bootstrap.servers"
+	KafkaAutoOffsetReset    = "kafka.auto.offset.reset"
+	KafkaConsumerMaxRetries = "kafka.consumer.max_retries"
+	KafkaProducerEnabled    = "kafka.producer.enabled"
 
 	OutboxPollIntervalSeconds = "outbox.poll_interval_seconds"
 	OutboxBatchSize           = "outbox.batch_size"

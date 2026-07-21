@@ -15,6 +15,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/otelkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/validatorkit"
+	"github.com/twmb/franz-go/pkg/kgo"
 )
 
 func main() {
@@ -41,16 +42,16 @@ func main() {
 	stopLogProvider := telemetry.InitLogProvider(cfg)
 	defer stopLogProvider()
 
-	runConsumers(cfg, consumers)
+	runConsumers(cfg, producer, consumers)
 }
 
-func runConsumers(cfg *config.Config, consumers *dependency_injection.Consumers) {
+func runConsumers(cfg *config.Config, producer *kgo.Client, consumers *dependency_injection.Consumers) {
 	ctx, cancel := context.WithCancel(context.Background())
 	wg := &sync.WaitGroup{}
 
 	logkit.Logger.Info("starting worker service")
 
-	route.Setup(ctx, cfg, consumers, wg)
+	route.Setup(ctx, cfg, producer, consumers, wg)
 
 	terminateSignals := make(chan os.Signal, 1)
 	signal.Notify(terminateSignals, syscall.SIGINT, syscall.SIGTERM)

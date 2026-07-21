@@ -118,6 +118,14 @@ func (c *Config) GetKafkaAutoOffsetReset() string {
 	return c.GetString(KafkaAutoOffsetReset)
 }
 
+func (c *Config) GetKafkaConsumerMaxRetries() int {
+	v := c.GetInt(KafkaConsumerMaxRetries)
+	if v > 0 {
+		return v
+	}
+	return 3
+}
+
 func (c *Config) GetKafkaProducerEnabled() bool {
 	return c.GetBool(KafkaProducerEnabled)
 }
