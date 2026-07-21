@@ -23,18 +23,7 @@ func NewNotifConsumer(usecase notifusecase.NotifUsecase) *NotifConsumer {
 	}
 }
 
-func (c *NotifConsumer) Notify(ctx context.Context, records []*kgo.Record) error {
-	for _, record := range records {
-		err := c.notify(ctx, record)
-		if err != nil {
-			logkit.Logger.WithContext(ctx).WithError(err).Error()
-			continue
-		}
-	}
-	return nil
-}
-
-func (c *NotifConsumer) notify(ctx context.Context, record *kgo.Record) error {
+func (c *NotifConsumer) Notify(ctx context.Context, record *kgo.Record) error {
 	ctx, span := telemetry.StartConsumer(ctx, record)
 	defer span.End()
 
@@ -42,7 +31,7 @@ func (c *NotifConsumer) notify(ctx context.Context, record *kgo.Record) error {
 	err := json.Unmarshal(record.Value, &event)
 	if err != nil {
 		logkit.Logger.WithContext(ctx).WithError(err).Error()
-		return errkit.AddFuncName(err, "messaging.(*NotifConsumer).notify")
+		return errkit.AddFuncName(err, "messaging.(*NotifConsumer).Notify")
 	}
 
 	req := dto.NotifyRequest{}
@@ -51,7 +40,7 @@ func (c *NotifConsumer) notify(ctx context.Context, record *kgo.Record) error {
 	err = c.Usecase.Notify(ctx, req)
 	if err != nil {
 		logkit.Logger.WithContext(ctx).WithError(err).Error()
-		return errkit.AddFuncName(err, "messaging.(*NotifConsumer).notify")
+		return errkit.AddFuncName(err, "messaging.(*NotifConsumer).Notify")
 	}
 
 	return nil

@@ -16,62 +16,62 @@ func Setup(ctx context.Context, cfg *config.Config, consumers *dependency_inject
 		consumerGroup := consumergroup.UserFollowedNotifyUser
 		_topic := topic.UserFollowed
 		handler := consumers.UserConsumer.NotifyUserBeingFollowed
-		messaging.ConsumeEvent(ctx, cfg, consumerGroup, _topic, handler)
+		messaging.ConsumeEventSingle(ctx, cfg, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.UserFollowedBatchStats
 		_topic := topic.UserFollowed
 		handler := consumers.UserConsumer.BatchUpdateUserFollowStats
-		messaging.ConsumeEvent(ctx, cfg, consumerGroup, _topic, handler)
+		messaging.ConsumeEventBatch(ctx, cfg, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageUploadedNotifyFollowers
 		_topic := topic.ImageUploaded
 		handler := consumers.ImageConsumer.NotifyFollowerOnUpload
-		messaging.ConsumeEvent(ctx, cfg, consumerGroup, _topic, handler)
+		messaging.ConsumeEventSingle(ctx, cfg, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageUploadedSyncSearch
 		_topic := topic.ImageUploaded
 		handler := consumers.ImageConsumer.SyncImageToElasticsearch
-		messaging.ConsumeEvent(ctx, cfg, consumerGroup, _topic, handler)
+		messaging.ConsumeEventSingle(ctx, cfg, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageLikedNotifyOwner
 		_topic := topic.ImageLiked
 		handler := consumers.ImageConsumer.NotifyUserImageLiked
-		messaging.ConsumeEvent(ctx, cfg, consumerGroup, _topic, handler)
+		messaging.ConsumeEventSingle(ctx, cfg, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageLikedBatchCount
 		_topic := topic.ImageLiked
 		handler := consumers.ImageConsumer.BatchUpdateImageLikeCount
-		messaging.ConsumeEvent(ctx, cfg, consumerGroup, _topic, handler)
+		messaging.ConsumeEventBatch(ctx, cfg, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageCommentedNotifyOwner
 		_topic := topic.ImageCommented
 		handler := consumers.ImageConsumer.NotifyUserImageCommented
-		messaging.ConsumeEvent(ctx, cfg, consumerGroup, _topic, handler)
+		messaging.ConsumeEventSingle(ctx, cfg, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageCommentedBatchCount
 		_topic := topic.ImageCommented
 		handler := consumers.ImageConsumer.BatchUpdateImageCommentCount
-		messaging.ConsumeEvent(ctx, cfg, consumerGroup, _topic, handler)
+		messaging.ConsumeEventBatch(ctx, cfg, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.NotifLog
 		_topic := topic.Notif
 		handler := consumers.NotifConsumer.Notify
-		messaging.ConsumeEvent(ctx, cfg, consumerGroup, _topic, handler)
+		messaging.ConsumeEventSingle(ctx, cfg, consumerGroup, _topic, handler)
 	})
 }

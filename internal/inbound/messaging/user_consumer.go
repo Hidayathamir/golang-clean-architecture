@@ -23,18 +23,7 @@ func NewUserConsumer(usecase userusecase.UserUsecase) *UserConsumer {
 	}
 }
 
-func (c *UserConsumer) NotifyUserBeingFollowed(ctx context.Context, records []*kgo.Record) error {
-	for _, record := range records {
-		err := c.notifyUserBeingFollowed(ctx, record)
-		if err != nil {
-			logkit.Logger.WithContext(ctx).WithError(err).Error()
-			continue
-		}
-	}
-	return nil
-}
-
-func (c *UserConsumer) notifyUserBeingFollowed(ctx context.Context, record *kgo.Record) error {
+func (c *UserConsumer) NotifyUserBeingFollowed(ctx context.Context, record *kgo.Record) error {
 	ctx, span := telemetry.StartConsumer(ctx, record)
 	defer span.End()
 
@@ -42,7 +31,7 @@ func (c *UserConsumer) notifyUserBeingFollowed(ctx context.Context, record *kgo.
 	err := json.Unmarshal(record.Value, &event)
 	if err != nil {
 		logkit.Logger.WithContext(ctx).WithError(err).Error()
-		return errkit.AddFuncName(err, "messaging.(*UserConsumer).notifyUserBeingFollowed")
+		return errkit.AddFuncName(err, "messaging.(*UserConsumer).NotifyUserBeingFollowed")
 	}
 
 	req := dto.NotifyUserBeingFollowedRequest{}
@@ -51,7 +40,7 @@ func (c *UserConsumer) notifyUserBeingFollowed(ctx context.Context, record *kgo.
 	err = c.Usecase.NotifyUserBeingFollowed(ctx, req)
 	if err != nil {
 		logkit.Logger.WithContext(ctx).WithError(err).Error()
-		return errkit.AddFuncName(err, "messaging.(*UserConsumer).notifyUserBeingFollowed")
+		return errkit.AddFuncName(err, "messaging.(*UserConsumer).NotifyUserBeingFollowed")
 	}
 
 	return nil
