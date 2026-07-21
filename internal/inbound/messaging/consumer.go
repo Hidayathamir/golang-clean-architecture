@@ -32,6 +32,7 @@ func ConsumeEventBatch(ctx context.Context, cfg *config.Config, consumerGroup st
 			for _, err := range errs {
 				localLogger.WithError(err.Err).Error("error client poll fetch")
 			}
+			continue
 		}
 
 		records := fetches.Records()
@@ -39,11 +40,11 @@ func ConsumeEventBatch(ctx context.Context, cfg *config.Config, consumerGroup st
 			err := handler(ctx, records)
 			if err != nil {
 				localLogger.WithError(err).Error("handler got error processing message")
-			}
-
-			err = client.CommitUncommittedOffsets(ctx)
-			if err != nil {
-				localLogger.WithError(err).Error("client error commit")
+			} else {
+				err = client.CommitUncommittedOffsets(ctx)
+				if err != nil {
+					localLogger.WithError(err).Error("client error commit")
+				}
 			}
 		}
 
@@ -75,6 +76,7 @@ func ConsumeEventSingle(ctx context.Context, cfg *config.Config, consumerGroup s
 			for _, err := range errs {
 				localLogger.WithError(err.Err).Error("error client poll fetch")
 			}
+			continue
 		}
 
 		records := fetches.Records()
@@ -83,11 +85,11 @@ func ConsumeEventSingle(ctx context.Context, cfg *config.Config, consumerGroup s
 			err := handler(ctx, records[0])
 			if err != nil {
 				localLogger.WithError(err).Error("handler got error processing message")
-			}
-
-			err = client.CommitUncommittedOffsets(ctx)
-			if err != nil {
-				localLogger.WithError(err).Error("client error commit")
+			} else {
+				err = client.CommitUncommittedOffsets(ctx)
+				if err != nil {
+					localLogger.WithError(err).Error("client error commit")
+				}
 			}
 		}
 
