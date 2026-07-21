@@ -31,7 +31,7 @@ func (c *NotifConsumer) Notify(ctx context.Context, record *kgo.Record) error {
 	err := json.Unmarshal(record.Value, &event)
 	if err != nil {
 		logkit.Logger.WithContext(ctx).WithError(err).Error()
-		return errkit.AddFuncName(err, "messaging.(*NotifConsumer).Notify")
+		return errkit.AddFuncName(errkit.WrapNonRetryable(err), "messaging.(*NotifConsumer).Notify")
 	}
 
 	req := dto.NotifyRequest{}

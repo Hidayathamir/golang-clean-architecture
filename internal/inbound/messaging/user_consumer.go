@@ -31,7 +31,7 @@ func (c *UserConsumer) NotifyUserBeingFollowed(ctx context.Context, record *kgo.
 	err := json.Unmarshal(record.Value, &event)
 	if err != nil {
 		logkit.Logger.WithContext(ctx).WithError(err).Error()
-		return errkit.AddFuncName(err, "messaging.(*UserConsumer).NotifyUserBeingFollowed")
+		return errkit.AddFuncName(errkit.WrapNonRetryable(err), "messaging.(*UserConsumer).NotifyUserBeingFollowed")
 	}
 
 	req := dto.NotifyUserBeingFollowedRequest{}

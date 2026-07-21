@@ -7,6 +7,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/provider"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/topic"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/sirupsen/logrus"
 	"github.com/twmb/franz-go/pkg/kgo"
@@ -144,7 +145,12 @@ func ConsumeEventSingle(ctx context.Context, cfg *config.Config, producer *kgo.C
 			err := handler(ctx, record)
 			if err != nil {
 				localLogger.WithError(err).Error("handler got error processing message")
-				produceToRetry(ctx, producer, primaryTopic, record, 1)
+
+				if errkit.IsNonRetryable(err) {
+					produceToDLQ(ctx, producer, primaryTopic, record)
+				} else {
+					produceToRetry(ctx, producer, primaryTopic, record, parseRetryCount(record)+1)
+				}
 			}
 
 			err = client.CommitUncommittedOffsets(ctx)
@@ -193,11 +199,15 @@ func ConsumeEventRetry(ctx context.Context, cfg *config.Config, producer *kgo.Cl
 			if err != nil {
 				localLogger.WithError(err).Error("handler got error processing message")
 
-				retryCount := parseRetryCount(record)
-				if retryCount >= maxRetries {
+				if errkit.IsNonRetryable(err) {
 					produceToDLQ(ctx, producer, primaryTopic, record)
 				} else {
-					produceToRetry(ctx, producer, primaryTopic, record, retryCount+1)
+					retryCount := parseRetryCount(record)
+					if retryCount >= maxRetries {
+						produceToDLQ(ctx, producer, primaryTopic, record)
+					} else {
+						produceToRetry(ctx, producer, primaryTopic, record, retryCount+1)
+					}
 				}
 			}
 

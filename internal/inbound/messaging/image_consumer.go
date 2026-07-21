@@ -31,7 +31,7 @@ func (c *ImageConsumer) NotifyFollowerOnUpload(ctx context.Context, record *kgo.
 	err := json.Unmarshal(record.Value, &event)
 	if err != nil {
 		logkit.Logger.WithContext(ctx).WithError(err).Error()
-		return errkit.AddFuncName(err, "messaging.(*ImageConsumer).NotifyFollowerOnUpload")
+		return errkit.AddFuncName(errkit.WrapNonRetryable(err), "messaging.(*ImageConsumer).NotifyFollowerOnUpload")
 	}
 
 	req := dto.NotifyFollowerOnUploadRequest{}
@@ -54,7 +54,7 @@ func (c *ImageConsumer) SyncImageToElasticsearch(ctx context.Context, record *kg
 	err := json.Unmarshal(record.Value, &event)
 	if err != nil {
 		logkit.Logger.WithContext(ctx).WithError(err).Error()
-		return errkit.AddFuncName(err, "messaging.(*ImageConsumer).SyncImageToElasticsearch")
+		return errkit.AddFuncName(errkit.WrapNonRetryable(err), "messaging.(*ImageConsumer).SyncImageToElasticsearch")
 	}
 
 	req := dto.SyncImageToElasticsearchRequest{}
@@ -77,7 +77,7 @@ func (c *ImageConsumer) NotifyUserImageLiked(ctx context.Context, record *kgo.Re
 	err := json.Unmarshal(record.Value, &event)
 	if err != nil {
 		logkit.Logger.WithContext(ctx).WithError(err).Error()
-		return errkit.AddFuncName(err, "messaging.(*ImageConsumer).NotifyUserImageLiked")
+		return errkit.AddFuncName(errkit.WrapNonRetryable(err), "messaging.(*ImageConsumer).NotifyUserImageLiked")
 	}
 
 	req := dto.NotifyUserImageLikedRequest{}
@@ -120,7 +120,7 @@ func (c *ImageConsumer) NotifyUserImageCommented(ctx context.Context, record *kg
 	err := json.Unmarshal(record.Value, &event)
 	if err != nil {
 		logkit.Logger.WithContext(ctx).WithError(err).Error()
-		return errkit.AddFuncName(err, "messaging.(*ImageConsumer).NotifyUserImageCommented")
+		return errkit.AddFuncName(errkit.WrapNonRetryable(err), "messaging.(*ImageConsumer).NotifyUserImageCommented")
 	}
 
 	req := dto.NotifyUserImageCommentedRequest{}
