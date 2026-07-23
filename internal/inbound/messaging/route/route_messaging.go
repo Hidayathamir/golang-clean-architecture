@@ -136,7 +136,7 @@ func Setup(ctx context.Context, cfg *config.Config, producer *kgo.Client, consum
 		consumerGroup := consumergroup.UserFollowedBatchStatsRetry
 		primaryTopic := topic.UserFollowed
 		retryTopic := topic.UserFollowedRetry
-		handler := consumers.UserConsumer.BatchUpdateUserFollowStatsRetry
+		handler := consumers.UserConsumer.UpdateUserFollowStats
 		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, primaryTopic, retryTopic, handler)
 	})
 
@@ -144,7 +144,7 @@ func Setup(ctx context.Context, cfg *config.Config, producer *kgo.Client, consum
 		consumerGroup := consumergroup.ImageLikedBatchCountRetry
 		primaryTopic := topic.ImageLiked
 		retryTopic := topic.ImageLikedRetry
-		handler := consumers.ImageConsumer.BatchUpdateImageLikeCountRetry
+		handler := consumers.ImageConsumer.UpdateImageLikeCount
 		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, primaryTopic, retryTopic, handler)
 	})
 
@@ -152,7 +152,7 @@ func Setup(ctx context.Context, cfg *config.Config, producer *kgo.Client, consum
 		consumerGroup := consumergroup.ImageCommentedBatchCountRetry
 		primaryTopic := topic.ImageCommented
 		retryTopic := topic.ImageCommentedRetry
-		handler := consumers.ImageConsumer.BatchUpdateImageCommentCountRetry
+		handler := consumers.ImageConsumer.UpdateImageCommentCount
 		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, primaryTopic, retryTopic, handler)
 	})
 }

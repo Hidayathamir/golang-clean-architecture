@@ -62,6 +62,15 @@ func (c *UserConsumer) BatchUpdateUserFollowStats(ctx context.Context, records [
 	return nil
 }
 
-func (c *UserConsumer) BatchUpdateUserFollowStatsRetry(ctx context.Context, record *kgo.Record) error {
-	return c.BatchUpdateUserFollowStats(ctx, []*kgo.Record{record})
+func (c *UserConsumer) UpdateUserFollowStats(ctx context.Context, record *kgo.Record) error {
+	ctx, span := telemetry.StartConsumer(ctx, record)
+	defer span.End()
+
+	err := c.BatchUpdateUserFollowStats(ctx, []*kgo.Record{record})
+	if err != nil {
+		logkit.Logger.WithContext(ctx).WithError(err).Error()
+		return errkit.AddFuncName(err, "messaging.(*UserConsumer).UpdateUserFollowStats")
+	}
+
+	return nil
 }

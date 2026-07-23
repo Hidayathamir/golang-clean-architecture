@@ -1,20 +1,3 @@
 idempotent consumer
 
-	wg.Go(func() {
-		consumerGroup := consumergroup.ImageCommentedBatchCountRetry
-		primaryTopic := topic.ImageCommented
-		retryTopic := topic.ImageCommentedRetry
-		handler := consumers.ImageConsumer.BatchUpdateImageCommentCountRetry
-		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, primaryTopic, retryTopic, handler)
-	})
-	to
-	wg.Go(func() {
-		consumerGroup := consumergroup.ImageCommentedBatchCountRetry
-		primaryTopic := topic.ImageCommented
-		retryTopic := topic.ImageCommentedRetry
-		handler := consumers.ImageConsumer.UpdateImageCommentCount
-		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, primaryTopic, retryTopic, handler)
-	})
-
-
 make constant topic as a type, with field primary, retry, dlq
