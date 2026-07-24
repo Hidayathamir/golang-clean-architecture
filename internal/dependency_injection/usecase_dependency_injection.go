@@ -7,6 +7,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/search"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/storage"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/idempotencyusecase"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/imageusecase"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/notifusecase"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/userusecase"
@@ -18,9 +19,11 @@ import (
 )
 
 type Usecases struct {
-	UserUsecase  userusecase.UserUsecase
-	ImageUsecase imageusecase.ImageUsecase
-	NotifUsecase notifusecase.NotifUsecase
+	UserUsecase        userusecase.UserUsecase
+	ImageUsecase       imageusecase.ImageUsecase
+	NotifUsecase       notifusecase.NotifUsecase
+	IdempotencyRepo    repository.IdempotencyRepository
+	IdempotencyUsecase idempotencyusecase.IdempotencyUsecase
 }
 
 func SetupUsecases(
@@ -59,6 +62,15 @@ func SetupUsecases(
 	var outboxRepository repository.OutboxRepository
 	outboxRepository = repository.NewOutboxRepository(cfg)
 	outboxRepository = repository.NewOutboxRepositoryMwLogger(outboxRepository)
+
+	var idempotencyRepo repository.IdempotencyRepository
+	idempotencyRepo = repository.NewIdempotencyRepository(cfg)
+	idempotencyRepo = repository.NewIdempotencyRepositoryMwLogger(idempotencyRepo)
+
+	// setup idempotency usecase
+	var idempotencyUsecase idempotencyusecase.IdempotencyUsecase
+	idempotencyUsecase = idempotencyusecase.NewIdempotencyUsecase(cfg, db, idempotencyRepo)
+	idempotencyUsecase = idempotencyusecase.NewIdempotencyUsecaseMwLogger(idempotencyUsecase)
 
 	// setup producer
 	var userProducer messaging.UserProducer
@@ -102,8 +114,10 @@ func SetupUsecases(
 	notifUsecase = notifusecase.NewNotifUsecaseMwLogger(notifUsecase)
 
 	return &Usecases{
-		UserUsecase:  userUsecase,
-		ImageUsecase: imageUsecase,
-		NotifUsecase: notifUsecase,
+		UserUsecase:        userUsecase,
+		ImageUsecase:       imageUsecase,
+		NotifUsecase:       notifUsecase,
+		IdempotencyRepo:    idempotencyRepo,
+		IdempotencyUsecase: idempotencyUsecase,
 	}
 }

@@ -45,6 +45,9 @@
       "enabled": true
     }
   },
+  "idempotency": {
+    "cleanup_interval_seconds": 3600
+  },
   "outbox": {
     "poll_interval_seconds": 5,
     "batch_size": 100

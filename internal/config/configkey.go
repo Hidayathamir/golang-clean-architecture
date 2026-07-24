@@ -32,6 +32,8 @@ const (
 
 	LogLevel = "log.level"
 
+	IdempotencyCleanupIntervalSeconds = "idempotency.cleanup_interval_seconds"
+
 	RedisHost     = "redis.host"
 	RedisPort     = "redis.port"
 	RedisDB       = "redis.db"
