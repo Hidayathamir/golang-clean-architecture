@@ -84,75 +84,66 @@ func Setup(ctx context.Context, cfg *config.Config, producer *kgo.Client, consum
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.UserFollowedNotifyUserRetry
-		primaryTopic := topic.UserFollowed
-		retryTopic := topic.UserFollowedRetry
+		_topic := topic.UserFollowed
 		handler := consumers.UserConsumer.NotifyUserBeingFollowed
-		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, primaryTopic, retryTopic, handler)
+		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageUploadedNotifyFollowersRetry
-		primaryTopic := topic.ImageUploaded
-		retryTopic := topic.ImageUploadedRetry
+		_topic := topic.ImageUploaded
 		handler := consumers.ImageConsumer.NotifyFollowerOnUpload
-		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, primaryTopic, retryTopic, handler)
+		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageUploadedSyncSearchRetry
-		primaryTopic := topic.ImageUploaded
-		retryTopic := topic.ImageUploadedRetry
+		_topic := topic.ImageUploaded
 		handler := consumers.ImageConsumer.SyncImageToElasticsearch
-		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, primaryTopic, retryTopic, handler)
+		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageLikedNotifyOwnerRetry
-		primaryTopic := topic.ImageLiked
-		retryTopic := topic.ImageLikedRetry
+		_topic := topic.ImageLiked
 		handler := consumers.ImageConsumer.NotifyUserImageLiked
-		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, primaryTopic, retryTopic, handler)
+		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageCommentedNotifyOwnerRetry
-		primaryTopic := topic.ImageCommented
-		retryTopic := topic.ImageCommentedRetry
+		_topic := topic.ImageCommented
 		handler := consumers.ImageConsumer.NotifyUserImageCommented
-		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, primaryTopic, retryTopic, handler)
+		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.NotifLogRetry
-		primaryTopic := topic.Notif
-		retryTopic := topic.NotifRetry
+		_topic := topic.Notif
 		handler := consumers.NotifConsumer.Notify
-		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, primaryTopic, retryTopic, handler)
+		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
 	// --- retry consumers: batch handlers ---
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.UserFollowedBatchStatsRetry
-		primaryTopic := topic.UserFollowed
-		retryTopic := topic.UserFollowedRetry
+		_topic := topic.UserFollowed
 		handler := consumers.UserConsumer.UpdateUserFollowStats
-		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, primaryTopic, retryTopic, handler)
+		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageLikedBatchCountRetry
-		primaryTopic := topic.ImageLiked
-		retryTopic := topic.ImageLikedRetry
+		_topic := topic.ImageLiked
 		handler := consumers.ImageConsumer.UpdateImageLikeCount
-		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, primaryTopic, retryTopic, handler)
+		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageCommentedBatchCountRetry
-		primaryTopic := topic.ImageCommented
-		retryTopic := topic.ImageCommentedRetry
+		_topic := topic.ImageCommented
 		handler := consumers.ImageConsumer.UpdateImageCommentCount
-		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, primaryTopic, retryTopic, handler)
+		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 }

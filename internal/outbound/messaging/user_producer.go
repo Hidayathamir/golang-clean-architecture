@@ -43,7 +43,7 @@ func (p *UserProducerImpl) SendUserFollowed(ctx context.Context, db *gorm.DB, ev
 	return nil
 }
 
-func (p *UserProducerImpl) send(ctx context.Context, db *gorm.DB, topicName string, event any) error {
+func (p *UserProducerImpl) send(ctx context.Context, db *gorm.DB, topicName topic.Topic, event any) error {
 	if !p.Cfg.GetKafkaProducerEnabled() {
 		logkit.Logger.WithContext(ctx).Warn("Kafka producer is disabled")
 		return nil
@@ -55,7 +55,7 @@ func (p *UserProducerImpl) send(ctx context.Context, db *gorm.DB, topicName stri
 	}
 
 	outbox := entity.Outbox{
-		Topic:        topicName,
+		Topic:        topicName.Primary,
 		Payload:      value,
 		TraceContext: telemetry.InjectTraceContext(ctx),
 		Status:       entity.OutboxStatusPending,
@@ -66,7 +66,7 @@ func (p *UserProducerImpl) send(ctx context.Context, db *gorm.DB, topicName stri
 		return errkit.AddFuncName(err, "messaging.(*UserProducerImpl).send")
 	}
 
-	logkit.Logger.WithContext(ctx).WithField("topic", topicName).Debug("outbox record inserted")
+	logkit.Logger.WithContext(ctx).WithField("topic", topicName.Primary).Debug("outbox record inserted")
 
 	return nil
 }

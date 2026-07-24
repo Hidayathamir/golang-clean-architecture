@@ -61,7 +61,7 @@ func (p *ImageProducerImpl) SendImageCommented(ctx context.Context, db *gorm.DB,
 	return nil
 }
 
-func (p *ImageProducerImpl) send(ctx context.Context, db *gorm.DB, topicName string, event any) error {
+func (p *ImageProducerImpl) send(ctx context.Context, db *gorm.DB, topicName topic.Topic, event any) error {
 	if !p.Cfg.GetKafkaProducerEnabled() {
 		logkit.Logger.WithContext(ctx).Warn("Kafka producer is disabled")
 		return nil
@@ -73,7 +73,7 @@ func (p *ImageProducerImpl) send(ctx context.Context, db *gorm.DB, topicName str
 	}
 
 	outbox := entity.Outbox{
-		Topic:        topicName,
+		Topic:        topicName.Primary,
 		Payload:      value,
 		TraceContext: telemetry.InjectTraceContext(ctx),
 		Status:       entity.OutboxStatusPending,
@@ -84,7 +84,7 @@ func (p *ImageProducerImpl) send(ctx context.Context, db *gorm.DB, topicName str
 		return errkit.AddFuncName(err, "messaging.(*ImageProducerImpl).send")
 	}
 
-	logkit.Logger.WithContext(ctx).WithField("topic", topicName).Debug("outbox record inserted")
+	logkit.Logger.WithContext(ctx).WithField("topic", topicName.Primary).Debug("outbox record inserted")
 
 	return nil
 }

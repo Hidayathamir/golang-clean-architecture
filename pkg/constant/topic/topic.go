@@ -1,37 +1,21 @@
 package topic
 
-const (
-	ImageUploaded  = "image.uploaded"
-	ImageLiked     = "image.liked"
-	ImageCommented = "image.commented"
-	UserFollowed   = "user.followed"
-	Notif          = "notif"
+type Topic struct {
+	Primary string
+}
 
-	ImageUploadedRetry  = "image.uploaded.retry"
-	ImageLikedRetry     = "image.liked.retry"
-	ImageCommentedRetry = "image.commented.retry"
-	UserFollowedRetry   = "user.followed.retry"
-	NotifRetry          = "notif.retry"
+func (t Topic) Retry() string {
+	return t.Primary + ".retry"
+}
 
-	ImageUploadedDLQ  = "image.uploaded.dlq"
-	ImageLikedDLQ     = "image.liked.dlq"
-	ImageCommentedDLQ = "image.commented.dlq"
-	UserFollowedDLQ   = "user.followed.dlq"
-	NotifDLQ          = "notif.dlq"
+func (t Topic) DLQ() string {
+	return t.Primary + ".dlq"
+}
+
+var (
+	ImageUploaded  = Topic{Primary: "image.uploaded"}
+	ImageLiked     = Topic{Primary: "image.liked"}
+	ImageCommented = Topic{Primary: "image.commented"}
+	UserFollowed   = Topic{Primary: "user.followed"}
+	Notif          = Topic{Primary: "notif"}
 )
-
-var PrimaryToRetry = map[string]string{
-	ImageUploaded:  ImageUploadedRetry,
-	ImageLiked:     ImageLikedRetry,
-	ImageCommented: ImageCommentedRetry,
-	UserFollowed:   UserFollowedRetry,
-	Notif:          NotifRetry,
-}
-
-var PrimaryToDLQ = map[string]string{
-	ImageUploaded:  ImageUploadedDLQ,
-	ImageLiked:     ImageLikedDLQ,
-	ImageCommented: ImageCommentedDLQ,
-	UserFollowed:   UserFollowedDLQ,
-	Notif:          NotifDLQ,
-}

@@ -30,10 +30,8 @@ func parseRetryCount(record *kgo.Record) int {
 	return result
 }
 
-func produceToRetry(ctx context.Context, producer *kgo.Client, originalTopic string, record *kgo.Record, retryCount int) {
-	retryTopic := topic.PrimaryToRetry[originalTopic]
-
-	record.Topic = retryTopic
+func produceToRetry(ctx context.Context, producer *kgo.Client, _topic topic.Topic, record *kgo.Record, retryCount int) {
+	record.Topic = _topic.Retry()
 
 	filtered := make([]kgo.RecordHeader, 0, len(record.Headers))
 	for _, h := range record.Headers {
@@ -50,34 +48,32 @@ func produceToRetry(ctx context.Context, producer *kgo.Client, originalTopic str
 	result := producer.ProduceSync(ctx, record)
 	if err := result.FirstErr(); err != nil {
 		logkit.Logger.WithContext(ctx).WithError(err).
-			WithField("retryTopic", retryTopic).
+			WithField("retryTopic", _topic.Retry()).
 			WithField("retryCount", retryCount).
 			Error("produceToRetry: failed to produce")
 	}
 }
 
-func produceToDLQ(ctx context.Context, producer *kgo.Client, originalTopic string, record *kgo.Record) {
-	dlqTopic := topic.PrimaryToDLQ[originalTopic]
-
-	record.Topic = dlqTopic
+func produceToDLQ(ctx context.Context, producer *kgo.Client, _topic topic.Topic, record *kgo.Record) {
+	record.Topic = _topic.DLQ()
 
 	result := producer.ProduceSync(ctx, record)
 	if err := result.FirstErr(); err != nil {
 		logkit.Logger.WithContext(ctx).WithError(err).
-			WithField("dlqTopic", dlqTopic).
+			WithField("dlqTopic", _topic.DLQ()).
 			Error("produceToDLQ: failed to produce")
 	}
 }
 
-func ConsumeEventBatch(ctx context.Context, cfg *config.Config, producer *kgo.Client, consumerGroup string, _topic string, handler ConsumerHandlerBatch) {
+func ConsumeEventBatch(ctx context.Context, cfg *config.Config, producer *kgo.Client, consumerGroup string, _topic topic.Topic, handler ConsumerHandlerBatch) {
 	localLogger := logkit.Logger.WithContext(ctx).WithFields(logrus.Fields{
 		"consumerGroup": consumerGroup,
-		"topic":         _topic,
+		"topic":         _topic.Primary,
 	})
 
 	localLogger.Info("setup kafka client")
 
-	client := provider.NewKafkaClientConsumerBatch(cfg, consumerGroup, _topic)
+	client := provider.NewKafkaClientConsumerBatch(cfg, consumerGroup, _topic.Primary)
 
 	for {
 		const maxPollRecords = 0 // returns all buffered records
@@ -119,15 +115,15 @@ func ConsumeEventBatch(ctx context.Context, cfg *config.Config, producer *kgo.Cl
 	localLogger.Info("Done closing consumer")
 }
 
-func ConsumeEventSingle(ctx context.Context, cfg *config.Config, producer *kgo.Client, consumerGroup string, primaryTopic string, handler ConsumerHandlerSingle) {
+func ConsumeEventSingle(ctx context.Context, cfg *config.Config, producer *kgo.Client, consumerGroup string, _topic topic.Topic, handler ConsumerHandlerSingle) {
 	localLogger := logkit.Logger.WithContext(ctx).WithFields(logrus.Fields{
 		"consumerGroup": consumerGroup,
-		"topic":         primaryTopic,
+		"topic":         _topic.Primary,
 	})
 
 	localLogger.Info("setup kafka client")
 
-	client := provider.NewKafkaClientConsumerSingle(cfg, consumerGroup, primaryTopic)
+	client := provider.NewKafkaClientConsumerSingle(cfg, consumerGroup, _topic.Primary)
 
 	for {
 		const maxPollRecords = 1 // returns a maximum 1 record.
@@ -147,9 +143,9 @@ func ConsumeEventSingle(ctx context.Context, cfg *config.Config, producer *kgo.C
 				localLogger.WithError(err).Error("handler got error processing message")
 
 				if errkit.IsNonRetryable(err) {
-					produceToDLQ(ctx, producer, primaryTopic, record)
+					produceToDLQ(ctx, producer, _topic, record)
 				} else {
-					produceToRetry(ctx, producer, primaryTopic, record, parseRetryCount(record)+1)
+					produceToRetry(ctx, producer, _topic, record, parseRetryCount(record)+1)
 				}
 			}
 
@@ -170,15 +166,15 @@ func ConsumeEventSingle(ctx context.Context, cfg *config.Config, producer *kgo.C
 	localLogger.Info("Done closing consumer")
 }
 
-func ConsumeEventRetry(ctx context.Context, cfg *config.Config, producer *kgo.Client, consumerGroup string, primaryTopic string, retryTopic string, handler ConsumerHandlerSingle) {
+func ConsumeEventRetry(ctx context.Context, cfg *config.Config, producer *kgo.Client, consumerGroup string, _topic topic.Topic, handler ConsumerHandlerSingle) {
 	localLogger := logkit.Logger.WithContext(ctx).WithFields(logrus.Fields{
 		"consumerGroup": consumerGroup,
-		"topic":         primaryTopic,
+		"topic":         _topic.Retry(),
 	})
 
 	localLogger.Info("setup kafka client")
 
-	client := provider.NewKafkaClientConsumerSingle(cfg, consumerGroup, retryTopic)
+	client := provider.NewKafkaClientConsumerSingle(cfg, consumerGroup, _topic.Retry())
 
 	maxRetries := cfg.GetKafkaConsumerMaxRetries()
 
@@ -200,13 +196,13 @@ func ConsumeEventRetry(ctx context.Context, cfg *config.Config, producer *kgo.Cl
 				localLogger.WithError(err).Error("handler got error processing message")
 
 				if errkit.IsNonRetryable(err) {
-					produceToDLQ(ctx, producer, primaryTopic, record)
+					produceToDLQ(ctx, producer, _topic, record)
 				} else {
 					retryCount := parseRetryCount(record)
 					if retryCount >= maxRetries {
-						produceToDLQ(ctx, producer, primaryTopic, record)
+						produceToDLQ(ctx, producer, _topic, record)
 					} else {
-						produceToRetry(ctx, producer, primaryTopic, record, retryCount+1)
+						produceToRetry(ctx, producer, _topic, record, retryCount+1)
 					}
 				}
 			}
