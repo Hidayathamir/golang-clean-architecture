@@ -26,7 +26,7 @@ type ImageProducer interface {
 var _ ImageProducer = &ImageProducerImpl{}
 
 type ImageProducerImpl struct {
-	Cfg             *config.Config
+	Cfg              *config.Config
 	OutboxRepository repository.OutboxRepository
 }
 

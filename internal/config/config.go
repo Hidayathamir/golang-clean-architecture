@@ -138,6 +138,14 @@ func (c *Config) GetOutboxBatchSize() int {
 	return c.GetInt(OutboxBatchSize)
 }
 
+func (c *Config) GetIdempotencyCleanupIntervalSeconds() int {
+	v := c.GetInt(IdempotencyCleanupIntervalSeconds)
+	if v > 0 {
+		return v
+	}
+	return 3600
+}
+
 func (c *Config) GetLogLevel() string {
 	return c.GetString(LogLevel)
 }
