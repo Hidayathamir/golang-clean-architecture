@@ -74,7 +74,7 @@ func (l *gormLogger) LogMode(level logger.LogLevel) logger.Interface {
 }
 
 func (l *gormLogger) Info(ctx context.Context, msg string, data ...any) {
-	logkit.Logger.WithContext(ctx).Infof(msg, data...)
+	logkit.Logger.WithContext(ctx).Debugf(msg, data...)
 }
 
 func (l *gormLogger) Warn(ctx context.Context, msg string, data ...any) {
@@ -95,6 +95,6 @@ func (l *gormLogger) Trace(ctx context.Context, begin time.Time, fc func() (stri
 	if err != nil {
 		entry.Error(sql)
 	} else {
-		entry.Info(sql)
+		entry.Debug(sql)
 	}
 }
