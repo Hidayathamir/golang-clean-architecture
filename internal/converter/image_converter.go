@@ -3,12 +3,10 @@ package converter
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"strings"
-	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/s3key"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
@@ -16,10 +14,8 @@ import (
 )
 
 func DtoUploadImageRequestToDtoS3UploadImageRequest(ctx context.Context, req dto.UploadImageRequest, s3UploadImgReq *dto.S3UploadImageRequest) error {
-	timenow := time.Now().Unix()
 	userAuth := ctxuserauth.Get(ctx)
-	safeFilename := strings.ReplaceAll(req.File.Filename, " ", "_")
-	s3UploadImgReq.Key = fmt.Sprintf("%s/%v_%s", userAuth.Username, timenow, safeFilename)
+	s3UploadImgReq.Key = s3key.Image(userAuth.Username, req.File.Filename)
 	file, err := req.File.Open()
 	if err != nil {
 		return errkit.AddFuncName(err, "converter.DtoUploadImageRequestToDtoS3UploadImageRequest")
