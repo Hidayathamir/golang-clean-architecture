@@ -1,5 +1,10 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "permissions": [
+    { "action": "edit", "resource": "internal/mock/*", "effect": "deny" },
+    { "action": "edit", "resource": "api/*", "effect": "deny" },
+    { "action": "edit", "resource": "logs/*", "effect": "deny" }
+  ],
   "mcp": {
     "servers": {
       "dbhub": {
