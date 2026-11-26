@@ -9,7 +9,38 @@ make generate         # Regenerate all mocks in internal/mock/ (deletes dir firs
 make swag             # Regenerate swagger docs in api/ (deletes dir first)
 ```
 
-**Never edit `internal/mock/` or `api/` by hand.** Both are fully generated. `.aiexclude` confirms this.
+**Never edit `internal/mock/` or `api/` by hand.** Both are fully generated. Editing them is denied via `permissions` in `opencode.jsonc` (as are `logs/`).
+
+## How to run the project
+
+Configuration is `config.json` at the project root (Viper). Sequence:
+
+1. **Start infrastructure** — Postgres, Kafka, SigNoz (tracing), Redpanda Console (Kafka UI):
+   ```bash
+   make docker-compose-up
+   ```
+   Wait for it to finish before continuing.
+2. **Run migrations:**
+   ```bash
+   make migrate
+   ```
+3. **Run the app servers** (separate terminals):
+   ```bash
+   make run-webserver      # HTTP APIs       -> logs/webserver_log.jsonl
+   make run-workerconsumer # Kafka consumers -> logs/workerconsumer_log.jsonl
+   make run-workerproducer # Outbox producer -> logs/workerproducer_log.jsonl
+   ```
+   - `run-workerconsumer` handles async tasks (notifications, image uploads) from Kafka topics.
+   - `run-workerproducer` polls the `outboxes` table and produces events to Kafka (at-least-once delivery with crash recovery via DB transactions).
+
+## Observability & management tools
+
+| Tool | URL | Description |
+| :--- | :--- | :--- |
+| **SigNoz** | http://localhost:3301 | Distributed traces, logs, application metrics. |
+| **Redpanda Console** | http://localhost:8080 | Kafka topics, consumers, messages in real-time. |
+| **Swagger** | http://localhost:3000/swagger | Interactive API documentation and testing. |
+| **Kibana** | http://localhost:5601 | Explore/visualize data in Elasticsearch. |
 
 ## Architecture layers (top → bottom)
 
