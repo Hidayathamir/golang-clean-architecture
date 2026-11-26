@@ -1,6 +1,6 @@
 # AGENTS.md
 
-> **Startup instructions moved to [AGENTS_STARTUP.md](AGENTS_STARTUP.md).**
+> **Startup instructions moved to [AGENTS_STARTUP.md](docs/AGENTS_STARTUP.md).**
 
 ## Code generation — run after interface changes
 

@@ -6,7 +6,7 @@ This is a Golang clean architecture template.
 
 ## Architecture
 
-![Clean Architecture](architecture.png)
+![Clean Architecture](docs/architecture.png)
 
 ## Getting Started
 
@@ -78,4 +78,4 @@ Once everything is running, you can monitor the system using these tools:
 
 ## Repository Guidelines
 
-For contributor instructions and repository structure details, see [Repository Guidelines](GEMINI.md).
+For contributor instructions and repository structure details, see [Repository Guidelines](AGENTS.md).

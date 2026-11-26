@@ -5,4 +5,3 @@ signoz/deploy/common/clickhouse/user_scripts/histogramQuantile
 .gocache/
 logs/
 node_modules/
-docs/
