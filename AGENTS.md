@@ -33,6 +33,8 @@ Configuration is `config.json` at the project root (Viper). Sequence:
    - `run-workerconsumer` handles async tasks (notifications, image uploads) from Kafka topics.
    - `run-workerproducer` polls the `outboxes` table and produces events to Kafka (at-least-once delivery with crash recovery via DB transactions).
 
+**Always start services with the `make run-*` commands.** Never use `go run` or `nohup` directly — they bypass tuistory and cause stale-process conflicts.
+
 ## Observability & management tools
 
 | Tool | URL | Description |
