@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Run a service and tee its output to a JSONL log file.
 #
+# The log is truncated (`>`) on every start, not appended (`>>`), so a dev
+# restart starts from an empty file instead of growing without bound.
+#
 # Why this exists: `tuistory launch -- sh -c 'go run X >> log'` does not work,
 # because tuistory re-parses the command string like a shell, mangling the quoted
 # `sh -c` argument. Executing this script as a single path avoids that, and the
@@ -13,4 +16,4 @@ pkg="$1"
 logfile="$2"
 
 mkdir -p "$(dirname "$logfile")"
-exec go run "$pkg" >>"$logfile" 2>&1
+exec go run "$pkg" >"$logfile" 2>&1
