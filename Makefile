@@ -150,7 +150,7 @@ check-codegen:
 		(echo "❌ generated code is stale. Run 'make generate && make swag' and commit the result." && exit 1)
 
 add-func-name:
-	@find ./internal ./pkg ./cmd -name '*.go' -not -path '*/mock/*' -not -path '*/pkg/errkit/cmd/*' | xargs go run ./pkg/errkit/cmd/addfuncname
+	@find ./internal ./pkg ./cmd -name '*.go' -not -path '*/mock/*' | xargs go run ./scripts/addfuncname
 
 check-tools:
 	@echo "🔍 Checking required tools..."

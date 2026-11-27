@@ -1,3 +1,6 @@
+// Command addfuncname rewrites errkit.AddFuncName calls with the enclosing
+// function name, so error sites stay enriched without hand-maintaining the
+// string. Run with `make add-func-name`; the pre-commit hook runs it too.
 package main
 
 import (
