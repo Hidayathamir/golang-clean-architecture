@@ -26,9 +26,11 @@ Configuration is `settings/config.json` (Viper). Always run in this order:
    make run-webserver      # HTTP APIs       -> logs/webserver_log.jsonl
    make run-workerconsumer # Kafka consumers -> logs/workerconsumer_log.jsonl
    make run-workerproducer # Outbox producer -> logs/workerproducer_log.jsonl
+   make run-workeridempotencycleaner # Idempotency cleanup -> logs/workeridempotencycleaner_log.jsonl
    ```
    - `run-workerconsumer` handles async tasks (notifications, image uploads) from Kafka topics.
    - `run-workerproducer` polls the `outboxes` table and produces events to Kafka (at-least-once delivery with crash recovery via DB transactions).
+   - `run-workeridempotencycleaner` prunes old `message_idempotency` rows on a ticker (see **Idempotency subsystem** below).
 
 **Always start services with the `make run-*` commands.** Never use `go run` or `nohup` directly — they bypass tuistory and cause stale-process conflicts. `run-*` commands are idempotent (rerunning kills the previous session).
 
@@ -102,7 +104,7 @@ Behavior:
 - A handler that sees an **already-inserted key** is skipped and returns `nil` — offset committed, no retry, no DLQ (de-dup is not error routing).
 - The wrapper is **fail-open**: a missing header or a failed check logs and proceeds to the handler anyway.
 - `IdempotencyHandlerBatch` filters per record; if all are duplicates the batch handler is never called.
-- The cleaner has **no `make run-*` target** — run it with `go run cmd/workeridempotencycleaner/main.go` (or add a target). Without it the table grows unbounded.
+- The cleaner runs via `make run-workeridempotencycleaner`. **Run it in production** — without it the table grows unbounded.
 
 Deep reference for the consumer-side flow: the `kafka-error-handling` skill.
 

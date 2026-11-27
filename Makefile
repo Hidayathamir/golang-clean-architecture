@@ -21,6 +21,10 @@ run-workerproducer:
 	mkdir -p logs
 	$(RUN_CMD) cmd/workerproducer/main.go >> logs/workerproducer_log.jsonl 2>&1
 
+run-workeridempotencycleaner:
+	mkdir -p logs
+	$(RUN_CMD) cmd/workeridempotencycleaner/main.go >> logs/workeridempotencycleaner_log.jsonl 2>&1
+
 go-test:
 	$(TEST_CMD) -count=1 -v ./internal/... >> logs/go_test.jsonl 2>&1
 
