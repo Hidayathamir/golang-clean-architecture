@@ -141,3 +141,4 @@ Single file: `config.json` at project root. Parsed via Viper in `internal/config
 - **`signoz-traces`** — ClickHouse MCP setup + trace/span/error SQL queries against SigNoz.
 - **`otel-architecture`** — full OTel implementation: trace/log providers, decorator spans, HTTP + Kafka instrumentation, log correlation, OTLP export.
 - **`kafka-error-handling`** — topic topology, retry/DLQ flow, error classification, consumer loop types, graceful shutdown.
+- **`git-commit-convention`** — Conventional Commits 1.0.0: format, types, scopes, breaking changes, footers.
