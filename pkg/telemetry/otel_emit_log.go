@@ -41,7 +41,7 @@ func EmitLogEntry(entry *logrus.Entry) {
 	record.SetSeverityText(severityText)
 	record.SetBody(attribute.StringValue(entry.Message))
 
-	if entry.HasCaller() {
+	if entry.Caller != nil {
 		record.AddAttributes(
 			semconv.CodeFunction(entry.Caller.Function),
 			semconv.CodeFilepath(entry.Caller.File),

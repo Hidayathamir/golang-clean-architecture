@@ -29,7 +29,7 @@ func main() {
 		}
 
 		if info.IsDir() {
-			filepath.Walk(arg, func(path string, fi os.FileInfo, err error) error {
+			err := filepath.Walk(arg, func(path string, fi os.FileInfo, err error) error {
 				if err != nil {
 					return err
 				}
@@ -43,6 +43,9 @@ func main() {
 				}
 				return nil
 			})
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "error walking %s: %v\n", arg, err)
+			}
 		} else if strings.HasSuffix(arg, ".go") {
 			if err := processFile(arg); err != nil {
 				fmt.Fprintf(os.Stderr, "error processing %s: %v\n", arg, err)
@@ -77,9 +80,8 @@ func processFile(filePath string) error {
 			})
 		case *ast.FuncLit:
 			var parentName string
-			for i := len(scopes) - 1; i >= 0; i-- {
-				parentName = scopes[i].name
-				break
+			if len(scopes) > 0 {
+				parentName = scopes[len(scopes)-1].name
 			}
 			if parentName == "" {
 				parentName = pkgName

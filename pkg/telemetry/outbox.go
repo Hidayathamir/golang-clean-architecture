@@ -40,6 +40,8 @@ func ExtractTraceContext(ctx context.Context, traceContext string) context.Conte
 		return ctx
 	}
 	carrier := make(mapCarrier)
-	json.Unmarshal([]byte(traceContext), &carrier)
+	if err := json.Unmarshal([]byte(traceContext), &carrier); err != nil {
+		return ctx
+	}
 	return otel.GetTextMapPropagator().Extract(ctx, carrier)
 }

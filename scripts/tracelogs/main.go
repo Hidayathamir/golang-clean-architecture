@@ -116,7 +116,7 @@ func searchFile(path, traceID, service string) ([]logLine, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	var out []logLine
 	scanner := bufio.NewScanner(f)
@@ -170,10 +170,8 @@ func writeOutput(path string, lines []logLine) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
 
 	w := bufio.NewWriter(f)
-	defer w.Flush()
 
 	enc := json.NewEncoder(w)
 	enc.SetEscapeHTML(false)
@@ -184,10 +182,15 @@ func writeOutput(path string, lines []logLine) error {
 		}
 		out["service"] = line.Service
 		if err := enc.Encode(out); err != nil {
+			_ = f.Close()
 			return err
 		}
 	}
-	return w.Flush()
+	if err := w.Flush(); err != nil {
+		_ = f.Close()
+		return err
+	}
+	return f.Close()
 }
 
 func fail(format string, args ...any) {
