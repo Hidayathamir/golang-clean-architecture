@@ -6,25 +6,56 @@
 # go run/go test so they exit cleanly without a TUI.
 HAS_TUISTORY := $(shell command -v tuistory 2>/dev/null)
 
+# Session names are fixed so `run-all` and the individual targets address the same
+# sessions (e.g. `make run-webserver` restarts the session `run-all` started).
+WEB_SESSION           := golang-clean-arch-webserver
+WORKERCONSUMER_SESSION := golang-clean-arch-workerconsumer
+WORKERPRODUCER_SESSION := golang-clean-arch-workerproducer
+CLEANER_SESSION       := golang-clean-arch-workeridempotencycleaner
+
+define require_tuistory
+@$(if $(HAS_TUISTORY),, $(error ❌ tuistory not found. Install: npm install -g tuistory (see 'make check-tools'). The run-* targets need it for idempotent restarts.))
+endef
+
 run-webserver:
-	@$(if $(HAS_TUISTORY),, $(error ❌ tuistory not found. Install: npm install -g tuistory (see 'make check-tools'). The run-* targets need it for idempotent restarts.))
+	$(require_tuistory)
 	mkdir -p logs
-	tuistory -- go run cmd/webserver/main.go >> logs/webserver_log.jsonl 2>&1
+	tuistory launch -s $(WEB_SESSION) --background --no-wait -- scripts/dev/runsvc.sh cmd/webserver/main.go logs/webserver_log.jsonl
 
 run-workerconsumer:
-	@$(if $(HAS_TUISTORY),, $(error ❌ tuistory not found. Install: npm install -g tuistory (see 'make check-tools'). The run-* targets need it for idempotent restarts.))
+	$(require_tuistory)
 	mkdir -p logs
-	tuistory -- go run cmd/workerconsumer/main.go >> logs/workerconsumer_log.jsonl 2>&1
+	tuistory launch -s $(WORKERCONSUMER_SESSION) --background --no-wait -- scripts/dev/runsvc.sh cmd/workerconsumer/main.go logs/workerconsumer_log.jsonl
 
 run-workerproducer:
-	@$(if $(HAS_TUISTORY),, $(error ❌ tuistory not found. Install: npm install -g tuistory (see 'make check-tools'). The run-* targets need it for idempotent restarts.))
+	$(require_tuistory)
 	mkdir -p logs
-	tuistory -- go run cmd/workerproducer/main.go >> logs/workerproducer_log.jsonl 2>&1
+	tuistory launch -s $(WORKERPRODUCER_SESSION) --background --no-wait -- scripts/dev/runsvc.sh cmd/workerproducer/main.go logs/workerproducer_log.jsonl
 
 run-workeridempotencycleaner:
-	@$(if $(HAS_TUISTORY),, $(error ❌ tuistory not found. Install: npm install -g tuistory (see 'make check-tools'). The run-* targets need it for idempotent restarts.))
+	$(require_tuistory)
 	mkdir -p logs
-	tuistory -- go run cmd/workeridempotencycleaner/main.go >> logs/workeridempotencycleaner_log.jsonl 2>&1
+	tuistory launch -s $(CLEANER_SESSION) --background --no-wait -- scripts/dev/runsvc.sh cmd/workeridempotencycleaner/main.go logs/workeridempotencycleaner_log.jsonl
+
+# Start every server in the background, one command. Idempotent: sessions already
+# running are left alone. Inspect with `tuistory sessions`, attach with
+# `tuistory attach -s <name>`, stop everything with `make stop-all`.
+run-all:
+	@echo "🚀 Starting all app servers in the background..."
+	@$(MAKE) --no-print-directory run-webserver run-workerconsumer run-workerproducer run-workeridempotencycleaner
+	@echo ""
+	@echo "✅ App servers started. Inspect sessions with: tuistory sessions"
+	@echo "   Live logs: tail -f logs/*.jsonl"
+	@echo "   Stop all:  make stop-all"
+
+# Stop every server session started by run-* / run-all.
+stop-all:
+	@$(if $(HAS_TUISTORY),, $(error ❌ tuistory not found. Install: npm install -g tuistory (see 'make check-tools').))
+	@-tuistory close -s $(WEB_SESSION) >/dev/null 2>&1 && echo "✔ stopped webserver" || echo "· webserver not running"
+	@-tuistory close -s $(WORKERCONSUMER_SESSION) >/dev/null 2>&1 && echo "✔ stopped workerconsumer" || echo "· workerconsumer not running"
+	@-tuistory close -s $(WORKERPRODUCER_SESSION) >/dev/null 2>&1 && echo "✔ stopped workerproducer" || echo "· workerproducer not running"
+	@-tuistory close -s $(CLEANER_SESSION) >/dev/null 2>&1 && echo "✔ stopped workeridempotencycleaner" || echo "· workeridempotencycleaner not running"
+	@echo "✅ Done stopping app servers."
 
 go-test:
 	mkdir -p logs
@@ -100,7 +131,7 @@ setup:
 	@echo "✅ Setup complete. Next steps:"
 	@echo "   1. make docker-compose-up            # start infra (wait for it to finish)"
 	@echo "   2. make migrate                      # apply DB migrations"
-	@echo "   3. make run-webserver                # and the other make run-* servers"
+	@echo "   3. make run-all                      # start all app servers in the background"
 
 # Fails if generated code is stale: regenerate, then assert no diff.
 # Runs in the pre-push hook (.githooks/pre-push); requires a clean working tree

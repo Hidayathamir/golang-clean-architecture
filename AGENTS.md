@@ -27,18 +27,25 @@ Configuration is `settings/config.json` (Viper). Always run in this order:
 
 1. **Start infrastructure** — `make docker-compose-up` (wait for it to finish). Postgres, Kafka (+ Zookeeper), Redis, Elasticsearch, Kibana, Localstack, Redpanda Console, and SigNoz (with its own ClickHouse + Zookeeper).
 2. **Run migrations** — `make migrate`.
-3. **Run the app servers** (separate terminals, any order after migration):
+3. **Run the app servers** — one command starts all four in the background:
    ```bash
-   make run-webserver      # HTTP APIs       -> logs/webserver_log.jsonl
-   make run-workerconsumer # Kafka consumers -> logs/workerconsumer_log.jsonl
-   make run-workerproducer # Outbox producer -> logs/workerproducer_log.jsonl
-   make run-workeridempotencycleaner # Idempotency cleanup -> logs/workeridempotencycleaner_log.jsonl
+   make run-all            # starts webserver + 3 workers (idempotent, returns immediately)
+   make stop-all           # stops everything
    ```
-   - `run-workerconsumer` handles async tasks (notifications, image uploads) from Kafka topics.
-   - `run-workerproducer` polls the `outboxes` table and produces events to Kafka (at-least-once delivery with crash recovery via DB transactions).
-   - `run-workeridempotencycleaner` prunes old `message_idempotency` rows on a ticker (see **Idempotency** below).
+   All four are part of a working system:
 
-**Always start services with the `make run-*` commands.** Never use `go run` or `nohup` directly — they bypass tuistory and cause stale-process conflicts. `run-*` commands are idempotent (rerunning kills the previous session), and they **require tuistory** — if it is missing the target fails with a clear error (run `make check-tools`). One-shot targets (`make migrate`, `make go-test`, `make go-e2e-test`) call plain `go run`/`go test` and do **not** use tuistory.
+   | Server | Purpose | Required? |
+   | :--- | :--- | :--- |
+   | `run-webserver` | Serves the HTTP API (`:3000`) | **Yes** |
+   | `run-workerconsumer` | Handles async Kafka tasks (notifications, image uploads) | **Yes** |
+   | `run-workerproducer` | Polls the `outboxes` table and produces events to Kafka (at-least-once with crash recovery) | **Yes** |
+   | `run-workeridempotencycleaner` | Prunes old `message_idempotency` rows on a ticker | Production only |
+
+   Without `run-workerproducer`, outbox events never reach Kafka; without `run-workerconsumer`, they never get processed. Each can also be started individually (`make run-webserver`, etc.) — they are idempotent (rerunning restarts the same named session).
+
+   Inspect sessions with `tuistory sessions`, attach with `tuistory attach -s golang-clean-arch-webserver`, and read live logs with `tail -f logs/*.jsonl`.
+
+**Always start services with the `make run-*` / `make run-all` commands.** Never use `go run` or `nohup` directly — they bypass tuistory and cause stale-process conflicts. The `run-*` and `stop-all` targets **require tuistory** — if it is missing they fail with a clear error (run `make check-tools`). One-shot targets (`make migrate`, `make go-test`, `make go-e2e-test`) call plain `go run`/`go test` and do **not** use tuistory.
 
 ## Tooling prerequisites
 
