@@ -147,7 +147,7 @@ Single file: `config.json` at project root. Parsed via Viper in `internal/config
 
 `docs/architecture.mermaid` is the source; `docs/architecture.png` is generated (used by README).
 
-- Regenerate: `make diagram` (runs `mmdc`, needs `npm install` first).
+- Regenerate: `make diagram` (fetches `mmdc` via `npx`, needs Node).
 - The pre-commit hook auto-regenerates the PNG and stages it whenever a `docs/*.mermaid` change is committed.
 - `docs/puppeteer-config.json` disables the Chromium sandbox (needed on Linux).
 
