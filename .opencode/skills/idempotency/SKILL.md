@@ -19,7 +19,7 @@ Kafka consumers are **at-least-once**, so every message carries an **`x-idempote
 | Usecase | `internal/usecase/idempotencyusecase/` — `InsertIfNotExists` (insert-if-absent) and `DeleteOlderThan` |
 | Inbound wrapper | `internal/inbound/messaging/idempotency.go` — `IdempotencyHandlerSingle` / `IdempotencyHandlerBatch` |
 | Cleaner binary | `cmd/workeridempotencycleaner/` — deletes rows older than 7 days on a ticker |
-| Config | `idempotency.cleanup_interval_seconds` (default `3600`) |
+| Config | `idempotency.cleanup_interval_seconds` (default `3600`) — the ticker interval only |
 
 ## Behavior
 
@@ -27,5 +27,6 @@ Kafka consumers are **at-least-once**, so every message carries an **`x-idempote
 - The wrapper is **fail-open**: a missing header or a failed check logs and proceeds to the handler anyway.
 - `IdempotencyHandlerBatch` filters per record; if all are duplicates the batch handler is never called.
 - The cleaner runs via `make run-workeridempotencycleaner`. **Run it in production** — without it the table grows unbounded.
+- Retention is **hardcoded to 7 days** in `cmd/workeridempotencycleaner/main.go` (`7*24*time.Hour`). Only the ticker interval is configurable (`idempotency.cleanup_interval_seconds`).
 
 Deep reference for the consumer-side retry/DLQ flow around this wrapper: the `kafka-error-handling` skill.
