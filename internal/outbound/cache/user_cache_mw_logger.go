@@ -5,6 +5,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/retrykit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/sirupsen/logrus"
 )
@@ -25,7 +26,9 @@ func (u *UserCacheMwLogger) Get(ctx context.Context, id int64) (*entity.User, er
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	user, err := u.Next.Get(ctx, id)
+	user, err := retrykit.CacheRetryWithData(ctx, func() (*entity.User, error) {
+		return u.Next.Get(ctx, id)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
@@ -41,7 +44,9 @@ func (u *UserCacheMwLogger) Set(ctx context.Context, user *entity.User) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := u.Next.Set(ctx, user)
+	err := retrykit.CacheRetry(ctx, func() error {
+		return u.Next.Set(ctx, user)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
@@ -56,7 +61,9 @@ func (u *UserCacheMwLogger) Delete(ctx context.Context, id int64) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := u.Next.Delete(ctx, id)
+	err := retrykit.CacheRetry(ctx, func() error {
+		return u.Next.Delete(ctx, id)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{

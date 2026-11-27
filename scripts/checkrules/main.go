@@ -35,10 +35,11 @@ var validMigrationName = regexp.MustCompile(`^\d{14}_[a-z0-9]+(_[a-z0-9]+)*\.sql
 // decoratorRule describes where decorators live and how the decorator file and
 // type name are derived from the interface file.
 type decoratorRule struct {
-	root      string                   // directory to walk
-	qualifies func(path string) bool   // is this the interface file?
-	mwPath    func(path string) string // sibling decorator path
-	mwLabel   func(path string) string // human-readable decorator name
+	root       string                   // directory to walk
+	qualifies  func(path string) bool   // is this the interface file?
+	mwPath     func(path string) string // sibling decorator path
+	mwLabel    func(path string) string // human-readable decorator name
+	needsRetry bool                     // retry marker required in method bodies
 }
 
 func main() {
@@ -74,6 +75,7 @@ func checkDecorators() []string {
 			mwLabel: func(path string) string {
 				return filepath.Base(strings.TrimSuffix(path, ".go") + "_mw_logger.go")
 			},
+			needsRetry: true,
 		},
 		{
 			root: "internal/usecase",
@@ -87,6 +89,7 @@ func checkDecorators() []string {
 			mwLabel: func(path string) string {
 				return filepath.Base(strings.TrimSuffix(path, ".go") + "_mw_logger.go")
 			},
+			needsRetry: false,
 		},
 	}
 
@@ -133,7 +136,7 @@ func checkDecoratorsIn(rule decoratorRule) []string {
 					fmt.Sprintf("decorator invalid: %s does not declare type %s", mwPath, want))
 				continue
 			}
-			violations = append(violations, checkDecoratorBody(mwPath, string(mw))...)
+			violations = append(violations, checkDecoratorBody(mwPath, string(mw), rule.needsRetry)...)
 		}
 		return nil
 	})
@@ -158,22 +161,24 @@ func interfaceNames(src string) []string {
 // capturing the method name. Only methods on the decorator struct qualify.
 var decoratorMethodRe = regexp.MustCompile(`(?m)^func\s+\([^)]*\)\s+(\w+)\([^)]*\)[^{]*\berror\b[^{]*\{`)
 
-// decoratorBodyMarkers are the four steps every decorator method must perform,
-// checked as substrings of the method body.
+// decoratorBodyMarkers are the steps every decorator method must perform,
+// checked as substrings of the method body. The retry step applies only to
+// outbound decorators (needsRetry); usecases call Next directly.
 var decoratorBodyMarkers = []struct {
-	label  string
-	marker string
+	label     string
+	marker    string
+	onlyRetry bool
 }{
-	{"telemetry.Start", "telemetry.Start(ctx)"},
-	{"defer span.End", "defer span.End()"},
-	{"retry", "retrykit."},
-	{"telemetry.RecordError", "telemetry.RecordError(span, err)"},
-	{"logkit.LogMw", "logkit.LogMw(ctx"},
+	{"telemetry.Start", "telemetry.Start(ctx)", false},
+	{"defer span.End", "defer span.End()", false},
+	{"retry", "retrykit.", true},
+	{"telemetry.RecordError", "telemetry.RecordError(span, err)", false},
+	{"logkit.LogMw", "logkit.LogMw(ctx", false},
 }
 
 // checkDecoratorBody verifies that every error-returning method in a decorator
-// file contains the four-step body (span, retry, record error, log).
-func checkDecoratorBody(path, src string) []string {
+// file contains the required body steps (span, retry, record error, log).
+func checkDecoratorBody(path, src string, needsRetry bool) []string {
 	var violations []string
 
 	locs := decoratorMethodRe.FindAllStringSubmatchIndex(src, -1)
@@ -187,6 +192,9 @@ func checkDecoratorBody(path, src string) []string {
 		body := src[start:end]
 
 		for _, m := range decoratorBodyMarkers {
+			if m.onlyRetry && !needsRetry {
+				continue
+			}
 			if !strings.Contains(body, m.marker) {
 				violations = append(violations,
 					fmt.Sprintf("decorator body: %s method %s missing %s", path, name, m.label))

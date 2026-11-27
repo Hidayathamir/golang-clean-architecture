@@ -5,6 +5,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/retrykit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/sirupsen/logrus"
 )
@@ -25,7 +26,9 @@ func (c *S3ClientMwLogger) UploadImage(ctx context.Context, req dto.S3UploadImag
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	url, err = c.Next.UploadImage(ctx, req)
+	url, err = retrykit.StorageRetryWithData(ctx, func() (string, error) {
+		return c.Next.UploadImage(ctx, req)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
@@ -41,7 +44,9 @@ func (c *S3ClientMwLogger) Download(ctx context.Context, req dto.S3DownloadReque
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	res, err := c.Next.Download(ctx, req)
+	res, err := retrykit.StorageRetryWithData(ctx, func() (dto.S3DownloadResponse, error) {
+		return c.Next.Download(ctx, req)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
@@ -58,7 +63,9 @@ func (c *S3ClientMwLogger) DeleteObject(ctx context.Context, req dto.S3DeleteObj
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	res, err := c.Next.DeleteObject(ctx, req)
+	res, err := retrykit.StorageRetryWithData(ctx, func() (dto.S3DeleteObjectResponse, error) {
+		return c.Next.DeleteObject(ctx, req)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{

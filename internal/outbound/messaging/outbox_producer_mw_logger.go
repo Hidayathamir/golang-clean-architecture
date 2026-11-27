@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/retrykit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/sirupsen/logrus"
 )
@@ -24,7 +25,9 @@ func (p *OutboxProducerMwLogger) ProducePending(ctx context.Context) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := p.Next.ProducePending(ctx)
+	err := retrykit.MessagingRetry(ctx, func() error {
+		return p.Next.ProducePending(ctx)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{}

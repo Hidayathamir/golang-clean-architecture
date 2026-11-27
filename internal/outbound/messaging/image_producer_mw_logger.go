@@ -5,6 +5,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/retrykit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -26,7 +27,9 @@ func (p *ImageProducerMwLogger) SendImageUploaded(ctx context.Context, db *gorm.
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := p.Next.SendImageUploaded(ctx, db, event)
+	err := retrykit.MessagingRetry(ctx, func() error {
+		return p.Next.SendImageUploaded(ctx, db, event)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
@@ -41,7 +44,9 @@ func (p *ImageProducerMwLogger) SendImageLiked(ctx context.Context, db *gorm.DB,
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := p.Next.SendImageLiked(ctx, db, event)
+	err := retrykit.MessagingRetry(ctx, func() error {
+		return p.Next.SendImageLiked(ctx, db, event)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
@@ -56,7 +61,9 @@ func (p *ImageProducerMwLogger) SendImageCommented(ctx context.Context, db *gorm
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := p.Next.SendImageCommented(ctx, db, event)
+	err := retrykit.MessagingRetry(ctx, func() error {
+		return p.Next.SendImageCommented(ctx, db, event)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{

@@ -57,7 +57,8 @@ func (r *FollowRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, foll
 }
 ```
 
-- The retry helper depends on the outbound type: `retrykit.DBRetry` / `DBRetryWithData` for DB; other variants for Kafka/HTTP as appropriate to the call.
+- The retry helper matches the outbound layer: `DBRetry`/`DBRetryWithData` (repository), `CacheRetry`/`CacheRetryWithData` (cache), `MessagingRetry`/`MessagingRetryWithData` (messaging), `SearchRetry`/`SearchRetryWithData` (search), `StorageRetry`/`StorageRetryWithData` (storage). Use the `*WithData` form for value-returning methods. Each layer has its own tuning in `pkg/retrykit`. Usecases call `Next` directly — no retry.
+- **Enforced** by `make check-rules`: every error-returning method in an outbound `_mw_logger.go` must contain `telemetry.Start(ctx)`, `defer span.End()`, a `retrykit.` call, `telemetry.RecordError(span, err)`, and `logkit.LogMw(ctx, ...)`; usecase decorators are exempt from the retry marker.
 - The telemetry mechanics (span naming, error recording, log correlation) live in the `otel-architecture` skill → "Decorator pattern".
 
 ## File naming conventions

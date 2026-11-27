@@ -5,6 +5,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/retrykit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
 	"github.com/sirupsen/logrus"
 )
@@ -25,7 +26,9 @@ func (i *ImageSearchMwLogger) IndexImage(ctx context.Context, document *dto.Imag
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	err := i.Next.IndexImage(ctx, document)
+	err := retrykit.SearchRetry(ctx, func() error {
+		return i.Next.IndexImage(ctx, document)
+	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
