@@ -1,0 +1,95 @@
+@baseUrl = http://localhost:3000
+@contentType = application/json
+@username = joko
+@password = joko
+
+### Register user
+# @name register
+POST {{baseUrl}}/api/users
+Content-Type: {{contentType}}
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}",
+  "name": "Joko"
+}
+
+### Register second user (follow target)
+# @name registerSecond
+POST {{baseUrl}}/api/users
+Content-Type: {{contentType}}
+
+{
+  "username": "budi",
+  "password": "budi",
+  "name": "Budi"
+}
+
+### Login user
+# @name login
+POST {{baseUrl}}/api/users/_login
+Content-Type: {{contentType}}
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+### Get current user
+GET {{baseUrl}}/api/users/_current
+Accept: {{contentType}}
+Authorization: {{login.response.body.$.data.token}}
+
+### Update current user
+PATCH {{baseUrl}}/api/users/_current
+Content-Type: {{contentType}}
+Authorization: {{login.response.body.$.data.token}}
+
+{
+  "name": "Joko Updated"
+}
+
+### Follow user
+POST {{baseUrl}}/api/users/_follow
+Content-Type: {{contentType}}
+Authorization: {{login.response.body.$.data.token}}
+
+{
+  "following_id": {{registerSecond.response.body.$.data.id}}
+}
+
+### Upload image
+POST {{baseUrl}}/api/images
+Authorization: {{login.response.body.$.data.token}}
+
+image: < ./sample.png
+caption: my first upload
+
+### Like image
+POST {{baseUrl}}/api/images/_like
+Content-Type: {{contentType}}
+Authorization: {{login.response.body.$.data.token}}
+
+{
+  "image_id": 1
+}
+
+### Comment image
+POST {{baseUrl}}/api/images/_comment
+Content-Type: {{contentType}}
+Authorization: {{login.response.body.$.data.token}}
+
+{
+  "image_id": 1,
+  "comment": "nice shot"
+}
+
+### Get image likes
+GET {{baseUrl}}/api/images/1/likes
+Accept: {{contentType}}
+Authorization: {{login.response.body.$.data.token}}
+
+### Get image comments
+GET {{baseUrl}}/api/images/1/comments
+Accept: {{contentType}}
+Authorization: {{login.response.body.$.data.token}}
