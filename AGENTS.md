@@ -47,6 +47,23 @@ Configuration is `settings/config.json` (Viper). Always run in this order:
 
 **Always start services with the `make run-*` / `make run-all` commands.** Never use `go run` or `nohup` directly — they bypass tuistory and cause stale-process conflicts. The `run-*` and `stop-all` targets **require tuistory** — if it is missing they fail with a clear error (run `make check-tools`). One-shot targets (`make migrate`, `make go-test`, `make go-e2e-test`) call plain `go run`/`go test` and do **not** use tuistory.
 
+## Finding logs for one request
+
+Each server writes its own `logs/<service>_log.jsonl`, and every line carries the request's `trace_id`. The trace id is returned to the caller as the **`X-Trace-ID`** response header.
+
+```bash
+# 1. Make a request and read the trace id from the response.
+curl -i http://localhost:3000/api/users/_current
+# -> X-Trace-ID: 6e49d1047e1d41e0a295caad7bbecaeb
+
+# 2. Pull every line for that trace from all log files, merged and time-sorted,
+#    each tagged with the service it came from.
+make trace-logs TRACE_ID=6e49d1047e1d41e0a295caad7bbecaeb
+# -> logs/trace_logs_search_result.jsonl   (override path with OUT=<file>)
+```
+
+`make trace-logs` runs `scripts/tracelogs`. It scans every `logs/*_log.jsonl`, keeps lines whose `trace_id` matches, adds a `service` field (the file's name, e.g. `webserver`, `workerconsumer`), sorts everything by the line's `time`, and writes one JSONL file. Use it instead of hand-grepping when a request spans services. For cross-service traces in one view (and to correlate with spans), the same `trace_id` is queryable in SigNoz — see the `signoz-traces` skill.
+
 ## Tooling prerequisites
 
 `make setup` runs `make check-tools` (which **fails** if anything is missing), downloads Go deps, then activates git hooks. Required tools:

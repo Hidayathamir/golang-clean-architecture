@@ -109,6 +109,13 @@ check-commit-msg:
 	@if [ -z "$(MSG_FILE)" ]; then echo "usage: make check-commit-msg MSG_FILE=<file>"; exit 2; fi
 	go run ./scripts/checkcommitmsg "$(MSG_FILE)"
 
+# Aggregate every logs/<service>_log.jsonl line for one trace into a single
+# time-sorted file, tagging each line with the service it came from.
+# Output: logs/trace_logs_search_result.jsonl (override with OUT=<path>).
+trace-logs:
+	@if [ -z "$(TRACE_ID)" ]; then echo "usage: make trace-logs TRACE_ID=<trace-id> [OUT=<file>]"; exit 2; fi
+	go run ./scripts/tracelogs "$(TRACE_ID)" $(if $(OUT),"$(OUT)",)
+
 # Render docs/*.mermaid to docs/*.png (requires Node; fetches mmdc via npx).
 # -s 3 renders at 3x scale for crisp text on hi-dpi displays.
 diagram:
