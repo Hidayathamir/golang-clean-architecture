@@ -95,6 +95,10 @@ clean:
 format:
 	golangci-lint run ./... --fix --tests=false
 
+# Lint without mutating files — used by the pre-commit hook.
+lint:
+	golangci-lint run ./... --tests=false
+
 generate:
 	rm -rf internal/mock &&	go generate ./internal/...
 
