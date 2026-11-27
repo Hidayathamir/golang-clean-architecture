@@ -2,7 +2,8 @@
 # Pre-commit:
 #   1. Regenerate docs/*.png if any docs/*.mermaid is staged.
 #   2. Keep errkit.AddFuncName call arguments in sync with function names.
-#   3. Enforce project rules before the commit is created.
+#   3. Enforce gofmt on staged Go files.
+#   4. Enforce project rules before the commit is created.
 # Installed via `make setup` (sets core.hooksPath to .githooks).
 #
 # To bypass in an emergency: git commit --no-verify
@@ -33,7 +34,17 @@ if [ -n "$staged_go" ]; then
 	fi
 fi
 
-# 3. Enforce project rules.
+# 3. Enforce gofmt on staged Go files (auto-format + re-stage).
+if [ -n "$staged_go" ]; then
+	unformatted=$(gofmt -l $staged_go)
+	if [ -n "$unformatted" ]; then
+		echo "🎨 gofmt: reformatting staged Go files..."
+		gofmt -w $staged_go
+		echo "$staged_go" | xargs -r git add
+	fi
+fi
+
+# 4. Enforce project rules.
 if ! make check-rules; then
 	echo ""
 	echo "❌ Commit blocked: project rules violated (see make check-rules)."
