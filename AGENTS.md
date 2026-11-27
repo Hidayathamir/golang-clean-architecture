@@ -131,6 +131,8 @@ return errkit.AddFuncName(err, "package.(*Type).Method")  // enrich with call si
 - Unit tests: `make go-test` (tests `./internal/...`)
 - E2E tests: `make go-e2e-test` (tests `./test/e2etest/...`)
 
+**Enforced** via `make check-rules` (`scripts/checkrules`): test files under `internal/` must declare `package {dir}_test`. Runs in the pre-commit hook (activate with `make setup`).
+
 ## Route conventions (Fiber)
 
 - Public routes: standard paths (`/api/users`)

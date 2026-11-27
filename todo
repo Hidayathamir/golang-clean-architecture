@@ -4,7 +4,7 @@ enforce: commit-msg hook for Conventional Commits (git-commit-convention skill) 
 enforce: extend checkrules to usecases (usecase decorator rule, AGENTS rule #7) [done]
 enforce: check-codegen in pre-push hook (catch stale internal/mock + api) [done]
 enforce: verify errkit.SetCode presence (AGENTS error handling)
-enforce: _test files use external package {pkg}_test
+enforce: _test files use external package {pkg}_test (internal/ only) [done]
 enforce: migration file naming <timestamp>_<name>.sql + Up/Down sections
 enforce: route convention (_ prefix for auth routes)
 enforce: no global config.Config usage

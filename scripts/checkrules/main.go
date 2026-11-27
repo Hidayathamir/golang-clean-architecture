@@ -9,6 +9,8 @@
 //     a sibling {@name}_usecase_mw_logger.go defining a {@Name}MwLogger type.
 //   - File naming: Go files use snake_case; decorators end in _mw_logger.go;
 //     tests end in _test.go; per-package fixtures are helper_test.go.
+//   - Test packages: test files under internal/ use an external test package
+//     (package {dir}_test).
 //
 // Run with `make check-rules`. Exits non-zero on any violation.
 package main
@@ -36,6 +38,7 @@ func main() {
 	var violations []string
 	violations = append(violations, checkDecorators()...)
 	violations = append(violations, checkFileNaming()...)
+	violations = append(violations, checkTestPackages()...)
 
 	if len(violations) > 0 {
 		fmt.Fprintln(os.Stderr, "❌ check-rules failed:")
@@ -170,6 +173,51 @@ func checkFileNaming() []string {
 		if err != nil {
 			violations = append(violations, fmt.Sprintf("walk %s: %v", root, err))
 		}
+	}
+	return violations
+}
+
+// pkgDecl matches a file's `package <name>` declaration.
+var pkgDecl = regexp.MustCompile(`(?m)^package\s+(\w+)`)
+
+// checkTestPackages enforces that test files under internal/ use an external
+// test package ({dir}_test), per the testing conventions in AGENTS.md.
+func checkTestPackages() []string {
+	var violations []string
+
+	err := filepath.WalkDir("internal", func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			if d.Name() == "mock" {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if !strings.HasSuffix(path, "_test.go") {
+			return nil
+		}
+
+		src, err := os.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		m := pkgDecl.FindSubmatch(src)
+		if m == nil {
+			violations = append(violations, fmt.Sprintf("no package declaration: %s", path))
+			return nil
+		}
+
+		want := filepath.Base(filepath.Dir(path)) + "_test"
+		if got := string(m[1]); got != want {
+			violations = append(violations,
+				fmt.Sprintf("bad test package: %s declares package %s (want %s)", path, got, want))
+		}
+		return nil
+	})
+	if err != nil {
+		violations = append(violations, fmt.Sprintf("walk internal: %v", err))
 	}
 	return violations
 }
