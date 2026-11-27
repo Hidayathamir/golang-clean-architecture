@@ -5,6 +5,8 @@ description: The Kafka topic topology, retry/DLQ flow, error classification, con
 
 # Kafka Consumer Error Handling
 
+This skill covers the retry/DLQ path. Consumer **de-duplication** (`x-idempotency-key`) runs just before it and has its own skill — see `idempotency`.
+
 ## Topic Topology
 
 Every primary topic has a corresponding **retry** and **DLQ** topic, mapped in `pkg/constant/topic/topic.go`.
@@ -21,14 +23,11 @@ A `x-retry-count` header tracks retry attempts (stored on the record, incremente
 
 ## Idempotency Wrapper
 
-Nearly every handler registered in `internal/inbound/messaging/route/route_messaging.go` is wrapped by a **de-duplication decorator** (`internal/inbound/messaging/idempotency.go`) that sits *between* the consumer loop and the real handler:
+Nearly every handler registered in `internal/inbound/messaging/route/route_messaging.go` is wrapped by a **de-duplication decorator** (`internal/inbound/messaging/idempotency.go`) that sits *between* the consumer loop and the real handler. Each record carries an **`x-idempotency-key` header**; a key already present in the `message_idempotency` table means the message was processed before, so it is **skipped and treated as success** (offset committed, no error, no retry).
 
-| Wrapper | Wraps | Behavior |
-|---------|-------|----------|
-| `IdempotencyHandlerSingle(usecase, handler)` | `ConsumerHandlerSingle` | Checks one record, calls handler only if new |
-| `IdempotencyHandlerBatch(usecase, handler)` | `ConsumerHandlerBatch` | Filters the batch to unseen records, calls handler once with survivors |
+For the full subsystem — the pieces table, wrapper signatures, and cleanup — see the `idempotency` skill.
 
-Each record carries an **`x-idempotency-key` header** (a UUID). The consumer reads it and calls `IdempotencyUsecase.InsertIfNotExists(ctx, key, topic, partition, offset)` — an insert-if-absent into the `message_idempotency` table (`internal/entity/message_idempotency.go`, migration `20260724000000_create_table_message_idempotency.sql`). A key already present means the message was processed before, so it is **skipped and treated as success** (offset committed, no error, no retry).
+One interaction matters to error handling: a skipped duplicate returns `nil`, so **the record never reaches the retry or DLQ topics**. The wrapper's job is de-dup, not error routing — the classification below still applies to records that *do* reach the handler.
 
 ```mermaid
 flowchart TD
@@ -46,13 +45,6 @@ flowchart TD
     J -->|No| K[Commit offset]
     J -->|Yes| L[Normal retry/DLQ routing]
 ```
-
-Key properties:
-
-- **Fail-open**: a missing header or a failed idempotency check logs and *proceeds* — the wrapper never blocks a message it can't verify.
-- **Batch granularity**: `IdempotencyHandlerBatch` de-dupes per record; if every record is a duplicate the handler is never called (`len(filtered) == 0` → return nil).
-- **Not a substitute for retry/DLQ**: a skipped duplicate returns `nil`, so the offset is committed and the record never reaches the retry or DLQ topics. The wrapper's job is de-dup, not error routing — classification below still applies to records that *do* reach the handler.
-- **Cleanup**: the `workeridempotencycleaner` binary (`cmd/workeridempotencycleaner`) deletes records older than **7 days** on a ticker (`idempotency.cleanup_interval_seconds`, default 3600). Without it the table grows unbounded.
 
 ## Consumer Loop Types
 
