@@ -30,7 +30,7 @@ Configuration is `settings/config.json` (Viper). Always run in this order:
    ```
    - `run-workerconsumer` handles async tasks (notifications, image uploads) from Kafka topics.
    - `run-workerproducer` polls the `outboxes` table and produces events to Kafka (at-least-once delivery with crash recovery via DB transactions).
-   - `run-workeridempotencycleaner` prunes old `message_idempotency` rows on a ticker (see **Idempotency subsystem** below).
+   - `run-workeridempotencycleaner` prunes old `message_idempotency` rows on a ticker (see **Idempotency** below).
 
 **Always start services with the `make run-*` commands.** Never use `go run` or `nohup` directly — they bypass tuistory and cause stale-process conflicts. `run-*` commands are idempotent (rerunning kills the previous session).
 
@@ -81,28 +81,11 @@ userRepo = repository.NewUserRepositoryMwLogger(userRepo)  // decorates
 
 The telemetry mechanics inside each generated method (span, `retrykit`, error recording, `logkit.LogMw`) live in the `otel-architecture` skill → "Decorator pattern".
 
-## Idempotency subsystem
+## Idempotency
 
-Kafka consumers are **at-least-once**, so every message carries an **`x-idempotency-key` header** (a UUID) and nearly every handler in `route_messaging.go` is wrapped by a de-dup decorator.
+Kafka consumers are **at-least-once**, so every message carries an **`x-idempotency-key` header** and nearly every handler in `route_messaging.go` is wrapped by a de-dup decorator (skipped duplicates commit the offset, no retry/DLQ; the wrapper is fail-open; run `make run-workeridempotencycleaner` in production).
 
-| Piece | Location |
-|-------|----------|
-| Entity | `internal/entity/message_idempotency.go` (table `message_idempotency`, PK `idempotency_key`) |
-| Migration | `db/migrations/20260724000000_create_table_message_idempotency.sql` |
-| Repository | `internal/outbound/repository/idempotency_repository.go` (+ `_mw_logger.go`) |
-| Usecase | `internal/usecase/idempotencyusecase/` — `InsertIfNotExists` (insert-if-absent) and `DeleteOlderThan` |
-| Inbound wrapper | `internal/inbound/messaging/idempotency.go` — `IdempotencyHandlerSingle` / `IdempotencyHandlerBatch` |
-| Cleaner binary | `cmd/workeridempotencycleaner/` — deletes rows older than 7 days on a ticker |
-| Config | `idempotency.cleanup_interval_seconds` (default `3600`) |
-
-Behavior:
-
-- A handler that sees an **already-inserted key** is skipped and returns `nil` — offset committed, no retry, no DLQ (de-dup is not error routing).
-- The wrapper is **fail-open**: a missing header or a failed check logs and proceeds to the handler anyway.
-- `IdempotencyHandlerBatch` filters per record; if all are duplicates the batch handler is never called.
-- The cleaner runs via `make run-workeridempotencycleaner`. **Run it in production** — without it the table grows unbounded.
-
-Deep reference for the consumer-side flow: the `kafka-error-handling` skill.
+Full detail — the table, wrapper functions, and behavior: the `idempotency` skill.
 
 ## File naming conventions
 
@@ -186,4 +169,5 @@ Single file: `settings/config.json`. Parsed via Viper in `internal/config/config
 - **`signoz-traces`** — ClickHouse MCP setup + trace/span/error SQL queries against SigNoz.
 - **`otel-architecture`** — full OTel implementation: trace/log providers, decorator spans, HTTP + Kafka instrumentation, log correlation, OTLP export.
 - **`kafka-error-handling`** — topic topology, retry/DLQ flow, error classification, consumer loop types, graceful shutdown.
+- **`idempotency`** — consumer de-duplication: `x-idempotency-key`, insert-if-absent usecase, inbound wrapper, `message_idempotency` table, cleaner binary.
 - **`git-commit-convention`** — Conventional Commits 1.0.0: format, types, scopes, breaking changes, footers.
