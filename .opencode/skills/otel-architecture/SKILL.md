@@ -153,21 +153,21 @@ Every usecase and outbound interface is wrapped by an `*_mw_logger.go` decorator
 flowchart LR
     Caller["Caller"] --> MW["UserRepositoryMwLogger"]
     MW -->|"1. telemetry.Start(ctx) → span<br/>name = calling func"| Real["UserRepositoryImpl"]
-    Real -->|"2. retrykit.DBRetry wraps real call"| DB[("DB")]
+    Real -->|"2. retrykit.DBRetry* wraps real call"| DB[("DB")]
 
     MW -->|"3. telemetry.RecordError(span, err)"| Span["span"]
     MW -->|"4. logkit.LogMw(ctx, fields, err)"| Log["logrus → OtelHook"]
 ```
 
-The generated template (every method in e.g. `internal/outbound/repository/user_repository_mw_logger.go:26`):
+For the make-or-break rule (every outbound interface must have a decorator, and where to wire it) see **AGENTS.md → Decorator pattern**. This section documents only the telemetry mechanics inside every generated method (see e.g. `internal/outbound/repository/user_repository_mw_logger.go:26`):
 
 ```go
-func (r *UserRepositoryMwLogger) FindByID(ctx context.Context, db *gorm.DB, user *entity.User, id int64) error {
-    ctx, span := telemetry.Start(ctx)   // span named "repository.(*UserRepositoryMwLogger).FindByID"
+func (r *UserRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, user *entity.User) error {
+    ctx, span := telemetry.Start(ctx)   // span named "repository.(*UserRepositoryMwLogger).Create"
     defer span.End()
 
     err := retrykit.DBRetry(ctx, func() error {
-        return r.Next.FindByID(ctx, db, user, id)
+        return r.Next.Create(ctx, db, user)
     })
     telemetry.RecordError(span, err)    // span.RecordError + set status=ERROR
     logkit.LogMw(ctx, fields, err)      // Debug on success, Error on failure
@@ -175,13 +175,11 @@ func (r *UserRepositoryMwLogger) FindByID(ctx context.Context, db *gorm.DB, user
 }
 ```
 
-`telemetry.Start` derives the span name from the **caller's function name** via `pkg/caller` (`otel_start.go:80`). The decorator chain is assembled in `dependency_injection`:
-
-```go
-var userRepo repository.UserRepository
-userRepo = repository.NewUserRepository(cfg)
-userRepo = repository.NewUserRepositoryMwLogger(userRepo)  // decorates
-```
+- Four steps, always in this order: **start span → call real method (wrapped in retry) → record error → emit log**.
+- `telemetry.Start` derives the span name from the **caller's function name** via `pkg/caller` (`otel_start.go:80`) — so the function name *is* the span name.
+- `retrykit.DBRetry(ctx, fn)` for no-value methods; `retrykit.DBRetryWithData(ctx, fn)` for value-returning ones (see `CountByUsername`).
+- `logkit.LogMw(ctx, fields, err)` emits **Debug on success, Error on failure**; `fields` carries the call's inputs/outputs (e.g. `username`, `total`).
+- The wrapper struct holds the real impl in a `Next` field, and `var _ Interface = &InterfaceMwLogger{}` asserts it still satisfies the interface.
 
 ---
 

@@ -66,13 +66,7 @@ pkg/              Shared utilities: logkit, errkit, telemetry, retrykit, validat
 
 ## Decorator pattern — mandatory for all outbound interfaces
 
-Every outbound interface (repository, cache, messaging, storage, search) **must** have a logger-middleware wrapper (`_mw_logger.go`) that:
-- Wraps the real implementation in a `{Interface}MwLogger` struct with a `Next {Interface}` field
-- Starts an OpenTelemetry span (`telemetry.Start`)
-- Calls `retrykit.DBRetry` (for DB) or the real method
-- Records errors to the span (`telemetry.RecordError`)
-- Emits structured log via `logkit.LogMw(ctx, logrus.Fields{...}, err)`
-- Satisfies the interface (`var _ Interface = &InterfaceMwLogger{}`)
+Every outbound interface (repository, cache, messaging, storage, search) **must** have a logger-middleware wrapper (`_mw_logger.go`) that wraps the real implementation in a `{Interface}MwLogger` struct with a `Next {Interface}` field and satisfies the interface (`var _ Interface = &InterfaceMwLogger{}`).
 
 Same pattern applies to usecases: `usecase → UserUsecaseMwLogger(UserUsecase)`.
 
@@ -84,6 +78,8 @@ userRepo = repository.NewUserRepositoryMwLogger(userRepo)  // decorates
 ```
 
 **Enforced** via `make check-rules` (`scripts/checkrules`): every interface in `internal/outbound/` must have a sibling `<name>_mw_logger.go` declaring `<Name>MwLogger`. Runs in the pre-commit hook (activate with `make setup`).
+
+The telemetry mechanics inside each generated method (span, `retrykit`, error recording, `logkit.LogMw`) live in the `otel-architecture` skill → "Decorator pattern".
 
 ## Idempotency subsystem
 
