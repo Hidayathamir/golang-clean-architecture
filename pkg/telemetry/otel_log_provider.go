@@ -6,15 +6,15 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 	"go.opentelemetry.io/otel/log"
-	"go.opentelemetry.io/otel/log/global"
 	sdklog "go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
 )
 
-var logger log.Logger = global.GetLoggerProvider().Logger(instrumentationScope)
+var logger log.Logger = otel.GetLoggerProvider().Logger(instrumentationScope)
 
 func InitLogProvider(cfg *config.Config) Stop {
 	exporter := newLogExporter(cfg)
@@ -29,7 +29,7 @@ func InitLogProvider(cfg *config.Config) Stop {
 		),
 	)
 
-	global.SetLoggerProvider(lp)
+	otel.SetLoggerProvider(lp)
 
 	logger = lp.Logger(cfg.GetAppName())
 
