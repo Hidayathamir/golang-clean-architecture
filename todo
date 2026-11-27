@@ -3,9 +3,9 @@ panic handler
 enforce: commit-msg hook for Conventional Commits (git-commit-convention skill) [done]
 enforce: extend checkrules to usecases (usecase decorator rule, AGENTS rule #7) [done]
 enforce: check-codegen in pre-push hook (catch stale internal/mock + api) [done]
-enforce: verify errkit.SetCode presence (AGENTS error handling)
 enforce: _test files use external package {pkg}_test (internal/ only) [done]
 enforce: migration file naming <timestamp>_<name>.sql + Up/Down sections [done]
-enforce: route convention (_ prefix for auth routes)
-enforce: no global config.Config usage
-docs: make skills actionable — add "Enforced?" status to each SKILL.md
+docs: make skills actionable — add "Enforced?" status to each SKILL.md [done]
+won't enforce: errkit.SetCode presence — needs AST analysis, false-positive prone; review by hand
+won't enforce: route convention (_ prefix for auth routes) — Fiber routes registered dynamically, not mechanically assertable
+won't enforce: no global config.Config usage — legitimate uses widespread, grep is false-positive prone

@@ -5,6 +5,8 @@ description: The consumer-side idempotency (de-duplication) subsystem — the x-
 
 # Idempotency (consumer de-duplication)
 
+> **Enforcement**: ❌ **Not enforced**. This is a behavioral reference — no mechanical check verifies that handlers are wrapped or that keys are set. Correctness depends on following the pattern when wiring consumers.
+
 Kafka consumers are **at-least-once**, so every message carries an **`x-idempotency-key` header** (a UUID) and nearly every handler in `internal/inbound/messaging/route/route_messaging.go` is wrapped by a de-dup decorator.
 
 ## Pieces

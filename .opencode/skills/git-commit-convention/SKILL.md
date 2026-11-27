@@ -5,6 +5,8 @@ description: Conventional Commits 1.0.0 — commit message format, allowed types
 
 # Conventional Commits 1.0.0
 
+> **Enforcement**: ✅ **Enforced**. Commit messages are validated by the commit-msg hook (`.githooks/commit-msg` → `make check-commit-msg`, `scripts/checkcommitmsg`). Header grammar, allowed types, blank-line body separation and uppercase `BREAKING CHANGE` footers are checked; merge/revert/fixup/squash messages are exempt. Bypass: `git commit --no-verify`.
+
 A lightweight convention on top of commit messages. It gives commit history explicit, machine-readable meaning and dovetails with [SemVer](https://semver.org): `fix` → PATCH, `feat` → MINOR, any `BREAKING CHANGE` → MAJOR.
 
 ## Format

@@ -5,6 +5,8 @@ description: The Kafka topic topology, retry/DLQ flow, error classification, con
 
 # Kafka Consumer Error Handling
 
+> **Enforcement**: ❌ **Not enforced**. Descriptive reference for the retry/DLQ flow, topic topology and error classification — no mechanical check. Correctness depends on following the patterns when wiring consumers.
+
 This skill covers the retry/DLQ path. Consumer **de-duplication** (`x-idempotency-key`) runs just before it and has its own skill — see `idempotency`.
 
 ## Topic Topology

@@ -5,6 +5,8 @@ description: How this project implements OpenTelemetry — traces, logs, spans, 
 
 # OpenTelemetry (OTel) Architecture
 
+> **Enforcement**: ⚠️ **Partly enforced**. The decorator rule this skill describes (every usecase and outbound interface wrapped by a `*_mw_logger.go` decorator) is enforced via `make check-rules` (`scripts/checkrules`, pre-commit hook). The rest — span/log mechanics, boot order, instrumentation wiring — is descriptive reference with no mechanical check.
+
 How this project implements OTel: **traces** (manual spans + auto-instrumentation) and **logs** (logrus → OTLP logs), both shipped over **OTLP gRPC** to SigNoz (ClickHouse-backed). No metrics signal.
 
 Key packages:

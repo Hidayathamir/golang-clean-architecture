@@ -5,6 +5,8 @@ description: Query distributed traces, spans, errors and latency from SigNoz via
 
 # SigNoz Traces — ClickHouse MCP
 
+> **Enforcement**: ➖ **Not applicable**. Operational reference (query tooling), not a rule.
+
 The opencode agent queries traces/spans directly from **ClickHouse** via an MCP server (no SigNoz API key needed). Configured in `~/.config/opencode/opencode.jsonc`.
 
 - **ClickHouse**: `localhost:8123`, user `default`, no password
