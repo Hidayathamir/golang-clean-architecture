@@ -86,7 +86,8 @@ setup:
 	@echo "✅ Git hooks activated (core.hooksPath = .githooks)"
 
 # Fails if generated code is stale: regenerate, then assert no diff.
-# Run in CI. Requires a clean working tree for the two generated dirs.
+# Runs in the pre-push hook (.githooks/pre-push); requires a clean working tree
+# for the two generated dirs.
 check-codegen:
 	$(MAKE) generate
 	$(MAKE) swag

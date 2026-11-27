@@ -1,0 +1,18 @@
+#!/bin/sh
+# Pre-push:
+#   Fail if generated code (internal/mock, api) is stale — regenerate and
+#   assert no diff. Runs here rather than in pre-commit because it rewrites
+#   files and is slower, so it belongs at the "before sharing" boundary.
+# Installed via `make setup` (sets core.hooksPath to .githooks).
+#
+# To bypass in an emergency: git push --no-verify
+
+set -e
+
+if ! make check-codegen; then
+	echo ""
+	echo "❌ Push blocked: generated code is stale."
+	echo "   Run 'make generate && make swag', commit the result, then push again."
+	echo "   Bypass with: git push --no-verify"
+	exit 1
+fi
