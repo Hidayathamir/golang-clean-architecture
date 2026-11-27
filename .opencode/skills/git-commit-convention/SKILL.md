@@ -1,5 +1,5 @@
 ---
-name: Git Commit Convention
+name: git-commit-convention
 description: Conventional Commits 1.0.0 — commit message format, allowed types, scopes, breaking changes, and footers. Use when writing git commit messages or reviewing commit history.
 ---
 

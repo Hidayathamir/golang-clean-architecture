@@ -1,5 +1,5 @@
 ---
-name: SigNoz Traces
+name: signoz-traces
 description: Query distributed traces, spans, errors and latency from SigNoz via the ClickHouse MCP server. Use when auditing requests, debugging slow or failing traces, or inspecting trace data.
 ---
 

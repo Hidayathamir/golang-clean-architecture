@@ -1,5 +1,5 @@
 ---
-name: OpenTelemetry Architecture
+name: otel-architecture
 description: How this project implements OpenTelemetry — traces, logs, spans, decorators, HTTP and Kafka instrumentation, log correlation, and OTLP export to SigNoz. Use when working on tracing, instrumentation, telemetry, or logging internals.
 ---
 
