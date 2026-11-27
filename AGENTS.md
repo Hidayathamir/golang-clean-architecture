@@ -96,6 +96,14 @@ return errkit.AddFuncName(err, "package.(*Type).Method")  // enrich with call si
 
 VSCode auto-runs `addfuncname` on `.go` file save. If you add new Go files outside VSCode, run `make add-func-name` manually.
 
+## Comments — explain why, never what
+
+- Comments are only for **why**: non-obvious intent, a tradeoff, a workaround, a subtle invariant.
+- Never restate what the code does — names and structure already do that. A "what" comment stales as code changes.
+- No obvious comments (`// increment i`), no section-header noise (`// === helpers ===`), no commented-out code.
+- Godoc on exported types/funcs/methods **is** allowed — it's API surface, not narration.
+- If body code needs a "why not obvious" note, keep it short and inline.
+
 ## Testing conventions
 
 - **Test package**: `package {pkg}_test` (external, black-box)
