@@ -11,9 +11,11 @@ make swag             # Regenerate swagger docs in api/ (deletes dir first)
 
 **Never edit `internal/mock/` or `api/` by hand.** Both are fully generated. Editing them is denied via `permissions` in `opencode.jsonc` (as are `logs/`).
 
-**Enforced in CI** (`.github/workflows/rules.yml`) via `make check-codegen` — regenerates and fails if the result differs from what's committed.
+**Enforced** by a shared pre-commit hook (`.githooks/pre-commit` → `make check-rules`). Run `make setup` once after cloning to activate it. `make check-codegen` (regenerate + assert no diff) is run manually when generated code changes.
 
 ## How to run the project
+
+**After cloning, run `make setup` once** — activates the shared pre-commit hook that enforces project rules.
 
 Configuration is `config.json` at the project root (Viper). Always run in this order:
 
@@ -79,7 +81,7 @@ userRepo = repository.NewUserRepository(cfg)
 userRepo = repository.NewUserRepositoryMwLogger(userRepo)  // decorates
 ```
 
-**Enforced** via `make check-rules` (`scripts/checkrules`): every interface in `internal/outbound/` must have a sibling `<name>_mw_logger.go` declaring `<Name>MwLogger`. Runs in CI; run locally before pushing.
+**Enforced** via `make check-rules` (`scripts/checkrules`): every interface in `internal/outbound/` must have a sibling `<name>_mw_logger.go` declaring `<Name>MwLogger`. Runs in the pre-commit hook (activate with `make setup`).
 
 ## File naming conventions
 
@@ -91,7 +93,7 @@ userRepo = repository.NewUserRepositoryMwLogger(userRepo)  // decorates
 | `helper_test.go` | `helper_test.go` | Shared test fixtures per package |
 | `mock/Mock{Interface}.go` | `mock/MockRepositoryUser.go` | Moq-generated mocks |
 
-**Enforced** via `make check-rules` (`scripts/checkrules`): Go files under `internal/`, `pkg/`, `cmd/` must be snake_case (with optional `_test`), except generated mocks. Runs in CI.
+**Enforced** via `make check-rules` (`scripts/checkrules`): Go files under `internal/`, `pkg/`, `cmd/` must be snake_case (with optional `_test`), except generated mocks. Runs in the pre-commit hook (activate with `make setup`).
 
 ## Error handling — always do both
 

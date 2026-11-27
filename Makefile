@@ -66,6 +66,11 @@ swag:
 check-rules:
 	go run ./scripts/checkrules
 
+# One-time setup after clone: activate the shared pre-commit hook.
+setup:
+	git config core.hooksPath .githooks
+	@echo "✅ Git hooks activated (core.hooksPath = .githooks)"
+
 # Fails if generated code is stale: regenerate, then assert no diff.
 # Run in CI. Requires a clean working tree for the two generated dirs.
 check-codegen:
