@@ -2,8 +2,11 @@
 // mechanically: codegen freshness (via CI), decorator pattern, and file naming.
 //
 // Rules enforced here:
-//   - Decorator pattern: every outbound interface with a real implementation
-//     must have a sibling {@name}_mw_logger.go defining a {@Name}MwLogger type.
+//   - Decorator pattern (outbound): every outbound interface with a real
+//     implementation must have a sibling {@name}_mw_logger.go defining a
+//     {@Name}MwLogger type.
+//   - Decorator pattern (usecase): every {@name}_usecase.go interface must have
+//     a sibling {@name}_usecase_mw_logger.go defining a {@Name}MwLogger type.
 //   - File naming: Go files use snake_case; decorators end in _mw_logger.go;
 //     tests end in _test.go; per-package fixtures are helper_test.go.
 //
@@ -20,6 +23,15 @@ import (
 
 var validFileName = regexp.MustCompile(`^[a-z0-9]+(_[a-z0-9]+)*(_test)?\.go$`)
 
+// decoratorRule describes where decorators live and how the decorator file and
+// type name are derived from the interface file.
+type decoratorRule struct {
+	root      string                   // directory to walk
+	qualifies func(path string) bool   // is this the interface file?
+	mwPath    func(path string) string // sibling decorator path
+	mwLabel   func(path string) string // human-readable decorator name
+}
+
 func main() {
 	var violations []string
 	violations = append(violations, checkDecorators()...)
@@ -35,20 +47,57 @@ func main() {
 	fmt.Println("✅ check-rules passed")
 }
 
-// checkDecorators verifies every outbound interface has a matching MwLogger
-// decorator file that declares a {Name}MwLogger type.
+// checkDecorators verifies every outbound and usecase interface has a matching
+// MwLogger decorator file that declares a {Name}MwLogger type.
 func checkDecorators() []string {
+	rules := []decoratorRule{
+		{
+			root: "internal/outbound",
+			qualifies: func(path string) bool {
+				return !strings.HasSuffix(path, "_test.go") &&
+					!strings.HasSuffix(path, "_mw_logger.go")
+			},
+			mwPath: func(path string) string {
+				return strings.TrimSuffix(path, ".go") + "_mw_logger.go"
+			},
+			mwLabel: func(path string) string {
+				return filepath.Base(strings.TrimSuffix(path, ".go") + "_mw_logger.go")
+			},
+		},
+		{
+			root: "internal/usecase",
+			// Usecase interfaces live in <name>_usecase.go.
+			qualifies: func(path string) bool {
+				return strings.HasSuffix(path, "_usecase.go")
+			},
+			mwPath: func(path string) string {
+				return strings.TrimSuffix(path, ".go") + "_mw_logger.go"
+			},
+			mwLabel: func(path string) string {
+				return filepath.Base(strings.TrimSuffix(path, ".go") + "_mw_logger.go")
+			},
+		},
+	}
+
+	var violations []string
+	for _, rule := range rules {
+		violations = append(violations, checkDecoratorsIn(rule)...)
+	}
+	return violations
+}
+
+// checkDecoratorsIn walks one root and reports interfaces missing their decorator.
+func checkDecoratorsIn(rule decoratorRule) []string {
 	var violations []string
 
-	err := filepath.WalkDir("internal/outbound", func(path string, d os.DirEntry, err error) error {
+	err := filepath.WalkDir(rule.root, func(path string, d os.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 		if d.IsDir() || !strings.HasSuffix(path, ".go") {
 			return nil
 		}
-		// Skip test files and the decorators themselves.
-		if strings.HasSuffix(path, "_test.go") || strings.HasSuffix(path, "_mw_logger.go") {
+		if !rule.qualifies(path) {
 			return nil
 		}
 
@@ -59,12 +108,12 @@ func checkDecorators() []string {
 
 		names := interfaceNames(string(src))
 		for _, name := range names {
-			mwPath := strings.TrimSuffix(path, ".go") + "_mw_logger.go"
+			mwPath := rule.mwPath(path)
 			mw, err := os.ReadFile(mwPath)
 			if err != nil {
 				violations = append(violations,
 					fmt.Sprintf("decorator missing: %s defines interface %s but %s does not exist",
-						path, name, filepath.Base(mwPath)))
+						path, name, rule.mwLabel(path)))
 				continue
 			}
 			want := name + "MwLogger"
@@ -76,7 +125,7 @@ func checkDecorators() []string {
 		return nil
 	})
 	if err != nil {
-		violations = append(violations, fmt.Sprintf("walk internal/outbound: %v", err))
+		violations = append(violations, fmt.Sprintf("walk %s: %v", rule.root, err))
 	}
 	return violations
 }

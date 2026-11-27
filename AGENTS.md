@@ -83,7 +83,7 @@ userRepo = repository.NewUserRepository(cfg)
 userRepo = repository.NewUserRepositoryMwLogger(userRepo)  // decorates
 ```
 
-**Enforced** via `make check-rules` (`scripts/checkrules`): every interface in `internal/outbound/` must have a sibling `<name>_mw_logger.go` declaring `<Name>MwLogger`. Runs in the pre-commit hook (activate with `make setup`).
+**Enforced** via `make check-rules` (`scripts/checkrules`): every interface in `internal/outbound/` must have a sibling `<name>_mw_logger.go` declaring `<Name>MwLogger`, and every interface in `internal/usecase/` must have a sibling `<name>_usecase_mw_logger.go` declaring `<Name>MwLogger`. Runs in the pre-commit hook (activate with `make setup`).
 
 The telemetry mechanics inside each generated method (span, `retrykit`, error recording, `logkit.LogMw`) live in the `otel-architecture` skill → "Decorator pattern".
 
