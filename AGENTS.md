@@ -11,7 +11,7 @@ make swag             # Regenerate swagger docs in api/ (deletes dir first)
 
 **Never edit `internal/mock/` or `api/` by hand.** Both are fully generated. Editing them is denied via `permissions` in `opencode.jsonc` (as are `logs/`).
 
-**Enforced** by a shared pre-commit hook (`.githooks/pre-commit` → `make check-rules`). Run `make setup` once after cloning to activate it. `make check-codegen` (regenerate + assert no diff) is run manually when generated code changes.
+**Enforced** by a shared pre-commit hook (`.githooks/pre-commit` → `make check-rules`). Run `make setup` once after cloning to activate it. Stale generated code is caught by the **pre-push** hook (`.githooks/pre-push` → `make check-codegen`): regenerate + assert no diff, so a push is blocked until the regenerated `internal/mock`/`api` is committed.
 
 ## Commit messages — Conventional Commits 1.0.0
 
