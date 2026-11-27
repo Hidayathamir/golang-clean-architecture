@@ -11,6 +11,8 @@
 //     tests end in _test.go; per-package fixtures are helper_test.go.
 //   - Test packages: test files under internal/ use an external test package
 //     (package {dir}_test).
+//   - Migrations: files under db/migrations/ are <14-digit-timestamp>_<name>.sql
+//     and carry both "-- +migrate Up" and "-- +migrate Down" sections, Up first.
 //
 // Run with `make check-rules`. Exits non-zero on any violation.
 package main
@@ -24,6 +26,9 @@ import (
 )
 
 var validFileName = regexp.MustCompile(`^[a-z0-9]+(_[a-z0-9]+)*(_test)?\.go$`)
+
+// validMigrationName matches <14-digit timestamp>_<snake_case name>.sql.
+var validMigrationName = regexp.MustCompile(`^\d{14}_[a-z0-9]+(_[a-z0-9]+)*\.sql$`)
 
 // decoratorRule describes where decorators live and how the decorator file and
 // type name are derived from the interface file.
@@ -39,6 +44,7 @@ func main() {
 	violations = append(violations, checkDecorators()...)
 	violations = append(violations, checkFileNaming()...)
 	violations = append(violations, checkTestPackages()...)
+	violations = append(violations, checkMigrations()...)
 
 	if len(violations) > 0 {
 		fmt.Fprintln(os.Stderr, "❌ check-rules failed:")
@@ -218,6 +224,50 @@ func checkTestPackages() []string {
 	})
 	if err != nil {
 		violations = append(violations, fmt.Sprintf("walk internal: %v", err))
+	}
+	return violations
+}
+
+// checkMigrations enforces the migration file convention in db/migrations/:
+// <14-digit-timestamp>_<name>.sql with "-- +migrate Up" before "-- +migrate Down".
+func checkMigrations() []string {
+	var violations []string
+
+	err := filepath.WalkDir("db/migrations", func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() || !strings.HasSuffix(path, ".sql") {
+			return nil
+		}
+
+		name := filepath.Base(path)
+		if !validMigrationName.MatchString(name) {
+			violations = append(violations,
+				fmt.Sprintf("bad migration name: %s (want <14-digit-timestamp>_<snake_case>.sql)", path))
+		}
+
+		src, err := os.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		s := string(src)
+		up := strings.Index(s, "-- +migrate Up")
+		down := strings.Index(s, "-- +migrate Down")
+		if up == -1 {
+			violations = append(violations, fmt.Sprintf("missing '-- +migrate Up' section: %s", path))
+		}
+		if down == -1 {
+			violations = append(violations, fmt.Sprintf("missing '-- +migrate Down' section: %s", path))
+		}
+		if up != -1 && down != -1 && up > down {
+			violations = append(violations,
+				fmt.Sprintf("'-- +migrate Up' must come before '-- +migrate Down': %s", path))
+		}
+		return nil
+	})
+	if err != nil {
+		violations = append(violations, fmt.Sprintf("walk db/migrations: %v", err))
 	}
 	return violations
 }

@@ -53,6 +53,8 @@ make migrate   # cmd/migrate -> pkg/migrate -> sql-migrate (library), Up only
 - Migration files live in `db/migrations/`, named `<timestamp>_<name>.sql`, with `-- +migrate Up` / `-- +migrate Down` sections.
 - `make migrate` only applies **Up** (all pending). It cannot roll back or show status; use `psql` against the `gorp_migrations` table for that.
 
+**Enforced** via `make check-rules` (`scripts/checkrules`): every `db/migrations/*.sql` must be named `<14-digit-timestamp>_<snake_case>.sql` and carry both `-- +migrate Up` and `-- +migrate Down`, Up first. Runs in the pre-commit hook (activate with `make setup`).
+
 ## Architecture layers (top → bottom)
 
 ```
