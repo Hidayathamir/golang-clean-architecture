@@ -13,6 +13,12 @@ make swag             # Regenerate swagger docs in api/ (deletes dir first)
 
 **Enforced** by a shared pre-commit hook (`.githooks/pre-commit` → `make check-rules`). Run `make setup` once after cloning to activate it. `make check-codegen` (regenerate + assert no diff) is run manually when generated code changes.
 
+## Commit messages — Conventional Commits 1.0.0
+
+Every commit message must follow Conventional Commits — `<type>[(scope)][!]: <description>`, using types `feat`, `fix`, `build`, `chore`, `ci`, `docs`, `style`, `refactor`, `perf`, `test`, `revert`. Merge, revert and fixup/squash commits are exempt.
+
+**Enforced** by the shared commit-msg hook (`.githooks/commit-msg` → `make check-commit-msg`, `scripts/checkcommitmsg`). Also available manually: `make check-commit-msg MSG_FILE=<file>`. Full spec: the `git-commit-convention` skill.
+
 ## How to run the project
 
 **After cloning, run `make setup` once** — activates the shared pre-commit hook that enforces project rules.

@@ -70,6 +70,11 @@ swag:
 check-rules:
 	go run ./scripts/checkrules
 
+# Enforce Conventional Commits on a commit message file (see .githooks/commit-msg).
+check-commit-msg:
+	@if [ -z "$(MSG_FILE)" ]; then echo "usage: make check-commit-msg MSG_FILE=<file>"; exit 2; fi
+	go run ./scripts/checkcommitmsg "$(MSG_FILE)"
+
 # Render docs/*.mermaid to docs/*.png (requires Node; fetches mmdc via npx).
 # -s 3 renders at 3x scale for crisp text on hi-dpi displays.
 diagram:

@@ -1,0 +1,11 @@
+#!/bin/sh
+# Commit-msg:
+#   Enforce Conventional Commits 1.0.0 on the commit message.
+#   Git passes the message file (COMMIT_EDITMSG) as $1.
+# Installed via `make setup` (sets core.hooksPath to .githooks).
+#
+# To bypass in an emergency: git commit --no-verify
+
+set -e
+
+make check-commit-msg MSG_FILE="$1"
