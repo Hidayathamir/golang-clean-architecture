@@ -16,7 +16,7 @@
           "--transport",
           "stdio",
           "--config",
-          "dbhub.toml"
+          "config/dbhub.toml"
         ]
       },
       "kafka": {
