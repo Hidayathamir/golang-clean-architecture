@@ -179,7 +179,7 @@ func (r *UserRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, user *
 
 - Four steps, always in this order: **start span → call real method (wrapped in retry) → record error → emit log**.
 - `telemetry.Start` derives the span name from the **caller's function name** via `pkg/caller` (`otel_start.go:80`) — so the function name *is* the span name.
-- `retrykit.DBRetry(ctx, fn)` for no-value methods; `retrykit.DBRetryWithData(ctx, fn)` for value-returning ones (see `CountByUsername`).
+- `retrykit.DBRetry(ctx, fn)` for no-value methods; `retrykit.DBRetryWithData(ctx, fn)` for value-returning ones (see `CountByUsername`). The retry helper depends on the outbound type — DB uses these; Kafka/HTTP use their own variants as appropriate to the call.
 - `logkit.LogMw(ctx, fields, err)` emits **Debug on success, Error on failure**; `fields` carries the call's inputs/outputs (e.g. `username`, `total`).
 - The wrapper struct holds the real impl in a `Next` field, and `var _ Interface = &InterfaceMwLogger{}` asserts it still satisfies the interface.
 

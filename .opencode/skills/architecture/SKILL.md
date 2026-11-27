@@ -74,14 +74,7 @@ Enforced by `make check-rules` (`scripts/checkrules`) in the pre-commit hook: Go
 
 ## Error handling
 
-Always do both:
-
-```go
-err = errkit.SetCode(err, http.StatusNotFound)            // set HTTP status
-return errkit.AddFuncName(err, "package.(*Type).Method")  // enrich with call site
-```
-
-`make add-func-name` fills in the caller's function name for `errkit.AddFuncName`. The pre-commit hook runs it automatically on any staged `.go` file and re-stages the result.
+Errors are tagged centrally via `pkg/errkit`: they carry the HTTP status, a client-facing message, and the call site that produced them. The HTTP layer reads it back with `errkit.GetHTTPError` (see `internal/inbound/http/response`). Non-retryable Kafka errors are marked with `errkit.WrapNonRetryable`.
 
 ## Diagrams
 

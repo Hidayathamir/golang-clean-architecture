@@ -7,6 +7,8 @@
 //     {@Name}MwLogger type.
 //   - Decorator pattern (usecase): every {@name}_usecase.go interface must have
 //     a sibling {@name}_usecase_mw_logger.go defining a {@Name}MwLogger type.
+//   - Decorator body: every error-returning method in a decorator must start a
+//     span, retry the real call, record the error on the span, and emit the log.
 //   - File naming: Go files use snake_case; decorators end in _mw_logger.go;
 //     tests end in _test.go; per-package fixtures are helper_test.go.
 //   - Test packages: test files under internal/ use an external test package
@@ -129,7 +131,9 @@ func checkDecoratorsIn(rule decoratorRule) []string {
 			if !regexp.MustCompile(`type\s+` + regexp.QuoteMeta(want) + `\s+struct`).MatchString(string(mw)) {
 				violations = append(violations,
 					fmt.Sprintf("decorator invalid: %s does not declare type %s", mwPath, want))
+				continue
 			}
+			violations = append(violations, checkDecoratorBody(mwPath, string(mw))...)
 		}
 		return nil
 	})
@@ -148,6 +152,48 @@ func interfaceNames(src string) []string {
 		out = append(out, m[1])
 	}
 	return out
+}
+
+// decoratorMethodRe matches a top-level method declaration that returns error,
+// capturing the method name. Only methods on the decorator struct qualify.
+var decoratorMethodRe = regexp.MustCompile(`(?m)^func\s+\([^)]*\)\s+(\w+)\([^)]*\)[^{]*\berror\b[^{]*\{`)
+
+// decoratorBodyMarkers are the four steps every decorator method must perform,
+// checked as substrings of the method body.
+var decoratorBodyMarkers = []struct {
+	label  string
+	marker string
+}{
+	{"telemetry.Start", "telemetry.Start(ctx)"},
+	{"defer span.End", "defer span.End()"},
+	{"retry", "retrykit."},
+	{"telemetry.RecordError", "telemetry.RecordError(span, err)"},
+	{"logkit.LogMw", "logkit.LogMw(ctx"},
+}
+
+// checkDecoratorBody verifies that every error-returning method in a decorator
+// file contains the four-step body (span, retry, record error, log).
+func checkDecoratorBody(path, src string) []string {
+	var violations []string
+
+	locs := decoratorMethodRe.FindAllStringSubmatchIndex(src, -1)
+	for i, loc := range locs {
+		name := src[loc[2]:loc[3]]
+		start := loc[1] // first byte of the body
+		end := len(src)
+		if i+1 < len(locs) {
+			end = locs[i+1][0]
+		}
+		body := src[start:end]
+
+		for _, m := range decoratorBodyMarkers {
+			if !strings.Contains(body, m.marker) {
+				violations = append(violations,
+					fmt.Sprintf("decorator body: %s method %s missing %s", path, name, m.label))
+			}
+		}
+	}
+	return violations
 }
 
 // checkFileNaming enforces the naming conventions across internal/, pkg/, cmd/.

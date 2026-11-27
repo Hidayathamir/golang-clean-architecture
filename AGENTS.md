@@ -38,7 +38,27 @@ userRepo = repository.NewUserRepository(cfg)
 userRepo = repository.NewUserRepositoryMwLogger(userRepo)  // decorates
 ```
 
-**Enforced** via `make check-rules` (`scripts/checkrules`): every interface in `internal/outbound/` must have a sibling `<name>_mw_logger.go` declaring `<Name>MwLogger`, and every interface in `internal/usecase/` must have a sibling `<name>_usecase_mw_logger.go` declaring `<Name>MwLogger`. The telemetry mechanics inside each generated method live in the `otel-architecture` skill → "Decorator pattern".
+**Enforced** via `make check-rules` (`scripts/checkrules`): every interface in `internal/outbound/` must have a sibling `<name>_mw_logger.go` declaring `<Name>MwLogger`, and every interface in `internal/usecase/` must have a sibling `<name>_usecase_mw_logger.go` declaring `<Name>MwLogger`.
+
+Every decorated method follows the same four steps — start span, call the real method (wrapped in retry), record the error on the span, emit the log (see `internal/outbound/repository/follow_repository_mw_logger.go:26`):
+
+```go
+func (r *FollowRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, follow *entity.Follow) error {
+	ctx, span := telemetry.Start(ctx) // span named after the caller's func
+	defer span.End()
+
+	err := retrykit.DBRetry(ctx, func() error { // no-value; DBRetryWithData for value-returning
+		return r.Next.Create(ctx, db, follow)
+	})
+	telemetry.RecordError(span, err) // span.RecordError + status=ERROR
+	fields := logrus.Fields{"follow": follow}
+	logkit.LogMw(ctx, fields, err) // Debug on success, Error on failure
+	return err
+}
+```
+
+- The retry helper depends on the outbound type: `retrykit.DBRetry` / `DBRetryWithData` for DB; other variants for Kafka/HTTP as appropriate to the call.
+- The telemetry mechanics (span naming, error recording, log correlation) live in the `otel-architecture` skill → "Decorator pattern".
 
 ## File naming conventions
 
@@ -58,14 +78,9 @@ Migration files under `db/migrations/` must be named `<14-digit-timestamp>_<snak
 
 **Enforced** via `make check-rules` (`scripts/checkrules`). How to run migrations: see **Database migrations** under Workflow.
 
-## Error handling — always do both
+## Error handling — tagged via `pkg/errkit`
 
-```go
-err = errkit.SetCode(err, http.StatusNotFound)            // set HTTP status
-return errkit.AddFuncName(err, "package.(*Type).Method")  // enrich with call site
-```
-
-`make add-func-name` fills in the caller's function name for `errkit.AddFuncName`. The pre-commit hook runs it automatically (on any staged `.go` file) and re-stages the result, so you normally do nothing. Run it manually only if you commit with `--no-verify`. (For instant feedback on save, `.vscode/settings.json` runs the same command — optional, not required.)
+Errors carry their HTTP status, a client-facing message, and the call site that produced them, all handled centrally by `pkg/errkit`. Non-retryable errors for Kafka are marked with `errkit.WrapNonRetryable` / read back with `errkit.IsNonRetryable` (see the `kafka-error-handling` skill → "Error Classification"). Details live in the `architecture` skill → "Error handling".
 
 ## Comments — explain why, never what
 
