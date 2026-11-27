@@ -44,6 +44,7 @@ flowchart LR
     Web --> Traces
     Producer --> Traces
     Consumer --> Traces
+    Cleaner --> Traces
     Web --> Logs
     Producer --> Logs
     Consumer --> Logs
@@ -103,6 +104,8 @@ defer stopLogProvider()
 - `otelkit.ValidateAbleToExportSpan()` sends a throwaway span and `ForceFlush`es with a 5s timeout — a hard startup gate on collector availability.
 
 The log provider mirrors this with `sdklog.NewLoggerProvider` + `NewBatchProcessor`.
+
+**`workeridempotencycleaner`** (`cmd/workeridempotencycleaner/main.go`) follows the same boot order (trace provider → log provider, both deferred) and **does emit traces** — not from `runCleaner` itself, but through the decorator chain: each `DeleteOlderThan` call goes via `IdempotencyUsecaseMwLogger` → `telemetry.Start`, producing a **root span** (no parent trace, since the ticker has no incoming context). So the Cleaner appears under both `Traces` and `Logs` in the §1 diagram.
 
 ---
 

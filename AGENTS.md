@@ -19,7 +19,7 @@ make swag             # Regenerate swagger docs in api/ (deletes dir first)
 
 Configuration is `settings/config.json` (Viper). Always run in this order:
 
-1. **Start infrastructure** — `make docker-compose-up` (wait for it to finish). Postgres, Kafka, SigNoz, Redpanda Console.
+1. **Start infrastructure** — `make docker-compose-up` (wait for it to finish). Postgres, Kafka (+ Zookeeper), Redis, Elasticsearch, Kibana, Localstack, Redpanda Console, and SigNoz (with its own ClickHouse + Zookeeper).
 2. **Run migrations** — `make migrate`.
 3. **Run the app servers** (separate terminals, any order after migration):
    ```bash
@@ -48,13 +48,13 @@ make migrate   # cmd/migrate -> pkg/migrate -> sql-migrate (library), Up only
 ## Architecture layers (top → bottom)
 
 ```
-cmd/              Entry points: webserver, workerconsumer, consumer, migrate
+cmd/              Entry points: webserver, workerconsumer, workerproducer, workeridempotencycleaner, migrate
 internal/
   inbound/        HTTP controllers (package http), Kafka consumers (package messaging)
   dto/            Request/response DTOs between layers
   converter/      Entity ↔ DTO transforms
-  usecase/*usecase/   Business logic (package userusecase, imageusecase, notifusecase)
-  entity/         Domain models (GORM structs)
+  usecase/*usecase/   Business logic (package userusecase, imageusecase, notifusecase, idempotencyusecase)
+  entity/         Domain models (GORM structs, e.g. message_idempotency)
   outbound/       External implementations: repository, cache, messaging, storage, search
   provider/       Component initialization (DB, Redis, Kafka, S3, Elasticsearch, Fiber)
   dependency_injection/   Wire everything together
@@ -82,6 +82,29 @@ userRepo = repository.NewUserRepositoryMwLogger(userRepo)  // decorates
 ```
 
 **Enforced** via `make check-rules` (`scripts/checkrules`): every interface in `internal/outbound/` must have a sibling `<name>_mw_logger.go` declaring `<Name>MwLogger`. Runs in the pre-commit hook (activate with `make setup`).
+
+## Idempotency subsystem
+
+Kafka consumers are **at-least-once**, so every message carries an **`x-idempotency-key` header** (a UUID) and nearly every handler in `route_messaging.go` is wrapped by a de-dup decorator.
+
+| Piece | Location |
+|-------|----------|
+| Entity | `internal/entity/message_idempotency.go` (table `message_idempotency`, PK `idempotency_key`) |
+| Migration | `db/migrations/20260724000000_create_table_message_idempotency.sql` |
+| Repository | `internal/outbound/repository/idempotency_repository.go` (+ `_mw_logger.go`) |
+| Usecase | `internal/usecase/idempotencyusecase/` — `InsertIfNotExists` (insert-if-absent) and `DeleteOlderThan` |
+| Inbound wrapper | `internal/inbound/messaging/idempotency.go` — `IdempotencyHandlerSingle` / `IdempotencyHandlerBatch` |
+| Cleaner binary | `cmd/workeridempotencycleaner/` — deletes rows older than 7 days on a ticker |
+| Config | `idempotency.cleanup_interval_seconds` (default `3600`) |
+
+Behavior:
+
+- A handler that sees an **already-inserted key** is skipped and returns `nil` — offset committed, no retry, no DLQ (de-dup is not error routing).
+- The wrapper is **fail-open**: a missing header or a failed check logs and proceeds to the handler anyway.
+- `IdempotencyHandlerBatch` filters per record; if all are duplicates the batch handler is never called.
+- The cleaner has **no `make run-*` target** — run it with `go run cmd/workeridempotencycleaner/main.go` (or add a target). Without it the table grows unbounded.
+
+Deep reference for the consumer-side flow: the `kafka-error-handling` skill.
 
 ## File naming conventions
 
