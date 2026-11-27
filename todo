@@ -1,3 +1,17 @@
 how easy to use this project as template?
 panic handler
 in read me diagram, why messaging to db?
+
+docs audit (README.md, Makefile, AGENTS.md, docs/architecture.mermaid, .opencode/skills/*):
+- statements are still correct, but docs have drifted incomplete since the idempotency feature
+- document idempotency subsystem (missing from AGENTS.md + skills):
+  - internal/usecase/idempotencyusecase/ (usecase + mw logger)
+  - internal/inbound/messaging/idempotency.go (IdempotencyHandlerSingle/Batch, x-idempotency-key header)
+  - internal/entity/message_idempotency.go + migration 20260724000000_create_table_message_idempotency.sql
+  - cmd/workeridempotencycleaner/ binary
+  - idempotency.cleanup_interval_seconds config key
+  - AGENTS.md architecture list omits idempotencyusecase, message_idempotency, and the 4th cmd/
+  - otel-architecture skill lists Cleaner in diagram but never explains it
+  - kafka-error-handling skill omits the idempotency wrapper that wraps nearly every handler in route_messaging.go, and the x-idempotency-key header
+- fix docs/architecture.mermaid dead ref: line 60 classes SCH but SCH is never defined (leftover scheduler node)
+- AGENTS.md infra line says "Postgres, Kafka, SigNoz, Redpanda Console" but docker compose also runs Elasticsearch, Kibana, Redis, Localstack
