@@ -1,11 +1,26 @@
 #!/bin/sh
-# Pre-commit: enforce project rules before a commit is created.
+# Pre-commit:
+#   1. Regenerate docs/*.png if any docs/*.mermaid is staged.
+#   2. Enforce project rules before the commit is created.
 # Installed via `make setup` (sets core.hooksPath to .githooks).
 #
 # To bypass in an emergency: git commit --no-verify
 
 set -e
 
+# 1. Keep rendered diagrams in sync with their mermaid source.
+staged_mermaid=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^docs/.*\.mermaid$' || true)
+if [ -n "$staged_mermaid" ]; then
+	echo "🎨 docs/*.mermaid changed -> regenerating diagrams..."
+	if ! make diagram; then
+		echo ""
+		echo "❌ Commit blocked: diagram render failed (see make diagram)."
+		exit 1
+	fi
+	git diff --name-only --diff-filter=ACM | grep -E '^docs/.*\.png$' | xargs -r git add
+fi
+
+# 2. Enforce project rules.
 if ! make check-rules; then
 	echo ""
 	echo "❌ Commit blocked: project rules violated (see make check-rules)."

@@ -143,6 +143,14 @@ VSCode auto-runs `addfuncname` on `.go` file save. If you add new Go files outsi
 
 Single file: `config.json` at project root. Parsed via Viper in `internal/config/config.go`. Typed access through `config.Config` struct — always inject via constructor, never use a global.
 
+## Diagrams
+
+`docs/architecture.mermaid` is the source; `docs/architecture.png` is generated (used by README).
+
+- Regenerate: `make diagram` (runs `mmdc`, needs `npm install` first).
+- The pre-commit hook auto-regenerates the PNG and stages it whenever a `docs/*.mermaid` change is committed.
+- `docs/puppeteer-config.json` disables the Chromium sandbox (needed on Linux).
+
 ## Observability & management tools
 
 | Tool | URL | Description |

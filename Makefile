@@ -66,6 +66,10 @@ swag:
 check-rules:
 	go run ./scripts/checkrules
 
+# Render docs/*.mermaid to docs/*.png (requires: npm install).
+diagram:
+	npm run --silent diagram
+
 # One-time setup after clone: activate the shared pre-commit hook.
 setup:
 	git config core.hooksPath .githooks
@@ -108,6 +112,11 @@ check-tools:
 		echo "✔ golangci-lint installed"; \
 	else \
 		echo "❌ golangci-lint not found. Install: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest"; \
+	fi
+	@if command -v npm >/dev/null 2>&1; then \
+		echo "✔ npm installed"; \
+	else \
+		echo "❌ npm not found. Install Node.js: https://nodejs.org/"; \
 	fi
 	@echo "✅ Done checking tools."
 
