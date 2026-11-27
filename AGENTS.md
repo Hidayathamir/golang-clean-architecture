@@ -1,6 +1,12 @@
 # AGENTS.md
 
-Always-on rules for this repo. Deep reference lives in skills — see **Skills** at the bottom.
+Always-on rules and workflow for this repo. Deep reference lives in skills — see **Skills** at the bottom.
+
+---
+
+# Rules (enforced by hooks)
+
+These are checked automatically. Run `make setup` once after cloning to activate the hooks.
 
 ## Code generation — run after interface changes
 
@@ -11,13 +17,67 @@ make swag             # Regenerate swagger docs in api/ (deletes dir first)
 
 **Never edit `internal/mock/` or `api/` by hand.** Both are fully generated. Editing them is denied via `permissions` in `opencode.jsonc` (as are `logs/`).
 
-**Enforced** by a shared pre-commit hook (`.githooks/pre-commit` → `make check-rules`). Run `make setup` once after cloning to activate it. Stale generated code is caught by the **pre-push** hook (`.githooks/pre-push` → `make check-codegen`): regenerate + assert no diff, so a push is blocked until the regenerated `internal/mock`/`api` is committed.
+**Enforced** by a shared pre-commit hook (`.githooks/pre-commit` → `make check-rules`). Stale generated code is caught by the **pre-push** hook (`.githooks/pre-push` → `make check-codegen`): regenerate + assert no diff, so a push is blocked until the regenerated `internal/mock`/`api` is committed.
 
 ## Commit messages — Conventional Commits 1.0.0
 
 Every commit message must follow Conventional Commits — `<type>[(scope)][!]: <description>`, using types `feat`, `fix`, `build`, `chore`, `ci`, `docs`, `style`, `refactor`, `perf`, `test`, `revert`. Merge, revert and fixup/squash commits are exempt.
 
 **Enforced** by the shared commit-msg hook (`.githooks/commit-msg` → `make check-commit-msg`, `scripts/checkcommitmsg`). Also available manually: `make check-commit-msg MSG_FILE=<file>`. Full spec: the `git-commit-convention` skill.
+
+## Decorator pattern — mandatory for all outbound interfaces
+
+Every outbound interface (repository, cache, messaging, storage, search) **must** have a logger-middleware wrapper (`_mw_logger.go`) that wraps the real implementation in a `{Interface}MwLogger` struct with a `Next {Interface}` field and satisfies the interface (`var _ Interface = &InterfaceMwLogger{}`).
+
+Same pattern applies to usecases: `usecase → UserUsecaseMwLogger(UserUsecase)`.
+
+Wire the decorator chain in `dependency_injection/` — real impl first, then logger wrapper:
+```go
+var userRepo repository.UserRepository
+userRepo = repository.NewUserRepository(cfg)
+userRepo = repository.NewUserRepositoryMwLogger(userRepo)  // decorates
+```
+
+**Enforced** via `make check-rules` (`scripts/checkrules`): every interface in `internal/outbound/` must have a sibling `<name>_mw_logger.go` declaring `<Name>MwLogger`, and every interface in `internal/usecase/` must have a sibling `<name>_usecase_mw_logger.go` declaring `<Name>MwLogger`. The telemetry mechanics inside each generated method live in the `otel-architecture` skill → "Decorator pattern".
+
+## File naming conventions
+
+Go files under `internal/`, `pkg/`, `cmd/` must be snake_case (with optional `_test`), except generated mocks. Decorators end in `_mw_logger.go`; tests end in `_test.go`; per-package fixtures are `helper_test.go`; moq mocks are `mock/Mock{Interface}.go`.
+
+**Enforced** via `make check-rules` (`scripts/checkrules`). Full table: the `architecture` skill.
+
+## Testing conventions
+
+Test files under `internal/` must declare `package {dir}_test` (external, black-box).
+
+**Enforced** via `make check-rules` (`scripts/checkrules`). DB mocking, fixtures, and how to run tests: the `architecture` skill.
+
+## Migration file naming
+
+Migration files under `db/migrations/` must be named `<14-digit-timestamp>_<snake_case>.sql` and carry both `-- +migrate Up` and `-- +migrate Down` sections, Up first.
+
+**Enforced** via `make check-rules` (`scripts/checkrules`). How to run migrations: see **Database migrations** under Workflow.
+
+## Error handling — always do both
+
+```go
+err = errkit.SetCode(err, http.StatusNotFound)            // set HTTP status
+return errkit.AddFuncName(err, "package.(*Type).Method")  // enrich with call site
+```
+
+`make add-func-name` fills in the caller's function name for `errkit.AddFuncName`. The pre-commit hook runs it automatically (on any staged `.go` file) and re-stages the result, so you normally do nothing. Run it manually only if you commit with `--no-verify`. (For instant feedback on save, `.vscode/settings.json` runs the same command — optional, not required.)
+
+## Comments — explain why, never what
+
+- Comments are only for **why**: non-obvious intent, a tradeoff, a workaround, a subtle invariant.
+- Never restate what the code does — names and structure already do that. A "what" comment stales as code changes.
+- No obvious comments (`// increment i`), no section-header noise (`// === helpers ===`), no commented-out code.
+- Godoc on exported types/funcs/methods **is** allowed — it's API surface, not narration.
+- If body code needs a "why not obvious" note, keep it short and inline.
+
+---
+
+# Workflow
 
 ## How to run the project
 
@@ -47,23 +107,6 @@ Configuration is `settings/config.json` (Viper). Always run in this order:
 
 **Always start services with the `make run-*` / `make run-all` commands.** Never use `go run` or `nohup` directly — they bypass tuistory and cause stale-process conflicts. The `run-*` and `stop-all` targets **require tuistory** — if it is missing they fail with a clear error (run `make check-tools`). One-shot targets (`make migrate`, `make go-test`, `make go-e2e-test`) call plain `go run`/`go test` and do **not** use tuistory.
 
-## Finding logs for one request
-
-Each server writes its own `logs/<service>_log.jsonl`, and every line carries the request's `trace_id`. The trace id is returned to the caller as the **`X-Trace-ID`** response header.
-
-```bash
-# 1. Make a request and read the trace id from the response.
-curl -i http://localhost:3000/api/users/_current
-# -> X-Trace-ID: 6e49d1047e1d41e0a295caad7bbecaeb
-
-# 2. Pull every line for that trace from all log files, merged and time-sorted,
-#    each tagged with the service it came from.
-make trace-logs TRACE_ID=6e49d1047e1d41e0a295caad7bbecaeb
-# -> logs/trace_logs_search_result.jsonl   (override path with OUT=<file>)
-```
-
-`make trace-logs` runs `scripts/tracelogs`. It scans every `logs/*_log.jsonl`, keeps lines whose `trace_id` matches, adds a `service` field (the file's name, e.g. `webserver`, `workerconsumer`), sorts everything by the line's `time`, and writes one JSONL file. Use it instead of hand-grepping when a request spans services. For cross-service traces in one view (and to correlate with spans), the same `trace_id` is queryable in SigNoz — see the `signoz-traces` skill.
-
 ## Tooling prerequisites
 
 `make setup` runs `make check-tools` (which **fails** if anything is missing), downloads Go deps, then activates git hooks. Required tools:
@@ -89,117 +132,27 @@ make migrate   # cmd/migrate -> pkg/migrate -> sql-migrate (library), Up only
 - Migration files live in `db/migrations/`, named `<timestamp>_<name>.sql`, with `-- +migrate Up` / `-- +migrate Down` sections.
 - `make migrate` only applies **Up** (all pending). It cannot roll back or show status; use `psql` against the `gorp_migrations` table for that.
 
-**Enforced** via `make check-rules` (`scripts/checkrules`): every `db/migrations/*.sql` must be named `<14-digit-timestamp>_<snake_case>.sql` and carry both `-- +migrate Up` and `-- +migrate Down`, Up first. Runs in the pre-commit hook (activate with `make setup`).
+## Finding logs for one request
 
-## Architecture layers (top → bottom)
+Each server writes its own `logs/<service>_log.jsonl`, and every line carries the request's `trace_id`. The trace id is returned to the caller as the **`X-Trace-ID`** response header.
 
-```
-cmd/              Entry points: webserver, workerconsumer, workerproducer, workeridempotencycleaner, migrate
-internal/
-  inbound/        HTTP controllers (package http), Kafka consumers (package messaging)
-  dto/            Request/response DTOs between layers
-  converter/      Entity ↔ DTO transforms
-  usecase/*usecase/   Business logic (package userusecase, imageusecase, notifusecase, idempotencyusecase)
-  entity/         Domain models (GORM structs, e.g. message_idempotency)
-  outbound/       External implementations: repository, cache, messaging, storage, search
-  provider/       Component initialization (DB, Redis, Kafka, S3, Elasticsearch, Fiber)
-  dependency_injection/   Wire everything together
-  config/         Viper-based config from settings/config.json
-pkg/              Shared utilities: logkit, errkit, telemetry, retrykit, validatorkit, caller, ctx, constant
+```bash
+# 1. Make a request and read the trace id from the response.
+curl -i http://localhost:3000/api/users/_current
+# -> X-Trace-ID: 6e49d1047e1d41e0a295caad7bbecaeb
+
+# 2. Merge every matching line from all log files into one, time-sorted, tagged file.
+make trace-logs TRACE_ID=6e49d1047e1d41e0a295caad7bbecaeb
+# -> logs/trace_logs_search_result.jsonl   (override path with OUT=<file>)
 ```
 
-## Decorator pattern — mandatory for all outbound interfaces
+Full detail — the tool, SigNoz correlation, and the async-work caveat: the `tracing-logs` skill.
 
-Every outbound interface (repository, cache, messaging, storage, search) **must** have a logger-middleware wrapper (`_mw_logger.go`) that wraps the real implementation in a `{Interface}MwLogger` struct with a `Next {Interface}` field and satisfies the interface (`var _ Interface = &InterfaceMwLogger{}`).
+---
 
-Same pattern applies to usecases: `usecase → UserUsecaseMwLogger(UserUsecase)`.
+# Reference
 
-Wire the decorator chain in `dependency_injection/` — real impl first, then logger wrapper:
-```go
-var userRepo repository.UserRepository
-userRepo = repository.NewUserRepository(cfg)
-userRepo = repository.NewUserRepositoryMwLogger(userRepo)  // decorates
-```
-
-**Enforced** via `make check-rules` (`scripts/checkrules`): every interface in `internal/outbound/` must have a sibling `<name>_mw_logger.go` declaring `<Name>MwLogger`, and every interface in `internal/usecase/` must have a sibling `<name>_usecase_mw_logger.go` declaring `<Name>MwLogger`. Runs in the pre-commit hook (activate with `make setup`).
-
-The telemetry mechanics inside each generated method (span, `retrykit`, error recording, `logkit.LogMw`) live in the `otel-architecture` skill → "Decorator pattern".
-
-## Idempotency
-
-Kafka consumers are **at-least-once**, so every message carries an **`x-idempotency-key` header** and nearly every handler in `route_messaging.go` is wrapped by a de-dup decorator (skipped duplicates commit the offset, no retry/DLQ; the wrapper is fail-open; run `make run-workeridempotencycleaner` in production).
-
-Full detail — the table, wrapper functions, and behavior: the `idempotency` skill.
-
-## File naming conventions
-
-| Pattern | Example | Purpose |
-|---------|---------|---------|
-| `snake_case.go` | `user_controller.go` | All Go files |
-| `*_mw_logger.go` | `user_repository_mw_logger.go` | Logger decorator |
-| `*_test.go` | `user_usecase_test.go` | Tests (external test package: `package foo_test`) |
-| `helper_test.go` | `helper_test.go` | Shared test fixtures per package |
-| `mock/Mock{Interface}.go` | `mock/MockRepositoryUser.go` | Moq-generated mocks |
-
-**Enforced** via `make check-rules` (`scripts/checkrules`): Go files under `internal/`, `pkg/`, `cmd/` must be snake_case (with optional `_test`), except generated mocks. Runs in the pre-commit hook (activate with `make setup`).
-
-## Error handling — always do both
-
-```go
-err = errkit.SetCode(err, http.StatusNotFound)            // set HTTP status
-return errkit.AddFuncName(err, "package.(*Type).Method")  // enrich with call site
-```
-
-`make add-func-name` fills in the caller's function name for `errkit.AddFuncName`. The pre-commit hook runs it automatically (on any staged `.go` file) and re-stages the result, so you normally do nothing. Run it manually only if you commit with `--no-verify`. (For instant feedback on save, `.vscode/settings.json` runs the same command — optional, not required.)
-
-## Comments — explain why, never what
-
-- Comments are only for **why**: non-obvious intent, a tradeoff, a workaround, a subtle invariant.
-- Never restate what the code does — names and structure already do that. A "what" comment stales as code changes.
-- No obvious comments (`// increment i`), no section-header noise (`// === helpers ===`), no commented-out code.
-- Godoc on exported types/funcs/methods **is** allowed — it's API surface, not narration.
-- If body code needs a "why not obvious" note, keep it short and inline.
-
-## Testing conventions
-
-- **Test package**: `package {pkg}_test` (external, black-box)
-- **DB mocking**: `go-sqlmock` + GORM with `PreferSimpleProtocol: true` (see `helper_test.go`)
-- **Interface mocking**: Use moq-generated mocks from `internal/mock/` — set `.Func` fields on the mock struct to control behavior
-- **Fixtures**: Place shared helpers in `helper_test.go` per package
-- Unit tests: `make go-test` (tests `./internal/...`)
-- E2E tests: `make go-e2e-test` (tests `./test/e2etest/...`)
-
-**Enforced** via `make check-rules` (`scripts/checkrules`): test files under `internal/` must declare `package {dir}_test`. Runs in the pre-commit hook (activate with `make setup`).
-
-## Route conventions (Fiber)
-
-- Public routes: standard paths (`/api/users`)
-- Authenticated routes: `_` prefix on the path segment (`/api/users/_current`, `/api/users/_follow`)
-- Swagger annotations are on controller methods; Swagger served at `/swagger/*`
-
-## Adding a new feature
-
-1. Define entity in `internal/entity/`
-2. Define DTOs in `internal/dto/`
-3. Create interface + impl in `internal/usecase/<name>usecase/` — add `//go:generate moq` directive
-4. Create outbound interface + impl in `internal/outbound/<layer>/` — add `//go:generate moq` directive
-5. Add MwLogger decorators for both usecase and infra
-6. Wire in `internal/dependency_injection/`
-7. Create controller/consumer in `internal/inbound/<http|messaging>/`
-8. Register routes in `internal/inbound/<http|messaging>/route/`
-9. Run `make generate && make swag`
-
-## Configuration
-
-Single file: `settings/config.json`. Parsed via Viper in `internal/config/config.go`. Typed access through `config.Config` struct — always inject via constructor, never use a global.
-
-## Diagrams
-
-`docs/architecture.mermaid` is the source; `docs/architecture.png` is generated (used by README).
-
-- Regenerate: `make diagram` (fetches `mmdc` via `npx`, needs Node).
-- The pre-commit hook auto-regenerates the PNG and stages it whenever a `docs/*.mermaid` change is committed.
-- `docs/puppeteer-config.json` disables the Chromium sandbox (needed on Linux).
+Pointers to the deep-dive skills. Load the skill when you need the detail.
 
 ## Observability & management tools
 
@@ -210,8 +163,22 @@ Single file: `settings/config.json`. Parsed via Viper in `internal/config/config
 | **Swagger** | http://localhost:3000/swagger | Interactive API documentation and testing. |
 | **Kibana** | http://localhost:5601 | Explore/visualize data in Elasticsearch. |
 
-## Skills — deep reference (loaded on demand)
+## Idempotency
 
+Kafka consumers are **at-least-once**, so every message carries an **`x-idempotency-key` header** and nearly every handler in `route_messaging.go` is wrapped by a de-dup decorator (skipped duplicates commit the offset, no retry/DLQ; the wrapper is fail-open; run `make run-workeridempotencycleaner` in production).
+
+Full detail — the table, wrapper functions, and behavior: the `idempotency` skill.
+
+## Architecture, layout, and adding features
+
+Layers (`cmd`/`internal`/`pkg`), route conventions, config, and the step-by-step for adding a feature: the `architecture` skill.
+
+---
+
+# Skills — deep reference (loaded on demand)
+
+- **`architecture`** — layers, file layout, route/config conventions, and how to add a feature.
+- **`tracing-logs`** — find all logs for one request by trace id (local files or SigNoz).
 - **`signoz-traces`** — ClickHouse MCP setup + trace/span/error SQL queries against SigNoz.
 - **`otel-architecture`** — full OTel implementation: trace/log providers, decorator spans, HTTP + Kafka instrumentation, log correlation, OTLP export.
 - **`kafka-error-handling`** — topic topology, retry/DLQ flow, error classification, consumer loop types, graceful shutdown.
