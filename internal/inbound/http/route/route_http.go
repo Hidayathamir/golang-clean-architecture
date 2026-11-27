@@ -10,6 +10,8 @@ import (
 func Setup(app *fiber.App, controllers *dependency_injection.Controllers, middlewares *dependency_injection.Middlewares) {
 	root := app.Group("")
 
+	root.Use(middlewares.RecoverMiddleware)
+
 	setupHomeRoute(root)
 	setupSwaggerRoute(root)
 

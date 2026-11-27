@@ -9,16 +9,19 @@ type Middlewares struct {
 	AuthMiddleware      fiber.Handler
 	TraceIDMiddleware   fiber.Handler
 	OtelFiberMiddleware fiber.Handler
+	RecoverMiddleware   fiber.Handler
 }
 
 func SetupMiddlewares(usecases *Usecases) *Middlewares {
 	authMiddleware := middleware.NewAuth(usecases.UserUsecase)
 	traceIDMiddleware := middleware.NewTraceID()
 	otelFiberMiddleware := middleware.NewOtelFiberMiddleware()
+	recoverMiddleware := middleware.NewRecover()
 
 	return &Middlewares{
 		AuthMiddleware:      authMiddleware,
 		TraceIDMiddleware:   traceIDMiddleware,
 		OtelFiberMiddleware: otelFiberMiddleware,
+		RecoverMiddleware:   recoverMiddleware,
 	}
 }

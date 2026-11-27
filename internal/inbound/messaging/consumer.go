@@ -2,6 +2,9 @@ package messaging
 
 import (
 	"context"
+	"fmt"
+	"net/http"
+	"runtime/debug"
 	"strconv"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
@@ -16,6 +19,25 @@ import (
 type ConsumerHandlerBatch func(ctx context.Context, records []*kgo.Record) error
 
 type ConsumerHandlerSingle func(ctx context.Context, record *kgo.Record) error
+
+// callHandler runs handler and converts a panic into an error, so a panicking
+// consumer handler flows into the existing retry/DLQ path instead of crashing
+// the worker process.
+func callHandler(ctx context.Context, handler func() error) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			logkit.Logger.WithContext(ctx).
+				WithField("panic", r).
+				WithField("stack", string(debug.Stack())).
+				Error("handler panicked")
+			err = errkit.SetCode(
+				errkit.Wrap(errkit.WrapNonRetryable(fmt.Errorf("panic: %v", r)), "callHandler"),
+				http.StatusInternalServerError,
+			)
+		}
+	}()
+	return handler()
+}
 
 func parseRetryCount(record *kgo.Record) int {
 	result := 0
@@ -88,7 +110,9 @@ func ConsumeEventBatch(ctx context.Context, cfg *config.Config, producer *kgo.Cl
 
 		records := fetches.Records()
 		if len(records) > 0 {
-			err := handler(ctx, records)
+			err := callHandler(ctx, func() error {
+				return handler(ctx, records)
+			})
 			if err != nil {
 				localLogger.WithError(err).Error("handler got error processing message")
 				// TODO: improve by knowing which individual record failed in the batch,
@@ -138,7 +162,9 @@ func ConsumeEventSingle(ctx context.Context, cfg *config.Config, producer *kgo.C
 		records := fetches.Records()
 		if len(records) > 0 {
 			record := records[0]
-			err := handler(ctx, record)
+			err := callHandler(ctx, func() error {
+				return handler(ctx, record)
+			})
 			if err != nil {
 				localLogger.WithError(err).Error("handler got error processing message")
 
@@ -191,7 +217,9 @@ func ConsumeEventRetry(ctx context.Context, cfg *config.Config, producer *kgo.Cl
 		records := fetches.Records()
 		if len(records) > 0 {
 			record := records[0]
-			err := handler(ctx, record)
+			err := callHandler(ctx, func() error {
+				return handler(ctx, record)
+			})
 			if err != nil {
 				localLogger.WithError(err).Error("handler got error processing message")
 
