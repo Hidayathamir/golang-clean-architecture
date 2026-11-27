@@ -35,6 +35,19 @@ Configuration is `config.json` at the project root (Viper). Sequence:
 
 **Always start services with the `make run-*` commands.** Never use `go run` or `nohup` directly — they bypass tuistory and cause stale-process conflicts.
 
+## Database migrations
+
+There is exactly **one** migration path:
+
+```bash
+make migrate   # cmd/migrate -> pkg/migrate -> sql-migrate (library), Up only
+```
+
+- Config comes from `config.json` (`database.*`) — the single source of truth for DB credentials.
+- `sql-migrate` is used as a **Go library** (`pkg/migrate/migrate.go`), not as a CLI. There is no `dbconfig.yml` and no `new-migration`/`migrate-up`/`migrate-down`/`migrate-status` target.
+- Migration files live in `db/migrations/`, named `<timestamp>_<name>.sql`, with `-- +migrate Up` / `-- +migrate Down` sections.
+- `make migrate` only applies **Up** (all pending). It cannot roll back or show status; use `psql` against the `gorp_migrations` table for that.
+
 ## Observability & management tools
 
 | Tool | URL | Description |
