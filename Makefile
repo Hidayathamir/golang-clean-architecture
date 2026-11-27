@@ -8,6 +8,8 @@ HAS_TUISTORY := $(shell command -v tuistory 2>/dev/null)
 
 # Session names are fixed so `run-all` and the individual targets address the same
 # sessions (e.g. `make run-webserver` restarts the session `run-all` started).
+# Truncating each log on restart is runsvc.sh's job, not the Makefile's: the restart
+# is performed in-place by tuistory, so a `rm` here races the reopened descriptor.
 WEB_SESSION           := golang-clean-arch-webserver
 WORKERCONSUMER_SESSION := golang-clean-arch-workerconsumer
 WORKERPRODUCER_SESSION := golang-clean-arch-workerproducer
@@ -59,11 +61,11 @@ stop-all:
 
 go-test:
 	mkdir -p logs
-	go test -count=1 -v ./internal/... >> logs/go_test.jsonl 2>&1
+	go test -count=1 -v ./internal/... > logs/go_test.jsonl 2>&1
 
 go-e2e-test:
 	mkdir -p logs
-	go test -count=1 -v ./test/e2etest/... >> logs/go_e2e_test.jsonl 2>&1
+	go test -count=1 -v ./test/e2etest/... > logs/go_e2e_test.jsonl 2>&1
 
 #################################### 
 
