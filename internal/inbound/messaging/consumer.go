@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"runtime/debug"
 	"strconv"
+	"sync"
+	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/provider"
@@ -50,6 +52,63 @@ func parseRetryCount(record *kgo.Record) int {
 		}
 	}
 	return result
+}
+
+// pollBackoff paces the poll loop when Kafka returns errors (e.g. a broker is
+// down or a topic is unknown). Without it the loop spins with no delay, logging
+// every error at full speed and pinning a CPU core while flooding the log file.
+// It also collapses duplicate errors so a persistent outage logs once per change
+// instead of once per iteration.
+type pollBackoff struct {
+	mu       sync.Mutex
+	lastKey  string
+	attempts uint
+}
+
+const (
+	pollBackoffBase = 100 * time.Millisecond
+	pollBackoffMax  = 10 * time.Second
+)
+
+// wait sleeps for the current backoff (exponential, capped) and resets once the
+// error clears. It logs an error only when the failure changes, and stops early
+// if the context is cancelled.
+func (b *pollBackoff) wait(ctx context.Context, logger *logrus.Entry, errs []kgo.FetchError) {
+	b.mu.Lock()
+	key := ""
+	if len(errs) > 0 {
+		key = errs[0].Err.Error()
+	}
+	changed := key != b.lastKey
+	b.lastKey = key
+	if key == "" {
+		b.attempts = 0
+		b.mu.Unlock()
+		return
+	}
+	b.attempts++
+	shift := b.attempts - 1
+	if shift > 6 {
+		shift = 6
+	}
+	delay := pollBackoffBase << shift
+	if delay > pollBackoffMax {
+		delay = pollBackoffMax
+	}
+	b.mu.Unlock()
+
+	if changed {
+		for _, e := range errs {
+			logger.WithError(e.Err).WithField("topic", e.Topic).Error("error client poll fetch")
+		}
+	}
+
+	timer := time.NewTimer(delay)
+	defer timer.Stop()
+	select {
+	case <-ctx.Done():
+	case <-timer.C:
+	}
 }
 
 func produceToRetry(ctx context.Context, producer *kgo.Client, _topic topic.Topic, record *kgo.Record, retryCount int) {
@@ -97,16 +156,21 @@ func ConsumeEventBatch(ctx context.Context, cfg *config.Config, producer *kgo.Cl
 
 	client := provider.NewKafkaClientConsumerBatch(cfg, consumerGroup, _topic.Primary)
 
+	var backoff pollBackoff
 	for {
 		const maxPollRecords = 0 // returns all buffered records
 		fetches := client.PollRecords(ctx, maxPollRecords)
 
 		if errs := fetches.Errors(); len(errs) > 0 {
-			for _, err := range errs {
-				localLogger.WithError(err.Err).Error("error client poll fetch")
+			backoff.wait(ctx, localLogger, errs)
+
+			if ctx.Err() != nil {
+				localLogger.WithError(ctx.Err()).Info("context cancelled, stopping consumer")
+				break
 			}
 			continue
 		}
+		backoff.wait(ctx, localLogger, nil)
 
 		records := fetches.Records()
 		if len(records) > 0 {
@@ -149,15 +213,20 @@ func ConsumeEventSingle(ctx context.Context, cfg *config.Config, producer *kgo.C
 
 	client := provider.NewKafkaClientConsumerSingle(cfg, consumerGroup, _topic.Primary)
 
+	var backoff pollBackoff
 	for {
 		const maxPollRecords = 1 // returns a maximum 1 record.
 		fetches := client.PollRecords(ctx, maxPollRecords)
 		if errs := fetches.Errors(); len(errs) > 0 {
-			for _, err := range errs {
-				localLogger.WithError(err.Err).Error("error client poll fetch")
+			backoff.wait(ctx, localLogger, errs)
+
+			if ctx.Err() != nil {
+				localLogger.WithError(ctx.Err()).Info("context cancelled, stopping consumer")
+				break
 			}
 			continue
 		}
+		backoff.wait(ctx, localLogger, nil)
 
 		records := fetches.Records()
 		if len(records) > 0 {
@@ -204,15 +273,20 @@ func ConsumeEventRetry(ctx context.Context, cfg *config.Config, producer *kgo.Cl
 
 	maxRetries := cfg.GetKafkaConsumerMaxRetries()
 
+	var backoff pollBackoff
 	for {
 		const maxPollRecords = 1 // returns a maximum 1 record.
 		fetches := client.PollRecords(ctx, maxPollRecords)
 		if errs := fetches.Errors(); len(errs) > 0 {
-			for _, err := range errs {
-				localLogger.WithError(err.Err).Error("error client poll fetch")
+			backoff.wait(ctx, localLogger, errs)
+
+			if ctx.Err() != nil {
+				localLogger.WithError(ctx.Err()).Info("context cancelled, stopping consumer")
+				break
 			}
 			continue
 		}
+		backoff.wait(ctx, localLogger, nil)
 
 		records := fetches.Records()
 		if len(records) > 0 {
