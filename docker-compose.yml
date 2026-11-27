@@ -145,16 +145,21 @@ services:
     depends_on:
       - kafka
 
-  localstack:
-    image: localstack/localstack:4.12.0
-    container_name: localstack-clean-arch
+  minio:
+    image: cgr.dev/chainguard/minio@sha256:b288eaa709ba2f799a39e9a8ceda71a08fabf90109b12c90badba9afff29485c
+    container_name: minio-clean-arch
     ports:
-      - "4566:4566"
+      - "9100:9000"
+      - "9001:9001"
     environment:
-      - SERVICES=s3
-      - DEFAULT_REGION=us-east-1
-    volumes:
-      - ./scripts/localstack:/etc/localstack/init/ready.d
+      - MINIO_ROOT_USER=test
+      - MINIO_ROOT_PASSWORD=testtesttest
+    command: ["server", "/data", "--console-address", ":9001"]
+    healthcheck:
+      test: ["CMD-SHELL", "mc alias set h http://127.0.0.1:9000 \"$MINIO_ROOT_USER\" \"$MINIO_ROOT_PASSWORD\" >/dev/null && mc ready h"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   init-clickhouse:
     <<: *signoz-common

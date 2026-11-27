@@ -85,7 +85,7 @@ return errkit.AddFuncName(err, "package.(*Type).Method")  // enrich with call si
 
 Configuration is `settings/config.json` (Viper). Always run in this order:
 
-1. **Start infrastructure** — `make docker-compose-up` (wait for it to finish). Postgres, Kafka (+ Zookeeper), Redis, Elasticsearch, Kibana, Localstack, Redpanda Console, and SigNoz (with its own ClickHouse + Zookeeper).
+1. **Start infrastructure** — `make docker-compose-up` (wait for it to finish). Postgres, Kafka (+ Zookeeper), Redis, Elasticsearch, Kibana, MinIO (S3 on `:9100`, console on `:9001`), Redpanda Console, and SigNoz (with its own ClickHouse + Zookeeper). The app creates the `image` bucket on startup, so no manual bucket setup is needed.
 2. **Run migrations** — `make migrate`.
 3. **Run the app servers** — one command starts all four in the background:
    ```bash
@@ -162,6 +162,7 @@ Pointers to the deep-dive skills. Load the skill when you need the detail.
 | **Redpanda Console** | http://localhost:8080 | Kafka topics, consumers, messages in real-time. |
 | **Swagger** | http://localhost:3000/swagger | Interactive API documentation and testing. |
 | **Kibana** | http://localhost:5601 | Explore/visualize data in Elasticsearch. |
+| **MinIO Console** | http://localhost:9001 | Browse/inspect the S3 (`image`) bucket. Login `test` / `testtesttest`. |
 
 ## Idempotency
 
