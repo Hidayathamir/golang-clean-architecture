@@ -43,6 +43,9 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-log:/var/lib/zookeeper/log
     healthcheck:
       test: [ "CMD", "bash", "-c", "echo ruok > /dev/tcp/127.0.0.1/2181 && exit 0 || exit 1" ]
       interval: 10s
@@ -68,6 +71,8 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+    volumes:
+      - kafka-data:/var/lib/kafka/data
 
   redpanda-console:
     image: docker.redpanda.com/redpandadata/console:v3.8.0
@@ -110,3 +115,9 @@ services:
 volumes:
   lgtm-data:
     name: lgtm-data
+  kafka-data:
+    name: kafka-data
+  zookeeper-data:
+    name: zookeeper-data
+  zookeeper-log:
+    name: zookeeper-log
