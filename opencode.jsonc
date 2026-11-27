@@ -29,20 +29,6 @@
         "environment": {
           "KAFKA_BROKERS": "localhost:9093"
         }
-      },
-      "clickhouse": {
-        "type": "local",
-        "command": [
-          "npx",
-          "-y",
-          "@arvoretech/clickhouse-mcp"
-        ],
-        "environment": {
-          "CLICKHOUSE_URL": "http://localhost:8123",
-          "CLICKHOUSE_USER": "default",
-          "CLICKHOUSE_PASSWORD": "",
-          "CLICKHOUSE_DATABASE": "signoz_traces"
-        }
       }
     }
   }

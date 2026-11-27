@@ -1,6 +1,6 @@
 ---
 name: tracing-logs
-description: Find every log line for one request by its trace id, from the per-service JSONL log files or SigNoz. Use when debugging a request end-to-end, correlating logs across servers, or when asked how to trace a request through the system.
+description: Find every log line for one request by its trace id, from the per-service JSONL log files or Grafana/Tempo. Use when debugging a request end-to-end, correlating logs across servers, or when asked how to trace a request through the system.
 ---
 
 # Tracing logs by trace id
@@ -44,9 +44,9 @@ Exit codes: `2` when the trace id is missing, `1` when no line matches.
 
 Why a tool and not `grep`: a single request spans several processes (webserver → outbox → workerproducer → Kafka → workerconsumer), each writing its own file. `grep '<id>' logs/*.jsonl` works, but does not merge, tag, or sort; the tool does. Prefer it whenever a request crosses services.
 
-## The full path — SigNoz
+## The full path — Grafana / Tempo
 
-When the local files are gone, rotated, or you want spans and logs in one view, query SigNoz by the same `trace_id`. See the `signoz-traces` skill for the ClickHouse queries (spans by `traceID`, plus how logs correlate via the same trace id).
+When the local files are gone, rotated, or you want spans and logs in one view, open Grafana at http://localhost:3001 (login `admin` / `admin`) and search Tempo by the same `trace_id`, or query the Tempo HTTP API. See the `tempo-traces` skill for the TraceQL equivalents and log correlation via Loki.
 
 ## A caveat on async work
 

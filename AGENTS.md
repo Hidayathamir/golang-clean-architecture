@@ -85,7 +85,7 @@ return errkit.AddFuncName(err, "package.(*Type).Method")  // enrich with call si
 
 Configuration is `settings/config.json` (Viper). Always run in this order:
 
-1. **Start infrastructure** — `make docker-compose-up` (wait for it to finish). Postgres, Kafka (+ Zookeeper), Redis, Elasticsearch, Kibana, MinIO (S3 on `:9100`, console on `:9001`), Redpanda Console, and SigNoz (with its own ClickHouse + Zookeeper). The app creates the `image` bucket on startup, so no manual bucket setup is needed.
+1. **Start infrastructure** — `make docker-compose-up` (wait for it to finish). Postgres, Kafka (+ Zookeeper), Redis, Elasticsearch, Kibana, MinIO (S3 on `:9100`, console on `:9001`), Redpanda Console, and Grafana LGTM (one container: OpenTelemetry Collector + Tempo + Loki + Prometheus + Grafana; OTLP on `:4317`/`:4318`, UI on `:3000`). The app creates the `image` bucket on startup, so no manual bucket setup is needed.
 2. **Run migrations** — `make migrate`.
 3. **Run the app servers** — one command starts all four in the background:
    ```bash
@@ -146,7 +146,7 @@ make trace-logs TRACE_ID=6e49d1047e1d41e0a295caad7bbecaeb
 # -> logs/trace_logs_search_result.jsonl   (override path with OUT=<file>)
 ```
 
-Full detail — the tool, SigNoz correlation, and the async-work caveat: the `tracing-logs` skill.
+Full detail — the tool, Grafana/Tempo correlation, and the async-work caveat: the `tracing-logs` skill.
 
 ---
 
@@ -158,7 +158,7 @@ Pointers to the deep-dive skills. Load the skill when you need the detail.
 
 | Tool | URL | Description |
 | :--- | :--- | :--- |
-| **SigNoz** | http://localhost:3301 | Distributed traces, logs, application metrics. |
+| **Grafana (LGTM)** | http://localhost:3001 | Distributed traces (Tempo), logs (Loki), metrics (Prometheus). Login `admin` / `admin`. |
 | **Redpanda Console** | http://localhost:8080 | Kafka topics, consumers, messages in real-time. |
 | **Swagger** | http://localhost:3000/swagger | Interactive API documentation and testing. |
 | **Kibana** | http://localhost:5601 | Explore/visualize data in Elasticsearch. |
@@ -179,8 +179,8 @@ Layers (`cmd`/`internal`/`pkg`), route conventions, config, and the step-by-step
 # Skills — deep reference (loaded on demand)
 
 - **`architecture`** — layers, file layout, route/config conventions, and how to add a feature.
-- **`tracing-logs`** — find all logs for one request by trace id (local files or SigNoz).
-- **`signoz-traces`** — ClickHouse MCP setup + trace/span/error SQL queries against SigNoz.
+- **`tracing-logs`** — find all logs for one request by trace id (local files or Grafana/Tempo).
+- **`tempo-traces`** — query traces/spans/errors from Tempo via the Grafana UI or the Tempo HTTP API (TraceQL).
 - **`otel-architecture`** — full OTel implementation: trace/log providers, decorator spans, HTTP + Kafka instrumentation, log correlation, OTLP export.
 - **`kafka-error-handling`** — topic topology, retry/DLQ flow, error classification, consumer loop types, graceful shutdown.
 - **`idempotency`** — consumer de-duplication: `x-idempotency-key`, insert-if-absent usecase, inbound wrapper, `message_idempotency` table, cleaner binary.

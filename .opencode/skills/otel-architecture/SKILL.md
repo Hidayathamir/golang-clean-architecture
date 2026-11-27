@@ -1,13 +1,13 @@
 ---
 name: otel-architecture
-description: How this project implements OpenTelemetry — traces, logs, spans, decorators, HTTP and Kafka instrumentation, log correlation, and OTLP export to SigNoz. Use when working on tracing, instrumentation, telemetry, or logging internals.
+description: How this project implements OpenTelemetry — traces, logs, spans, decorators, HTTP and Kafka instrumentation, log correlation, and OTLP export to Grafana LGTM (Tempo + Loki). Use when working on tracing, instrumentation, telemetry, or logging internals.
 ---
 
 # OpenTelemetry (OTel) Architecture
 
 > **Enforcement**: ⚠️ **Partly enforced**. The decorator rule this skill describes (every usecase and outbound interface wrapped by a `*_mw_logger.go` decorator) is enforced via `make check-rules` (`scripts/checkrules`, pre-commit hook). The rest — span/log mechanics, boot order, instrumentation wiring — is descriptive reference with no mechanical check.
 
-How this project implements OTel: **traces** (manual spans + auto-instrumentation) and **logs** (logrus → OTLP logs), both shipped over **OTLP gRPC** to SigNoz (ClickHouse-backed). No metrics signal.
+How this project implements OTel: **traces** (manual spans + auto-instrumentation) and **logs** (logrus → OTLP logs), both shipped over **OTLP gRPC** to Grafana LGTM (Tempo for traces, Loki for logs, all in one container). No metrics signal.
 
 Key packages:
 
@@ -41,7 +41,7 @@ flowchart LR
     end
 
     OTLP["OTLP gRPC exporter<br/>telemetry.otlp.endpoint"]
-    SigNoz["SigNoz (Collector + ClickHouse)"]
+    LGTM["Grafana LGTM<br/>(Collector + Tempo + Loki)"]
 
     Web --> Traces
     Producer --> Traces
@@ -54,7 +54,7 @@ flowchart LR
 
     Traces --> OTLP
     Logs --> OTLP
-    OTLP --> SigNoz
+    OTLP --> LGTM
 ```
 
 - **Traces** come from two sources: *manual spans* (`telemetry.Start`) and *auto-instrumentation* (otelfiber for HTTP, kotel hooks for Kafka).
@@ -129,7 +129,7 @@ flowchart TD
     Controller -.->|"logrus entry + ctx<br/>(trace_id, span_id)"| OtelHook["OtelHook"]
     Repo -.-> OtelHook
     OtelHook -->|"convert to OTel log.Record"| LogBatch["BatchProcessor"]
-    LogBatch -->|"OTLP gRPC"| SigNoz
+    LogBatch -->|"OTLP gRPC"| LGTM
 
     MW -->|"span.End() on response"| Out["Out"]
     Controller --> Out
@@ -194,13 +194,13 @@ flowchart TD
     Getter -->|"attach trace_id, span_id to entry.Data"| Emit["telemetry.EmitLogEntry"]
     Emit -->|"convert logrus.Level → OTel Severity"| Record["log.Record<br/>(timestamp, severity, body,<br/>code.file/func/line, JSON fields)"]
     Record --> LoggerProvider["global LoggerProvider (BatchProcessor)"]
-    LoggerProvider -->|"OTLP gRPC"| SigNoz["SigNoz"]
+    LoggerProvider -->|"OTLP gRPC"| LGTM["Grafana LGTM"]
 ```
 
 `pkg/logrushook/otel_hook.go`:
 
 - Runs on **every** logrus entry (`AllLevels`).
-- Pulls `trace_id` / `span_id` from the context and injects them as log fields (this is what makes logs joinable to traces in SigNoz).
+- Pulls `trace_id` / `span_id` from the context and injects them as log fields (this is what makes logs joinable to traces in Grafana/Tempo).
 - Calls `telemetry.EmitLogEntry(entry)` (`pkg/telemetry/otel_emit_log.go`), which maps severity, sets the message as body, adds caller code location attributes (`semconv.CodeFunction/Filepath/LineNumber`), JSON-serializes all `entry.Data` fields, then `logger.Emit(ctx, record)`.
 
 The hook is registered in `logkit.SetupLogger`:
@@ -334,4 +334,4 @@ Single source: `settings/config.json` → `internal/config/configkey.go:43`
 | Log | logrus → `OtelHook` → `EmitLogEntry` | `sdklog` BatchProcessor → OTLP gRPC |
 | Metric | — | not implemented |
 
-For querying traces from SigNoz/ClickHouse, see the `signoz-traces` skill.
+For querying traces from Grafana/Tempo, see the `tempo-traces` skill.
