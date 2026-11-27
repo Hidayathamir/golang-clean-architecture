@@ -72,7 +72,7 @@ sequenceDiagram
     participant otelkit as otelkit.ValidateAbleToExportSpan
     participant logs as InitLogProvider
 
-    main->>cfg: NewConfig() -> reads config.json
+    main->>cfg: NewConfig() -> reads settings/config.json
     main->>logkit: JSON formatter + add OtelHook
     main->>trace: build TracerProvider (AlwaysSample, Batcher, resource)
     trace-->>main: returns Stop (ForceFlush + Shutdown)
@@ -303,7 +303,7 @@ flowchart LR
 
 ## 7. Configuration
 
-Single source: `config.json` → `internal/config/configkey.go:43`
+Single source: `settings/config.json` → `internal/config/configkey.go:43`
 
 ```jsonc
 {

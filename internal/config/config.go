@@ -15,10 +15,10 @@ func NewConfig() *Config {
 
 	v.SetConfigName("config")
 	v.SetConfigType("json")
-	v.AddConfigPath("./../../../")
-	v.AddConfigPath("./../../")
-	v.AddConfigPath("./../")
-	v.AddConfigPath("./")
+	v.AddConfigPath("./settings")
+	v.AddConfigPath("./../settings")
+	v.AddConfigPath("./../../settings")
+	v.AddConfigPath("./../../../settings")
 
 	config := &Config{Viper: v}
 

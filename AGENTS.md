@@ -17,7 +17,7 @@ make swag             # Regenerate swagger docs in api/ (deletes dir first)
 
 **After cloning, run `make setup` once** — activates the shared pre-commit hook that enforces project rules.
 
-Configuration is `config.json` at the project root (Viper). Always run in this order:
+Configuration is `settings/config.json` (Viper). Always run in this order:
 
 1. **Start infrastructure** — `make docker-compose-up` (wait for it to finish). Postgres, Kafka, SigNoz, Redpanda Console.
 2. **Run migrations** — `make migrate`.
@@ -40,7 +40,7 @@ There is exactly **one** migration path:
 make migrate   # cmd/migrate -> pkg/migrate -> sql-migrate (library), Up only
 ```
 
-- Config comes from `config.json` (`database.*`) — the single source of truth for DB credentials.
+- Config comes from `settings/config.json` (`database.*`) — the single source of truth for DB credentials.
 - `sql-migrate` is used as a **Go library** (`pkg/migrate/migrate.go`), not as a CLI. There is no `dbconfig.yml` and no `new-migration`/`migrate-up`/`migrate-down`/`migrate-status` target.
 - Migration files live in `db/migrations/`, named `<timestamp>_<name>.sql`, with `-- +migrate Up` / `-- +migrate Down` sections.
 - `make migrate` only applies **Up** (all pending). It cannot roll back or show status; use `psql` against the `gorp_migrations` table for that.
@@ -58,7 +58,7 @@ internal/
   outbound/       External implementations: repository, cache, messaging, storage, search
   provider/       Component initialization (DB, Redis, Kafka, S3, Elasticsearch, Fiber)
   dependency_injection/   Wire everything together
-  config/         Viper-based config from config.json
+  config/         Viper-based config from settings/config.json
 pkg/              Shared utilities: logkit, errkit, telemetry, retrykit, validatorkit, caller, ctx, constant
 ```
 
@@ -141,7 +141,7 @@ VSCode auto-runs `addfuncname` on `.go` file save. If you add new Go files outsi
 
 ## Configuration
 
-Single file: `config.json` at project root. Parsed via Viper in `internal/config/config.go`. Typed access through `config.Config` struct — always inject via constructor, never use a global.
+Single file: `settings/config.json`. Parsed via Viper in `internal/config/config.go`. Typed access through `config.Config` struct — always inject via constructor, never use a global.
 
 ## Diagrams
 
