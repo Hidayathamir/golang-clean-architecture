@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/log"
 	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
 )
@@ -38,18 +39,18 @@ func EmitLogEntry(entry *logrus.Entry) {
 
 	record.SetSeverity(severity)
 	record.SetSeverityText(severityText)
-	record.SetBody(log.StringValue(entry.Message))
+	record.SetBody(attribute.StringValue(entry.Message))
 
 	if entry.HasCaller() {
 		record.AddAttributes(
-			log.KeyValueFromAttribute(semconv.CodeFunction(entry.Caller.Function)),
-			log.KeyValueFromAttribute(semconv.CodeFilepath(entry.Caller.File)),
-			log.KeyValueFromAttribute(semconv.CodeLineNumber(entry.Caller.Line)),
+			semconv.CodeFunction(entry.Caller.Function),
+			semconv.CodeFilepath(entry.Caller.File),
+			semconv.CodeLineNumber(entry.Caller.Line),
 		)
 	}
 
 	for key, value := range entry.Data {
-		record.AddAttributes(log.String(key, JSONStr(value)))
+		record.AddAttributes(attribute.String(key, JSONStr(value)))
 	}
 
 	logger.Emit(ctx, record)
