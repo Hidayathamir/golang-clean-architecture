@@ -83,11 +83,24 @@ check-commit-msg:
 diagram:
 	npx -y @mermaid-js/mermaid-cli -i docs/architecture.mermaid -o docs/architecture.png -b white -s 3 -p docs/puppeteer-config.json
 
-# One-time setup after clone: activate the shared pre-commit hook.
+# One-time onboarding after clone. Idempotent — safe to rerun.
+# 1) verify tools (hard-fails if missing)  2) download Go deps
+# 3) activate git hooks  4) verify the hook is live  5) print next steps.
 setup:
-	@$(MAKE) check-tools
-	git config core.hooksPath .githooks
+	@echo "🚀 Setting up the project..."
+	@$(MAKE) --no-print-directory check-tools
+	@echo "📦 Downloading Go dependencies..."
+	@go mod download
+	@echo "🪝 Activating git hooks..."
+	@git config core.hooksPath .githooks
+	@test "$$(git config core.hooksPath)" = ".githooks" || (echo "❌ Failed to activate git hooks." && exit 1)
+	@if [ ! -x .githooks/pre-commit ]; then echo "❌ .githooks/pre-commit is not executable."; exit 1; fi
 	@echo "✅ Git hooks activated (core.hooksPath = .githooks)"
+	@echo ""
+	@echo "✅ Setup complete. Next steps:"
+	@echo "   1. make docker-compose-up            # start infra (wait for it to finish)"
+	@echo "   2. make migrate                      # apply DB migrations"
+	@echo "   3. make run-webserver                # and the other make run-* servers"
 
 # Fails if generated code is stale: regenerate, then assert no diff.
 # Runs in the pre-push hook (.githooks/pre-push); requires a clean working tree
@@ -103,42 +116,16 @@ add-func-name:
 
 check-tools:
 	@echo "🔍 Checking required tools..."
-	@if command -v go >/dev/null 2>&1; then \
-		echo "✔ go installed"; \
-	else \
-		echo "❌ go not found. Install: https://go.dev/"; \
-	fi
-	@if command -v docker >/dev/null 2>&1; then \
-		echo "✔ docker installed"; \
-	else \
-		echo "❌ docker not found. Install: https://www.docker.com/"; \
-	fi
-	@if command -v swag >/dev/null 2>&1; then \
-		echo "✔ swag installed"; \
-	else \
-		echo "❌ swag not found. Install: https://github.com/swaggo/swag"; \
-	fi
-	@if command -v moq >/dev/null 2>&1; then \
-		echo "✔ moq installed"; \
-	else \
-		echo "❌ moq not found. Install: https://github.com/matryer/moq"; \
-	fi
-	@if command -v golangci-lint >/dev/null 2>&1; then \
-		echo "✔ golangci-lint installed"; \
-	else \
-		echo "❌ golangci-lint not found. Install: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest"; \
-	fi
-	@if command -v npm >/dev/null 2>&1; then \
-		echo "✔ npm installed"; \
-	else \
-		echo "❌ npm not found. Install Node.js: https://nodejs.org/"; \
-	fi
-	@if command -v tuistory >/dev/null 2>&1; then \
-		echo "✔ tuistory installed"; \
-	else \
-		echo "❌ tuistory not found. Required for 'make run-*'. Install: npm install -g tuistory"; \
-	fi
-	@echo "✅ Done checking tools."
+	@missing=0; \
+	if command -v go >/dev/null 2>&1; then echo "✔ go installed"; else echo "❌ go not found. Install: https://go.dev/"; missing=1; fi; \
+	if command -v docker >/dev/null 2>&1; then echo "✔ docker installed"; else echo "❌ docker not found. Install: https://www.docker.com/"; missing=1; fi; \
+	if command -v swag >/dev/null 2>&1; then echo "✔ swag installed"; else echo "❌ swag not found. Install: go install github.com/swaggo/swag/cmd/swag@latest"; missing=1; fi; \
+	if command -v moq >/dev/null 2>&1; then echo "✔ moq installed"; else echo "❌ moq not found. Install: go install github.com/matryer/moq@latest"; missing=1; fi; \
+	if command -v golangci-lint >/dev/null 2>&1; then echo "✔ golangci-lint installed"; else echo "❌ golangci-lint not found. Install: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest"; missing=1; fi; \
+	if command -v npm >/dev/null 2>&1; then echo "✔ npm installed"; else echo "❌ npm not found. Install Node.js: https://nodejs.org/"; missing=1; fi; \
+	if command -v tuistory >/dev/null 2>&1; then echo "✔ tuistory installed"; else echo "❌ tuistory not found. Required for 'make run-*'. Install: npm install -g tuistory"; missing=1; fi; \
+	if [ $$missing -ne 0 ]; then echo "❌ One or more required tools are missing — install them, then rerun 'make setup'."; exit 1; fi; \
+	echo "✅ All required tools installed."
 
 OLD_MODULE := github.com/Hidayathamir/golang-clean-architecture
 

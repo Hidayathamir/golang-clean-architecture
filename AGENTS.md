@@ -21,7 +21,7 @@ Every commit message must follow Conventional Commits — `<type>[(scope)][!]: <
 
 ## How to run the project
 
-**After cloning, run `make setup` once** — checks required tools and activates the shared pre-commit hook that enforces project rules.
+**After cloning, run `make setup` once** — it verifies all required tools (hard-fails if any are missing), downloads Go dependencies, activates the shared pre-commit hook, and prints the next steps. It is idempotent, so rerun it any time.
 
 Configuration is `settings/config.json` (Viper). Always run in this order:
 
@@ -42,7 +42,7 @@ Configuration is `settings/config.json` (Viper). Always run in this order:
 
 ## Tooling prerequisites
 
-`make setup` runs `make check-tools` and activates git hooks. Required tools:
+`make setup` runs `make check-tools` (which **fails** if anything is missing), downloads Go deps, then activates git hooks. Required tools:
 
 - **go** — compiler/runtime.
 - **docker** — infrastructure via `make docker-compose-up`.
