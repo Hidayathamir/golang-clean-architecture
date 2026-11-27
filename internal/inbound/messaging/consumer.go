@@ -70,9 +70,18 @@ const (
 	pollBackoffMax  = 10 * time.Second
 )
 
-// wait sleeps for the current backoff (exponential, capped) and resets once the
-// error clears. It logs an error only when the failure changes, and stops early
-// if the context is cancelled.
+// reset clears the backoff state after a successful poll, so the next outage
+// starts its delay from the base instead of the cap.
+func (b *pollBackoff) reset() {
+	b.mu.Lock()
+	b.lastKey = ""
+	b.attempts = 0
+	b.mu.Unlock()
+}
+
+// wait sleeps for the current backoff (exponential, capped) after a poll error.
+// It logs an error only when the failure changes, and stops early if the context
+// is cancelled.
 func (b *pollBackoff) wait(ctx context.Context, logger *logrus.Entry, errs []kgo.FetchError) {
 	b.mu.Lock()
 	key := ""
@@ -81,11 +90,6 @@ func (b *pollBackoff) wait(ctx context.Context, logger *logrus.Entry, errs []kgo
 	}
 	changed := key != b.lastKey
 	b.lastKey = key
-	if key == "" {
-		b.attempts = 0
-		b.mu.Unlock()
-		return
-	}
 	b.attempts++
 	shift := b.attempts - 1
 	if shift > 6 {
@@ -170,7 +174,7 @@ func ConsumeEventBatch(ctx context.Context, cfg *config.Config, producer *kgo.Cl
 			}
 			continue
 		}
-		backoff.wait(ctx, localLogger, nil)
+		backoff.reset()
 
 		records := fetches.Records()
 		if len(records) > 0 {
@@ -226,7 +230,7 @@ func ConsumeEventSingle(ctx context.Context, cfg *config.Config, producer *kgo.C
 			}
 			continue
 		}
-		backoff.wait(ctx, localLogger, nil)
+		backoff.reset()
 
 		records := fetches.Records()
 		if len(records) > 0 {
@@ -286,7 +290,7 @@ func ConsumeEventRetry(ctx context.Context, cfg *config.Config, producer *kgo.Cl
 			}
 			continue
 		}
-		backoff.wait(ctx, localLogger, nil)
+		backoff.reset()
 
 		records := fetches.Records()
 		if len(records) > 0 {
