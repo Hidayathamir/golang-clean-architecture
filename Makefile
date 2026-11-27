@@ -67,8 +67,9 @@ check-rules:
 	go run ./scripts/checkrules
 
 # Render docs/*.mermaid to docs/*.png (requires Node; fetches mmdc via npx).
+# -s 3 renders at 3x scale for crisp text on hi-dpi displays.
 diagram:
-	npx -y @mermaid-js/mermaid-cli -i docs/architecture.mermaid -o docs/architecture.png -b white -p docs/puppeteer-config.json
+	npx -y @mermaid-js/mermaid-cli -i docs/architecture.mermaid -o docs/architecture.png -b white -s 3 -p docs/puppeteer-config.json
 
 # One-time setup after clone: activate the shared pre-commit hook.
 setup:
