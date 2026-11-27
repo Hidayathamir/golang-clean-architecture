@@ -63,6 +63,17 @@ generate:
 swag:
 	rm -rf api/ && swag fmt --exclude ./internal/mock && swag init --parseDependency --parseInternal --generalInfo ./cmd/webserver/main.go --output ./api/
 
+check-rules:
+	go run ./scripts/checkrules
+
+# Fails if generated code is stale: regenerate, then assert no diff.
+# Run in CI. Requires a clean working tree for the two generated dirs.
+check-codegen:
+	$(MAKE) generate
+	$(MAKE) swag
+	@git diff --exit-code -- internal/mock api || \
+		(echo "❌ generated code is stale. Run 'make generate && make swag' and commit the result." && exit 1)
+
 add-func-name:
 	@find ./internal ./pkg ./cmd -name '*.go' -not -path '*/mock/*' -not -path '*/pkg/errkit/cmd/*' | xargs go run ./pkg/errkit/cmd/addfuncname
 

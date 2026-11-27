@@ -11,6 +11,8 @@ make swag             # Regenerate swagger docs in api/ (deletes dir first)
 
 **Never edit `internal/mock/` or `api/` by hand.** Both are fully generated. Editing them is denied via `permissions` in `opencode.jsonc` (as are `logs/`).
 
+**Enforced in CI** (`.github/workflows/rules.yml`) via `make check-codegen` — regenerates and fails if the result differs from what's committed.
+
 ## How to run the project
 
 Configuration is `config.json` at the project root (Viper). Always run in this order:
@@ -77,6 +79,8 @@ userRepo = repository.NewUserRepository(cfg)
 userRepo = repository.NewUserRepositoryMwLogger(userRepo)  // decorates
 ```
 
+**Enforced** via `make check-rules` (`scripts/checkrules`): every interface in `internal/outbound/` must have a sibling `<name>_mw_logger.go` declaring `<Name>MwLogger`. Runs in CI; run locally before pushing.
+
 ## File naming conventions
 
 | Pattern | Example | Purpose |
@@ -86,6 +90,8 @@ userRepo = repository.NewUserRepositoryMwLogger(userRepo)  // decorates
 | `*_test.go` | `user_usecase_test.go` | Tests (external test package: `package foo_test`) |
 | `helper_test.go` | `helper_test.go` | Shared test fixtures per package |
 | `mock/Mock{Interface}.go` | `mock/MockRepositoryUser.go` | Moq-generated mocks |
+
+**Enforced** via `make check-rules` (`scripts/checkrules`): Go files under `internal/`, `pkg/`, `cmd/` must be snake_case (with optional `_test`), except generated mocks. Runs in CI.
 
 ## Error handling — always do both
 
