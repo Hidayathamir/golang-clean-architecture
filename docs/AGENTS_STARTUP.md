@@ -12,7 +12,6 @@ make run-workerconsumer        # Kafka consumer worker
 make run-workerproducer # Outbox producer (polls outbox table, sends to Kafka)
 make go-test           # Unit tests (./internal/...)
 make go-e2e-test       # E2E tests (./test/e2etest/...)
-make new-migration     # Create new migration (config: dbconfig.yml)
 ```
 
 ## Full startup flow (correct order)

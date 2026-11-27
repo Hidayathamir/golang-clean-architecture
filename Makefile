@@ -32,18 +32,6 @@ go-e2e-test:
 migrate:
 	$(RUN_CMD) cmd/migrate/main.go
 
-new-migration:
-	sql-migrate new -config=dbconfig.yml -env=local
-
-migrate-status:
-	sql-migrate status -config=dbconfig.yml -env=local
-
-migrate-up:
-	sql-migrate up -config=dbconfig.yml -env=local
-
-migrate-down:
-	sql-migrate down -limit=0 -config=dbconfig.yml -env=local
-
 #################################### 
 
 docker-compose-up:
@@ -84,11 +72,6 @@ check-tools:
 		echo "✔ go installed"; \
 	else \
 		echo "❌ go not found. Install: https://go.dev/"; \
-	fi
-	@if command -v sql-migrate >/dev/null 2>&1; then \
-		echo "✔ sql-migrate installed"; \
-	else \
-		echo "❌ sql-migrate not found. Install: go install github.com/rubenv/sql-migrate/sql-migrate@latest"; \
 	fi
 	@if command -v docker >/dev/null 2>&1; then \
 		echo "✔ docker installed"; \
