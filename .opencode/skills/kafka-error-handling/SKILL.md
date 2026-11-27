@@ -1,3 +1,8 @@
+---
+name: Kafka Consumer Error Handling
+description: The Kafka topic topology, retry/DLQ flow, error classification, consumer loop types, and graceful shutdown. Use when working on Kafka consumers, retry topics, DLQ handling, or consumer error paths.
+---
+
 # Kafka Consumer Error Handling
 
 ## Topic Topology

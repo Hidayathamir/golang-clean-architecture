@@ -1,3 +1,8 @@
+---
+name: OpenTelemetry Architecture
+description: How this project implements OpenTelemetry — traces, logs, spans, decorators, HTTP and Kafka instrumentation, log correlation, and OTLP export to SigNoz. Use when working on tracing, instrumentation, telemetry, or logging internals.
+---
+
 # OpenTelemetry (OTel) Architecture
 
 How this project implements OTel: **traces** (manual spans + auto-instrumentation) and **logs** (logrus → OTLP logs), both shipped over **OTLP gRPC** to SigNoz (ClickHouse-backed). No metrics signal.
@@ -325,3 +330,5 @@ Single source: `config.json` → `internal/config/configkey.go:43`
 | Trace | `telemetry.Start*` (MwLogger decorators), otelfiber, kotel | Batch span exporter → OTLP gRPC |
 | Log | logrus → `OtelHook` → `EmitLogEntry` | `sdklog` BatchProcessor → OTLP gRPC |
 | Metric | — | not implemented |
+
+For querying traces from SigNoz/ClickHouse, see the `signoz-traces` skill.

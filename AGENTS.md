@@ -1,6 +1,6 @@
 # AGENTS.md
 
-> **Startup instructions moved to [AGENTS_STARTUP.md](docs/AGENTS_STARTUP.md).**
+Always-on rules for this repo. Deep reference lives in skills — see **Skills** at the bottom.
 
 ## Code generation — run after interface changes
 
@@ -13,18 +13,11 @@ make swag             # Regenerate swagger docs in api/ (deletes dir first)
 
 ## How to run the project
 
-Configuration is `config.json` at the project root (Viper). Sequence:
+Configuration is `config.json` at the project root (Viper). Always run in this order:
 
-1. **Start infrastructure** — Postgres, Kafka, SigNoz (tracing), Redpanda Console (Kafka UI):
-   ```bash
-   make docker-compose-up
-   ```
-   Wait for it to finish before continuing.
-2. **Run migrations:**
-   ```bash
-   make migrate
-   ```
-3. **Run the app servers** (separate terminals):
+1. **Start infrastructure** — `make docker-compose-up` (wait for it to finish). Postgres, Kafka, SigNoz, Redpanda Console.
+2. **Run migrations** — `make migrate`.
+3. **Run the app servers** (separate terminals, any order after migration):
    ```bash
    make run-webserver      # HTTP APIs       -> logs/webserver_log.jsonl
    make run-workerconsumer # Kafka consumers -> logs/workerconsumer_log.jsonl
@@ -33,7 +26,7 @@ Configuration is `config.json` at the project root (Viper). Sequence:
    - `run-workerconsumer` handles async tasks (notifications, image uploads) from Kafka topics.
    - `run-workerproducer` polls the `outboxes` table and produces events to Kafka (at-least-once delivery with crash recovery via DB transactions).
 
-**Always start services with the `make run-*` commands.** Never use `go run` or `nohup` directly — they bypass tuistory and cause stale-process conflicts.
+**Always start services with the `make run-*` commands.** Never use `go run` or `nohup` directly — they bypass tuistory and cause stale-process conflicts. `run-*` commands are idempotent (rerunning kills the previous session).
 
 ## Database migrations
 
@@ -47,15 +40,6 @@ make migrate   # cmd/migrate -> pkg/migrate -> sql-migrate (library), Up only
 - `sql-migrate` is used as a **Go library** (`pkg/migrate/migrate.go`), not as a CLI. There is no `dbconfig.yml` and no `new-migration`/`migrate-up`/`migrate-down`/`migrate-status` target.
 - Migration files live in `db/migrations/`, named `<timestamp>_<name>.sql`, with `-- +migrate Up` / `-- +migrate Down` sections.
 - `make migrate` only applies **Up** (all pending). It cannot roll back or show status; use `psql` against the `gorp_migrations` table for that.
-
-## Observability & management tools
-
-| Tool | URL | Description |
-| :--- | :--- | :--- |
-| **SigNoz** | http://localhost:3301 | Distributed traces, logs, application metrics. |
-| **Redpanda Console** | http://localhost:8080 | Kafka topics, consumers, messages in real-time. |
-| **Swagger** | http://localhost:3000/swagger | Interactive API documentation and testing. |
-| **Kibana** | http://localhost:5601 | Explore/visualize data in Elasticsearch. |
 
 ## Architecture layers (top → bottom)
 
@@ -139,58 +123,21 @@ VSCode auto-runs `addfuncname` on `.go` file save. If you add new Go files outsi
 8. Register routes in `internal/inbound/<http|messaging>/route/`
 9. Run `make generate && make swag`
 
-## SigNoz tracing — ClickHouse MCP
-
-The opencode agent queries traces/spans directly from **ClickHouse** via an MCP server (no SigNoz API key needed). Configured in `~/.config/opencode/opencode.jsonc`.
-
-- **ClickHouse**: `localhost:8123`, user `default`, no password
-- **MCP server**: `@arvoretech/clickhouse-mcp` (read-only, runs via `npx`)
-- **Tools**: `read_query`, `list_tables`, `describe_table`, `list_databases`
-- **Required**: `docker-compose` must be running (`make docker-compose-up`)
-
-### SigNoz ClickHouse tables for traces
-
-| Table | Contents |
-|---|---|
-| `signoz_traces.signoz_index_v2` | Main traces/spans index (serviceName, name, durationNano, statusCode, tags, httpMethod, httpRoute, etc.) |
-| `signoz_traces.signoz_spans` | Span details (traceID + model JSON blob) |
-| `signoz_traces.signoz_error_index_v2` | Error traces |
-
-### Common trace queries
-
-```sql
--- Recent traces for a service
-SELECT traceID, spanID, serviceName, name, durationNano,
-       timestamp, statusCode, httpMethod, httpRoute
-FROM signoz_traces.signoz_index_v2
-WHERE serviceName = '<service>'
-  AND timestamp > now() - INTERVAL 1 HOUR
-ORDER BY timestamp DESC
-LIMIT 20
-
--- Get full trace by ID
-SELECT * FROM signoz_traces.signoz_index_v2
-WHERE traceID = '<trace-id>'
-ORDER BY timestamp
-
--- Error traces last hour
-SELECT traceID, spanID, serviceName, name, durationNano,
-       timestamp, statusMessage, exceptionType, exceptionMessage
-FROM signoz_traces.signoz_index_v2
-WHERE statusCode = 2
-  AND timestamp > now() - INTERVAL 1 HOUR
-ORDER BY timestamp DESC
-
--- Slow traces (p99+ duration)
-SELECT traceID, spanID, serviceName, name, durationNano,
-       timestamp, httpMethod, httpRoute
-FROM signoz_traces.signoz_index_v2
-WHERE durationNano > 1000000000  -- > 1s
-  AND timestamp > now() - INTERVAL 1 HOUR
-ORDER BY durationNano DESC
-LIMIT 20
-```
-
 ## Configuration
 
 Single file: `config.json` at project root. Parsed via Viper in `internal/config/config.go`. Typed access through `config.Config` struct — always inject via constructor, never use a global.
+
+## Observability & management tools
+
+| Tool | URL | Description |
+| :--- | :--- | :--- |
+| **SigNoz** | http://localhost:3301 | Distributed traces, logs, application metrics. |
+| **Redpanda Console** | http://localhost:8080 | Kafka topics, consumers, messages in real-time. |
+| **Swagger** | http://localhost:3000/swagger | Interactive API documentation and testing. |
+| **Kibana** | http://localhost:5601 | Explore/visualize data in Elasticsearch. |
+
+## Skills — deep reference (loaded on demand)
+
+- **`signoz-traces`** — ClickHouse MCP setup + trace/span/error SQL queries against SigNoz.
+- **`otel-architecture`** — full OTel implementation: trace/log providers, decorator spans, HTTP + Kafka instrumentation, log correlation, OTLP export.
+- **`kafka-error-handling`** — topic topology, retry/DLQ flow, error classification, consumer loop types, graceful shutdown.
