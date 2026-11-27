@@ -1,7 +1,8 @@
 #!/bin/sh
 # Pre-commit:
 #   1. Regenerate docs/*.png if any docs/*.mermaid is staged.
-#   2. Enforce project rules before the commit is created.
+#   2. Keep errkit.AddFuncName call arguments in sync with function names.
+#   3. Enforce project rules before the commit is created.
 # Installed via `make setup` (sets core.hooksPath to .githooks).
 #
 # To bypass in an emergency: git commit --no-verify
@@ -20,7 +21,19 @@ if [ -n "$staged_mermaid" ]; then
 	git diff --name-only --diff-filter=ACM | grep -E '^docs/.*\.png$' | xargs -r git add
 fi
 
-# 2. Enforce project rules.
+# 2. Keep errkit.AddFuncName call sites in sync with the enclosing function.
+#    Best-effort: a tool failure warns but does not block (step 3 still gates).
+staged_go=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.go$' || true)
+if [ -n "$staged_go" ]; then
+	if make add-func-name; then
+		git add -u internal pkg cmd
+	else
+		echo ""
+		echo "⚠️  add-func-name failed; AddFuncName arguments may be stale. Run: make add-func-name"
+	fi
+fi
+
+# 3. Enforce project rules.
 if ! make check-rules; then
 	echo ""
 	echo "❌ Commit blocked: project rules violated (see make check-rules)."

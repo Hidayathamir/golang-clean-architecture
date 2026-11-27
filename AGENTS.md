@@ -106,7 +106,7 @@ err = errkit.SetCode(err, http.StatusNotFound)            // set HTTP status
 return errkit.AddFuncName(err, "package.(*Type).Method")  // enrich with call site
 ```
 
-VSCode auto-runs `addfuncname` on `.go` file save. If you add new Go files outside VSCode, run `make add-func-name` manually.
+`make add-func-name` fills in the caller's function name for `errkit.AddFuncName`. The pre-commit hook runs it automatically (on any staged `.go` file) and re-stages the result, so you normally do nothing. Run it manually only if you commit with `--no-verify`. (For instant feedback on save, `.vscode/settings.json` runs the same command — optional, not required.)
 
 ## Comments — explain why, never what
 
