@@ -21,7 +21,7 @@ Every commit message must follow Conventional Commits — `<type>[(scope)][!]: <
 
 ## How to run the project
 
-**After cloning, run `make setup` once** — activates the shared pre-commit hook that enforces project rules.
+**After cloning, run `make setup` once** — checks required tools and activates the shared pre-commit hook that enforces project rules.
 
 Configuration is `settings/config.json` (Viper). Always run in this order:
 
@@ -38,7 +38,19 @@ Configuration is `settings/config.json` (Viper). Always run in this order:
    - `run-workerproducer` polls the `outboxes` table and produces events to Kafka (at-least-once delivery with crash recovery via DB transactions).
    - `run-workeridempotencycleaner` prunes old `message_idempotency` rows on a ticker (see **Idempotency** below).
 
-**Always start services with the `make run-*` commands.** Never use `go run` or `nohup` directly — they bypass tuistory and cause stale-process conflicts. `run-*` commands are idempotent (rerunning kills the previous session).
+**Always start services with the `make run-*` commands.** Never use `go run` or `nohup` directly — they bypass tuistory and cause stale-process conflicts. `run-*` commands are idempotent (rerunning kills the previous session), and they **require tuistory** — if it is missing the target fails with a clear error (run `make check-tools`). One-shot targets (`make migrate`, `make go-test`, `make go-e2e-test`) call plain `go run`/`go test` and do **not** use tuistory.
+
+## Tooling prerequisites
+
+`make setup` runs `make check-tools` and activates git hooks. Required tools:
+
+- **go** — compiler/runtime.
+- **docker** — infrastructure via `make docker-compose-up`.
+- **swag** — `make swag` (swagger docs). `go install github.com/swaggo/swag/cmd/swag@latest`.
+- **moq** — `make generate` (mocks). `go install github.com/matryer/moq@latest`.
+- **golangci-lint** — `make format`. `go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest`.
+- **npm / Node** — `make diagram` (mmdc) and installing tuistory.
+- **tuistory** — required by `make run-*` for idempotent restarts. `npm install -g tuistory`.
 
 ## Database migrations
 

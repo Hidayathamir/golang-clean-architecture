@@ -1,40 +1,43 @@
 .SILENT:
 
+# tuistory wraps the long-running servers in named sessions so rerunning `make run-*`
+# restarts them idempotently instead of spawning a duplicate (port/consumer conflicts).
+# It is REQUIRED for the run-* targets. One-shot targets (migrate, tests) use plain
+# go run/go test so they exit cleanly without a TUI.
 HAS_TUISTORY := $(shell command -v tuistory 2>/dev/null)
-ifeq ($(HAS_TUISTORY),)
-  RUN_CMD = go run
-  TEST_CMD = go test
-else
-  RUN_CMD = tuistory -- go run
-  TEST_CMD = tuistory -- go test
-endif
 
 run-webserver:
+	@$(if $(HAS_TUISTORY),, $(error ❌ tuistory not found. Install: npm install -g tuistory (see 'make check-tools'). The run-* targets need it for idempotent restarts.))
 	mkdir -p logs
-	$(RUN_CMD) cmd/webserver/main.go >> logs/webserver_log.jsonl 2>&1
+	tuistory -- go run cmd/webserver/main.go >> logs/webserver_log.jsonl 2>&1
 
 run-workerconsumer:
+	@$(if $(HAS_TUISTORY),, $(error ❌ tuistory not found. Install: npm install -g tuistory (see 'make check-tools'). The run-* targets need it for idempotent restarts.))
 	mkdir -p logs
-	$(RUN_CMD) cmd/workerconsumer/main.go >> logs/workerconsumer_log.jsonl 2>&1
+	tuistory -- go run cmd/workerconsumer/main.go >> logs/workerconsumer_log.jsonl 2>&1
 
 run-workerproducer:
+	@$(if $(HAS_TUISTORY),, $(error ❌ tuistory not found. Install: npm install -g tuistory (see 'make check-tools'). The run-* targets need it for idempotent restarts.))
 	mkdir -p logs
-	$(RUN_CMD) cmd/workerproducer/main.go >> logs/workerproducer_log.jsonl 2>&1
+	tuistory -- go run cmd/workerproducer/main.go >> logs/workerproducer_log.jsonl 2>&1
 
 run-workeridempotencycleaner:
+	@$(if $(HAS_TUISTORY),, $(error ❌ tuistory not found. Install: npm install -g tuistory (see 'make check-tools'). The run-* targets need it for idempotent restarts.))
 	mkdir -p logs
-	$(RUN_CMD) cmd/workeridempotencycleaner/main.go >> logs/workeridempotencycleaner_log.jsonl 2>&1
+	tuistory -- go run cmd/workeridempotencycleaner/main.go >> logs/workeridempotencycleaner_log.jsonl 2>&1
 
 go-test:
-	$(TEST_CMD) -count=1 -v ./internal/... >> logs/go_test.jsonl 2>&1
+	mkdir -p logs
+	go test -count=1 -v ./internal/... >> logs/go_test.jsonl 2>&1
 
 go-e2e-test:
-	$(TEST_CMD) -count=1 -v ./test/e2etest/... >> logs/go_e2e_test.jsonl 2>&1
+	mkdir -p logs
+	go test -count=1 -v ./test/e2etest/... >> logs/go_e2e_test.jsonl 2>&1
 
 #################################### 
 
 migrate:
-	$(RUN_CMD) cmd/migrate/main.go
+	go run cmd/migrate/main.go
 
 #################################### 
 
@@ -82,6 +85,7 @@ diagram:
 
 # One-time setup after clone: activate the shared pre-commit hook.
 setup:
+	@$(MAKE) check-tools
 	git config core.hooksPath .githooks
 	@echo "✅ Git hooks activated (core.hooksPath = .githooks)"
 
@@ -128,6 +132,11 @@ check-tools:
 		echo "✔ npm installed"; \
 	else \
 		echo "❌ npm not found. Install Node.js: https://nodejs.org/"; \
+	fi
+	@if command -v tuistory >/dev/null 2>&1; then \
+		echo "✔ tuistory installed"; \
+	else \
+		echo "❌ tuistory not found. Required for 'make run-*'. Install: npm install -g tuistory"; \
 	fi
 	@echo "✅ Done checking tools."
 
