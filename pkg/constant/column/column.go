@@ -61,4 +61,7 @@ const (
 	Topic          Column = "topic"
 	Payload        Column = "payload"
 	Status         Column = "status"
+	ActorID        Column = "actor_id"
+	Type           Column = "type"
+	IsRead         Column = "is_read"
 )

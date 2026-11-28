@@ -9,4 +9,5 @@ const (
 	User               = "users"
 	UserStat           = "user_stats"
 	MessageIdempotency = "message_idempotency"
+	Notification       = "notifications"
 )
