@@ -2,6 +2,9 @@ package dto
 
 import "time"
 
+// NotificationResponse is the WebSocket payload for real-time pushes. When
+// Type == "chat" the frame represents a direct message: ID is the chat id and
+// ActorID is the sender. All other Type values are activity notifications.
 type NotificationResponse struct {
 	ID        int64     `json:"id"`
 	ActorID   int64     `json:"actor_id"`
