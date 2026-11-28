@@ -29,6 +29,9 @@ var _ imageusecase.ImageUsecase = &ImageUsecaseMock{}
 //			CommentFunc: func(ctx context.Context, req dto.CommentImageRequest) error {
 //				panic("mock out the Comment method")
 //			},
+//			DeleteImageFunc: func(ctx context.Context, req dto.DeleteImageRequest) error {
+//				panic("mock out the DeleteImage method")
+//			},
 //			ExploreFunc: func(ctx context.Context, req dto.ExploreRequest) (dto.ExploreResponse, error) {
 //				panic("mock out the Explore method")
 //			},
@@ -80,6 +83,9 @@ type ImageUsecaseMock struct {
 
 	// CommentFunc mocks the Comment method.
 	CommentFunc func(ctx context.Context, req dto.CommentImageRequest) error
+
+	// DeleteImageFunc mocks the DeleteImage method.
+	DeleteImageFunc func(ctx context.Context, req dto.DeleteImageRequest) error
 
 	// ExploreFunc mocks the Explore method.
 	ExploreFunc func(ctx context.Context, req dto.ExploreRequest) (dto.ExploreResponse, error)
@@ -139,6 +145,13 @@ type ImageUsecaseMock struct {
 			Ctx context.Context
 			// Req is the req argument value.
 			Req dto.CommentImageRequest
+		}
+		// DeleteImage holds details about calls to the DeleteImage method.
+		DeleteImage []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req dto.DeleteImageRequest
 		}
 		// Explore holds details about calls to the Explore method.
 		Explore []struct {
@@ -228,6 +241,7 @@ type ImageUsecaseMock struct {
 	lockBatchUpdateImageCommentCount sync.RWMutex
 	lockBatchUpdateImageLikeCount    sync.RWMutex
 	lockComment                      sync.RWMutex
+	lockDeleteImage                  sync.RWMutex
 	lockExplore                      sync.RWMutex
 	lockGetComment                   sync.RWMutex
 	lockGetFeed                      sync.RWMutex
@@ -347,6 +361,42 @@ func (mock *ImageUsecaseMock) CommentCalls() []struct {
 	mock.lockComment.RLock()
 	calls = mock.calls.Comment
 	mock.lockComment.RUnlock()
+	return calls
+}
+
+// DeleteImage calls DeleteImageFunc.
+func (mock *ImageUsecaseMock) DeleteImage(ctx context.Context, req dto.DeleteImageRequest) error {
+	if mock.DeleteImageFunc == nil {
+		panic("ImageUsecaseMock.DeleteImageFunc: method is nil but ImageUsecase.DeleteImage was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req dto.DeleteImageRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockDeleteImage.Lock()
+	mock.calls.DeleteImage = append(mock.calls.DeleteImage, callInfo)
+	mock.lockDeleteImage.Unlock()
+	return mock.DeleteImageFunc(ctx, req)
+}
+
+// DeleteImageCalls gets all the calls that were made to DeleteImage.
+// Check the length with:
+//
+//	len(mockedImageUsecase.DeleteImageCalls())
+func (mock *ImageUsecaseMock) DeleteImageCalls() []struct {
+	Ctx context.Context
+	Req dto.DeleteImageRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req dto.DeleteImageRequest
+	}
+	mock.lockDeleteImage.RLock()
+	calls = mock.calls.DeleteImage
+	mock.lockDeleteImage.RUnlock()
 	return calls
 }
 

@@ -95,6 +95,23 @@ func (r *ImageRepositoryMwLogger) FindByUserID(ctx context.Context, db *gorm.DB,
 	return err
 }
 
+func (r *ImageRepositoryMwLogger) DeleteByID(ctx context.Context, db *gorm.DB, image *entity.Image) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.DeleteByID(ctx, db, image)
+	})
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"image": image,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return err
+}
+
 func (r *ImageRepositoryMwLogger) IncrementCommentCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()

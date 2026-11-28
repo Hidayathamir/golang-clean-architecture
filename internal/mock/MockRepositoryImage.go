@@ -25,6 +25,9 @@ var _ repository.ImageRepository = &ImageRepositoryMock{}
 //			CreateFunc: func(ctx context.Context, db *gorm.DB, image *entity.Image) error {
 //				panic("mock out the Create method")
 //			},
+//			DeleteByIDFunc: func(ctx context.Context, db *gorm.DB, image *entity.Image) error {
+//				panic("mock out the DeleteByID method")
+//			},
 //			FindByIDFunc: func(ctx context.Context, db *gorm.DB, image *entity.Image, id int64) error {
 //				panic("mock out the FindByID method")
 //			},
@@ -50,6 +53,9 @@ type ImageRepositoryMock struct {
 	// CreateFunc mocks the Create method.
 	CreateFunc func(ctx context.Context, db *gorm.DB, image *entity.Image) error
 
+	// DeleteByIDFunc mocks the DeleteByID method.
+	DeleteByIDFunc func(ctx context.Context, db *gorm.DB, image *entity.Image) error
+
 	// FindByIDFunc mocks the FindByID method.
 	FindByIDFunc func(ctx context.Context, db *gorm.DB, image *entity.Image, id int64) error
 
@@ -69,6 +75,15 @@ type ImageRepositoryMock struct {
 	calls struct {
 		// Create holds details about calls to the Create method.
 		Create []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
+			// Image is the image argument value.
+			Image *entity.Image
+		}
+		// DeleteByID holds details about calls to the DeleteByID method.
+		DeleteByID []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Db is the db argument value.
@@ -145,6 +160,7 @@ type ImageRepositoryMock struct {
 		}
 	}
 	lockCreate                    sync.RWMutex
+	lockDeleteByID                sync.RWMutex
 	lockFindByID                  sync.RWMutex
 	lockFindByUserID              sync.RWMutex
 	lockFindFeedByFollowerID      sync.RWMutex
@@ -189,6 +205,46 @@ func (mock *ImageRepositoryMock) CreateCalls() []struct {
 	mock.lockCreate.RLock()
 	calls = mock.calls.Create
 	mock.lockCreate.RUnlock()
+	return calls
+}
+
+// DeleteByID calls DeleteByIDFunc.
+func (mock *ImageRepositoryMock) DeleteByID(ctx context.Context, db *gorm.DB, image *entity.Image) error {
+	if mock.DeleteByIDFunc == nil {
+		panic("ImageRepositoryMock.DeleteByIDFunc: method is nil but ImageRepository.DeleteByID was just called")
+	}
+	callInfo := struct {
+		Ctx   context.Context
+		Db    *gorm.DB
+		Image *entity.Image
+	}{
+		Ctx:   ctx,
+		Db:    db,
+		Image: image,
+	}
+	mock.lockDeleteByID.Lock()
+	mock.calls.DeleteByID = append(mock.calls.DeleteByID, callInfo)
+	mock.lockDeleteByID.Unlock()
+	return mock.DeleteByIDFunc(ctx, db, image)
+}
+
+// DeleteByIDCalls gets all the calls that were made to DeleteByID.
+// Check the length with:
+//
+//	len(mockedImageRepository.DeleteByIDCalls())
+func (mock *ImageRepositoryMock) DeleteByIDCalls() []struct {
+	Ctx   context.Context
+	Db    *gorm.DB
+	Image *entity.Image
+} {
+	var calls []struct {
+		Ctx   context.Context
+		Db    *gorm.DB
+		Image *entity.Image
+	}
+	mock.lockDeleteByID.RLock()
+	calls = mock.calls.DeleteByID
+	mock.lockDeleteByID.RUnlock()
 	return calls
 }
 

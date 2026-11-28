@@ -277,6 +277,40 @@ func (c *ImageController) Explore(ctx *fiber.Ctx) error {
 	return response.Data(ctx, http.StatusOK, res)
 }
 
+// DeleteImage godoc
+//
+//	@Summary		Delete image
+//	@Description	Delete an image (only the owner may delete)
+//	@Tags			images
+//	@Produce		json
+//	@Param			imageId	path	int	true	"Image ID"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[string]
+//	@Router			/api/images/{imageId} [delete]
+func (c *ImageController) DeleteImage(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
+	imageID, err := strconv.ParseInt(ctx.Params("imageId"), 10, 64)
+	if err != nil {
+		err = errkit.SetCode(err, http.StatusBadRequest)
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*ImageController).DeleteImage")
+	}
+
+	req := dto.DeleteImageRequest{
+		ID: imageID,
+	}
+
+	err = c.Usecase.DeleteImage(ctx.UserContext(), req)
+	if err != nil {
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*ImageController).DeleteImage")
+	}
+
+	return response.Data(ctx, http.StatusOK, "ok")
+}
+
 // GetLike godoc
 //
 //	@Summary		Get image likes

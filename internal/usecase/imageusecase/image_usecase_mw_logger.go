@@ -131,6 +131,21 @@ func (u *ImageUsecaseMwLogger) Explore(ctx context.Context, req dto.ExploreReque
 	return res, err
 }
 
+func (u *ImageUsecaseMwLogger) DeleteImage(ctx context.Context, req dto.DeleteImageRequest) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := u.Next.DeleteImage(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return err
+}
+
 func (u *ImageUsecaseMwLogger) GetComment(ctx context.Context, req dto.GetCommentRequest) (dto.CommentResponseList, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()

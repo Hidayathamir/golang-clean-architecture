@@ -477,6 +477,26 @@ paths:
       tags:
       - images
   /api/images/{imageId}:
+    delete:
+      description: Delete an image (only the owner may delete)
+      parameters:
+      - description: Image ID
+        in: path
+        name: imageId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-string'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Delete image
+      tags:
+      - images
     get:
       description: Get a single image by id
       parameters:

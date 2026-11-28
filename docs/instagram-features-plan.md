@@ -52,7 +52,7 @@ Work items one at a time using the `instagram-feature` skill (the step-by-step r
 
 ### Phase 2 — Write APIs
 
-- [ ] `DELETE /api/images/:id` — delete own post (only the owner may delete).
+- [x] `DELETE /api/images/:id` — delete own post (only the owner may delete).
 - [ ] `PATCH /api/images/:id` — edit own post caption (only the owner may edit).
 - [ ] Unlike — `DELETE /api/images/:id/like` (only like currently exists); decrement like count.
 - [ ] `DELETE /api/images/:id/comments/:commentId` — delete a comment (comment owner or image owner).

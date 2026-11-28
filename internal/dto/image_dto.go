@@ -37,6 +37,12 @@ type GetImageRequest struct {
 	ID int64 `validate:"required"`
 }
 
+// DeleteImageRequest is the input for DELETE /api/images/:imageId. The caller
+// (owner check) comes from the auth context.
+type DeleteImageRequest struct {
+	ID int64 `json:"-" validate:"required"`
+}
+
 type LikeResponse struct {
 	ID        int64          `json:"id"`
 	UserID    int64          `json:"user_id"`

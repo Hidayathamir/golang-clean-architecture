@@ -20,6 +20,7 @@ type ImageRepository interface {
 	FindByID(ctx context.Context, db *gorm.DB, image *entity.Image, id int64) error
 	FindFeedByFollowerID(ctx context.Context, db *gorm.DB, imageList *entity.ImageList, followerID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error
 	FindByUserID(ctx context.Context, db *gorm.DB, imageList *entity.ImageList, userID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error
+	DeleteByID(ctx context.Context, db *gorm.DB, image *entity.Image) error
 	IncrementCommentCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error
 	IncrementLikeCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error
 }
@@ -93,6 +94,14 @@ func (r *ImageRepositoryImpl) FindByUserID(ctx context.Context, db *gorm.DB, ima
 	err := query.Find(imageList).Error
 	if err != nil {
 		return errkit.AddFuncName(err, "repository.(*ImageRepositoryImpl).FindByUserID")
+	}
+	return nil
+}
+
+func (r *ImageRepositoryImpl) DeleteByID(ctx context.Context, db *gorm.DB, image *entity.Image) error {
+	err := db.WithContext(ctx).Delete(image).Error
+	if err != nil {
+		return errkit.AddFuncName(err, "repository.(*ImageRepositoryImpl).DeleteByID")
 	}
 	return nil
 }
