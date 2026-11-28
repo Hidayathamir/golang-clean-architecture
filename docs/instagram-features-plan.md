@@ -60,7 +60,7 @@ Work items one at a time using the `instagram-feature` skill (the step-by-step r
 
 ### Phase 3 — Housekeeping
 
-- [ ] **Cursor-based pagination convention**, applied consistently to every Phase 1 + 2 list endpoint (feed, user grid, followers, following, explore, likes, comments).
+- [x] **Cursor-based pagination convention**, applied consistently to every Phase 1 + 2 list endpoint (feed, user grid, followers, following, explore, likes, comments). Documented in `docs/pagination.md`.
 
   **Expected outcome**
   - Every list endpoint accepts `limit` (default + max, e.g. 20 / 100) and `cursor` (opaque string; absent = first page).
