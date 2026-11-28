@@ -3,6 +3,7 @@ package route
 import (
 	_ "github.com/Hidayathamir/golang-clean-architecture/api" // need import for swagger
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dependency_injection"
+	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
 )
@@ -18,6 +19,7 @@ func Setup(app *fiber.App, controllers *dependency_injection.Controllers, middle
 	api := root.Group("/api", middlewares.OtelFiberMiddleware, middlewares.TraceIDMiddleware)
 
 	setupGuestRoute(api, controllers)
+	setupWebsocketRoute(api, controllers)
 
 	authenticated := api.Group("", middlewares.AuthMiddleware)
 	setupAuthRoute(authenticated, controllers)
@@ -39,6 +41,18 @@ func setupGuestRoute(router fiber.Router, controllers *dependency_injection.Cont
 		users.Post("", controllers.UserController.Register)
 		users.Post("/_login", controllers.UserController.Login)
 	}
+}
+
+// setupWebsocketRoute authenticates via the token query parameter, so it is not
+// behind AuthMiddleware (browsers cannot set headers on a WebSocket handshake).
+func setupWebsocketRoute(router fiber.Router, controllers *dependency_injection.Controllers) {
+	router.Use("/ws/notifications", func(ctx *fiber.Ctx) error {
+		if websocket.IsWebSocketUpgrade(ctx) {
+			return ctx.Next()
+		}
+		return fiber.ErrUpgradeRequired
+	})
+	router.Get("/ws/notifications", controllers.NotificationHandler.Handle)
 }
 
 func setupAuthRoute(router fiber.Router, controllers *dependency_injection.Controllers) {
@@ -71,4 +85,12 @@ func setupAuthRoute(router fiber.Router, controllers *dependency_injection.Contr
 
 	router.Get("/feed", controllers.ImageController.GetFeed)
 	router.Get("/explore", controllers.ImageController.Explore)
+
+	notifications := router.Group("/notifications")
+	{
+		notifications.Get("", controllers.NotificationController.List)
+		notifications.Post("/_read", controllers.NotificationController.MarkRead)
+		notifications.Post("/_read_all", controllers.NotificationController.MarkAllRead)
+		notifications.Get("/_unread_count", controllers.NotificationController.UnreadCount)
+	}
 }

@@ -20,6 +20,18 @@ var _ notifusecase.NotifUsecase = &NotifUsecaseMock{}
 //
 //		// make and configure a mocked notifusecase.NotifUsecase
 //		mockedNotifUsecase := &NotifUsecaseMock{
+//			CountUnreadFunc: func(ctx context.Context) (dto.UnreadCountResponse, error) {
+//				panic("mock out the CountUnread method")
+//			},
+//			ListFunc: func(ctx context.Context, req dto.NotificationsRequest) (dto.NotificationsResponse, error) {
+//				panic("mock out the List method")
+//			},
+//			MarkAllReadFunc: func(ctx context.Context) error {
+//				panic("mock out the MarkAllRead method")
+//			},
+//			MarkReadFunc: func(ctx context.Context, req dto.MarkNotificationReadRequest) error {
+//				panic("mock out the MarkRead method")
+//			},
 //			NotifyFunc: func(ctx context.Context, req dto.NotifyRequest) error {
 //				panic("mock out the Notify method")
 //			},
@@ -30,11 +42,47 @@ var _ notifusecase.NotifUsecase = &NotifUsecaseMock{}
 //
 //	}
 type NotifUsecaseMock struct {
+	// CountUnreadFunc mocks the CountUnread method.
+	CountUnreadFunc func(ctx context.Context) (dto.UnreadCountResponse, error)
+
+	// ListFunc mocks the List method.
+	ListFunc func(ctx context.Context, req dto.NotificationsRequest) (dto.NotificationsResponse, error)
+
+	// MarkAllReadFunc mocks the MarkAllRead method.
+	MarkAllReadFunc func(ctx context.Context) error
+
+	// MarkReadFunc mocks the MarkRead method.
+	MarkReadFunc func(ctx context.Context, req dto.MarkNotificationReadRequest) error
+
 	// NotifyFunc mocks the Notify method.
 	NotifyFunc func(ctx context.Context, req dto.NotifyRequest) error
 
 	// calls tracks calls to the methods.
 	calls struct {
+		// CountUnread holds details about calls to the CountUnread method.
+		CountUnread []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+		}
+		// List holds details about calls to the List method.
+		List []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req dto.NotificationsRequest
+		}
+		// MarkAllRead holds details about calls to the MarkAllRead method.
+		MarkAllRead []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+		}
+		// MarkRead holds details about calls to the MarkRead method.
+		MarkRead []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req dto.MarkNotificationReadRequest
+		}
 		// Notify holds details about calls to the Notify method.
 		Notify []struct {
 			// Ctx is the ctx argument value.
@@ -43,7 +91,147 @@ type NotifUsecaseMock struct {
 			Req dto.NotifyRequest
 		}
 	}
-	lockNotify sync.RWMutex
+	lockCountUnread sync.RWMutex
+	lockList        sync.RWMutex
+	lockMarkAllRead sync.RWMutex
+	lockMarkRead    sync.RWMutex
+	lockNotify      sync.RWMutex
+}
+
+// CountUnread calls CountUnreadFunc.
+func (mock *NotifUsecaseMock) CountUnread(ctx context.Context) (dto.UnreadCountResponse, error) {
+	if mock.CountUnreadFunc == nil {
+		panic("NotifUsecaseMock.CountUnreadFunc: method is nil but NotifUsecase.CountUnread was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+	}{
+		Ctx: ctx,
+	}
+	mock.lockCountUnread.Lock()
+	mock.calls.CountUnread = append(mock.calls.CountUnread, callInfo)
+	mock.lockCountUnread.Unlock()
+	return mock.CountUnreadFunc(ctx)
+}
+
+// CountUnreadCalls gets all the calls that were made to CountUnread.
+// Check the length with:
+//
+//	len(mockedNotifUsecase.CountUnreadCalls())
+func (mock *NotifUsecaseMock) CountUnreadCalls() []struct {
+	Ctx context.Context
+} {
+	var calls []struct {
+		Ctx context.Context
+	}
+	mock.lockCountUnread.RLock()
+	calls = mock.calls.CountUnread
+	mock.lockCountUnread.RUnlock()
+	return calls
+}
+
+// List calls ListFunc.
+func (mock *NotifUsecaseMock) List(ctx context.Context, req dto.NotificationsRequest) (dto.NotificationsResponse, error) {
+	if mock.ListFunc == nil {
+		panic("NotifUsecaseMock.ListFunc: method is nil but NotifUsecase.List was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req dto.NotificationsRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockList.Lock()
+	mock.calls.List = append(mock.calls.List, callInfo)
+	mock.lockList.Unlock()
+	return mock.ListFunc(ctx, req)
+}
+
+// ListCalls gets all the calls that were made to List.
+// Check the length with:
+//
+//	len(mockedNotifUsecase.ListCalls())
+func (mock *NotifUsecaseMock) ListCalls() []struct {
+	Ctx context.Context
+	Req dto.NotificationsRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req dto.NotificationsRequest
+	}
+	mock.lockList.RLock()
+	calls = mock.calls.List
+	mock.lockList.RUnlock()
+	return calls
+}
+
+// MarkAllRead calls MarkAllReadFunc.
+func (mock *NotifUsecaseMock) MarkAllRead(ctx context.Context) error {
+	if mock.MarkAllReadFunc == nil {
+		panic("NotifUsecaseMock.MarkAllReadFunc: method is nil but NotifUsecase.MarkAllRead was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+	}{
+		Ctx: ctx,
+	}
+	mock.lockMarkAllRead.Lock()
+	mock.calls.MarkAllRead = append(mock.calls.MarkAllRead, callInfo)
+	mock.lockMarkAllRead.Unlock()
+	return mock.MarkAllReadFunc(ctx)
+}
+
+// MarkAllReadCalls gets all the calls that were made to MarkAllRead.
+// Check the length with:
+//
+//	len(mockedNotifUsecase.MarkAllReadCalls())
+func (mock *NotifUsecaseMock) MarkAllReadCalls() []struct {
+	Ctx context.Context
+} {
+	var calls []struct {
+		Ctx context.Context
+	}
+	mock.lockMarkAllRead.RLock()
+	calls = mock.calls.MarkAllRead
+	mock.lockMarkAllRead.RUnlock()
+	return calls
+}
+
+// MarkRead calls MarkReadFunc.
+func (mock *NotifUsecaseMock) MarkRead(ctx context.Context, req dto.MarkNotificationReadRequest) error {
+	if mock.MarkReadFunc == nil {
+		panic("NotifUsecaseMock.MarkReadFunc: method is nil but NotifUsecase.MarkRead was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req dto.MarkNotificationReadRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockMarkRead.Lock()
+	mock.calls.MarkRead = append(mock.calls.MarkRead, callInfo)
+	mock.lockMarkRead.Unlock()
+	return mock.MarkReadFunc(ctx, req)
+}
+
+// MarkReadCalls gets all the calls that were made to MarkRead.
+// Check the length with:
+//
+//	len(mockedNotifUsecase.MarkReadCalls())
+func (mock *NotifUsecaseMock) MarkReadCalls() []struct {
+	Ctx context.Context
+	Req dto.MarkNotificationReadRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req dto.MarkNotificationReadRequest
+	}
+	mock.lockMarkRead.RLock()
+	calls = mock.calls.MarkRead
+	mock.lockMarkRead.RUnlock()
+	return calls
 }
 
 // Notify calls NotifyFunc.

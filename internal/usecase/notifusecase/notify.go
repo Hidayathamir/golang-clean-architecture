@@ -4,10 +4,13 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
+	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 )
 
 func (u *NotifUsecaseImpl) Notify(ctx context.Context, req dto.NotifyRequest) error {
-	logkit.Logger.WithContext(ctx).WithField("req", req).Info("dummy notify")
+	err := u.createAndPush(ctx, req)
+	if err != nil {
+		return errkit.AddFuncName(err, "notifusecase.(*NotifUsecaseImpl).Notify")
+	}
 	return nil
 }

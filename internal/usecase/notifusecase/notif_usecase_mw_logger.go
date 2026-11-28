@@ -35,3 +35,59 @@ func (u *NotifUsecaseMwLogger) Notify(ctx context.Context, req dto.NotifyRequest
 
 	return err
 }
+
+func (u *NotifUsecaseMwLogger) List(ctx context.Context, req dto.NotificationsRequest) (dto.NotificationsResponse, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	res, err := u.Next.List(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return res, err
+}
+
+func (u *NotifUsecaseMwLogger) MarkRead(ctx context.Context, req dto.MarkNotificationReadRequest) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := u.Next.MarkRead(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return err
+}
+
+func (u *NotifUsecaseMwLogger) MarkAllRead(ctx context.Context) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := u.Next.MarkAllRead(ctx)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{}
+	logkit.LogMw(ctx, fields, err)
+
+	return err
+}
+
+func (u *NotifUsecaseMwLogger) CountUnread(ctx context.Context) (dto.UnreadCountResponse, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	res, err := u.Next.CountUnread(ctx)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{}
+	logkit.LogMw(ctx, fields, err)
+
+	return res, err
+}

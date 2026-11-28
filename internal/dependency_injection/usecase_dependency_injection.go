@@ -2,6 +2,7 @@ package dependency_injection
 
 import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/inbound/websocket"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/cache"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/repository"
@@ -22,6 +23,7 @@ type Usecases struct {
 	UserUsecase        userusecase.UserUsecase
 	ImageUsecase       imageusecase.ImageUsecase
 	NotifUsecase       notifusecase.NotifUsecase
+	NotificationHub    *websocket.Hub
 	IdempotencyRepo    repository.IdempotencyRepository
 	IdempotencyUsecase idempotencyusecase.IdempotencyUsecase
 }
@@ -38,6 +40,12 @@ func SetupUsecases(
 	var userRepository repository.UserRepository
 	userRepository = repository.NewUserRepository(cfg)
 	userRepository = repository.NewUserRepositoryMwLogger(userRepository)
+
+	var notificationRepository repository.NotificationRepository
+	notificationRepository = repository.NewNotificationRepository(cfg)
+	notificationRepository = repository.NewNotificationRepositoryMwLogger(notificationRepository)
+
+	notificationHub := websocket.NewHub()
 
 	var userStatRepository repository.UserStatRepository
 	userStatRepository = repository.NewUserStatRepository(cfg)
@@ -101,6 +109,10 @@ func SetupUsecases(
 	imageSearch = search.NewImageSearchMwLogger(imageSearch)
 
 	// setup use cases
+	var notifUsecase notifusecase.NotifUsecase
+	notifUsecase = notifusecase.NewNotifUsecase(cfg, db, notificationRepository, userRepository, notificationHub)
+	notifUsecase = notifusecase.NewNotifUsecaseMwLogger(notifUsecase)
+
 	var userUsecase userusecase.UserUsecase
 	userUsecase = userusecase.NewUserUsecase(cfg, db, userRepository, userStatRepository, followRepository, userProducer, notifProducer, s3Client, userCache)
 	userUsecase = userusecase.NewUserUsecaseMwLogger(userUsecase)
@@ -109,14 +121,11 @@ func SetupUsecases(
 	imageUsecase = imageusecase.NewImageUsecase(cfg, db, imageRepository, likeRepository, commentRepository, followRepository, userRepository, imageProducer, notifProducer, s3Client, imageSearch)
 	imageUsecase = imageusecase.NewImageUsecaseMwLogger(imageUsecase)
 
-	var notifUsecase notifusecase.NotifUsecase
-	notifUsecase = notifusecase.NewNotifUsecase(cfg, db)
-	notifUsecase = notifusecase.NewNotifUsecaseMwLogger(notifUsecase)
-
 	return &Usecases{
 		UserUsecase:        userUsecase,
 		ImageUsecase:       imageUsecase,
 		NotifUsecase:       notifUsecase,
+		NotificationHub:    notificationHub,
 		IdempotencyRepo:    idempotencyRepo,
 		IdempotencyUsecase: idempotencyUsecase,
 	}
