@@ -11,6 +11,7 @@ type Controllers struct {
 	ImageController        *http.ImageController
 	NotificationController *http.NotificationController
 	NotificationHandler    *websocket.NotificationHandler
+	NotificationSubscriber *websocket.NotificationSubscriber
 }
 
 func SetupControllers(cfg *config.Config, usecases *Usecases) *Controllers {
@@ -18,10 +19,12 @@ func SetupControllers(cfg *config.Config, usecases *Usecases) *Controllers {
 	imageController := http.NewImageController(cfg, usecases.ImageUsecase)
 	notificationController := http.NewNotificationController(cfg, usecases.NotifUsecase)
 	notificationHandler := websocket.NewNotificationHandler(usecases.NotificationHub, usecases.UserUsecase)
+	notificationSubscriber := websocket.NewNotificationSubscriber(usecases.RedisClient, usecases.NotificationHub)
 	return &Controllers{
 		UserController:         userController,
 		ImageController:        imageController,
 		NotificationController: notificationController,
 		NotificationHandler:    notificationHandler,
+		NotificationSubscriber: notificationSubscriber,
 	}
 }

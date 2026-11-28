@@ -21,7 +21,7 @@ type NotificationsRequest struct {
 type NotificationsResponse = CursorPage[NotificationResponseList]
 
 type MarkNotificationReadRequest struct {
-	NotificationID int64 `validate:"required"`
+	NotificationID int64 `json:"notification_id" validate:"required"`
 }
 
 type UnreadCountResponse struct {

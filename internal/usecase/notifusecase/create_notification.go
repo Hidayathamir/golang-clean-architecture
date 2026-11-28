@@ -2,7 +2,6 @@ package notifusecase
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"net/http"
 
@@ -46,11 +45,10 @@ func (u *NotifUsecaseImpl) createAndPush(ctx context.Context, req dto.NotifyRequ
 	res.ImageID = notification.ImageID
 	res.IsRead = notification.IsRead
 	res.CreatedAt = notification.CreatedAt
-	payload, err := json.Marshal(res)
+	err = u.Publisher.Publish(ctx, notification.UserID, res)
 	if err != nil {
 		return errkit.AddFuncName(err, "notifusecase.(*NotifUsecaseImpl).createAndPush")
 	}
-	u.Hub.Send(notification.UserID, payload)
-	logkit.Logger.WithContext(ctx).WithField("notification", res).Debug("notification pushed")
+	logkit.Logger.WithContext(ctx).WithField("notification", res).Debug("notification published")
 	return nil
 }

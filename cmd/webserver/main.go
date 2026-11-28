@@ -64,6 +64,9 @@ func runHTTPServer(cfg *config.Config, controllers *dependency_injection.Control
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
+	// Forward notifications published by the worker processes to the local sockets.
+	go controllers.NotificationSubscriber.Run(ctx)
+
 	go func() {
 		<-ctx.Done()          // Block until a termination signal arrives, then trigger a graceful shutdown.
 		err := app.Shutdown() // Stop accepting new requests and wait for in-flight handlers to finish.

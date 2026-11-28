@@ -5,7 +5,7 @@ import (
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/inbound/websocket"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/cache"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/repository"
 	"gorm.io/gorm"
 )
@@ -26,7 +26,7 @@ type NotifUsecaseImpl struct {
 	DB                     *gorm.DB
 	NotificationRepository repository.NotificationRepository
 	UserRepository         repository.UserRepository
-	Hub                    websocket.Sender
+	Publisher              cache.NotificationPublisher
 }
 
 func NewNotifUsecase(
@@ -34,13 +34,13 @@ func NewNotifUsecase(
 	DB *gorm.DB,
 	notificationRepository repository.NotificationRepository,
 	userRepository repository.UserRepository,
-	hub websocket.Sender,
+	publisher cache.NotificationPublisher,
 ) *NotifUsecaseImpl {
 	return &NotifUsecaseImpl{
 		Config:                 Cfg,
 		DB:                     DB,
 		NotificationRepository: notificationRepository,
 		UserRepository:         userRepository,
-		Hub:                    hub,
+		Publisher:              publisher,
 	}
 }

@@ -24,6 +24,7 @@ type Usecases struct {
 	ImageUsecase       imageusecase.ImageUsecase
 	NotifUsecase       notifusecase.NotifUsecase
 	NotificationHub    *websocket.Hub
+	RedisClient        *redis.Client
 	IdempotencyRepo    repository.IdempotencyRepository
 	IdempotencyUsecase idempotencyusecase.IdempotencyUsecase
 }
@@ -103,6 +104,10 @@ func SetupUsecases(
 	userCache = cache.NewUserCache(redisClient)
 	userCache = cache.NewUserCacheMwLogger(userCache)
 
+	var notificationPublisher cache.NotificationPublisher
+	notificationPublisher = cache.NewNotificationPublisher(redisClient)
+	notificationPublisher = cache.NewNotificationPublisherMwLogger(notificationPublisher)
+
 	// setup search
 	var imageSearch search.ImageSearch
 	imageSearch = search.NewImageSearch(elasticsearchClient)
@@ -110,7 +115,7 @@ func SetupUsecases(
 
 	// setup use cases
 	var notifUsecase notifusecase.NotifUsecase
-	notifUsecase = notifusecase.NewNotifUsecase(cfg, db, notificationRepository, userRepository, notificationHub)
+	notifUsecase = notifusecase.NewNotifUsecase(cfg, db, notificationRepository, userRepository, notificationPublisher)
 	notifUsecase = notifusecase.NewNotifUsecaseMwLogger(notifUsecase)
 
 	var userUsecase userusecase.UserUsecase
@@ -126,6 +131,7 @@ func SetupUsecases(
 		ImageUsecase:       imageUsecase,
 		NotifUsecase:       notifUsecase,
 		NotificationHub:    notificationHub,
+		RedisClient:        redisClient,
 		IdempotencyRepo:    idempotencyRepo,
 		IdempotencyUsecase: idempotencyUsecase,
 	}
