@@ -211,7 +211,6 @@ Layers (`cmd`/`internal`/`pkg`), route conventions, config, and the step-by-step
 # Skills — deep reference (loaded on demand)
 
 - **`architecture`** — layers, file layout, route/config conventions, and how to add a feature.
-- **`instagram-feature`** — step-by-step recipe for implementing one endpoint from `docs/instagram-features-plan.md` (file paths per layer, templates, pagination, commands).
 - **`tracing-logs`** — find all logs for one request by trace id (local files or Grafana/Tempo).
 - **`tempo-traces`** — query traces/spans/errors from Tempo via the Grafana UI or the Tempo HTTP API (TraceQL).
 - **`otel-architecture`** — full OTel implementation: trace/log providers, decorator spans, HTTP + Kafka instrumentation, log correlation, OTLP export.
