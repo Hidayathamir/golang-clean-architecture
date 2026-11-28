@@ -2,6 +2,7 @@ package dependency_injection
 
 import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/chatusecase"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/idempotencyusecase"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/imageusecase"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/notifusecase"
@@ -14,6 +15,7 @@ type Usecases struct {
 	ImageUsecase       imageusecase.ImageUsecase
 	NotifUsecase       notifusecase.NotifUsecase
 	IdempotencyUsecase idempotencyusecase.IdempotencyUsecase
+	ChatUsecase        chatusecase.ChatUsecase
 }
 
 func SetupUsecases(
@@ -41,10 +43,15 @@ func SetupUsecases(
 	imageUsecase = imageusecase.NewImageUsecase(cfg, db, repositories.ImageRepository, repositories.LikeRepository, repositories.CommentRepository, repositories.FollowRepository, repositories.UserRepository, messagings.ImageProducer, messagings.NotifProducer, storages.S3Client, searches.ImageSearch, notifUsecase)
 	imageUsecase = imageusecase.NewImageUsecaseMwLogger(imageUsecase)
 
+	var chatUsecase chatusecase.ChatUsecase
+	chatUsecase = chatusecase.NewChatUsecase(cfg, db, repositories.ChatRepository, repositories.UserRepository, caches.NotificationPublisher)
+	chatUsecase = chatusecase.NewChatUsecaseMwLogger(chatUsecase)
+
 	return &Usecases{
 		UserUsecase:        userUsecase,
 		ImageUsecase:       imageUsecase,
 		NotifUsecase:       notifUsecase,
 		IdempotencyUsecase: idempotencyUsecase,
+		ChatUsecase:        chatUsecase,
 	}
 }
