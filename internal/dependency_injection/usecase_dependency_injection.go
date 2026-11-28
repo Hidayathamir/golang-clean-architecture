@@ -114,11 +114,11 @@ func SetupUsecases(
 	notifUsecase = notifusecase.NewNotifUsecaseMwLogger(notifUsecase)
 
 	var userUsecase userusecase.UserUsecase
-	userUsecase = userusecase.NewUserUsecase(cfg, db, userRepository, userStatRepository, followRepository, userProducer, notifProducer, s3Client, userCache)
+	userUsecase = userusecase.NewUserUsecase(cfg, db, userRepository, userStatRepository, followRepository, userProducer, notifProducer, s3Client, userCache, notifUsecase)
 	userUsecase = userusecase.NewUserUsecaseMwLogger(userUsecase)
 
 	var imageUsecase imageusecase.ImageUsecase
-	imageUsecase = imageusecase.NewImageUsecase(cfg, db, imageRepository, likeRepository, commentRepository, followRepository, userRepository, imageProducer, notifProducer, s3Client, imageSearch)
+	imageUsecase = imageusecase.NewImageUsecase(cfg, db, imageRepository, likeRepository, commentRepository, followRepository, userRepository, imageProducer, notifProducer, s3Client, imageSearch, notifUsecase)
 	imageUsecase = imageusecase.NewImageUsecaseMwLogger(imageUsecase)
 
 	return &Usecases{

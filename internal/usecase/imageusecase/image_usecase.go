@@ -9,6 +9,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/search"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/storage"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/notifusecase"
 	"gorm.io/gorm"
 )
 
@@ -60,6 +61,9 @@ type ImageUsecaseImpl struct {
 
 	// search
 	ImageSearch search.ImageSearch
+
+	// usecase
+	NotifUsecase notifusecase.NotifUsecase
 }
 
 func NewImageUsecase(
@@ -82,6 +86,9 @@ func NewImageUsecase(
 
 	// search
 	ImageSearch search.ImageSearch,
+
+	// usecase
+	NotifUsecase notifusecase.NotifUsecase,
 ) *ImageUsecaseImpl {
 	return &ImageUsecaseImpl{
 		Cfg: Config,
@@ -103,5 +110,8 @@ func NewImageUsecase(
 
 		// search
 		ImageSearch: ImageSearch,
+
+		// usecase
+		NotifUsecase: NotifUsecase,
 	}
 }

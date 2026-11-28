@@ -9,6 +9,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/storage"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/notifusecase"
 	"gorm.io/gorm"
 )
 
@@ -49,6 +50,9 @@ type UserUsecaseImpl struct {
 
 	// cache
 	UserCache cache.UserCache
+
+	// usecase
+	NotifUsecase notifusecase.NotifUsecase
 }
 
 func NewUserUsecase(
@@ -69,6 +73,9 @@ func NewUserUsecase(
 
 	// cache
 	UserCache cache.UserCache,
+
+	// usecase
+	NotifUsecase notifusecase.NotifUsecase,
 ) *UserUsecaseImpl {
 	return &UserUsecaseImpl{
 		Config: Cfg,
@@ -88,5 +95,8 @@ func NewUserUsecase(
 
 		// cache
 		UserCache: UserCache,
+
+		// usecase
+		NotifUsecase: NotifUsecase,
 	}
 }

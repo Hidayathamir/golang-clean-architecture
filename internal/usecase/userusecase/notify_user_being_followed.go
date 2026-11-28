@@ -2,7 +2,6 @@ package userusecase
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
@@ -17,23 +16,14 @@ func (u *UserUsecaseImpl) NotifyUserBeingFollowed(ctx context.Context, req dto.N
 		err = errkit.SetCode(err, http.StatusBadRequest)
 		return errkit.AddFuncName(err, "userusecase.(*UserUsecaseImpl).NotifyUserBeingFollowed")
 	}
-
-	followerUser := entity.User{}
-
-	err = u.UserRepository.FindByID(ctx, u.DB, &followerUser, req.FollowerID)
-	if err != nil {
-		return errkit.AddFuncName(err, "userusecase.(*UserUsecaseImpl).NotifyUserBeingFollowed")
-	}
-
-	event := dto.NotifEvent{
+	notifReq := dto.NotifyRequest{
 		UserID:  req.FollowingID,
-		Message: fmt.Sprintf("%s just follow you", followerUser.Name),
+		ActorID: req.FollowerID,
+		Type:    entity.NotificationTypeFollow,
 	}
-
-	err = u.NotifProducer.SendNotif(ctx, u.DB, &event)
+	err = u.NotifUsecase.Notify(ctx, notifReq)
 	if err != nil {
 		return errkit.AddFuncName(err, "userusecase.(*UserUsecaseImpl).NotifyUserBeingFollowed")
 	}
-
 	return nil
 }

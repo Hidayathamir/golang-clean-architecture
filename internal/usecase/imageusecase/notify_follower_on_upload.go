@@ -2,7 +2,6 @@ package imageusecase
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
@@ -17,32 +16,21 @@ func (u *ImageUsecaseImpl) NotifyFollowerOnUpload(ctx context.Context, req dto.N
 		err = errkit.SetCode(err, http.StatusBadRequest)
 		return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).NotifyFollowerOnUpload")
 	}
-
-	user := entity.User{}
-
-	err = u.UserRepository.FindByID(ctx, u.DB, &user, req.UserID)
-	if err != nil {
-		return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).NotifyFollowerOnUpload")
-	}
-
 	followList := entity.FollowList{}
-
-	err = u.FollowRepository.FindByFollowingID(ctx, u.DB, &followList, user.ID)
+	err = u.FollowRepository.FindByFollowingID(ctx, u.DB, &followList, req.UserID)
 	if err != nil {
 		return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).NotifyFollowerOnUpload")
 	}
-
-	for _, follow := range followList {
-		event := dto.NotifEvent{
-			UserID:  follow.FollowerID,
-			Message: fmt.Sprintf("%s just upload an image", user.Name),
+	for i := range followList {
+		notifReq := dto.NotifyRequest{
+			UserID:  followList[i].FollowerID,
+			ActorID: req.UserID,
+			Type:    entity.NotificationTypeNewPost,
 		}
-
-		err = u.NotifProducer.SendNotif(ctx, u.DB, &event)
+		err = u.NotifUsecase.Notify(ctx, notifReq)
 		if err != nil {
 			return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).NotifyFollowerOnUpload")
 		}
 	}
-
 	return nil
 }

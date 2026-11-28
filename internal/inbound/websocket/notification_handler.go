@@ -1,10 +1,10 @@
 package websocket
 
 import (
+	"context"
 	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
-	"github.com/Hidayathamir/golang-clean-architecture/internal/usecase/userusecase"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 )
@@ -15,15 +15,23 @@ const (
 	pingPeriod = (pongWait * 9) / 10
 )
 
-type NotificationHandler struct {
-	Hub         *Hub
-	UserUsecase userusecase.UserUsecase
+// TokenVerifier is the narrow slice of the user usecase the websocket handler
+// needs. Declaring it here (rather than importing userusecase) keeps the
+// notifusecase -> websocket -> userusecase -> notifusecase edge from forming a
+// cycle.
+type TokenVerifier interface {
+	Verify(ctx context.Context, req dto.VerifyUserRequest) (dto.UserAuth, error)
 }
 
-func NewNotificationHandler(hub *Hub, userUsecase userusecase.UserUsecase) *NotificationHandler {
+type NotificationHandler struct {
+	Hub           *Hub
+	TokenVerifier TokenVerifier
+}
+
+func NewNotificationHandler(hub *Hub, tokenVerifier TokenVerifier) *NotificationHandler {
 	return &NotificationHandler{
-		Hub:         hub,
-		UserUsecase: userUsecase,
+		Hub:           hub,
+		TokenVerifier: tokenVerifier,
 	}
 }
 
@@ -32,7 +40,7 @@ func NewNotificationHandler(hub *Hub, userUsecase userusecase.UserUsecase) *Noti
 // WebSocket handshake, hence the query parameter.
 func (h *NotificationHandler) Handle(ctx *fiber.Ctx) error {
 	token := ctx.Query("token")
-	userAuth, err := h.UserUsecase.Verify(ctx.UserContext(), dto.VerifyUserRequest{Token: token})
+	userAuth, err := h.TokenVerifier.Verify(ctx.UserContext(), dto.VerifyUserRequest{Token: token})
 	if err != nil {
 		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
 	}
