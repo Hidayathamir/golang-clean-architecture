@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/column"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/table"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
@@ -13,6 +14,7 @@ import (
 //go:generate moq -out=../../mock/MockRepositoryUserStat.go -pkg=mock . UserStatRepository
 
 type UserStatRepository interface {
+	FindByUserID(ctx context.Context, db *gorm.DB, userStat *entity.UserStat, userID int64) error
 	IncrementFollowerCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error
 	IncrementFollowingCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error
 	IncrementFollowerCountAndFollowingCountByID(ctx context.Context, db *gorm.DB, id int64, followerCount int, followingCount int) error
@@ -28,6 +30,16 @@ func NewUserStatRepository(cfg *config.Config) *UserStatRepositoryImpl {
 	return &UserStatRepositoryImpl{
 		Cfg: cfg,
 	}
+}
+
+func (r *UserStatRepositoryImpl) FindByUserID(ctx context.Context, db *gorm.DB, userStat *entity.UserStat, userID int64) error {
+	// A user with no follow activity yet has no user_stats row; treat that as
+	// zero counts rather than a not-found error.
+	err := db.WithContext(ctx).Where(column.UserID.Eq(userID)).Limit(1).Find(userStat).Error
+	if err != nil {
+		return errkit.AddFuncName(err, "repository.(*UserStatRepositoryImpl).FindByUserID")
+	}
+	return nil
 }
 
 func (r *UserStatRepositoryImpl) IncrementFollowerCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error {

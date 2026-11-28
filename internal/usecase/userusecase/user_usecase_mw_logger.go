@@ -68,6 +68,22 @@ func (u *UserUsecaseMwLogger) Current(ctx context.Context, req dto.GetUserReques
 	return res, err
 }
 
+func (u *UserUsecaseMwLogger) GetProfile(ctx context.Context, req dto.GetProfileRequest) (dto.ProfileResponse, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	res, err := u.Next.GetProfile(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+		"res": res,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return res, err
+}
+
 func (u *UserUsecaseMwLogger) Login(ctx context.Context, req dto.LoginUserRequest) (dto.UserLoginResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()

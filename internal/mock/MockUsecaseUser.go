@@ -32,6 +32,9 @@ var _ userusecase.UserUsecase = &UserUsecaseMock{}
 //			FollowFunc: func(ctx context.Context, req dto.FollowUserRequest) error {
 //				panic("mock out the Follow method")
 //			},
+//			GetProfileFunc: func(ctx context.Context, req dto.GetProfileRequest) (dto.ProfileResponse, error) {
+//				panic("mock out the GetProfile method")
+//			},
 //			LoginFunc: func(ctx context.Context, req dto.LoginUserRequest) (dto.UserLoginResponse, error) {
 //				panic("mock out the Login method")
 //			},
@@ -62,6 +65,9 @@ type UserUsecaseMock struct {
 
 	// FollowFunc mocks the Follow method.
 	FollowFunc func(ctx context.Context, req dto.FollowUserRequest) error
+
+	// GetProfileFunc mocks the GetProfile method.
+	GetProfileFunc func(ctx context.Context, req dto.GetProfileRequest) (dto.ProfileResponse, error)
 
 	// LoginFunc mocks the Login method.
 	LoginFunc func(ctx context.Context, req dto.LoginUserRequest) (dto.UserLoginResponse, error)
@@ -105,6 +111,13 @@ type UserUsecaseMock struct {
 			// Req is the req argument value.
 			Req dto.FollowUserRequest
 		}
+		// GetProfile holds details about calls to the GetProfile method.
+		GetProfile []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req dto.GetProfileRequest
+		}
 		// Login holds details about calls to the Login method.
 		Login []struct {
 			// Ctx is the ctx argument value.
@@ -138,6 +151,7 @@ type UserUsecaseMock struct {
 	lockCreate                     sync.RWMutex
 	lockCurrent                    sync.RWMutex
 	lockFollow                     sync.RWMutex
+	lockGetProfile                 sync.RWMutex
 	lockLogin                      sync.RWMutex
 	lockNotifyUserBeingFollowed    sync.RWMutex
 	lockUpdate                     sync.RWMutex
@@ -285,6 +299,42 @@ func (mock *UserUsecaseMock) FollowCalls() []struct {
 	mock.lockFollow.RLock()
 	calls = mock.calls.Follow
 	mock.lockFollow.RUnlock()
+	return calls
+}
+
+// GetProfile calls GetProfileFunc.
+func (mock *UserUsecaseMock) GetProfile(ctx context.Context, req dto.GetProfileRequest) (dto.ProfileResponse, error) {
+	if mock.GetProfileFunc == nil {
+		panic("UserUsecaseMock.GetProfileFunc: method is nil but UserUsecase.GetProfile was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req dto.GetProfileRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockGetProfile.Lock()
+	mock.calls.GetProfile = append(mock.calls.GetProfile, callInfo)
+	mock.lockGetProfile.Unlock()
+	return mock.GetProfileFunc(ctx, req)
+}
+
+// GetProfileCalls gets all the calls that were made to GetProfile.
+// Check the length with:
+//
+//	len(mockedUserUsecase.GetProfileCalls())
+func (mock *UserUsecaseMock) GetProfileCalls() []struct {
+	Ctx context.Context
+	Req dto.GetProfileRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req dto.GetProfileRequest
+	}
+	mock.lockGetProfile.RLock()
+	calls = mock.calls.GetProfile
+	mock.lockGetProfile.RUnlock()
 	return calls
 }
 

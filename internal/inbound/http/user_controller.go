@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
@@ -106,6 +107,40 @@ func (c *UserController) Current(ctx *fiber.Ctx) error {
 	if err != nil {
 		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
 		return errkit.AddFuncName(err, "http.(*UserController).Current")
+	}
+
+	return response.Data(ctx, http.StatusOK, res)
+}
+
+// GetProfile godoc
+//
+//	@Summary		Get user profile
+//	@Description	Get a user's public profile with follower/following counts
+//	@Tags			users
+//	@Produce		json
+//	@Param			id	path	int	true	"User ID"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[dto.ProfileResponse]
+//	@Router			/api/users/{id} [get]
+func (c *UserController) GetProfile(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
+	userID, err := strconv.ParseInt(ctx.Params("id"), 10, 64)
+	if err != nil {
+		err = errkit.SetCode(err, http.StatusBadRequest)
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*UserController).GetProfile")
+	}
+
+	req := dto.GetProfileRequest{
+		ID: userID,
+	}
+
+	res, err := c.Usecase.GetProfile(ctx.UserContext(), req)
+	if err != nil {
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*UserController).GetProfile")
 	}
 
 	return response.Data(ctx, http.StatusOK, res)

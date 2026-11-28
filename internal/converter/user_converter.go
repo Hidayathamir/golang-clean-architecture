@@ -43,6 +43,14 @@ func EntityUserToDtoUserLoginResponse(user entity.User, res *dto.UserLoginRespon
 	res.UpdatedAt = user.UpdatedAt
 }
 
+func EntityUserAndUserStatToDtoProfileResponse(user entity.User, userStat entity.UserStat, res *dto.ProfileResponse) {
+	res.ID = user.ID
+	res.Username = user.Username
+	res.Name = user.Name
+	res.FollowerCount = userStat.FollowerCount
+	res.FollowingCount = userStat.FollowingCount
+}
+
 func EntityUserToDtoUserAuth(user entity.User, userAuth *dto.UserAuth) {
 	userAuth.ID = user.ID
 	userAuth.Username = user.Username

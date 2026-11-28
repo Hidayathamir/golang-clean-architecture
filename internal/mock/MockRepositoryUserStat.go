@@ -5,6 +5,7 @@ package mock
 
 import (
 	"context"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/repository"
 	"gorm.io/gorm"
 	"sync"
@@ -20,6 +21,9 @@ var _ repository.UserStatRepository = &UserStatRepositoryMock{}
 //
 //		// make and configure a mocked repository.UserStatRepository
 //		mockedUserStatRepository := &UserStatRepositoryMock{
+//			FindByUserIDFunc: func(ctx context.Context, db *gorm.DB, userStat *entity.UserStat, userID int64) error {
+//				panic("mock out the FindByUserID method")
+//			},
 //			IncrementFollowerCountAndFollowingCountByIDFunc: func(ctx context.Context, db *gorm.DB, id int64, followerCount int, followingCount int) error {
 //				panic("mock out the IncrementFollowerCountAndFollowingCountByID method")
 //			},
@@ -36,6 +40,9 @@ var _ repository.UserStatRepository = &UserStatRepositoryMock{}
 //
 //	}
 type UserStatRepositoryMock struct {
+	// FindByUserIDFunc mocks the FindByUserID method.
+	FindByUserIDFunc func(ctx context.Context, db *gorm.DB, userStat *entity.UserStat, userID int64) error
+
 	// IncrementFollowerCountAndFollowingCountByIDFunc mocks the IncrementFollowerCountAndFollowingCountByID method.
 	IncrementFollowerCountAndFollowingCountByIDFunc func(ctx context.Context, db *gorm.DB, id int64, followerCount int, followingCount int) error
 
@@ -47,6 +54,17 @@ type UserStatRepositoryMock struct {
 
 	// calls tracks calls to the methods.
 	calls struct {
+		// FindByUserID holds details about calls to the FindByUserID method.
+		FindByUserID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
+			// UserStat is the userStat argument value.
+			UserStat *entity.UserStat
+			// UserID is the userID argument value.
+			UserID int64
+		}
 		// IncrementFollowerCountAndFollowingCountByID holds details about calls to the IncrementFollowerCountAndFollowingCountByID method.
 		IncrementFollowerCountAndFollowingCountByID []struct {
 			// Ctx is the ctx argument value.
@@ -83,9 +101,54 @@ type UserStatRepositoryMock struct {
 			Count int
 		}
 	}
+	lockFindByUserID                                sync.RWMutex
 	lockIncrementFollowerCountAndFollowingCountByID sync.RWMutex
 	lockIncrementFollowerCountByID                  sync.RWMutex
 	lockIncrementFollowingCountByID                 sync.RWMutex
+}
+
+// FindByUserID calls FindByUserIDFunc.
+func (mock *UserStatRepositoryMock) FindByUserID(ctx context.Context, db *gorm.DB, userStat *entity.UserStat, userID int64) error {
+	if mock.FindByUserIDFunc == nil {
+		panic("UserStatRepositoryMock.FindByUserIDFunc: method is nil but UserStatRepository.FindByUserID was just called")
+	}
+	callInfo := struct {
+		Ctx      context.Context
+		Db       *gorm.DB
+		UserStat *entity.UserStat
+		UserID   int64
+	}{
+		Ctx:      ctx,
+		Db:       db,
+		UserStat: userStat,
+		UserID:   userID,
+	}
+	mock.lockFindByUserID.Lock()
+	mock.calls.FindByUserID = append(mock.calls.FindByUserID, callInfo)
+	mock.lockFindByUserID.Unlock()
+	return mock.FindByUserIDFunc(ctx, db, userStat, userID)
+}
+
+// FindByUserIDCalls gets all the calls that were made to FindByUserID.
+// Check the length with:
+//
+//	len(mockedUserStatRepository.FindByUserIDCalls())
+func (mock *UserStatRepositoryMock) FindByUserIDCalls() []struct {
+	Ctx      context.Context
+	Db       *gorm.DB
+	UserStat *entity.UserStat
+	UserID   int64
+} {
+	var calls []struct {
+		Ctx      context.Context
+		Db       *gorm.DB
+		UserStat *entity.UserStat
+		UserID   int64
+	}
+	mock.lockFindByUserID.RLock()
+	calls = mock.calls.FindByUserID
+	mock.lockFindByUserID.RUnlock()
+	return calls
 }
 
 // IncrementFollowerCountAndFollowingCountByID calls IncrementFollowerCountAndFollowingCountByIDFunc.

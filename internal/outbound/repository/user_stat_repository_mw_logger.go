@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/retrykit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
@@ -20,6 +21,24 @@ func NewUserStatRepositoryMwLogger(next UserStatRepository) *UserStatRepositoryM
 	return &UserStatRepositoryMwLogger{
 		Next: next,
 	}
+}
+
+func (r *UserStatRepositoryMwLogger) FindByUserID(ctx context.Context, db *gorm.DB, userStat *entity.UserStat, userID int64) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.FindByUserID(ctx, db, userStat, userID)
+	})
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"user_stat": userStat,
+		"user":      userID,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return err
 }
 
 func (r *UserStatRepositoryMwLogger) IncrementFollowerCountAndFollowingCountByID(ctx context.Context, db *gorm.DB, id int64, followerCount int, followingCount int) error {

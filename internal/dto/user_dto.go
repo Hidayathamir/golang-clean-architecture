@@ -53,6 +53,20 @@ type GetUserRequest struct {
 	ID int64 `json:"id" validate:"required"`
 }
 
+// ProfileResponse is the public profile for GET /api/users/:id.
+type ProfileResponse struct {
+	ID             int64  `json:"id"`
+	Username       string `json:"username"`
+	Name           string `json:"name"`
+	FollowerCount  int    `json:"follower_count"`
+	FollowingCount int    `json:"following_count"`
+}
+
+// GetProfileRequest is the input for GET /api/users/:id.
+type GetProfileRequest struct {
+	ID int64 `json:"id" validate:"required"`
+}
+
 type FollowUserRequest struct {
 	FollowingID int64 `json:"following_id"`
 }

@@ -95,6 +95,19 @@ definitions:
     - password
     - username
     type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.ProfileResponse:
+    properties:
+      follower_count:
+        type: integer
+      following_count:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      username:
+        type: string
+    type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_dto.RegisterUserRequest:
     properties:
       name:
@@ -209,6 +222,17 @@ definitions:
         items:
           $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.LikeResponse'
         type: array
+      error_detail:
+        type: string
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.PageMetadata'
+    type: object
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ProfileResponse
+  : properties:
+      data:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.ProfileResponse'
       error_detail:
         type: string
       error_message:
@@ -517,6 +541,27 @@ paths:
           schema:
             $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_UserLoginResponse'
       summary: Login user
+      tags:
+      - users
+  /api/users/{id}:
+    get:
+      description: Get a user's public profile with follower/following counts
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ProfileResponse'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Get user profile
       tags:
       - users
   /api/users/{id}/images:
