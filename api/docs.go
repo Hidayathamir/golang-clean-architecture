@@ -493,6 +493,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/users/{id}/following": {
+            "get": {
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
+                ],
+                "description": "Get the list of users the given user follows (cursor paginated)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get user followings",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page size (default 20, max 100)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Opaque cursor from the previous page; empty for the first page",
+                        "name": "cursor",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_FollowingsResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/users/{id}/images": {
             "get": {
                 "security": [
@@ -605,6 +651,20 @@ const docTemplate = `{
             }
         },
         "github_com_Hidayathamir_golang-clean-architecture_internal_dto.FollowersResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.UserResponse"
+                    }
+                },
+                "next_cursor": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_dto.FollowingsResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -872,6 +932,23 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.FollowersResponse"
+                },
+                "error_detail": {
+                    "type": "string"
+                },
+                "error_message": {
+                    "type": "string"
+                },
+                "paging": {
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.PageMetadata"
+                }
+            }
+        },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_FollowingsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.FollowingsResponse"
                 },
                 "error_detail": {
                     "type": "string"

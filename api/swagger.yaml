@@ -49,6 +49,15 @@ definitions:
       next_cursor:
         type: string
     type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.FollowingsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.UserResponse'
+        type: array
+      next_cursor:
+        type: string
+    type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_dto.ImageResponse:
     properties:
       caption:
@@ -218,6 +227,17 @@ definitions:
   : properties:
       data:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.FollowersResponse'
+      error_detail:
+        type: string
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.PageMetadata'
+    type: object
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_FollowingsResponse
+  : properties:
+      data:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.FollowingsResponse'
       error_detail:
         type: string
       error_message:
@@ -611,6 +631,35 @@ paths:
       security:
       - SimpleApiKeyAuth: []
       summary: Get user followers
+      tags:
+      - users
+  /api/users/{id}/following:
+    get:
+      description: Get the list of users the given user follows (cursor paginated)
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Page size (default 20, max 100)
+        in: query
+        name: limit
+        type: integer
+      - description: Opaque cursor from the previous page; empty for the first page
+        in: query
+        name: cursor
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_FollowingsResponse'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Get user followings
       tags:
       - users
   /api/users/{id}/images:

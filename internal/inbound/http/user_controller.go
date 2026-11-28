@@ -192,6 +192,52 @@ func (c *UserController) GetFollowers(ctx *fiber.Ctx) error {
 	return response.Data(ctx, http.StatusOK, res)
 }
 
+// GetFollowings godoc
+//
+//	@Summary		Get user followings
+//	@Description	Get the list of users the given user follows (cursor paginated)
+//	@Tags			users
+//	@Produce		json
+//	@Param			id		path	int		true	"User ID"
+//	@Param			limit	query	int		false	"Page size (default 20, max 100)"
+//	@Param			cursor	query	string	false	"Opaque cursor from the previous page; empty for the first page"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[dto.FollowingsResponse]
+//	@Router			/api/users/{id}/following [get]
+func (c *UserController) GetFollowings(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
+	userID, err := strconv.ParseInt(ctx.Params("id"), 10, 64)
+	if err != nil {
+		err = errkit.SetCode(err, http.StatusBadRequest)
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*UserController).GetFollowings")
+	}
+
+	req := dto.FollowingsRequest{
+		UserID: userID,
+	}
+	if limitStr := ctx.Query("limit"); limitStr != "" {
+		limit, err := strconv.Atoi(limitStr)
+		if err != nil {
+			err = errkit.SetCode(err, http.StatusBadRequest)
+			logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+			return errkit.AddFuncName(err, "http.(*UserController).GetFollowings")
+		}
+		req.Page.Limit = limit
+	}
+	req.Page.Cursor = ctx.Query("cursor")
+
+	res, err := c.Usecase.GetFollowings(ctx.UserContext(), req)
+	if err != nil {
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*UserController).GetFollowings")
+	}
+
+	return response.Data(ctx, http.StatusOK, res)
+}
+
 // Update godoc
 //
 //	@Summary		Update user
