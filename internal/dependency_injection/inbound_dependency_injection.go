@@ -50,17 +50,20 @@ type Consumers struct {
 	ImageConsumer *messaging.ImageConsumer
 	NotifConsumer *messaging.NotifConsumer
 	UserConsumer  *messaging.UserConsumer
+	EmailConsumer *messaging.EmailConsumer
 }
 
-func SetupConsumers(cfg *config.Config, usecases *Usecases) *Consumers {
+func SetupConsumers(cfg *config.Config, usecases *Usecases, emails *Emails) *Consumers {
 	imageConsumer := messaging.NewImageConsumer(usecases.ImageUsecase)
 	notifConsumer := messaging.NewNotifConsumer(usecases.NotifUsecase)
 	userConsumer := messaging.NewUserConsumer(usecases.UserUsecase)
+	emailConsumer := messaging.NewEmailConsumer(emails.Sender)
 
 	return &Consumers{
 		ImageConsumer: imageConsumer,
 		NotifConsumer: notifConsumer,
 		UserConsumer:  userConsumer,
+		EmailConsumer: emailConsumer,
 	}
 }
 

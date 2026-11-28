@@ -38,6 +38,7 @@ func registerUser(t *testing.T, username, password, name string) {
 		Username: username,
 		Password: password,
 		Name:     name,
+		Email:    username + "@example.com",
 	}
 
 	bodyJSON, err := json.Marshal(requestBody)

@@ -40,6 +40,7 @@ func setupGuestRoute(router fiber.Router, controllers *dependency_injection.Cont
 	{
 		users.Post("", controllers.UserController.Register)
 		users.Post("/_login", controllers.UserController.Login)
+		users.Get("/_verify_email", controllers.UserController.VerifyEmail)
 	}
 }
 

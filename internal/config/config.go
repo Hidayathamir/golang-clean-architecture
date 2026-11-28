@@ -118,6 +118,22 @@ func (c *Config) GetElasticsearchAddress() string {
 	return c.GetString(ElasticsearchAddress)
 }
 
+func (c *Config) GetEmailSMTPHost() string {
+	return c.GetString(EmailSMTPHost)
+}
+
+func (c *Config) GetEmailSMTPPort() int {
+	return c.GetInt(EmailSMTPPort)
+}
+
+func (c *Config) GetEmailFrom() string {
+	return c.GetString(EmailFrom)
+}
+
+func (c *Config) GetEmailVerificationURL() string {
+	return c.GetString(EmailVerificationURL)
+}
+
 func (c *Config) GetKafkaBootstrapServers() string {
 	return c.GetString(KafkaBootstrapServers)
 }

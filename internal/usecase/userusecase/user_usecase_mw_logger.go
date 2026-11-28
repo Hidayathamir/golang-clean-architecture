@@ -52,6 +52,36 @@ func (u *UserUsecaseMwLogger) Create(ctx context.Context, req dto.RegisterUserRe
 	return res, err
 }
 
+func (u *UserUsecaseMwLogger) VerifyEmail(ctx context.Context, req dto.VerifyEmailRequest) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := u.Next.VerifyEmail(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return err
+}
+
+func (u *UserUsecaseMwLogger) SendEmailVerification(ctx context.Context, req dto.EmailVerificationEvent) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := u.Next.SendEmailVerification(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return err
+}
+
 func (u *UserUsecaseMwLogger) Current(ctx context.Context, req dto.GetUserRequest) (dto.UserResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()

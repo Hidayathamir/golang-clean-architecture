@@ -46,6 +46,13 @@ var (
 		retry.DelayType(retry.BackOffDelay),
 		retry.RetryIf(retryIf),
 	}
+	emailRetryOption = []retry.Option{
+		retry.Attempts(3),
+		retry.Delay(1 * time.Second),
+		retry.MaxDelay(5 * time.Second),
+		retry.DelayType(retry.BackOffDelay),
+		retry.RetryIf(retryIf),
+	}
 )
 
 func DBRetry(ctx context.Context, operation func() error) error {
@@ -95,6 +102,16 @@ func StorageRetry(ctx context.Context, operation func() error) error {
 
 func StorageRetryWithData[T any](ctx context.Context, operation func() (T, error)) (T, error) {
 	return retry.NewWithData[T](withContext(ctx, storageRetryOption, "StorageRetryWithData")...).
+		Do(func() (T, error) { return operation() })
+}
+
+func EmailRetry(ctx context.Context, operation func() error) error {
+	return retry.New(withContext(ctx, emailRetryOption, "EmailRetry")...).
+		Do(func() error { return operation() })
+}
+
+func EmailRetryWithData[T any](ctx context.Context, operation func() (T, error)) (T, error) {
+	return retry.NewWithData[T](withContext(ctx, emailRetryOption, "EmailRetryWithData")...).
 		Do(func() (T, error) { return operation() })
 }
 

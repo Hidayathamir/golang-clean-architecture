@@ -20,6 +20,7 @@ type UserRepository interface {
 	CountByUsername(ctx context.Context, db *gorm.DB, username string) (int64, error)
 	FindByID(ctx context.Context, db *gorm.DB, user *entity.User, id int64) error
 	FindByUsername(ctx context.Context, db *gorm.DB, user *entity.User, username string) error
+	FindByVerificationToken(ctx context.Context, db *gorm.DB, user *entity.User, token string) error
 	FindByIDs(ctx context.Context, db *gorm.DB, userList *entity.UserList, ids []int64) error
 }
 
@@ -85,6 +86,15 @@ func (r *UserRepositoryImpl) FindByUsername(ctx context.Context, db *gorm.DB, us
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusNotFound)
 		return errkit.AddFuncName(err, "repository.(*UserRepositoryImpl).FindByUsername")
+	}
+	return nil
+}
+
+func (r *UserRepositoryImpl) FindByVerificationToken(ctx context.Context, db *gorm.DB, user *entity.User, token string) error {
+	err := db.WithContext(ctx).Where(column.VerificationToken.Eq(token)).Take(user).Error
+	if err != nil {
+		err = errkit.SetCode(err, http.StatusNotFound)
+		return errkit.AddFuncName(err, "repository.(*UserRepositoryImpl).FindByVerificationToken")
 	}
 	return nil
 }

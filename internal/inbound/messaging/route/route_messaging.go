@@ -64,6 +64,13 @@ func Setup(ctx context.Context, cfg *config.Config, producer *kgo.Client, consum
 		messaging.ConsumeEventSingle(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
+	wg.Go(func() {
+		consumerGroup := consumergroup.EmailVerificationSend
+		_topic := topic.EmailVerification
+		handler := messaging.IdempotencyHandlerSingle(usecases.IdempotencyUsecase, consumerGroup, consumers.EmailConsumer.SendVerificationEmail)
+		messaging.ConsumeEventSingle(ctx, cfg, producer, consumerGroup, _topic, handler)
+	})
+
 	// --- primary consumers: batch ---
 
 	wg.Go(func() {
@@ -135,6 +142,13 @@ func Setup(ctx context.Context, cfg *config.Config, producer *kgo.Client, consum
 		consumerGroup := consumergroup.NotifLogRetry
 		_topic := topic.Notif
 		handler := messaging.IdempotencyHandlerSingle(usecases.IdempotencyUsecase, consumerGroup, consumers.NotifConsumer.Notify)
+		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
+	})
+
+	wg.Go(func() {
+		consumerGroup := consumergroup.EmailVerificationSendRetry
+		_topic := topic.EmailVerification
+		handler := messaging.IdempotencyHandlerSingle(usecases.IdempotencyUsecase, consumerGroup, consumers.EmailConsumer.SendVerificationEmail)
 		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 

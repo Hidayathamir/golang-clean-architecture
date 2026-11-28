@@ -6,6 +6,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/cache"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/email"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/storage"
@@ -18,6 +19,8 @@ import (
 type UserUsecase interface {
 	Verify(ctx context.Context, req dto.VerifyUserRequest) (dto.UserAuth, error)
 	Create(ctx context.Context, req dto.RegisterUserRequest) (dto.UserResponse, error)
+	VerifyEmail(ctx context.Context, req dto.VerifyEmailRequest) error
+	SendEmailVerification(ctx context.Context, req dto.EmailVerificationEvent) error
 	Login(ctx context.Context, req dto.LoginUserRequest) (dto.UserLoginResponse, error)
 	Current(ctx context.Context, req dto.GetUserRequest) (dto.UserResponse, error)
 	GetProfile(ctx context.Context, req dto.GetProfileRequest) (dto.ProfileResponse, error)
@@ -44,9 +47,13 @@ type UserUsecaseImpl struct {
 	// producer
 	UserProducer  messaging.UserProducer
 	NotifProducer messaging.NotifProducer
+	EmailProducer messaging.EmailProducer
 
 	// storage
 	S3Client storage.S3Client
+
+	// email
+	EmailSender email.Sender
 
 	// cache
 	UserCache cache.UserCache
@@ -67,9 +74,13 @@ func NewUserUsecase(
 	// producer
 	UserProducer messaging.UserProducer,
 	NotifProducer messaging.NotifProducer,
+	EmailProducer messaging.EmailProducer,
 
 	// storage
 	S3Client storage.S3Client,
+
+	// email
+	EmailSender email.Sender,
 
 	// cache
 	UserCache cache.UserCache,
@@ -89,9 +100,13 @@ func NewUserUsecase(
 		// producer
 		UserProducer:  UserProducer,
 		NotifProducer: NotifProducer,
+		EmailProducer: EmailProducer,
 
 		// storage
 		S3Client: S3Client,
+
+		// email
+		EmailSender: EmailSender,
 
 		// cache
 		UserCache: UserCache,

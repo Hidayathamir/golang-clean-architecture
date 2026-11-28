@@ -35,10 +35,11 @@ func main() {
 	caches := dependency_injection.SetupCaches(redisClient)
 	searches := dependency_injection.SetupSearches(elasticsearchClient)
 	storages := dependency_injection.SetupStorages(cfg, s3Client)
+	emails := dependency_injection.SetupEmails(cfg)
 
-	usecases := dependency_injection.SetupUsecases(cfg, db, caches, messagings, repositories, searches, storages)
+	usecases := dependency_injection.SetupUsecases(cfg, db, caches, messagings, repositories, searches, storages, emails)
 
-	consumers := dependency_injection.SetupConsumers(cfg, usecases)
+	consumers := dependency_injection.SetupConsumers(cfg, usecases, emails)
 
 	stopTraceProvider := telemetry.InitTraceProvider(cfg)
 	defer stopTraceProvider()

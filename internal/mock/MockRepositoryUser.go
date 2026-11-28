@@ -36,6 +36,9 @@ var _ repository.UserRepository = &UserRepositoryMock{}
 //			FindByUsernameFunc: func(ctx context.Context, db *gorm.DB, user *entity.User, username string) error {
 //				panic("mock out the FindByUsername method")
 //			},
+//			FindByVerificationTokenFunc: func(ctx context.Context, db *gorm.DB, user *entity.User, token string) error {
+//				panic("mock out the FindByVerificationToken method")
+//			},
 //			UpdateFunc: func(ctx context.Context, db *gorm.DB, user *entity.User) error {
 //				panic("mock out the Update method")
 //			},
@@ -60,6 +63,9 @@ type UserRepositoryMock struct {
 
 	// FindByUsernameFunc mocks the FindByUsername method.
 	FindByUsernameFunc func(ctx context.Context, db *gorm.DB, user *entity.User, username string) error
+
+	// FindByVerificationTokenFunc mocks the FindByVerificationToken method.
+	FindByVerificationTokenFunc func(ctx context.Context, db *gorm.DB, user *entity.User, token string) error
 
 	// UpdateFunc mocks the Update method.
 	UpdateFunc func(ctx context.Context, db *gorm.DB, user *entity.User) error
@@ -117,6 +123,17 @@ type UserRepositoryMock struct {
 			// Username is the username argument value.
 			Username string
 		}
+		// FindByVerificationToken holds details about calls to the FindByVerificationToken method.
+		FindByVerificationToken []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
+			// User is the user argument value.
+			User *entity.User
+			// Token is the token argument value.
+			Token string
+		}
 		// Update holds details about calls to the Update method.
 		Update []struct {
 			// Ctx is the ctx argument value.
@@ -127,12 +144,13 @@ type UserRepositoryMock struct {
 			User *entity.User
 		}
 	}
-	lockCountByUsername sync.RWMutex
-	lockCreate          sync.RWMutex
-	lockFindByID        sync.RWMutex
-	lockFindByIDs       sync.RWMutex
-	lockFindByUsername  sync.RWMutex
-	lockUpdate          sync.RWMutex
+	lockCountByUsername         sync.RWMutex
+	lockCreate                  sync.RWMutex
+	lockFindByID                sync.RWMutex
+	lockFindByIDs               sync.RWMutex
+	lockFindByUsername          sync.RWMutex
+	lockFindByVerificationToken sync.RWMutex
+	lockUpdate                  sync.RWMutex
 }
 
 // CountByUsername calls CountByUsernameFunc.
@@ -344,6 +362,50 @@ func (mock *UserRepositoryMock) FindByUsernameCalls() []struct {
 	mock.lockFindByUsername.RLock()
 	calls = mock.calls.FindByUsername
 	mock.lockFindByUsername.RUnlock()
+	return calls
+}
+
+// FindByVerificationToken calls FindByVerificationTokenFunc.
+func (mock *UserRepositoryMock) FindByVerificationToken(ctx context.Context, db *gorm.DB, user *entity.User, token string) error {
+	if mock.FindByVerificationTokenFunc == nil {
+		panic("UserRepositoryMock.FindByVerificationTokenFunc: method is nil but UserRepository.FindByVerificationToken was just called")
+	}
+	callInfo := struct {
+		Ctx   context.Context
+		Db    *gorm.DB
+		User  *entity.User
+		Token string
+	}{
+		Ctx:   ctx,
+		Db:    db,
+		User:  user,
+		Token: token,
+	}
+	mock.lockFindByVerificationToken.Lock()
+	mock.calls.FindByVerificationToken = append(mock.calls.FindByVerificationToken, callInfo)
+	mock.lockFindByVerificationToken.Unlock()
+	return mock.FindByVerificationTokenFunc(ctx, db, user, token)
+}
+
+// FindByVerificationTokenCalls gets all the calls that were made to FindByVerificationToken.
+// Check the length with:
+//
+//	len(mockedUserRepository.FindByVerificationTokenCalls())
+func (mock *UserRepositoryMock) FindByVerificationTokenCalls() []struct {
+	Ctx   context.Context
+	Db    *gorm.DB
+	User  *entity.User
+	Token string
+} {
+	var calls []struct {
+		Ctx   context.Context
+		Db    *gorm.DB
+		User  *entity.User
+		Token string
+	}
+	mock.lockFindByVerificationToken.RLock()
+	calls = mock.calls.FindByVerificationToken
+	mock.lockFindByVerificationToken.RUnlock()
 	return calls
 }
 

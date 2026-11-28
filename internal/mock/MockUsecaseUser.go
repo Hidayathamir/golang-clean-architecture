@@ -47,6 +47,9 @@ var _ userusecase.UserUsecase = &UserUsecaseMock{}
 //			NotifyUserBeingFollowedFunc: func(ctx context.Context, req dto.NotifyUserBeingFollowedRequest) error {
 //				panic("mock out the NotifyUserBeingFollowed method")
 //			},
+//			SendEmailVerificationFunc: func(ctx context.Context, req dto.EmailVerificationEvent) error {
+//				panic("mock out the SendEmailVerification method")
+//			},
 //			UnfollowFunc: func(ctx context.Context, req dto.UnfollowUserRequest) error {
 //				panic("mock out the Unfollow method")
 //			},
@@ -55,6 +58,9 @@ var _ userusecase.UserUsecase = &UserUsecaseMock{}
 //			},
 //			VerifyFunc: func(ctx context.Context, req dto.VerifyUserRequest) (dto.UserAuth, error) {
 //				panic("mock out the Verify method")
+//			},
+//			VerifyEmailFunc: func(ctx context.Context, req dto.VerifyEmailRequest) error {
+//				panic("mock out the VerifyEmail method")
 //			},
 //		}
 //
@@ -90,6 +96,9 @@ type UserUsecaseMock struct {
 	// NotifyUserBeingFollowedFunc mocks the NotifyUserBeingFollowed method.
 	NotifyUserBeingFollowedFunc func(ctx context.Context, req dto.NotifyUserBeingFollowedRequest) error
 
+	// SendEmailVerificationFunc mocks the SendEmailVerification method.
+	SendEmailVerificationFunc func(ctx context.Context, req dto.EmailVerificationEvent) error
+
 	// UnfollowFunc mocks the Unfollow method.
 	UnfollowFunc func(ctx context.Context, req dto.UnfollowUserRequest) error
 
@@ -98,6 +107,9 @@ type UserUsecaseMock struct {
 
 	// VerifyFunc mocks the Verify method.
 	VerifyFunc func(ctx context.Context, req dto.VerifyUserRequest) (dto.UserAuth, error)
+
+	// VerifyEmailFunc mocks the VerifyEmail method.
+	VerifyEmailFunc func(ctx context.Context, req dto.VerifyEmailRequest) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -164,6 +176,13 @@ type UserUsecaseMock struct {
 			// Req is the req argument value.
 			Req dto.NotifyUserBeingFollowedRequest
 		}
+		// SendEmailVerification holds details about calls to the SendEmailVerification method.
+		SendEmailVerification []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req dto.EmailVerificationEvent
+		}
 		// Unfollow holds details about calls to the Unfollow method.
 		Unfollow []struct {
 			// Ctx is the ctx argument value.
@@ -185,6 +204,13 @@ type UserUsecaseMock struct {
 			// Req is the req argument value.
 			Req dto.VerifyUserRequest
 		}
+		// VerifyEmail holds details about calls to the VerifyEmail method.
+		VerifyEmail []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req dto.VerifyEmailRequest
+		}
 	}
 	lockBatchUpdateUserFollowStats sync.RWMutex
 	lockCreate                     sync.RWMutex
@@ -195,9 +221,11 @@ type UserUsecaseMock struct {
 	lockGetProfile                 sync.RWMutex
 	lockLogin                      sync.RWMutex
 	lockNotifyUserBeingFollowed    sync.RWMutex
+	lockSendEmailVerification      sync.RWMutex
 	lockUnfollow                   sync.RWMutex
 	lockUpdate                     sync.RWMutex
 	lockVerify                     sync.RWMutex
+	lockVerifyEmail                sync.RWMutex
 }
 
 // BatchUpdateUserFollowStats calls BatchUpdateUserFollowStatsFunc.
@@ -524,6 +552,42 @@ func (mock *UserUsecaseMock) NotifyUserBeingFollowedCalls() []struct {
 	return calls
 }
 
+// SendEmailVerification calls SendEmailVerificationFunc.
+func (mock *UserUsecaseMock) SendEmailVerification(ctx context.Context, req dto.EmailVerificationEvent) error {
+	if mock.SendEmailVerificationFunc == nil {
+		panic("UserUsecaseMock.SendEmailVerificationFunc: method is nil but UserUsecase.SendEmailVerification was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req dto.EmailVerificationEvent
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockSendEmailVerification.Lock()
+	mock.calls.SendEmailVerification = append(mock.calls.SendEmailVerification, callInfo)
+	mock.lockSendEmailVerification.Unlock()
+	return mock.SendEmailVerificationFunc(ctx, req)
+}
+
+// SendEmailVerificationCalls gets all the calls that were made to SendEmailVerification.
+// Check the length with:
+//
+//	len(mockedUserUsecase.SendEmailVerificationCalls())
+func (mock *UserUsecaseMock) SendEmailVerificationCalls() []struct {
+	Ctx context.Context
+	Req dto.EmailVerificationEvent
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req dto.EmailVerificationEvent
+	}
+	mock.lockSendEmailVerification.RLock()
+	calls = mock.calls.SendEmailVerification
+	mock.lockSendEmailVerification.RUnlock()
+	return calls
+}
+
 // Unfollow calls UnfollowFunc.
 func (mock *UserUsecaseMock) Unfollow(ctx context.Context, req dto.UnfollowUserRequest) error {
 	if mock.UnfollowFunc == nil {
@@ -629,5 +693,41 @@ func (mock *UserUsecaseMock) VerifyCalls() []struct {
 	mock.lockVerify.RLock()
 	calls = mock.calls.Verify
 	mock.lockVerify.RUnlock()
+	return calls
+}
+
+// VerifyEmail calls VerifyEmailFunc.
+func (mock *UserUsecaseMock) VerifyEmail(ctx context.Context, req dto.VerifyEmailRequest) error {
+	if mock.VerifyEmailFunc == nil {
+		panic("UserUsecaseMock.VerifyEmailFunc: method is nil but UserUsecase.VerifyEmail was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req dto.VerifyEmailRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockVerifyEmail.Lock()
+	mock.calls.VerifyEmail = append(mock.calls.VerifyEmail, callInfo)
+	mock.lockVerifyEmail.Unlock()
+	return mock.VerifyEmailFunc(ctx, req)
+}
+
+// VerifyEmailCalls gets all the calls that were made to VerifyEmail.
+// Check the length with:
+//
+//	len(mockedUserUsecase.VerifyEmailCalls())
+func (mock *UserUsecaseMock) VerifyEmailCalls() []struct {
+	Ctx context.Context
+	Req dto.VerifyEmailRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req dto.VerifyEmailRequest
+	}
+	mock.lockVerifyEmail.RLock()
+	calls = mock.calls.VerifyEmail
+	mock.lockVerifyEmail.RUnlock()
 	return calls
 }

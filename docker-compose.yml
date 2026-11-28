@@ -100,6 +100,13 @@ services:
       timeout: 5s
       retries: 20
 
+  mailpit:
+    image: axllent/mailpit:v1.27
+    container_name: mailpit-clean-arch
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
   lgtm:
     image: grafana/otel-lgtm:latest
     container_name: lgtm-clean-arch

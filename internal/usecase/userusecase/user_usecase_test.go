@@ -6,6 +6,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/cache"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/email"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/storage"
@@ -25,12 +26,14 @@ func TestNewUserUsecase(t *testing.T) {
 
 	var UserProducer messaging.UserProducer = &mock.UserProducerMock{}
 	var NotifProducer messaging.NotifProducer = &mock.NotifProducerMock{}
+	var EmailProducer messaging.EmailProducer = &mock.EmailProducerMock{}
 
 	var S3Client storage.S3Client = &mock.S3ClientMock{}
+	var EmailSender email.Sender = &mock.SenderMock{}
 	var UserCache cache.UserCache = &mock.UserCacheMock{}
 	var NotifUsecase notifusecase.NotifUsecase = &mock.NotifUsecaseMock{}
 
-	u := userusecase.NewUserUsecase(Config, DB, UserRepository, UserStatRepository, FollowRepository, UserProducer, NotifProducer, S3Client, UserCache, NotifUsecase)
+	u := userusecase.NewUserUsecase(Config, DB, UserRepository, UserStatRepository, FollowRepository, UserProducer, NotifProducer, EmailProducer, S3Client, EmailSender, UserCache, NotifUsecase)
 
 	require.NotEmpty(t, u)
 }

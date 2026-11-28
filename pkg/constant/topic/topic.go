@@ -13,10 +13,11 @@ func (t Topic) DLQ() string {
 }
 
 var (
-	ImageUploaded  = Topic{Primary: "image.uploaded"}
-	ImageLiked     = Topic{Primary: "image.liked"}
-	ImageCommented = Topic{Primary: "image.commented"}
-	ImageDeleted   = Topic{Primary: "image.deleted"}
-	UserFollowed   = Topic{Primary: "user.followed"}
-	Notif          = Topic{Primary: "notif"}
+	ImageUploaded     = Topic{Primary: "image.uploaded"}
+	ImageLiked        = Topic{Primary: "image.liked"}
+	ImageCommented    = Topic{Primary: "image.commented"}
+	ImageDeleted      = Topic{Primary: "image.deleted"}
+	UserFollowed      = Topic{Primary: "user.followed"}
+	Notif             = Topic{Primary: "notif"}
+	EmailVerification = Topic{Primary: "email.verification"}
 )

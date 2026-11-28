@@ -23,6 +23,8 @@ const (
 
 	NotifLog = "notif.log"
 
+	EmailVerificationSend = "email.verification.send"
+
 	ImageUploadedNotifyFollowersRetry = "image.uploaded.notify-followers.retry"
 	ImageUploadedSyncSearchRetry      = "image.uploaded.sync-search.retry"
 	ImageLikedNotifyOwnerRetry        = "image.liked.notify-owner.retry"
@@ -35,4 +37,6 @@ const (
 	UserFollowedBatchStatsRetry = "user.followed.batch-stats.retry"
 
 	NotifLogRetry = "notif.log.retry"
+
+	EmailVerificationSendRetry = "email.verification.send.retry"
 )

@@ -30,6 +30,14 @@
   "elasticsearch": {
     "address": "http://localhost:9200"
   },
+  "email": {
+    "smtp": {
+      "host": "localhost",
+      "port": 1025
+    },
+    "from": "no-reply@golang-clean-architecture.local",
+    "verification_url": "http://localhost:3000/api/users/_verify_email"
+  },
   "kafka": {
     "bootstrap": {
       "servers": "localhost:9093"

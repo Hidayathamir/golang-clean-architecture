@@ -15,6 +15,7 @@ func DtoRegisterUserRequestToEntityUser(req dto.RegisterUserRequest, user *entit
 	user.Username = req.Username
 	user.Name = req.Name
 	user.Password = password
+	user.Email = req.Email
 }
 
 func DtoUpdateUserRequestToEntityUser(req dto.UpdateUserRequest, user *entity.User, password string) {
@@ -31,6 +32,8 @@ func EntityUserToDtoUserResponse(user entity.User, res *dto.UserResponse) {
 	res.ID = user.ID
 	res.Username = user.Username
 	res.Name = user.Name
+	res.Email = user.Email
+	res.EmailVerifiedAt = user.EmailVerifiedAt
 	res.CreatedAt = user.CreatedAt
 	res.UpdatedAt = user.UpdatedAt
 }

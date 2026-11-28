@@ -129,7 +129,7 @@ Errors carry their HTTP status, a client-facing message, and the call site that 
 
 Configuration is `settings/config.json` (Viper). Always run in this order:
 
-1. **Start infrastructure** — `make docker-compose-up` (wait for it to finish). Postgres, Kafka (+ Zookeeper), Redis, Elasticsearch, Kibana, MinIO (S3 on `:9100`, console on `:9001`), Redpanda Console, and Grafana LGTM (one container: OpenTelemetry Collector + Tempo + Loki + Prometheus + Grafana; OTLP on `:4317`/`:4318`, UI on `:3000`). The app creates the `image` bucket on startup, so no manual bucket setup is needed.
+1. **Start infrastructure** — `make docker-compose-up` (wait for it to finish). Postgres, Kafka (+ Zookeeper), Redis, Elasticsearch, Kibana, MinIO (S3 on `:9100`, console on `:9001`), Mailpit (SMTP on `:1025`, web UI on `:8025`), Redpanda Console, and Grafana LGTM (one container: OpenTelemetry Collector + Tempo + Loki + Prometheus + Grafana; OTLP on `:4317`/`:4318`, UI on `:3000`). The app creates the `image` bucket on startup, so no manual bucket setup is needed.
 2. **Run migrations** — `make migrate`.
 3. **Seed dev data** — `make seed` (optional; dev fixtures only, see the `seeding` skill).
 4. **Run the app servers** — one command starts all four in the background:
@@ -208,6 +208,7 @@ Pointers to the deep-dive skills. Load the skill when you need the detail.
 | **Swagger** | http://localhost:3000/swagger | Interactive API documentation and testing. |
 | **Kibana** | http://localhost:5601 | Explore/visualize data in Elasticsearch. |
 | **MinIO Console** | http://localhost:9001 | Browse/inspect the S3 (`image`) bucket. Login `test` / `testtesttest`. |
+| **Mailpit** | http://localhost:8025 | Captured outbound email (SMTP on `:1025`). API at `/api/v1/messages`. |
 
 ## Idempotency
 
@@ -216,6 +217,17 @@ Kafka consumers are **at-least-once**, so every message carries an **`x-idempote
 **Enforced** via `make check-rules` (`scripts/checkrules`): every `ConsumeEventSingle`/`ConsumeEventBatch`/`ConsumeEventRetry` call in `route_messaging.go` must pass a handler wrapped by `messaging.IdempotencyHandlerSingle`/`Batch`. Inherently idempotent consumers (the Elasticsearch sync ones) are allowlisted in `checkConsumerIdempotency`.
 
 Full detail — the table, wrapper functions, and behavior: the `idempotency` skill.
+
+## Email verification
+
+A worked example of the full async email path. On `POST /api/users` the user row and an `email.verification` outbox event commit together; the worker producer ships it to Kafka, the worker consumer calls the outbound `email.Sender` (SMTP → **Mailpit**), and the emailed link (`GET /api/users/_verify_email?token=...`) sets `users.email_verified_at`. Verification is idempotent; an unknown token is `404`.
+
+- Outbound: `internal/outbound/email/` (`Sender` + SMTP impl + `_mw_logger`), wired as the `Emails` container.
+- Producer/consumer: `internal/outbound/messaging/email_producer.go`, `internal/inbound/messaging/email_consumer.go`.
+- Usecases: `userusecase.Create` (enqueues), `SendEmailVerification` (consumer handler), `VerifyEmail`.
+- Config: `email.*` in `settings/config.json` (SMTP host/port, from, verification URL).
+
+Covered end-to-end by `test/e2etest/email_verification_test.go` — run `make go-e2e-test` (needs infra + `make run-all`) to confirm it still works.
 
 ## Architecture, layout, and adding features
 

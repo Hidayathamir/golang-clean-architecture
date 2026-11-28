@@ -3,6 +3,7 @@ package dependency_injection
 import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/cache"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/email"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/messaging"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/repository"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/search"
@@ -36,6 +37,7 @@ type Messagings struct {
 	UserProducer  messaging.UserProducer
 	ImageProducer messaging.ImageProducer
 	NotifProducer messaging.NotifProducer
+	EmailProducer messaging.EmailProducer
 }
 
 func SetupMessagings(cfg *config.Config, repositories *Repositories) *Messagings {
@@ -51,10 +53,15 @@ func SetupMessagings(cfg *config.Config, repositories *Repositories) *Messagings
 	notifProducer = messaging.NewNotifProducer(cfg, repositories.OutboxRepository)
 	notifProducer = messaging.NewNotifProducerMwLogger(notifProducer)
 
+	var emailProducer messaging.EmailProducer
+	emailProducer = messaging.NewEmailProducer(cfg, repositories.OutboxRepository)
+	emailProducer = messaging.NewEmailProducerMwLogger(emailProducer)
+
 	return &Messagings{
 		UserProducer:  userProducer,
 		ImageProducer: imageProducer,
 		NotifProducer: notifProducer,
+		EmailProducer: emailProducer,
 	}
 }
 
@@ -151,5 +158,19 @@ func SetupStorages(cfg *config.Config, awsS3Client *s3.Client) *Storages {
 
 	return &Storages{
 		S3Client: s3Client,
+	}
+}
+
+type Emails struct {
+	Sender email.Sender
+}
+
+func SetupEmails(cfg *config.Config) *Emails {
+	var sender email.Sender
+	sender = email.NewSender(cfg)
+	sender = email.NewSenderMwLogger(sender)
+
+	return &Emails{
+		Sender: sender,
 	}
 }

@@ -26,6 +26,7 @@ func SetupUsecases(
 	repositories *Repositories,
 	searches *Searches,
 	storages *Storages,
+	emails *Emails,
 ) *Usecases {
 	var idempotencyUsecase idempotencyusecase.IdempotencyUsecase
 	idempotencyUsecase = idempotencyusecase.NewIdempotencyUsecase(cfg, db, repositories.IdempotencyRepository)
@@ -36,7 +37,7 @@ func SetupUsecases(
 	notifUsecase = notifusecase.NewNotifUsecaseMwLogger(notifUsecase)
 
 	var userUsecase userusecase.UserUsecase
-	userUsecase = userusecase.NewUserUsecase(cfg, db, repositories.UserRepository, repositories.UserStatRepository, repositories.FollowRepository, messagings.UserProducer, messagings.NotifProducer, storages.S3Client, caches.UserCache, notifUsecase)
+	userUsecase = userusecase.NewUserUsecase(cfg, db, repositories.UserRepository, repositories.UserStatRepository, repositories.FollowRepository, messagings.UserProducer, messagings.NotifProducer, messagings.EmailProducer, storages.S3Client, emails.Sender, caches.UserCache, notifUsecase)
 	userUsecase = userusecase.NewUserUsecaseMwLogger(userUsecase)
 
 	var imageUsecase imageusecase.ImageUsecase

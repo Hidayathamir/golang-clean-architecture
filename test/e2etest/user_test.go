@@ -24,6 +24,7 @@ func TestRegister(t *testing.T) {
 		Username: "khannedy",
 		Password: "rahasia",
 		Name:     "Eko Khannedy",
+		Email:    "khannedy@example.com",
 	}
 
 	bodyJson, err := json.Marshal(requestBody)
@@ -105,6 +106,7 @@ func TestRegisterDuplicate(t *testing.T) {
 		Username: "khannedy",
 		Password: "rahasia",
 		Name:     "Eko Khannedy",
+		Email:    "khannedy@example.com",
 	}
 
 	bodyJson, err := json.Marshal(requestBody)

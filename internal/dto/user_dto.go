@@ -8,11 +8,13 @@ import (
 )
 
 type UserResponse struct {
-	ID        int64     `json:"id"`
-	Username  string    `json:"username"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID              int64      `json:"id"`
+	Username        string     `json:"username"`
+	Name            string     `json:"name"`
+	Email           string     `json:"email"`
+	EmailVerifiedAt *time.Time `json:"email_verified_at"`
+	CreatedAt       time.Time  `json:"created_at"`
+	UpdatedAt       time.Time  `json:"updated_at"`
 }
 
 type VerifyUserRequest struct {
@@ -23,6 +25,22 @@ type RegisterUserRequest struct {
 	Username string `json:"username" validate:"required,max=100"`
 	Password string `json:"password" validate:"required,max=100"`
 	Name     string `json:"name"     validate:"required,max=100"`
+	Email    string `json:"email"    validate:"required,email,max=255"`
+}
+
+// VerifyEmailRequest is the input for GET /api/users/_verify_email. The token
+// is the value emailed to the user at registration.
+type VerifyEmailRequest struct {
+	Token string `json:"token" validate:"required"`
+}
+
+// EmailVerificationEvent is published to Kafka when a user registers. The
+// consumer turns it into the actual verification email.
+type EmailVerificationEvent struct {
+	UserID int64  `json:"user_id" validate:"required"`
+	Email  string `json:"email"   validate:"required,email"`
+	Name   string `json:"name"`
+	Token  string `json:"token"   validate:"required"`
 }
 
 type UpdateUserRequest struct {

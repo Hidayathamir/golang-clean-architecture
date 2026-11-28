@@ -23,6 +23,11 @@ const (
 
 	ElasticsearchAddress = "elasticsearch.address"
 
+	EmailSMTPHost        = "email.smtp.host"
+	EmailSMTPPort        = "email.smtp.port"
+	EmailFrom            = "email.from"
+	EmailVerificationURL = "email.verification_url"
+
 	KafkaBootstrapServers   = "kafka.bootstrap.servers"
 	KafkaAutoOffsetReset    = "kafka.auto.offset.reset"
 	KafkaConsumerMaxRetries = "kafka.consumer.max_retries"

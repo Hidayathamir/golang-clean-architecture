@@ -85,6 +85,31 @@ func (c *UserController) Login(ctx *fiber.Ctx) error {
 	return response.Data(ctx, http.StatusOK, res)
 }
 
+// VerifyEmail godoc
+//
+//	@Summary		Verify email
+//	@Description	Confirm a user's email address using the token from the verification email
+//	@Tags			users
+//	@Param			token	query		string	true	"Verification token"
+//	@Success		200		{object}	response.WebResponse[string]
+//	@Router			/api/users/_verify_email [get]
+func (c *UserController) VerifyEmail(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
+	req := dto.VerifyEmailRequest{
+		Token: ctx.Query("token"),
+	}
+
+	err := c.Usecase.VerifyEmail(ctx.UserContext(), req)
+	if err != nil {
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*UserController).VerifyEmail")
+	}
+
+	return response.Data(ctx, http.StatusOK, "ok")
+}
+
 // Current godoc
 //
 //	@Summary		Get current user

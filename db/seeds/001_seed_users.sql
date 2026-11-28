@@ -1,7 +1,7 @@
 -- +migrate Up
-insert into users (username, password, name)
-values ('alice', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Alice'),
-       ('bob', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Bob')
+insert into users (username, password, name, email, email_verified_at)
+values ('alice', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Alice', 'alice@example.com', now()),
+       ('bob', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Bob', 'bob@example.com', now())
 on conflict do nothing;
 
 insert into user_stats (user_id, follower_count, following_count)

@@ -94,6 +94,23 @@ func (r *UserRepositoryMwLogger) FindByUsername(ctx context.Context, db *gorm.DB
 	return err
 }
 
+func (r *UserRepositoryMwLogger) FindByVerificationToken(ctx context.Context, db *gorm.DB, user *entity.User, token string) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.FindByVerificationToken(ctx, db, user, token)
+	})
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"user": user,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return err
+}
+
 func (r *UserRepositoryMwLogger) Update(ctx context.Context, db *gorm.DB, user *entity.User) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()

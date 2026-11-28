@@ -881,6 +881,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/users/_verify_email": {
+            "get": {
+                "description": "Confirm a user's email address using the token from the verification email",
+                "tags": [
+                    "users"
+                ],
+                "summary": "Verify email",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Verification token",
+                        "name": "token",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/users/{id}": {
             "get": {
                 "security": [
@@ -1473,11 +1499,16 @@ const docTemplate = `{
         "github_com_Hidayathamir_golang-clean-architecture_internal_dto.RegisterUserRequest": {
             "type": "object",
             "required": [
+                "email",
                 "name",
                 "password",
                 "username"
             ],
             "properties": {
+                "email": {
+                    "type": "string",
+                    "maxLength": 255
+                },
                 "name": {
                     "type": "string",
                     "maxLength": 100
@@ -1604,6 +1635,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "email_verified_at": {
                     "type": "string"
                 },
                 "id": {

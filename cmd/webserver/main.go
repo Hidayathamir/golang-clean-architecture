@@ -44,9 +44,10 @@ func main() {
 	caches := dependency_injection.SetupCaches(redisClient)
 	searches := dependency_injection.SetupSearches(elasticsearchClient)
 	storages := dependency_injection.SetupStorages(cfg, awsS3Client)
+	emails := dependency_injection.SetupEmails(cfg)
 	hubs := dependency_injection.SetupHubs()
 
-	usecases := dependency_injection.SetupUsecases(cfg, db, caches, messagings, repositories, searches, storages)
+	usecases := dependency_injection.SetupUsecases(cfg, db, caches, messagings, repositories, searches, storages, emails)
 
 	controllers := dependency_injection.SetupControllers(cfg, redisClient, hubs, usecases)
 	middlewares := dependency_injection.SetupMiddlewares(usecases)

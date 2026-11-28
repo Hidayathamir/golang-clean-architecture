@@ -16,13 +16,13 @@ import (
 )
 
 func TestUserUsecaseImpl_Create_Success(t *testing.T) {
-	gormDB, _ := newFakeDB(t)
+	gormDB, sqlMockDB := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserProducerMock{}
+	EmailProducer := &mock.EmailProducerMock{}
 	u := &userusecase.UserUsecaseImpl{
 		DB:             gormDB,
 		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
+		EmailProducer:  EmailProducer,
 		UserCache:      newUserCacheMock(t),
 	}
 
@@ -32,19 +32,22 @@ func TestUserUsecaseImpl_Create_Success(t *testing.T) {
 		Username: "user1",
 		Password: "pw1",
 		Name:     "name1",
-	}
-
-	UserRepository.CountByUsernameFunc = func(ctx context.Context, db *gorm.DB, username string) (int64, error) {
-		return 0, nil
+		Email:    "user1@example.com",
 	}
 
 	UserRepository.CreateFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User) error {
+		entityMoqParam.ID = 7
 		return nil
 	}
 
-	UserProducer.SendUserFollowedFunc = func(ctx context.Context, db *gorm.DB, event *dto.UserFollowedEvent) error {
+	var sentEvent *dto.EmailVerificationEvent
+	EmailProducer.SendVerificationEmailFunc = func(ctx context.Context, db *gorm.DB, event *dto.EmailVerificationEvent) error {
+		sentEvent = event
 		return nil
 	}
+
+	sqlMockDB.ExpectBegin()
+	sqlMockDB.ExpectCommit()
 
 	// ------------------------------------------------------- //
 
@@ -53,25 +56,31 @@ func TestUserUsecaseImpl_Create_Success(t *testing.T) {
 	// ------------------------------------------------------- //
 
 	var expected = dto.UserResponse{
-		ID:        0,
+		ID:        7,
 		Username:  "user1",
 		Name:      "name1",
+		Email:     "user1@example.com",
 		CreatedAt: time.Time{},
 		UpdatedAt: time.Time{},
 	}
 
-	require.Equal(t, expected, res)
 	require.Nil(t, err)
+	require.Equal(t, expected, res)
+
+	require.NotNil(t, sentEvent)
+	require.Equal(t, int64(7), sentEvent.UserID)
+	require.Equal(t, "user1@example.com", sentEvent.Email)
+	require.NotEmpty(t, sentEvent.Token)
 }
 
 func TestUserUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 	gormDB, _ := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserProducerMock{}
+	EmailProducer := &mock.EmailProducerMock{}
 	u := &userusecase.UserUsecaseImpl{
 		DB:             gormDB,
 		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
+		EmailProducer:  EmailProducer,
 		UserCache:      newUserCacheMock(t),
 	}
 
@@ -81,18 +90,7 @@ func TestUserUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 		Username: "",
 		Password: "pw1",
 		Name:     "name1",
-	}
-
-	UserRepository.CountByUsernameFunc = func(ctx context.Context, db *gorm.DB, username string) (int64, error) {
-		return 0, nil
-	}
-
-	UserRepository.CreateFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User) error {
-		return nil
-	}
-
-	UserProducer.SendUserFollowedFunc = func(ctx context.Context, db *gorm.DB, event *dto.UserFollowedEvent) error {
-		return nil
+		Email:    "not-an-email",
 	}
 
 	// ------------------------------------------------------- //
@@ -110,13 +108,13 @@ func TestUserUsecaseImpl_Create_Fail_ValidateStruct(t *testing.T) {
 }
 
 func TestUserUsecaseImpl_Create_Fail_Create(t *testing.T) {
-	gormDB, _ := newFakeDB(t)
+	gormDB, sqlMockDB := newFakeDB(t)
 	UserRepository := &mock.UserRepositoryMock{}
-	UserProducer := &mock.UserProducerMock{}
+	EmailProducer := &mock.EmailProducerMock{}
 	u := &userusecase.UserUsecaseImpl{
 		DB:             gormDB,
 		UserRepository: UserRepository,
-		UserProducer:   UserProducer,
+		EmailProducer:  EmailProducer,
 		UserCache:      newUserCacheMock(t),
 	}
 
@@ -126,11 +124,59 @@ func TestUserUsecaseImpl_Create_Fail_Create(t *testing.T) {
 		Username: "user1",
 		Password: "pw1",
 		Name:     "name1",
+		Email:    "user1@example.com",
 	}
 
 	UserRepository.CreateFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User) error {
 		return assert.AnError
 	}
+
+	sqlMockDB.ExpectBegin()
+	sqlMockDB.ExpectRollback()
+
+	// ------------------------------------------------------- //
+
+	res, err := u.Create(context.Background(), *req)
+
+	// ------------------------------------------------------- //
+
+	var expected dto.UserResponse
+
+	require.Equal(t, expected, res)
+	require.NotNil(t, err)
+	require.ErrorIs(t, err, assert.AnError)
+}
+
+func TestUserUsecaseImpl_Create_Fail_SendVerificationEmail(t *testing.T) {
+	gormDB, sqlMockDB := newFakeDB(t)
+	UserRepository := &mock.UserRepositoryMock{}
+	EmailProducer := &mock.EmailProducerMock{}
+	u := &userusecase.UserUsecaseImpl{
+		DB:             gormDB,
+		UserRepository: UserRepository,
+		EmailProducer:  EmailProducer,
+		UserCache:      newUserCacheMock(t),
+	}
+
+	// ------------------------------------------------------- //
+
+	req := &dto.RegisterUserRequest{
+		Username: "user1",
+		Password: "pw1",
+		Name:     "name1",
+		Email:    "user1@example.com",
+	}
+
+	UserRepository.CreateFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.User) error {
+		return nil
+	}
+
+	EmailProducer.SendVerificationEmailFunc = func(ctx context.Context, db *gorm.DB, event *dto.EmailVerificationEvent) error {
+		return assert.AnError
+	}
+
+	sqlMockDB.ExpectBegin()
+	sqlMockDB.ExpectRollback()
 
 	// ------------------------------------------------------- //
 
