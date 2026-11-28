@@ -131,7 +131,8 @@ Configuration is `settings/config.json` (Viper). Always run in this order:
 
 1. **Start infrastructure** — `make docker-compose-up` (wait for it to finish). Postgres, Kafka (+ Zookeeper), Redis, Elasticsearch, Kibana, MinIO (S3 on `:9100`, console on `:9001`), Redpanda Console, and Grafana LGTM (one container: OpenTelemetry Collector + Tempo + Loki + Prometheus + Grafana; OTLP on `:4317`/`:4318`, UI on `:3000`). The app creates the `image` bucket on startup, so no manual bucket setup is needed.
 2. **Run migrations** — `make migrate`.
-3. **Run the app servers** — one command starts all four in the background:
+3. **Seed dev data** — `make seed` (optional; dev fixtures only, see the `seeding` skill).
+4. **Run the app servers** — one command starts all four in the background:
    ```bash
    make run-all            # starts webserver + 3 workers (idempotent, returns immediately)
    make stop-all           # stops everything
@@ -230,4 +231,5 @@ Layers (`cmd`/`internal`/`pkg`), route conventions, config, and the step-by-step
 - **`otel-architecture`** — full OTel implementation: trace/log providers, decorator spans, HTTP + Kafka instrumentation, log correlation, OTLP export.
 - **`kafka-error-handling`** — topic topology, retry/DLQ flow, error classification, consumer loop types, graceful shutdown.
 - **`idempotency`** — consumer de-duplication: `x-idempotency-key`, insert-if-absent usecase, inbound wrapper, `message_idempotency` table, cleaner binary.
+- **`seeding`** — dev data: `make seed`, `cmd/seed` → `pkg/seed`, `db/seeds/`, and the fresh-environment MinIO/Kafka gotchas.
 - **`git-commit-convention`** — Conventional Commits 1.0.0: format, types, scopes, breaking changes, footers.

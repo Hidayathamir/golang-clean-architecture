@@ -12,7 +12,7 @@ This is the deep reference for how the project is laid out. AGENTS.md carries th
 ## Layers (top → bottom)
 
 ```
-cmd/              Entry points: webserver, workerconsumer, workerproducer, workeridempotencycleaner, migrate
+cmd/              Entry points: webserver, workerconsumer, workerproducer, workeridempotencycleaner, migrate, seed
 internal/
   inbound/        HTTP controllers (package http), Kafka consumers (package messaging)
   dto/            Request/response DTOs between layers
