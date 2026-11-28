@@ -116,6 +116,21 @@ func (u *UserUsecaseMwLogger) GetFollowings(ctx context.Context, req dto.Followi
 	return res, err
 }
 
+func (u *UserUsecaseMwLogger) Unfollow(ctx context.Context, req dto.UnfollowUserRequest) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := u.Next.Unfollow(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return err
+}
+
 func (u *UserUsecaseMwLogger) Login(ctx context.Context, req dto.LoginUserRequest) (dto.UserLoginResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()

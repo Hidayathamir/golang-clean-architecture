@@ -18,6 +18,7 @@ type FollowRepository interface {
 	FindByFollowingID(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followingID int64) error
 	FindFollowersByFollowingID(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followingID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error
 	FindFollowingsByFollowerID(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followerID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error
+	DeleteByFollowerIDAndFollowingID(ctx context.Context, db *gorm.DB, followerID int64, followingID int64) (int64, error)
 }
 
 var _ FollowRepository = &FollowRepositoryImpl{}
@@ -65,6 +66,19 @@ func (r *FollowRepositoryImpl) FindFollowersByFollowingID(ctx context.Context, d
 		return errkit.AddFuncName(err, "repository.(*FollowRepositoryImpl).FindFollowersByFollowingID")
 	}
 	return nil
+}
+
+func (r *FollowRepositoryImpl) DeleteByFollowerIDAndFollowingID(ctx context.Context, db *gorm.DB, followerID int64, followingID int64) (int64, error) {
+	whereFollower, argFollower := column.FollowerID.Eq(followerID)
+	whereFollowing, argFollowing := column.FollowingID.Eq(followingID)
+	result := db.WithContext(ctx).
+		Where(whereFollower, argFollower).
+		Where(whereFollowing, argFollowing).
+		Delete(&entity.Follow{})
+	if result.Error != nil {
+		return 0, errkit.AddFuncName(result.Error, "repository.(*FollowRepositoryImpl).DeleteByFollowerIDAndFollowingID")
+	}
+	return result.RowsAffected, nil
 }
 
 func (r *FollowRepositoryImpl) FindFollowingsByFollowerID(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followerID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {

@@ -238,6 +238,40 @@ func (c *UserController) GetFollowings(ctx *fiber.Ctx) error {
 	return response.Data(ctx, http.StatusOK, res)
 }
 
+// Unfollow godoc
+//
+//	@Summary		Unfollow user
+//	@Description	Unfollow a user the current user follows
+//	@Tags			users
+//	@Produce		json
+//	@Param			id	path	int	true	"User ID to unfollow"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[string]
+//	@Router			/api/users/{id}/follow [delete]
+func (c *UserController) Unfollow(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
+	followingID, err := strconv.ParseInt(ctx.Params("id"), 10, 64)
+	if err != nil {
+		err = errkit.SetCode(err, http.StatusBadRequest)
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*UserController).Unfollow")
+	}
+
+	req := dto.UnfollowUserRequest{
+		FollowingID: followingID,
+	}
+
+	err = c.Usecase.Unfollow(ctx.UserContext(), req)
+	if err != nil {
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*UserController).Unfollow")
+	}
+
+	return response.Data(ctx, http.StatusOK, "ok")
+}
+
 // Update godoc
 //
 //	@Summary		Update user

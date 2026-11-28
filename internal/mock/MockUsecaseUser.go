@@ -47,6 +47,9 @@ var _ userusecase.UserUsecase = &UserUsecaseMock{}
 //			NotifyUserBeingFollowedFunc: func(ctx context.Context, req dto.NotifyUserBeingFollowedRequest) error {
 //				panic("mock out the NotifyUserBeingFollowed method")
 //			},
+//			UnfollowFunc: func(ctx context.Context, req dto.UnfollowUserRequest) error {
+//				panic("mock out the Unfollow method")
+//			},
 //			UpdateFunc: func(ctx context.Context, req dto.UpdateUserRequest) (dto.UserResponse, error) {
 //				panic("mock out the Update method")
 //			},
@@ -86,6 +89,9 @@ type UserUsecaseMock struct {
 
 	// NotifyUserBeingFollowedFunc mocks the NotifyUserBeingFollowed method.
 	NotifyUserBeingFollowedFunc func(ctx context.Context, req dto.NotifyUserBeingFollowedRequest) error
+
+	// UnfollowFunc mocks the Unfollow method.
+	UnfollowFunc func(ctx context.Context, req dto.UnfollowUserRequest) error
 
 	// UpdateFunc mocks the Update method.
 	UpdateFunc func(ctx context.Context, req dto.UpdateUserRequest) (dto.UserResponse, error)
@@ -158,6 +164,13 @@ type UserUsecaseMock struct {
 			// Req is the req argument value.
 			Req dto.NotifyUserBeingFollowedRequest
 		}
+		// Unfollow holds details about calls to the Unfollow method.
+		Unfollow []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req dto.UnfollowUserRequest
+		}
 		// Update holds details about calls to the Update method.
 		Update []struct {
 			// Ctx is the ctx argument value.
@@ -182,6 +195,7 @@ type UserUsecaseMock struct {
 	lockGetProfile                 sync.RWMutex
 	lockLogin                      sync.RWMutex
 	lockNotifyUserBeingFollowed    sync.RWMutex
+	lockUnfollow                   sync.RWMutex
 	lockUpdate                     sync.RWMutex
 	lockVerify                     sync.RWMutex
 }
@@ -507,6 +521,42 @@ func (mock *UserUsecaseMock) NotifyUserBeingFollowedCalls() []struct {
 	mock.lockNotifyUserBeingFollowed.RLock()
 	calls = mock.calls.NotifyUserBeingFollowed
 	mock.lockNotifyUserBeingFollowed.RUnlock()
+	return calls
+}
+
+// Unfollow calls UnfollowFunc.
+func (mock *UserUsecaseMock) Unfollow(ctx context.Context, req dto.UnfollowUserRequest) error {
+	if mock.UnfollowFunc == nil {
+		panic("UserUsecaseMock.UnfollowFunc: method is nil but UserUsecase.Unfollow was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req dto.UnfollowUserRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockUnfollow.Lock()
+	mock.calls.Unfollow = append(mock.calls.Unfollow, callInfo)
+	mock.lockUnfollow.Unlock()
+	return mock.UnfollowFunc(ctx, req)
+}
+
+// UnfollowCalls gets all the calls that were made to Unfollow.
+// Check the length with:
+//
+//	len(mockedUserUsecase.UnfollowCalls())
+func (mock *UserUsecaseMock) UnfollowCalls() []struct {
+	Ctx context.Context
+	Req dto.UnfollowUserRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req dto.UnfollowUserRequest
+	}
+	mock.lockUnfollow.RLock()
+	calls = mock.calls.Unfollow
+	mock.lockUnfollow.RUnlock()
 	return calls
 }
 

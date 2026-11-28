@@ -93,6 +93,12 @@ type FollowUserRequest struct {
 	FollowingID int64 `json:"following_id"`
 }
 
+// UnfollowUserRequest is the input for DELETE /api/users/:id/follow. The
+// follower comes from the auth context.
+type UnfollowUserRequest struct {
+	FollowingID int64 `json:"-" validate:"required"`
+}
+
 type NotifyUserBeingFollowedRequest struct {
 	FollowerID  int64
 	FollowingID int64
@@ -109,11 +115,11 @@ type UserIncreaseFollowerFollowingCount struct {
 }
 
 func (u UserIncreaseFollowerFollowingCount) HasFollowerCount() bool {
-	return u.FollowerCount > 0
+	return u.FollowerCount != 0
 }
 
 func (u UserIncreaseFollowerFollowingCount) HasFollowingCount() bool {
-	return u.FollowingCount > 0
+	return u.FollowingCount != 0
 }
 
 func (u UserIncreaseFollowerFollowingCount) HasFollowerCountAndFollowingCount() bool {
@@ -126,6 +132,7 @@ type UserFollowedEvent struct {
 	ID          int64          `json:"id"`
 	FollowerID  int64          `json:"follower_id"`
 	FollowingID int64          `json:"following_id"`
+	Count       int            `json:"count"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `json:"deleted_at"`

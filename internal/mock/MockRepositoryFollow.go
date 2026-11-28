@@ -25,6 +25,9 @@ var _ repository.FollowRepository = &FollowRepositoryMock{}
 //			CreateFunc: func(ctx context.Context, db *gorm.DB, follow *entity.Follow) error {
 //				panic("mock out the Create method")
 //			},
+//			DeleteByFollowerIDAndFollowingIDFunc: func(ctx context.Context, db *gorm.DB, followerID int64, followingID int64) (int64, error) {
+//				panic("mock out the DeleteByFollowerIDAndFollowingID method")
+//			},
 //			FindByFollowingIDFunc: func(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followingID int64) error {
 //				panic("mock out the FindByFollowingID method")
 //			},
@@ -43,6 +46,9 @@ var _ repository.FollowRepository = &FollowRepositoryMock{}
 type FollowRepositoryMock struct {
 	// CreateFunc mocks the Create method.
 	CreateFunc func(ctx context.Context, db *gorm.DB, follow *entity.Follow) error
+
+	// DeleteByFollowerIDAndFollowingIDFunc mocks the DeleteByFollowerIDAndFollowingID method.
+	DeleteByFollowerIDAndFollowingIDFunc func(ctx context.Context, db *gorm.DB, followerID int64, followingID int64) (int64, error)
 
 	// FindByFollowingIDFunc mocks the FindByFollowingID method.
 	FindByFollowingIDFunc func(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followingID int64) error
@@ -63,6 +69,17 @@ type FollowRepositoryMock struct {
 			Db *gorm.DB
 			// Follow is the follow argument value.
 			Follow *entity.Follow
+		}
+		// DeleteByFollowerIDAndFollowingID holds details about calls to the DeleteByFollowerIDAndFollowingID method.
+		DeleteByFollowerIDAndFollowingID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
+			// FollowerID is the followerID argument value.
+			FollowerID int64
+			// FollowingID is the followingID argument value.
+			FollowingID int64
 		}
 		// FindByFollowingID holds details about calls to the FindByFollowingID method.
 		FindByFollowingID []struct {
@@ -110,10 +127,11 @@ type FollowRepositoryMock struct {
 			Limit int
 		}
 	}
-	lockCreate                     sync.RWMutex
-	lockFindByFollowingID          sync.RWMutex
-	lockFindFollowersByFollowingID sync.RWMutex
-	lockFindFollowingsByFollowerID sync.RWMutex
+	lockCreate                           sync.RWMutex
+	lockDeleteByFollowerIDAndFollowingID sync.RWMutex
+	lockFindByFollowingID                sync.RWMutex
+	lockFindFollowersByFollowingID       sync.RWMutex
+	lockFindFollowingsByFollowerID       sync.RWMutex
 }
 
 // Create calls CreateFunc.
@@ -153,6 +171,50 @@ func (mock *FollowRepositoryMock) CreateCalls() []struct {
 	mock.lockCreate.RLock()
 	calls = mock.calls.Create
 	mock.lockCreate.RUnlock()
+	return calls
+}
+
+// DeleteByFollowerIDAndFollowingID calls DeleteByFollowerIDAndFollowingIDFunc.
+func (mock *FollowRepositoryMock) DeleteByFollowerIDAndFollowingID(ctx context.Context, db *gorm.DB, followerID int64, followingID int64) (int64, error) {
+	if mock.DeleteByFollowerIDAndFollowingIDFunc == nil {
+		panic("FollowRepositoryMock.DeleteByFollowerIDAndFollowingIDFunc: method is nil but FollowRepository.DeleteByFollowerIDAndFollowingID was just called")
+	}
+	callInfo := struct {
+		Ctx         context.Context
+		Db          *gorm.DB
+		FollowerID  int64
+		FollowingID int64
+	}{
+		Ctx:         ctx,
+		Db:          db,
+		FollowerID:  followerID,
+		FollowingID: followingID,
+	}
+	mock.lockDeleteByFollowerIDAndFollowingID.Lock()
+	mock.calls.DeleteByFollowerIDAndFollowingID = append(mock.calls.DeleteByFollowerIDAndFollowingID, callInfo)
+	mock.lockDeleteByFollowerIDAndFollowingID.Unlock()
+	return mock.DeleteByFollowerIDAndFollowingIDFunc(ctx, db, followerID, followingID)
+}
+
+// DeleteByFollowerIDAndFollowingIDCalls gets all the calls that were made to DeleteByFollowerIDAndFollowingID.
+// Check the length with:
+//
+//	len(mockedFollowRepository.DeleteByFollowerIDAndFollowingIDCalls())
+func (mock *FollowRepositoryMock) DeleteByFollowerIDAndFollowingIDCalls() []struct {
+	Ctx         context.Context
+	Db          *gorm.DB
+	FollowerID  int64
+	FollowingID int64
+} {
+	var calls []struct {
+		Ctx         context.Context
+		Db          *gorm.DB
+		FollowerID  int64
+		FollowingID int64
+	}
+	mock.lockDeleteByFollowerIDAndFollowingID.RLock()
+	calls = mock.calls.DeleteByFollowerIDAndFollowingID
+	mock.lockDeleteByFollowerIDAndFollowingID.RUnlock()
 	return calls
 }
 

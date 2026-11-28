@@ -80,6 +80,7 @@ func EntityFollowToDtoUserFollowedEvent(follow entity.Follow, event *dto.UserFol
 	event.ID = follow.ID
 	event.FollowerID = follow.FollowerID
 	event.FollowingID = follow.FollowingID
+	event.Count = 1
 	event.CreatedAt = follow.CreatedAt
 	event.UpdatedAt = follow.UpdatedAt
 	event.DeletedAt = follow.DeletedAt
@@ -101,8 +102,14 @@ func KGoRecordListToDtoBatchUpdateUserFollowStatsRequest(ctx context.Context, re
 			logkit.Logger.WithContext(ctx).WithError(err).Warn("Failed to unmarshal user followed event")
 			continue
 		}
-		userFollowerCounts[event.FollowingID]++
-		userFollowingCounts[event.FollowerID]++
+		// Count is +1 for a follow and -1 for an unfollow. Older events predate
+		// the field, so a zero is treated as a single follow.
+		count := event.Count
+		if count == 0 {
+			count = 1
+		}
+		userFollowerCounts[event.FollowingID] += count
+		userFollowingCounts[event.FollowerID] += count
 	}
 
 	allUserIDs := make(map[int64]struct{})

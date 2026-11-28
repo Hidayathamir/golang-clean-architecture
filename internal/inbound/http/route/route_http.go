@@ -47,6 +47,7 @@ func setupAuthRoute(router fiber.Router, controllers *dependency_injection.Contr
 		users.Patch("/_current", controllers.UserController.Update)
 		users.Get("/_current", controllers.UserController.Current)
 		users.Post("/_follow", controllers.UserController.Follow)
+		users.Delete("/:id/follow", controllers.UserController.Unfollow)
 		users.Get("/:id/images", controllers.ImageController.GetUserImages)
 		users.Get("/:id/followers", controllers.UserController.GetFollowers)
 		users.Get("/:id/following", controllers.UserController.GetFollowings)

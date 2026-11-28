@@ -751,6 +751,27 @@ paths:
       summary: Get user profile
       tags:
       - users
+  /api/users/{id}/follow:
+    delete:
+      description: Unfollow a user the current user follows
+      parameters:
+      - description: User ID to unfollow
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-string'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Unfollow user
+      tags:
+      - users
   /api/users/{id}/followers:
     get:
       description: Get the list of users following the given user (cursor paginated)

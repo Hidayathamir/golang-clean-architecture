@@ -59,6 +59,25 @@ func (r *FollowRepositoryMwLogger) FindByFollowingID(ctx context.Context, db *go
 	return err
 }
 
+func (r *FollowRepositoryMwLogger) DeleteByFollowerIDAndFollowingID(ctx context.Context, db *gorm.DB, followerID int64, followingID int64) (int64, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	deleted, err := retrykit.DBRetryWithData(ctx, func() (int64, error) {
+		return r.Next.DeleteByFollowerIDAndFollowingID(ctx, db, followerID, followingID)
+	})
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"followerID":  followerID,
+		"followingID": followingID,
+		"deleted":     deleted,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return deleted, err
+}
+
 func (r *FollowRepositoryMwLogger) FindFollowersByFollowingID(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followingID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
