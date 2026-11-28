@@ -1,9 +1,9 @@
 #!/bin/sh
 # Pre-commit:
 #   1. Regenerate docs/*.png if any docs/*.mermaid is staged.
-#   2. Keep errkit.AddFuncName call arguments in sync with function names.
+#   2. Keep errkit.AddFuncName call arguments in sync with function names (auto-fix).
 #   3. Enforce gofmt on staged Go files.
-#   4. Run golangci-lint on staged Go packages.
+#   4. Run golangci-lint on staged Go packages (required — no skip).
 #   5. Enforce project rules before the commit is created.
 # Installed via `make setup` (sets core.hooksPath to .githooks).
 #
@@ -24,15 +24,15 @@ if [ -n "$staged_mermaid" ]; then
 fi
 
 # 2. Keep errkit.AddFuncName call sites in sync with the enclosing function.
-#    Best-effort: a tool failure warns but does not block (step 3 still gates).
+#    Auto-fixes and re-stages; only fails if the tool itself errors.
 staged_go=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.go$' || true)
 if [ -n "$staged_go" ]; then
-	if make add-func-name; then
-		git add -u internal pkg cmd
-	else
+	if ! make add-func-name; then
 		echo ""
-		echo "⚠️  add-func-name failed; AddFuncName arguments may be stale. Run: make add-func-name"
+		echo "❌ Commit blocked: add-func-name failed (see make add-func-name)."
+		exit 1
 	fi
+	git add -u internal pkg cmd
 fi
 
 # 3. Enforce gofmt on staged Go files (auto-format + re-stage).
@@ -46,18 +46,20 @@ if [ -n "$staged_go" ]; then
 fi
 
 # 4. Run golangci-lint on packages touched by staged Go files.
-#    Skipped when golangci-lint is absent so commits still work on fresh clones.
+#    Required: commit is blocked when golangci-lint is not installed.
 if [ -n "$staged_go" ]; then
-	if command -v golangci-lint >/dev/null 2>&1; then
-		echo "🔍 golangci-lint on staged packages..."
-		if ! make lint; then
-			echo ""
-			echo "❌ Commit blocked: golangci-lint failed."
-			echo "   Fix the issues above, or bypass with: git commit --no-verify"
-			exit 1
-		fi
-	else
-		echo "⚠️  golangci-lint not found; skipping lint. Install: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest"
+	if ! command -v golangci-lint >/dev/null 2>&1; then
+		echo ""
+		echo "❌ Commit blocked: golangci-lint not found."
+		echo "   Install: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest"
+		exit 1
+	fi
+	echo "🔍 golangci-lint on staged packages..."
+	if ! make lint; then
+		echo ""
+		echo "❌ Commit blocked: golangci-lint failed."
+		echo "   Fix the issues above, or bypass with: git commit --no-verify"
+		exit 1
 	fi
 fi
 

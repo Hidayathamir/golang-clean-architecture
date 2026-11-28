@@ -15,6 +15,9 @@
 //     (package {dir}_test).
 //   - Migrations: files under db/migrations/ are <14-digit-timestamp>_<name>.sql
 //     and carry both "-- +migrate Up" and "-- +migrate Down" sections, Up first.
+//   - Inbound spans: every HTTP controller method starts a controller span
+//     (telemetry.StartController); every Kafka consumer method starts a consumer
+//     span (telemetry.StartConsumer or telemetry.StartConsumerBatch).
 //
 // Run with `make check-rules`. Exits non-zero on any violation.
 package main
@@ -48,6 +51,7 @@ func main() {
 	violations = append(violations, checkFileNaming()...)
 	violations = append(violations, checkTestPackages()...)
 	violations = append(violations, checkMigrations()...)
+	violations = append(violations, checkInboundSpans()...)
 
 	if len(violations) > 0 {
 		fmt.Fprintln(os.Stderr, "❌ check-rules failed:")
@@ -322,6 +326,87 @@ func checkMigrations() []string {
 	})
 	if err != nil {
 		violations = append(violations, fmt.Sprintf("walk db/migrations: %v", err))
+	}
+	return violations
+}
+
+// inboundSpanRule describes an inbound package whose methods must start a span.
+type inboundSpanRule struct {
+	root       string   // directory to walk
+	markers    []string // acceptable span-start calls (any one satisfies the rule)
+	markerDesc string   // human-readable form of markers
+	methodRe   *regexp.Regexp
+}
+
+// checkInboundSpans verifies that every controller/consumer method starts its
+// own telemetry span, matching the inbound-span convention enforced in AGENTS.md.
+func checkInboundSpans() []string {
+	rules := []inboundSpanRule{
+		{
+			root:       "internal/inbound/http",
+			markers:    []string{"telemetry.StartController("},
+			markerDesc: "telemetry.StartController",
+			methodRe:   regexp.MustCompile(`(?m)^func\s+\([^)]*\*(\w*Controller)\)\s+(\w+)\(`),
+		},
+		{
+			root:       "internal/inbound/messaging",
+			markers:    []string{"telemetry.StartConsumer(", "telemetry.StartConsumerBatch("},
+			markerDesc: "telemetry.StartConsumer or telemetry.StartConsumerBatch",
+			methodRe:   regexp.MustCompile(`(?m)^func\s+\([^)]*\*(\w*Consumer)\)\s+(\w+)\(`),
+		},
+	}
+
+	var violations []string
+	for _, rule := range rules {
+		violations = append(violations, checkInboundSpansIn(rule)...)
+	}
+	return violations
+}
+
+// checkInboundSpansIn walks one inbound root and reports methods missing a span.
+func checkInboundSpansIn(rule inboundSpanRule) []string {
+	var violations []string
+
+	err := filepath.WalkDir(rule.root, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() || !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
+			return nil
+		}
+
+		src, err := os.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		s := string(src)
+
+		locs := rule.methodRe.FindAllStringSubmatchIndex(s, -1)
+		for i, loc := range locs {
+			name := s[loc[4]:loc[5]]
+			start := loc[1]
+			end := len(s)
+			if i+1 < len(locs) {
+				end = locs[i+1][0]
+			}
+			body := s[start:end]
+
+			found := false
+			for _, m := range rule.markers {
+				if strings.Contains(body, m) {
+					found = true
+					break
+				}
+			}
+			if !found {
+				violations = append(violations,
+					fmt.Sprintf("inbound span: %s method %s missing %s", path, name, rule.markerDesc))
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		violations = append(violations, fmt.Sprintf("walk %s: %v", rule.root, err))
 	}
 	return violations
 }
