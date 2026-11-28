@@ -205,11 +205,11 @@ func TestGetLikes(t *testing.T) {
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
 	// Verify response body
-	respBody := &response.WebResponse[dto.LikeResponseList]{}
+	respBody := &response.WebResponse[dto.LikesResponse]{}
 	err = json.NewDecoder(res.Body).Decode(respBody)
 	require.Nil(t, err)
-	require.NotEmpty(t, respBody.Data)
-	require.Equal(t, imageID, respBody.Data[0].ImageID)
+	require.NotEmpty(t, respBody.Data.Data)
+	require.Equal(t, imageID, respBody.Data.Data[0].ImageID)
 }
 
 func TestGetComments(t *testing.T) {
@@ -250,11 +250,11 @@ func TestGetComments(t *testing.T) {
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
 	// Verify response body
-	respBody := &response.WebResponse[dto.CommentResponseList]{}
+	respBody := &response.WebResponse[dto.CommentsResponse]{}
 	err = json.NewDecoder(res.Body).Decode(respBody)
 	require.Nil(t, err)
-	require.NotEmpty(t, respBody.Data)
-	require.Equal(t, "Wow", respBody.Data[0].Comment)
+	require.NotEmpty(t, respBody.Data.Data)
+	require.Equal(t, "Wow", respBody.Data.Data[0].Comment)
 }
 
 func TestImageFlow(t *testing.T) {
@@ -331,11 +331,11 @@ func TestMultipleUsersCommentImage(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
-	respBody := &response.WebResponse[dto.CommentResponseList]{}
+	respBody := &response.WebResponse[dto.CommentsResponse]{}
 	err = json.NewDecoder(res.Body).Decode(respBody)
 	require.Nil(t, err)
 
-	require.Len(t, respBody.Data, 2)
+	require.Len(t, respBody.Data.Data, 2)
 }
 
 func TestMultipleUsersLikeImage(t *testing.T) {
@@ -367,9 +367,9 @@ func TestMultipleUsersLikeImage(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
-	respBody := &response.WebResponse[dto.LikeResponseList]{}
+	respBody := &response.WebResponse[dto.LikesResponse]{}
 	err = json.NewDecoder(res.Body).Decode(respBody)
 	require.Nil(t, err)
 
-	require.Len(t, respBody.Data, 2)
+	require.Len(t, respBody.Data.Data, 2)
 }

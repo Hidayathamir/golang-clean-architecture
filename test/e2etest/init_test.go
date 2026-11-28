@@ -28,8 +28,9 @@ func TestMain(m *testing.M) {
 	logkit.SetupLogger(cfg)
 	validatorkit.SetupValidator(cfg)
 	db = provider.NewDatabase(cfg)
-	db.Exec(`DROP SCHEMA public CASCADE`)
-	db.Exec(`CREATE SCHEMA public`)
+	// The app servers share this database, so instead of dropping the schema
+	// (which blocks on their open transactions) each test clears its data via
+	// ClearAll. Migrations here are idempotent and apply 0 when already current.
 	cfg.SetDatabaseMigrations("../../db/migrations")
 	migrate.Migrate(cfg, db)
 

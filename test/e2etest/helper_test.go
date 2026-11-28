@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
@@ -232,11 +233,63 @@ func requireNil(t *testing.T, f func() error) {
 }
 
 func ClearAll() {
+	WaitForAsyncEventsToDrain()
 	ClearComments()
 	ClearLikes()
 	ClearImages()
+	ClearFollows()
+	ClearUserStats()
+	ClearMessageIdempotency()
 	ClearUsers()
 	redisClient.FlushAll(context.Background())
+}
+
+// WaitForAsyncEventsToDrain blocks until the outbox has been published and the
+// consumers have caught up. Without it, in-flight events from a previous test
+// run after that test's users are deleted, failing the user_stats foreign key.
+func WaitForAsyncEventsToDrain() {
+	deadline := time.Now().Add(10 * time.Second)
+	for {
+		var pending int64
+		err := db.Model(&entity.Outbox{}).
+			Where("status = ?", entity.OutboxStatusPending).
+			Count(&pending).Error
+		if err != nil {
+			logkit.Logger.Panicf("Failed count pending outbox : %+v", err)
+		}
+		if pending == 0 {
+			// Give consumers a moment to finish the messages already fetched.
+			time.Sleep(500 * time.Millisecond)
+			return
+		}
+		if time.Now().After(deadline) {
+			logkit.Logger.Panicf("Timed out waiting for outbox to drain, %d still pending", pending)
+		}
+		time.Sleep(200 * time.Millisecond)
+	}
+}
+
+// ClearMessageIdempotency drops processed-message markers so Kafka consumers
+// re-process events. Needed because follow stats are applied asynchronously.
+func ClearMessageIdempotency() {
+	err := db.Unscoped().Where("idempotency_key is not null").Delete(&entity.MessageIdempotency{}).Error
+	if err != nil {
+		logkit.Logger.Panicf("Failed clear message idempotency data : %+v", err)
+	}
+}
+
+func ClearFollows() {
+	err := db.Unscoped().Where("id is not null").Delete(&entity.Follow{}).Error
+	if err != nil {
+		logkit.Logger.Panicf("Failed clear follow data : %+v", err)
+	}
+}
+
+func ClearUserStats() {
+	err := db.Unscoped().Where("id is not null").Delete(&entity.UserStat{}).Error
+	if err != nil {
+		logkit.Logger.Panicf("Failed clear user stat data : %+v", err)
+	}
 }
 
 func ClearUsers() {
