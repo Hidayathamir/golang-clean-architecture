@@ -68,6 +68,7 @@ type Repositories struct {
 	FollowRepository       repository.FollowRepository
 	OutboxRepository       repository.OutboxRepository
 	IdempotencyRepository  repository.IdempotencyRepository
+	ChatRepository         repository.ChatRepository
 }
 
 func SetupRepositories(cfg *config.Config) *Repositories {
@@ -107,6 +108,10 @@ func SetupRepositories(cfg *config.Config) *Repositories {
 	idempotencyRepository = repository.NewIdempotencyRepository(cfg)
 	idempotencyRepository = repository.NewIdempotencyRepositoryMwLogger(idempotencyRepository)
 
+	var chatRepository repository.ChatRepository
+	chatRepository = repository.NewChatRepository(cfg)
+	chatRepository = repository.NewChatRepositoryMwLogger(chatRepository)
+
 	return &Repositories{
 		UserRepository:         userRepository,
 		NotificationRepository: notificationRepository,
@@ -117,6 +122,7 @@ func SetupRepositories(cfg *config.Config) *Repositories {
 		FollowRepository:       followRepository,
 		OutboxRepository:       outboxRepository,
 		IdempotencyRepository:  idempotencyRepository,
+		ChatRepository:         chatRepository,
 	}
 }
 

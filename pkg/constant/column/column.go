@@ -65,6 +65,7 @@ const (
 	Type           Column = "type"
 	IsRead         Column = "is_read"
 	RecipientID    Column = "recipient_id"
+	SenderID       Column = "sender_id"
 	Content        Column = "content"
 	ReadAt         Column = "read_at"
 )
