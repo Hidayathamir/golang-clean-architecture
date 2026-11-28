@@ -74,6 +74,14 @@ func (c *Config) SetDatabaseMigrations(value string) {
 	c.Set(DatabaseMigrations, value)
 }
 
+func (c *Config) GetDatabaseSeeds() string {
+	return c.GetString(DatabaseSeeds)
+}
+
+func (c *Config) SetDatabaseSeeds(value string) {
+	c.Set(DatabaseSeeds, value)
+}
+
 func (c *Config) GetDatabaseUsername() string {
 	return c.GetString(DatabaseUsername)
 }

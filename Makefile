@@ -74,6 +74,11 @@ migrate:
 
 #################################### 
 
+seed:
+	go run cmd/seed/main.go
+
+#################################### 
+
 docker-compose-up:
 	docker compose up -d
 

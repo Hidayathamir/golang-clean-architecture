@@ -15,6 +15,7 @@
   },
   "database": {
     "migrations": "db/migrations",
+    "seeds": "db/seeds",
     "username": "postgres",
     "password": "postgres",
     "host": "localhost",

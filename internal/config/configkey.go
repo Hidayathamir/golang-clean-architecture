@@ -11,6 +11,7 @@ const (
 	AWSBaseEndpoint = "aws.base_endpoint"
 
 	DatabaseMigrations   = "database.migrations"
+	DatabaseSeeds        = "database.seeds"
 	DatabaseUsername     = "database.username"
 	DatabasePassword     = "database.password"
 	DatabaseHost         = "database.host"
