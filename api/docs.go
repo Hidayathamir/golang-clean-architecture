@@ -1199,10 +1199,10 @@ const docTemplate = `{
         "github_com_Hidayathamir_golang-clean-architecture_internal_dto.MarkNotificationReadRequest": {
             "type": "object",
             "required": [
-                "notificationID"
+                "notification_id"
             ],
             "properties": {
-                "notificationID": {
+                "notification_id": {
                     "type": "integer"
                 }
             }

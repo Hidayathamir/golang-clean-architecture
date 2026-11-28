@@ -151,10 +151,10 @@ definitions:
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_dto.MarkNotificationReadRequest:
     properties:
-      notificationID:
+      notification_id:
         type: integer
     required:
-    - notificationID
+    - notification_id
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_dto.NotificationResponse:
     properties:
