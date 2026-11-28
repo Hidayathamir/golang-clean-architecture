@@ -7,7 +7,8 @@ Written from the `/api/feed` implementation; mirror it for every new endpoint.
 
 - Layers flow **inbound → usecase → outbound**; `converter` translates `entity` ↔ `dto`.
 - Every interface gets a `_mw_logger.go` decorator (enforced by `make check-rules`).
-- No hardcoded table/column strings in repositories — use `pkg/constant/table` and `pkg/constant/column`.
+- No hardcoded table/column strings in repositories — use `pkg/constant/table` and `pkg/constant/column`. **Enforced**: any string literal equal to a known table/column name in `internal/outbound/repository/` fails `make check-rules` (decorators + tests exempt).
+- Every handled error must be wrapped with `errkit.AddFuncName(err, "<call site>")` before returning, in impl files of `internal/outbound/*`, `internal/usecase`, `internal/inbound`. **Enforced**; decorators + tests exempt (they record via `telemetry.RecordError` instead). Bare `return err` propagation is exempt.
 
 ## 1. File map (exact paths)
 
