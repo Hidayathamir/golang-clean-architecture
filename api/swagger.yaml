@@ -26,6 +26,15 @@ definitions:
       user_id:
         type: integer
     type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.CommentsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.CommentResponse'
+        type: array
+      next_cursor:
+        type: string
+    type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_dto.ExploreResponse:
     properties:
       data:
@@ -109,6 +118,15 @@ definitions:
         type: string
       user_id:
         type: integer
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.LikesResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.LikeResponse'
+        type: array
+      next_cursor:
+        type: string
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_dto.LoginUserRequest:
     properties:
@@ -216,12 +234,10 @@ definitions:
       total_page:
         type: integer
     type: object
-  ? github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_CommentResponseList
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_CommentsResponse
   : properties:
       data:
-        items:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.CommentResponse'
-        type: array
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.CommentsResponse'
       error_detail:
         type: string
       error_message:
@@ -284,12 +300,10 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.PageMetadata'
     type: object
-  ? github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_LikeResponseList
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_LikesResponse
   : properties:
       data:
-        items:
-          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.LikeResponse'
-        type: array
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.LikesResponse'
       error_detail:
         type: string
       error_message:
@@ -555,20 +569,28 @@ paths:
       - images
   /api/images/{imageId}/comments:
     get:
-      description: Get list of comments for an image
+      description: Get list of comments for an image (cursor paginated)
       parameters:
       - description: Image ID
         in: path
         name: imageId
         required: true
         type: integer
+      - description: Page size (default 20, max 100)
+        in: query
+        name: limit
+        type: integer
+      - description: Opaque cursor from the previous page; empty for the first page
+        in: query
+        name: cursor
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_CommentResponseList'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_CommentsResponse'
       security:
       - SimpleApiKeyAuth: []
       summary: Get image comments
@@ -623,20 +645,28 @@ paths:
       - images
   /api/images/{imageId}/likes:
     get:
-      description: Get list of likes for an image
+      description: Get list of likes for an image (cursor paginated)
       parameters:
       - description: Image ID
         in: path
         name: imageId
         required: true
         type: integer
+      - description: Page size (default 20, max 100)
+        in: query
+        name: limit
+        type: integer
+      - description: Opaque cursor from the previous page; empty for the first page
+        in: query
+        name: cursor
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_LikeResponseList'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_LikesResponse'
       security:
       - SimpleApiKeyAuth: []
       summary: Get image likes

@@ -432,12 +432,14 @@ func (c *ImageController) DeleteImageComment(ctx *fiber.Ctx) error {
 // GetLike godoc
 //
 //	@Summary		Get image likes
-//	@Description	Get list of likes for an image
+//	@Description	Get list of likes for an image (cursor paginated)
 //	@Tags			images
 //	@Produce		json
-//	@Param			imageId	path	int	true	"Image ID"
+//	@Param			imageId	path	int		true	"Image ID"
+//	@Param			limit	query	int		false	"Page size (default 20, max 100)"
+//	@Param			cursor	query	string	false	"Opaque cursor from the previous page; empty for the first page"
 //	@Security		SimpleApiKeyAuth
-//	@Success		200	{object}	response.WebResponse[dto.LikeResponseList]
+//	@Success		200	{object}	response.WebResponse[dto.LikesResponse]
 //	@Router			/api/images/{imageId}/likes [get]
 func (c *ImageController) GetLike(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
@@ -453,6 +455,16 @@ func (c *ImageController) GetLike(ctx *fiber.Ctx) error {
 	req := dto.GetLikeRequest{
 		ImageID: imageID,
 	}
+	if limitStr := ctx.Query("limit"); limitStr != "" {
+		limit, err := strconv.Atoi(limitStr)
+		if err != nil {
+			err = errkit.SetCode(err, http.StatusBadRequest)
+			logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+			return errkit.AddFuncName(err, "http.(*ImageController).GetLike")
+		}
+		req.Page.Limit = limit
+	}
+	req.Page.Cursor = ctx.Query("cursor")
 
 	res, err := c.Usecase.GetLike(ctx.UserContext(), req)
 	if err != nil {
@@ -466,12 +478,14 @@ func (c *ImageController) GetLike(ctx *fiber.Ctx) error {
 // GetComment godoc
 //
 //	@Summary		Get image comments
-//	@Description	Get list of comments for an image
+//	@Description	Get list of comments for an image (cursor paginated)
 //	@Tags			images
 //	@Produce		json
-//	@Param			imageId	path	int	true	"Image ID"
+//	@Param			imageId	path	int		true	"Image ID"
+//	@Param			limit	query	int		false	"Page size (default 20, max 100)"
+//	@Param			cursor	query	string	false	"Opaque cursor from the previous page; empty for the first page"
 //	@Security		SimpleApiKeyAuth
-//	@Success		200	{object}	response.WebResponse[dto.CommentResponseList]
+//	@Success		200	{object}	response.WebResponse[dto.CommentsResponse]
 //	@Router			/api/images/{imageId}/comments [get]
 func (c *ImageController) GetComment(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
@@ -487,6 +501,16 @@ func (c *ImageController) GetComment(ctx *fiber.Ctx) error {
 	req := dto.GetCommentRequest{
 		ImageID: imageID,
 	}
+	if limitStr := ctx.Query("limit"); limitStr != "" {
+		limit, err := strconv.Atoi(limitStr)
+		if err != nil {
+			err = errkit.SetCode(err, http.StatusBadRequest)
+			logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+			return errkit.AddFuncName(err, "http.(*ImageController).GetComment")
+		}
+		req.Page.Limit = limit
+	}
+	req.Page.Cursor = ctx.Query("cursor")
 
 	res, err := c.Usecase.GetComment(ctx.UserContext(), req)
 	if err != nil {

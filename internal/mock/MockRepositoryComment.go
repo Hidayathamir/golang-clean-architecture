@@ -9,6 +9,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/repository"
 	"gorm.io/gorm"
 	"sync"
+	"time"
 )
 
 // Ensure, that CommentRepositoryMock does implement repository.CommentRepository.
@@ -30,7 +31,7 @@ var _ repository.CommentRepository = &CommentRepositoryMock{}
 //			FindByIDFunc: func(ctx context.Context, db *gorm.DB, comment *entity.Comment, id int64) error {
 //				panic("mock out the FindByID method")
 //			},
-//			FindByImageIDFunc: func(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64) error {
+//			FindByImageIDFunc: func(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
 //				panic("mock out the FindByImageID method")
 //			},
 //		}
@@ -50,7 +51,7 @@ type CommentRepositoryMock struct {
 	FindByIDFunc func(ctx context.Context, db *gorm.DB, comment *entity.Comment, id int64) error
 
 	// FindByImageIDFunc mocks the FindByImageID method.
-	FindByImageIDFunc func(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64) error
+	FindByImageIDFunc func(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -93,6 +94,12 @@ type CommentRepositoryMock struct {
 			CommentList *entity.CommentList
 			// ImageID is the imageID argument value.
 			ImageID int64
+			// CursorCreatedAt is the cursorCreatedAt argument value.
+			CursorCreatedAt time.Time
+			// CursorID is the cursorID argument value.
+			CursorID int64
+			// Limit is the limit argument value.
+			Limit int
 		}
 	}
 	lockCreate        sync.RWMutex
@@ -226,25 +233,31 @@ func (mock *CommentRepositoryMock) FindByIDCalls() []struct {
 }
 
 // FindByImageID calls FindByImageIDFunc.
-func (mock *CommentRepositoryMock) FindByImageID(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64) error {
+func (mock *CommentRepositoryMock) FindByImageID(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
 	if mock.FindByImageIDFunc == nil {
 		panic("CommentRepositoryMock.FindByImageIDFunc: method is nil but CommentRepository.FindByImageID was just called")
 	}
 	callInfo := struct {
-		Ctx         context.Context
-		Db          *gorm.DB
-		CommentList *entity.CommentList
-		ImageID     int64
+		Ctx             context.Context
+		Db              *gorm.DB
+		CommentList     *entity.CommentList
+		ImageID         int64
+		CursorCreatedAt time.Time
+		CursorID        int64
+		Limit           int
 	}{
-		Ctx:         ctx,
-		Db:          db,
-		CommentList: commentList,
-		ImageID:     imageID,
+		Ctx:             ctx,
+		Db:              db,
+		CommentList:     commentList,
+		ImageID:         imageID,
+		CursorCreatedAt: cursorCreatedAt,
+		CursorID:        cursorID,
+		Limit:           limit,
 	}
 	mock.lockFindByImageID.Lock()
 	mock.calls.FindByImageID = append(mock.calls.FindByImageID, callInfo)
 	mock.lockFindByImageID.Unlock()
-	return mock.FindByImageIDFunc(ctx, db, commentList, imageID)
+	return mock.FindByImageIDFunc(ctx, db, commentList, imageID, cursorCreatedAt, cursorID, limit)
 }
 
 // FindByImageIDCalls gets all the calls that were made to FindByImageID.
@@ -252,16 +265,22 @@ func (mock *CommentRepositoryMock) FindByImageID(ctx context.Context, db *gorm.D
 //
 //	len(mockedCommentRepository.FindByImageIDCalls())
 func (mock *CommentRepositoryMock) FindByImageIDCalls() []struct {
-	Ctx         context.Context
-	Db          *gorm.DB
-	CommentList *entity.CommentList
-	ImageID     int64
+	Ctx             context.Context
+	Db              *gorm.DB
+	CommentList     *entity.CommentList
+	ImageID         int64
+	CursorCreatedAt time.Time
+	CursorID        int64
+	Limit           int
 } {
 	var calls []struct {
-		Ctx         context.Context
-		Db          *gorm.DB
-		CommentList *entity.CommentList
-		ImageID     int64
+		Ctx             context.Context
+		Db              *gorm.DB
+		CommentList     *entity.CommentList
+		ImageID         int64
+		CursorCreatedAt time.Time
+		CursorID        int64
+		Limit           int
 	}
 	mock.lockFindByImageID.RLock()
 	calls = mock.calls.FindByImageID

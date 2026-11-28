@@ -191,7 +191,7 @@ func (u *ImageUsecaseMwLogger) DeleteImageComment(ctx context.Context, req dto.D
 	return err
 }
 
-func (u *ImageUsecaseMwLogger) GetComment(ctx context.Context, req dto.GetCommentRequest) (dto.CommentResponseList, error) {
+func (u *ImageUsecaseMwLogger) GetComment(ctx context.Context, req dto.GetCommentRequest) (dto.CommentsResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
@@ -207,7 +207,7 @@ func (u *ImageUsecaseMwLogger) GetComment(ctx context.Context, req dto.GetCommen
 	return res, err
 }
 
-func (u *ImageUsecaseMwLogger) GetLike(ctx context.Context, req dto.GetLikeRequest) (dto.LikeResponseList, error) {
+func (u *ImageUsecaseMwLogger) GetLike(ctx context.Context, req dto.GetLikeRequest) (dto.LikesResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 

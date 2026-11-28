@@ -325,7 +325,7 @@ const docTemplate = `{
                         "SimpleApiKeyAuth": []
                     }
                 ],
-                "description": "Get list of comments for an image",
+                "description": "Get list of comments for an image (cursor paginated)",
                 "produces": [
                     "application/json"
                 ],
@@ -340,13 +340,25 @@ const docTemplate = `{
                         "name": "imageId",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page size (default 20, max 100)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Opaque cursor from the previous page; empty for the first page",
+                        "name": "cursor",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_CommentResponseList"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_CommentsResponse"
                         }
                     }
                 }
@@ -434,7 +446,7 @@ const docTemplate = `{
                         "SimpleApiKeyAuth": []
                     }
                 ],
-                "description": "Get list of likes for an image",
+                "description": "Get list of likes for an image (cursor paginated)",
                 "produces": [
                     "application/json"
                 ],
@@ -449,13 +461,25 @@ const docTemplate = `{
                         "name": "imageId",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page size (default 20, max 100)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Opaque cursor from the previous page; empty for the first page",
+                        "name": "cursor",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_LikeResponseList"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_LikesResponse"
                         }
                     }
                 }
@@ -852,6 +876,20 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_dto.CommentsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.CommentResponse"
+                    }
+                },
+                "next_cursor": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_Hidayathamir_golang-clean-architecture_internal_dto.ExploreResponse": {
             "type": "object",
             "properties": {
@@ -979,6 +1017,20 @@ const docTemplate = `{
                 },
                 "user_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_dto.LikesResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.LikeResponse"
+                    }
+                },
+                "next_cursor": {
+                    "type": "string"
                 }
             }
         },
@@ -1140,14 +1192,11 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_CommentResponseList": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_CommentsResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.CommentResponse"
-                    }
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.CommentsResponse"
                 },
                 "error_detail": {
                     "type": "string"
@@ -1245,14 +1294,11 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_LikeResponseList": {
+        "github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_LikesResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.LikeResponse"
-                    }
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.LikesResponse"
                 },
                 "error_detail": {
                     "type": "string"

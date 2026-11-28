@@ -9,6 +9,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/repository"
 	"gorm.io/gorm"
 	"sync"
+	"time"
 )
 
 // Ensure, that LikeRepositoryMock does implement repository.LikeRepository.
@@ -27,7 +28,7 @@ var _ repository.LikeRepository = &LikeRepositoryMock{}
 //			DeleteByUserIDAndImageIDFunc: func(ctx context.Context, db *gorm.DB, userID int64, imageID int64) (int64, error) {
 //				panic("mock out the DeleteByUserIDAndImageID method")
 //			},
-//			FindByImageIDFunc: func(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64) error {
+//			FindByImageIDFunc: func(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
 //				panic("mock out the FindByImageID method")
 //			},
 //		}
@@ -44,7 +45,7 @@ type LikeRepositoryMock struct {
 	DeleteByUserIDAndImageIDFunc func(ctx context.Context, db *gorm.DB, userID int64, imageID int64) (int64, error)
 
 	// FindByImageIDFunc mocks the FindByImageID method.
-	FindByImageIDFunc func(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64) error
+	FindByImageIDFunc func(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -78,6 +79,12 @@ type LikeRepositoryMock struct {
 			LikeList *entity.LikeList
 			// ImageID is the imageID argument value.
 			ImageID int64
+			// CursorCreatedAt is the cursorCreatedAt argument value.
+			CursorCreatedAt time.Time
+			// CursorID is the cursorID argument value.
+			CursorID int64
+			// Limit is the limit argument value.
+			Limit int
 		}
 	}
 	lockCreate                   sync.RWMutex
@@ -170,25 +177,31 @@ func (mock *LikeRepositoryMock) DeleteByUserIDAndImageIDCalls() []struct {
 }
 
 // FindByImageID calls FindByImageIDFunc.
-func (mock *LikeRepositoryMock) FindByImageID(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64) error {
+func (mock *LikeRepositoryMock) FindByImageID(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
 	if mock.FindByImageIDFunc == nil {
 		panic("LikeRepositoryMock.FindByImageIDFunc: method is nil but LikeRepository.FindByImageID was just called")
 	}
 	callInfo := struct {
-		Ctx      context.Context
-		Db       *gorm.DB
-		LikeList *entity.LikeList
-		ImageID  int64
+		Ctx             context.Context
+		Db              *gorm.DB
+		LikeList        *entity.LikeList
+		ImageID         int64
+		CursorCreatedAt time.Time
+		CursorID        int64
+		Limit           int
 	}{
-		Ctx:      ctx,
-		Db:       db,
-		LikeList: likeList,
-		ImageID:  imageID,
+		Ctx:             ctx,
+		Db:              db,
+		LikeList:        likeList,
+		ImageID:         imageID,
+		CursorCreatedAt: cursorCreatedAt,
+		CursorID:        cursorID,
+		Limit:           limit,
 	}
 	mock.lockFindByImageID.Lock()
 	mock.calls.FindByImageID = append(mock.calls.FindByImageID, callInfo)
 	mock.lockFindByImageID.Unlock()
-	return mock.FindByImageIDFunc(ctx, db, likeList, imageID)
+	return mock.FindByImageIDFunc(ctx, db, likeList, imageID, cursorCreatedAt, cursorID, limit)
 }
 
 // FindByImageIDCalls gets all the calls that were made to FindByImageID.
@@ -196,16 +209,22 @@ func (mock *LikeRepositoryMock) FindByImageID(ctx context.Context, db *gorm.DB, 
 //
 //	len(mockedLikeRepository.FindByImageIDCalls())
 func (mock *LikeRepositoryMock) FindByImageIDCalls() []struct {
-	Ctx      context.Context
-	Db       *gorm.DB
-	LikeList *entity.LikeList
-	ImageID  int64
+	Ctx             context.Context
+	Db              *gorm.DB
+	LikeList        *entity.LikeList
+	ImageID         int64
+	CursorCreatedAt time.Time
+	CursorID        int64
+	Limit           int
 } {
 	var calls []struct {
-		Ctx      context.Context
-		Db       *gorm.DB
-		LikeList *entity.LikeList
-		ImageID  int64
+		Ctx             context.Context
+		Db              *gorm.DB
+		LikeList        *entity.LikeList
+		ImageID         int64
+		CursorCreatedAt time.Time
+		CursorID        int64
+		Limit           int
 	}
 	mock.lockFindByImageID.RLock()
 	calls = mock.calls.FindByImageID

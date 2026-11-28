@@ -75,6 +75,9 @@ type LikeResponse struct {
 
 type LikeResponseList []LikeResponse
 
+// LikesResponse is a page of an image's likes, newest first.
+type LikesResponse = CursorPage[LikeResponseList]
+
 type CommentResponse struct {
 	ID        int64          `json:"id"`
 	UserID    int64          `json:"user_id"`
@@ -86,6 +89,9 @@ type CommentResponse struct {
 }
 
 type CommentResponseList []CommentResponse
+
+// CommentsResponse is a page of an image's comments, newest first.
+type CommentsResponse = CursorPage[CommentResponseList]
 
 // FeedRequest is the input for GET /api/feed. The user is taken from auth
 // context; Page carries the cursor pagination input.
@@ -119,10 +125,12 @@ type ExploreResponse = CursorPage[ImageResponseList]
 
 type GetLikeRequest struct {
 	ImageID int64
+	Page    PageRequest
 }
 
 type GetCommentRequest struct {
 	ImageID int64
+	Page    PageRequest
 }
 
 type NotifyFollowerOnUploadRequest struct {

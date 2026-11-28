@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
@@ -16,7 +17,7 @@ import (
 type CommentRepository interface {
 	Create(ctx context.Context, db *gorm.DB, comment *entity.Comment) error
 	FindByID(ctx context.Context, db *gorm.DB, comment *entity.Comment, id int64) error
-	FindByImageID(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64) error
+	FindByImageID(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error
 	DeleteByID(ctx context.Context, db *gorm.DB, comment *entity.Comment) error
 }
 
@@ -49,8 +50,19 @@ func (r *CommentRepositoryImpl) FindByID(ctx context.Context, db *gorm.DB, comme
 	return nil
 }
 
-func (r *CommentRepositoryImpl) FindByImageID(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64) error {
-	err := db.WithContext(ctx).Where(column.ImageID.Eq(imageID)).Find(commentList).Error
+func (r *CommentRepositoryImpl) FindByImageID(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
+	query := db.WithContext(ctx).
+		Where(column.ImageID.Eq(imageID)).
+		Order(column.CreatedAt.Desc()).
+		Order(column.ID.Desc()).
+		Limit(limit)
+
+	if cursorID > 0 {
+		whereKeyset, argCreatedAt, argID := column.KeysetBefore(cursorCreatedAt, cursorID)
+		query = query.Where(whereKeyset, argCreatedAt, argID)
+	}
+
+	err := query.Find(commentList).Error
 	if err != nil {
 		return errkit.AddFuncName(err, "repository.(*CommentRepositoryImpl).FindByImageID")
 	}

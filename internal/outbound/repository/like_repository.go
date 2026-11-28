@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
@@ -14,7 +15,7 @@ import (
 
 type LikeRepository interface {
 	Create(ctx context.Context, db *gorm.DB, like *entity.Like) error
-	FindByImageID(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64) error
+	FindByImageID(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error
 	DeleteByUserIDAndImageID(ctx context.Context, db *gorm.DB, userID int64, imageID int64) (int64, error)
 }
 
@@ -38,8 +39,19 @@ func (r *LikeRepositoryImpl) Create(ctx context.Context, db *gorm.DB, like *enti
 	return nil
 }
 
-func (r *LikeRepositoryImpl) FindByImageID(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64) error {
-	err := db.WithContext(ctx).Where(column.ImageID.Eq(imageID)).Find(likeList).Error
+func (r *LikeRepositoryImpl) FindByImageID(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
+	query := db.WithContext(ctx).
+		Where(column.ImageID.Eq(imageID)).
+		Order(column.CreatedAt.Desc()).
+		Order(column.ID.Desc()).
+		Limit(limit)
+
+	if cursorID > 0 {
+		whereKeyset, argCreatedAt, argID := column.KeysetBefore(cursorCreatedAt, cursorID)
+		query = query.Where(whereKeyset, argCreatedAt, argID)
+	}
+
+	err := query.Find(likeList).Error
 	if err != nil {
 		return errkit.AddFuncName(err, "repository.(*LikeRepositoryImpl).FindByImageID")
 	}

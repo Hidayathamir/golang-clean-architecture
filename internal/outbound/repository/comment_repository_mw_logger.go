@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
@@ -75,12 +76,12 @@ func (r *CommentRepositoryMwLogger) DeleteByID(ctx context.Context, db *gorm.DB,
 	return err
 }
 
-func (r *CommentRepositoryMwLogger) FindByImageID(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64) error {
+func (r *CommentRepositoryMwLogger) FindByImageID(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
 	err := retrykit.DBRetry(ctx, func() error {
-		return r.Next.FindByImageID(ctx, db, commentList, imageID)
+		return r.Next.FindByImageID(ctx, db, commentList, imageID, cursorCreatedAt, cursorID, limit)
 	})
 	telemetry.RecordError(span, err)
 

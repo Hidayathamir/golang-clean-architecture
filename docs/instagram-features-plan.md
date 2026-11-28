@@ -75,7 +75,7 @@ Work items one at a time using the `instagram-feature` skill (the step-by-step r
 ## Notes / decisions for the implementing agent
 
 - Reuse `ImageRepository`, `FollowRepository`, `UserRepository`, `LikeRepository`, `CommentRepository` where possible; add methods instead of new repositories.
-- The feed query is essentially: images whose `user_id` is in (follows of current user), ordered by `created_at desc`, paginated.
+- The feed query is essentially: images whose `user_id` is in (follows of current user), ordered bs in (follows of current user), ordered by `created_at desc`, paginated.
 - `/api/explore` should reuse the existing `ImageSearch` (Elasticsearch) outbound already wired for search sync.
 - Keep responses consistent with existing DTO shapes (`ImageResponse`, etc.).
 - Do not introduce new domains listed under **Out of scope**.

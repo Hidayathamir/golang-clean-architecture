@@ -38,7 +38,7 @@ var _ imageusecase.ImageUsecase = &ImageUsecaseMock{}
 //			ExploreFunc: func(ctx context.Context, req dto.ExploreRequest) (dto.ExploreResponse, error) {
 //				panic("mock out the Explore method")
 //			},
-//			GetCommentFunc: func(ctx context.Context, req dto.GetCommentRequest) (dto.CommentResponseList, error) {
+//			GetCommentFunc: func(ctx context.Context, req dto.GetCommentRequest) (dto.CommentsResponse, error) {
 //				panic("mock out the GetComment method")
 //			},
 //			GetFeedFunc: func(ctx context.Context, req dto.FeedRequest) (dto.FeedResponse, error) {
@@ -47,7 +47,7 @@ var _ imageusecase.ImageUsecase = &ImageUsecaseMock{}
 //			GetImageFunc: func(ctx context.Context, req dto.GetImageRequest) (dto.ImageResponse, error) {
 //				panic("mock out the GetImage method")
 //			},
-//			GetLikeFunc: func(ctx context.Context, req dto.GetLikeRequest) (dto.LikeResponseList, error) {
+//			GetLikeFunc: func(ctx context.Context, req dto.GetLikeRequest) (dto.LikesResponse, error) {
 //				panic("mock out the GetLike method")
 //			},
 //			GetUserImagesFunc: func(ctx context.Context, req dto.UserImagesRequest) (dto.UserImagesResponse, error) {
@@ -103,7 +103,7 @@ type ImageUsecaseMock struct {
 	ExploreFunc func(ctx context.Context, req dto.ExploreRequest) (dto.ExploreResponse, error)
 
 	// GetCommentFunc mocks the GetComment method.
-	GetCommentFunc func(ctx context.Context, req dto.GetCommentRequest) (dto.CommentResponseList, error)
+	GetCommentFunc func(ctx context.Context, req dto.GetCommentRequest) (dto.CommentsResponse, error)
 
 	// GetFeedFunc mocks the GetFeed method.
 	GetFeedFunc func(ctx context.Context, req dto.FeedRequest) (dto.FeedResponse, error)
@@ -112,7 +112,7 @@ type ImageUsecaseMock struct {
 	GetImageFunc func(ctx context.Context, req dto.GetImageRequest) (dto.ImageResponse, error)
 
 	// GetLikeFunc mocks the GetLike method.
-	GetLikeFunc func(ctx context.Context, req dto.GetLikeRequest) (dto.LikeResponseList, error)
+	GetLikeFunc func(ctx context.Context, req dto.GetLikeRequest) (dto.LikesResponse, error)
 
 	// GetUserImagesFunc mocks the GetUserImages method.
 	GetUserImagesFunc func(ctx context.Context, req dto.UserImagesRequest) (dto.UserImagesResponse, error)
@@ -515,7 +515,7 @@ func (mock *ImageUsecaseMock) ExploreCalls() []struct {
 }
 
 // GetComment calls GetCommentFunc.
-func (mock *ImageUsecaseMock) GetComment(ctx context.Context, req dto.GetCommentRequest) (dto.CommentResponseList, error) {
+func (mock *ImageUsecaseMock) GetComment(ctx context.Context, req dto.GetCommentRequest) (dto.CommentsResponse, error) {
 	if mock.GetCommentFunc == nil {
 		panic("ImageUsecaseMock.GetCommentFunc: method is nil but ImageUsecase.GetComment was just called")
 	}
@@ -623,7 +623,7 @@ func (mock *ImageUsecaseMock) GetImageCalls() []struct {
 }
 
 // GetLike calls GetLikeFunc.
-func (mock *ImageUsecaseMock) GetLike(ctx context.Context, req dto.GetLikeRequest) (dto.LikeResponseList, error) {
+func (mock *ImageUsecaseMock) GetLike(ctx context.Context, req dto.GetLikeRequest) (dto.LikesResponse, error) {
 	if mock.GetLikeFunc == nil {
 		panic("ImageUsecaseMock.GetLikeFunc: method is nil but ImageUsecase.GetLike was just called")
 	}
