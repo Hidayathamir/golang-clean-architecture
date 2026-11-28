@@ -123,12 +123,11 @@ order by c.created_at desc`
 func (r *ChatRepositoryImpl) MarkThreadRead(ctx context.Context, db *gorm.DB, userID, peerID int64, readAt time.Time) (int64, error) {
 	whereRecipient, argRecipient := column.RecipientID.Eq(userID)
 	whereSender, argSender := column.SenderID.Eq(peerID)
-	whereUnread, argUnread := column.ReadAt.Eq(nil)
 	result := db.WithContext(ctx).
 		Model(&entity.Chat{}).
 		Where(whereRecipient, argRecipient).
 		Where(whereSender, argSender).
-		Where(whereUnread, argUnread).
+		Where(column.ReadAt.IsNull()).
 		Update(column.ReadAt.Str(), sql.NullTime{Time: readAt, Valid: true})
 	if result.Error != nil {
 		return 0, errkit.AddFuncName(result.Error, "repository.(*ChatRepositoryImpl).MarkThreadRead")
@@ -139,11 +138,10 @@ func (r *ChatRepositoryImpl) MarkThreadRead(ctx context.Context, db *gorm.DB, us
 func (r *ChatRepositoryImpl) CountUnread(ctx context.Context, db *gorm.DB, userID int64) (int64, error) {
 	var total int64
 	whereRecipient, argRecipient := column.RecipientID.Eq(userID)
-	whereUnread, argUnread := column.ReadAt.Eq(nil)
 	err := db.WithContext(ctx).
 		Model(&entity.Chat{}).
 		Where(whereRecipient, argRecipient).
-		Where(whereUnread, argUnread).
+		Where(column.ReadAt.IsNull()).
 		Count(&total).Error
 	if err != nil {
 		return 0, errkit.AddFuncName(err, "repository.(*ChatRepositoryImpl).CountUnread")

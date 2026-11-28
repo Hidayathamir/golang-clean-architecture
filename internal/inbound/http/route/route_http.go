@@ -93,4 +93,13 @@ func setupAuthRoute(router fiber.Router, controllers *dependency_injection.Contr
 		notifications.Post("/_read_all", controllers.NotificationController.MarkAllRead)
 		notifications.Get("/_unread_count", controllers.NotificationController.UnreadCount)
 	}
+
+	chats := router.Group("/chats")
+	{
+		chats.Post("", controllers.ChatController.Send)
+		chats.Get("/conversations", controllers.ChatController.ListConversations)
+		chats.Post("/_read", controllers.ChatController.MarkRead)
+		chats.Get("/_unread_count", controllers.ChatController.UnreadCount)
+		chats.Get("/:userId", controllers.ChatController.GetThread)
+	}
 }

@@ -14,6 +14,7 @@ type Controllers struct {
 	NotificationController *http.NotificationController
 	NotificationHandler    *websocket.NotificationHandler
 	NotificationSubscriber *websocket.NotificationSubscriber
+	ChatController         *http.ChatController
 }
 
 type Hubs struct {
@@ -32,12 +33,14 @@ func SetupControllers(cfg *config.Config, redisClient *redis.Client, hubs *Hubs,
 	notificationController := http.NewNotificationController(cfg, usecases.NotifUsecase)
 	notificationHandler := websocket.NewNotificationHandler(hubs.NotificationHub, usecases.UserUsecase)
 	notificationSubscriber := websocket.NewNotificationSubscriber(redisClient, hubs.NotificationHub)
+	chatController := http.NewChatController(cfg, usecases.ChatUsecase)
 	return &Controllers{
 		UserController:         userController,
 		ImageController:        imageController,
 		NotificationController: notificationController,
 		NotificationHandler:    notificationHandler,
 		NotificationSubscriber: notificationSubscriber,
+		ChatController:         chatController,
 	}
 }
 

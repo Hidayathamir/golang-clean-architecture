@@ -1,4 +1,19 @@
 definitions:
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.ChatResponse:
+    properties:
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      read_at:
+        type: string
+      recipient_id:
+        type: integer
+      sender_id:
+        type: integer
+    type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_dto.CommentImageRequest:
     properties:
       comment:
@@ -43,6 +58,26 @@ definitions:
         type: string
     required:
     - key
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.ConversationResponse:
+    properties:
+      last_chat:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.ChatResponse'
+      peer_id:
+        type: integer
+      peer_name:
+        type: string
+      peer_username:
+        type: string
+      unread_count:
+        type: integer
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.ConversationsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.ConversationResponse'
+        type: array
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_dto.ExploreResponse:
     properties:
@@ -149,6 +184,13 @@ definitions:
     - password
     - username
     type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.MarkChatReadRequest:
+    properties:
+      peer_id:
+        type: integer
+    required:
+    - peer_id
+    type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_dto.MarkNotificationReadRequest:
     properties:
       notification_id:
@@ -220,6 +262,31 @@ definitions:
     - name
     - password
     - username
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.SendChatRequest:
+    properties:
+      content:
+        maxLength: 2000
+        type: string
+      recipient_id:
+        type: integer
+    required:
+    - content
+    - recipient_id
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.ThreadResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.ChatResponse'
+        type: array
+      next_cursor:
+        type: string
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.UnreadChatCountResponse:
+    properties:
+      unread_count:
+        type: integer
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_dto.UnreadCountResponse:
     properties:
@@ -301,10 +368,32 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.PageMetadata'
     type: object
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ChatResponse
+  : properties:
+      data:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.ChatResponse'
+      error_detail:
+        type: string
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.PageMetadata'
+    type: object
   ? github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_CommentsResponse
   : properties:
       data:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.CommentsResponse'
+      error_detail:
+        type: string
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.PageMetadata'
+    type: object
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ConversationsResponse
+  : properties:
+      data:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.ConversationsResponse'
       error_detail:
         type: string
       error_message:
@@ -413,6 +502,28 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.PageMetadata'
     type: object
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ThreadResponse
+  : properties:
+      data:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.ThreadResponse'
+      error_detail:
+        type: string
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.PageMetadata'
+    type: object
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_UnreadChatCountResponse
+  : properties:
+      data:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.UnreadChatCountResponse'
+      error_detail:
+        type: string
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.PageMetadata'
+    type: object
   ? github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_UnreadCountResponse
   : properties:
       data:
@@ -480,6 +591,84 @@ info:
   contact: {}
   title: Golang Clean Architecture
 paths:
+  /api/chats:
+    post:
+      parameters:
+      - description: Send Chat Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.SendChatRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ChatResponse'
+      summary: Send a chat
+      tags:
+      - chats
+  /api/chats/_read:
+    post:
+      parameters:
+      - description: Mark Chat Read Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.MarkChatReadRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-any'
+      summary: Mark a chat thread read
+      tags:
+      - chats
+  /api/chats/_unread_count:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_UnreadChatCountResponse'
+      summary: Unread chat count
+      tags:
+      - chats
+  /api/chats/{userId}:
+    get:
+      parameters:
+      - description: peer user id
+        in: path
+        name: userId
+        required: true
+        type: integer
+      - description: page size
+        in: query
+        name: limit
+        type: integer
+      - description: opaque cursor
+        in: query
+        name: cursor
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ThreadResponse'
+      summary: Get a chat thread with a user
+      tags:
+      - chats
+  /api/chats/conversations:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ConversationsResponse'
+      summary: List chat conversations
+      tags:
+      - chats
   /api/explore:
     get:
       description: Discover posts via Elasticsearch, newest first (cursor paginated)
