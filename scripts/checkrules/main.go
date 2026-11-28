@@ -18,12 +18,19 @@
 //   - Inbound spans: every HTTP controller method starts a controller span
 //     (telemetry.StartController); every Kafka consumer method starts a consumer
 //     span (telemetry.StartConsumer or telemetry.StartConsumerBatch).
+//   - Consumer idempotency: every ConsumeEvent* call in
+//     internal/inbound/messaging/route/route_messaging.go must pass a handler
+//     produced by messaging.IdempotencyHandlerSingle/Batch, unless the consumer
+//     group is allowlisted as inherently idempotent.
 //
 // Run with `make check-rules`. Exits non-zero on any violation.
 package main
 
 import (
 	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -52,6 +59,7 @@ func main() {
 	violations = append(violations, checkTestPackages()...)
 	violations = append(violations, checkMigrations()...)
 	violations = append(violations, checkInboundSpans()...)
+	violations = append(violations, checkConsumerIdempotency()...)
 
 	if len(violations) > 0 {
 		fmt.Fprintln(os.Stderr, "❌ check-rules failed:")
@@ -409,4 +417,179 @@ func checkInboundSpansIn(rule inboundSpanRule) []string {
 		violations = append(violations, fmt.Sprintf("walk %s: %v", rule.root, err))
 	}
 	return violations
+}
+
+// routeMessagingPath is the single file that wires Kafka consumers to handlers.
+const routeMessagingPath = "internal/inbound/messaging/route/route_messaging.go"
+
+// routeFile holds the parsed route_messaging.go for the duration of the check,
+// so helpers can locate the block enclosing a given call.
+var routeFile *ast.File
+
+// idempotencyAllowlist names consumer groups whose handlers are inherently
+// idempotent and therefore intentionally skip the de-dup wrapper (e.g. an
+// Elasticsearch upsert that converges under repeated writes). Any new unwrapped
+// consumer fails the check until it is either wrapped or added here.
+var idempotencyAllowlist = map[string]bool{
+	"ImageUploadedSyncSearch":      true,
+	"ImageUploadedSyncSearchRetry": true,
+}
+
+// consumeEventFns are the loop functions whose handler argument must be wrapped.
+var consumeEventFns = map[string]bool{
+	"ConsumeEventSingle": true,
+	"ConsumeEventBatch":  true,
+	"ConsumeEventRetry":  true,
+}
+
+// checkConsumerIdempotency verifies every ConsumeEvent* call in
+// route_messaging.go receives a handler produced by
+// messaging.IdempotencyHandlerSingle/Batch, unless its consumer group is
+// allowlisted as inherently idempotent.
+//
+// Each consumer is a wg.Go(func(){...}) block whose final statement is the
+// ConsumeEvent* call; the handler is the call's last argument. A wrapped handler
+// is always a call to an IdempotencyHandler* function, so this is a direct AST
+// inspection rather than a fragile text match.
+func checkConsumerIdempotency() []string {
+	fset := token.NewFileSet()
+	file, err := parser.ParseFile(fset, routeMessagingPath, nil, 0)
+	if err != nil {
+		return []string{fmt.Sprintf("parse %s: %v", routeMessagingPath, err)}
+	}
+	routeFile = file
+
+	var violations []string
+
+	ast.Inspect(file, func(n ast.Node) bool {
+		call, ok := n.(*ast.CallExpr)
+		if !ok {
+			return true
+		}
+		fnName := calleeName(call.Fun)
+		if !consumeEventFns[fnName] {
+			return true
+		}
+
+		if group := consumerGroupForCall(fset, file, call); idempotencyAllowlist[group] {
+			return true
+		}
+
+		if isIdempotencyWrapped(call, call.Args[len(call.Args)-1]) {
+			return true
+		}
+
+		pos := fset.Position(call.Pos())
+		violations = append(violations,
+			fmt.Sprintf("consumer idempotency: %s:%d %s passes an unwrapped handler; wrap it with messaging.IdempotencyHandlerSingle/Batch (or allowlist the consumer group)",
+				routeMessagingPath, pos.Line, fnName))
+		return true
+	})
+
+	return violations
+}
+
+// isIdempotencyWrapped reports whether the handler expression is a call to one
+// of the IdempotencyHandler* wrapper functions. The handler is usually passed as
+// a local identifier (`handler`), so an Ident is resolved back to the right-hand
+// side of the assignment inside the same consumer block.
+func isIdempotencyWrapped(call *ast.CallExpr, expr ast.Expr) bool {
+	if call, ok := expr.(*ast.CallExpr); ok {
+		return isIdempotencyWrapperName(calleeName(call.Fun))
+	}
+	id, ok := expr.(*ast.Ident)
+	if !ok {
+		return false
+	}
+	// Find the block that contains this call, then look for `handler := <wrapped>`
+	// within it. Blocks are the func literals passed to wg.Go per consumer.
+	block := enclosingBlock(call)
+	if block == nil {
+		return false
+	}
+	wrapped := false
+	ast.Inspect(block, func(n ast.Node) bool {
+		assign, ok := n.(*ast.AssignStmt)
+		if !ok || len(assign.Lhs) != 1 || len(assign.Rhs) != 1 {
+			return true
+		}
+		lhs, ok := assign.Lhs[0].(*ast.Ident)
+		if !ok || lhs.Name != id.Name {
+			return true
+		}
+		if c, ok := assign.Rhs[0].(*ast.CallExpr); ok && isIdempotencyWrapperName(calleeName(c.Fun)) {
+			wrapped = true
+			return false
+		}
+		return true
+	})
+	return wrapped
+}
+
+// enclosingBlock returns the tightest *ast.BlockStmt containing call, which for
+// the route file is the body of the per-consumer func literal.
+func enclosingBlock(call *ast.CallExpr) *ast.BlockStmt {
+	var best *ast.BlockStmt
+	start := call.Pos()
+	end := call.End()
+	ast.Inspect(routeFile, func(n ast.Node) bool {
+		blk, ok := n.(*ast.BlockStmt)
+		if !ok {
+			return true
+		}
+		if blk.Pos() <= start && blk.End() >= end {
+			// Tightest span = best candidate.
+			if best == nil || (blk.End()-blk.Pos()) < (best.End()-best.Pos()) {
+				best = blk
+			}
+		}
+		return true
+	})
+	return best
+}
+
+// isIdempotencyWrapperName reports whether a function name is a de-dup wrapper.
+func isIdempotencyWrapperName(name string) bool {
+	return name == "IdempotencyHandlerSingle" || name == "IdempotencyHandlerBatch"
+}
+
+// calleeName returns the final identifier of a call's function expression,
+// covering both pkg.Fn (SelectorExpr) and bare Fn (Ident).
+func calleeName(fun ast.Expr) string {
+	switch f := fun.(type) {
+	case *ast.Ident:
+		return f.Name
+	case *ast.SelectorExpr:
+		return f.Sel.Name
+	}
+	return ""
+}
+
+// consumerGroupForCall returns the consumer-group identifier for a ConsumeEvent*
+// call by finding the `consumerGroup := consumergroup.X` assignment that precedes
+// the call in the same function literal. The assignment always sits on an earlier
+// source line than the call, so a file-wide walk keyed on line order is enough.
+func consumerGroupForCall(fset *token.FileSet, file ast.Node, call *ast.CallExpr) string {
+	callLine := fset.Position(call.Pos()).Line
+	group := ""
+
+	ast.Inspect(file, func(n ast.Node) bool {
+		assign, ok := n.(*ast.AssignStmt)
+		if !ok || len(assign.Lhs) != 1 || len(assign.Rhs) != 1 {
+			return true
+		}
+		id, ok := assign.Lhs[0].(*ast.Ident)
+		if !ok || id.Name != "consumerGroup" {
+			return true
+		}
+		line := fset.Position(assign.Pos()).Line
+		if line >= callLine {
+			return true
+		}
+		if sel, ok := assign.Rhs[0].(*ast.SelectorExpr); ok {
+			group = sel.Sel.Name
+		}
+		return true
+	})
+	return group
 }

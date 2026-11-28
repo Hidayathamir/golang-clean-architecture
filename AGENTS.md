@@ -184,6 +184,8 @@ Pointers to the deep-dive skills. Load the skill when you need the detail.
 
 Kafka consumers are **at-least-once**, so every message carries an **`x-idempotency-key` header** and nearly every handler in `route_messaging.go` is wrapped by a de-dup decorator (skipped duplicates commit the offset, no retry/DLQ; the wrapper is fail-open; run `make run-workeridempotencycleaner` in production).
 
+**Enforced** via `make check-rules` (`scripts/checkrules`): every `ConsumeEventSingle`/`ConsumeEventBatch`/`ConsumeEventRetry` call in `route_messaging.go` must pass a handler wrapped by `messaging.IdempotencyHandlerSingle`/`Batch`. Inherently idempotent consumers (the Elasticsearch sync ones) are allowlisted in `checkConsumerIdempotency`.
+
 Full detail — the table, wrapper functions, and behavior: the `idempotency` skill.
 
 ## Architecture, layout, and adding features
