@@ -28,6 +28,9 @@ var _ repository.ImageRepository = &ImageRepositoryMock{}
 //			FindByIDFunc: func(ctx context.Context, db *gorm.DB, image *entity.Image, id int64) error {
 //				panic("mock out the FindByID method")
 //			},
+//			FindByUserIDFunc: func(ctx context.Context, db *gorm.DB, imageList *entity.ImageList, userID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
+//				panic("mock out the FindByUserID method")
+//			},
 //			FindFeedByFollowerIDFunc: func(ctx context.Context, db *gorm.DB, imageList *entity.ImageList, followerID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
 //				panic("mock out the FindFeedByFollowerID method")
 //			},
@@ -49,6 +52,9 @@ type ImageRepositoryMock struct {
 
 	// FindByIDFunc mocks the FindByID method.
 	FindByIDFunc func(ctx context.Context, db *gorm.DB, image *entity.Image, id int64) error
+
+	// FindByUserIDFunc mocks the FindByUserID method.
+	FindByUserIDFunc func(ctx context.Context, db *gorm.DB, imageList *entity.ImageList, userID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error
 
 	// FindFeedByFollowerIDFunc mocks the FindFeedByFollowerID method.
 	FindFeedByFollowerIDFunc func(ctx context.Context, db *gorm.DB, imageList *entity.ImageList, followerID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error
@@ -80,6 +86,23 @@ type ImageRepositoryMock struct {
 			Image *entity.Image
 			// ID is the id argument value.
 			ID int64
+		}
+		// FindByUserID holds details about calls to the FindByUserID method.
+		FindByUserID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
+			// ImageList is the imageList argument value.
+			ImageList *entity.ImageList
+			// UserID is the userID argument value.
+			UserID int64
+			// CursorCreatedAt is the cursorCreatedAt argument value.
+			CursorCreatedAt time.Time
+			// CursorID is the cursorID argument value.
+			CursorID int64
+			// Limit is the limit argument value.
+			Limit int
 		}
 		// FindFeedByFollowerID holds details about calls to the FindFeedByFollowerID method.
 		FindFeedByFollowerID []struct {
@@ -123,6 +146,7 @@ type ImageRepositoryMock struct {
 	}
 	lockCreate                    sync.RWMutex
 	lockFindByID                  sync.RWMutex
+	lockFindByUserID              sync.RWMutex
 	lockFindFeedByFollowerID      sync.RWMutex
 	lockIncrementCommentCountByID sync.RWMutex
 	lockIncrementLikeCountByID    sync.RWMutex
@@ -209,6 +233,62 @@ func (mock *ImageRepositoryMock) FindByIDCalls() []struct {
 	mock.lockFindByID.RLock()
 	calls = mock.calls.FindByID
 	mock.lockFindByID.RUnlock()
+	return calls
+}
+
+// FindByUserID calls FindByUserIDFunc.
+func (mock *ImageRepositoryMock) FindByUserID(ctx context.Context, db *gorm.DB, imageList *entity.ImageList, userID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
+	if mock.FindByUserIDFunc == nil {
+		panic("ImageRepositoryMock.FindByUserIDFunc: method is nil but ImageRepository.FindByUserID was just called")
+	}
+	callInfo := struct {
+		Ctx             context.Context
+		Db              *gorm.DB
+		ImageList       *entity.ImageList
+		UserID          int64
+		CursorCreatedAt time.Time
+		CursorID        int64
+		Limit           int
+	}{
+		Ctx:             ctx,
+		Db:              db,
+		ImageList:       imageList,
+		UserID:          userID,
+		CursorCreatedAt: cursorCreatedAt,
+		CursorID:        cursorID,
+		Limit:           limit,
+	}
+	mock.lockFindByUserID.Lock()
+	mock.calls.FindByUserID = append(mock.calls.FindByUserID, callInfo)
+	mock.lockFindByUserID.Unlock()
+	return mock.FindByUserIDFunc(ctx, db, imageList, userID, cursorCreatedAt, cursorID, limit)
+}
+
+// FindByUserIDCalls gets all the calls that were made to FindByUserID.
+// Check the length with:
+//
+//	len(mockedImageRepository.FindByUserIDCalls())
+func (mock *ImageRepositoryMock) FindByUserIDCalls() []struct {
+	Ctx             context.Context
+	Db              *gorm.DB
+	ImageList       *entity.ImageList
+	UserID          int64
+	CursorCreatedAt time.Time
+	CursorID        int64
+	Limit           int
+} {
+	var calls []struct {
+		Ctx             context.Context
+		Db              *gorm.DB
+		ImageList       *entity.ImageList
+		UserID          int64
+		CursorCreatedAt time.Time
+		CursorID        int64
+		Limit           int
+	}
+	mock.lockFindByUserID.RLock()
+	calls = mock.calls.FindByUserID
+	mock.lockFindByUserID.RUnlock()
 	return calls
 }
 

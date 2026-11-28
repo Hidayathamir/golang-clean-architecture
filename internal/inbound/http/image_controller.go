@@ -195,6 +195,52 @@ func (c *ImageController) GetFeed(ctx *fiber.Ctx) error {
 	return response.Data(ctx, http.StatusOK, res)
 }
 
+// GetUserImages godoc
+//
+//	@Summary		Get user images
+//	@Description	Get a user's post grid, newest first (cursor paginated)
+//	@Tags			images
+//	@Produce		json
+//	@Param			id		path	int		true	"User ID"
+//	@Param			limit	query	int		false	"Page size (default 20, max 100)"
+//	@Param			cursor	query	string	false	"Opaque cursor from the previous page; empty for the first page"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[dto.UserImagesResponse]
+//	@Router			/api/users/{id}/images [get]
+func (c *ImageController) GetUserImages(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
+	userID, err := strconv.ParseInt(ctx.Params("id"), 10, 64)
+	if err != nil {
+		err = errkit.SetCode(err, http.StatusBadRequest)
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*ImageController).GetUserImages")
+	}
+
+	req := dto.UserImagesRequest{
+		UserID: userID,
+	}
+	if limitStr := ctx.Query("limit"); limitStr != "" {
+		limit, err := strconv.Atoi(limitStr)
+		if err != nil {
+			err = errkit.SetCode(err, http.StatusBadRequest)
+			logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+			return errkit.AddFuncName(err, "http.(*ImageController).GetUserImages")
+		}
+		req.Page.Limit = limit
+	}
+	req.Page.Cursor = ctx.Query("cursor")
+
+	res, err := c.Usecase.GetUserImages(ctx.UserContext(), req)
+	if err != nil {
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*ImageController).GetUserImages")
+	}
+
+	return response.Data(ctx, http.StatusOK, res)
+}
+
 // GetLike godoc
 //
 //	@Summary		Get image likes

@@ -412,6 +412,52 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/users/{id}/images": {
+            "get": {
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
+                ],
+                "description": "Get a user's post grid, newest first (cursor paginated)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "images"
+                ],
+                "summary": "Get user images",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page size (default 20, max 100)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Opaque cursor from the previous page; empty for the first page",
+                        "name": "cursor",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_UserImagesResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -596,6 +642,20 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_dto.UserImagesResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.ImageResponse"
+                    }
+                },
+                "next_cursor": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_Hidayathamir_golang-clean-architecture_internal_dto.UserLoginResponse": {
             "type": "object",
             "properties": {
@@ -718,6 +778,23 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.LikeResponse"
                     }
+                },
+                "error_detail": {
+                    "type": "string"
+                },
+                "error_message": {
+                    "type": "string"
+                },
+                "paging": {
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.PageMetadata"
+                }
+            }
+        },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_UserImagesResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.UserImagesResponse"
                 },
                 "error_detail": {
                     "type": "string"

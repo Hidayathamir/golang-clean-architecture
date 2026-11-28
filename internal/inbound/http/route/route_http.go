@@ -47,6 +47,7 @@ func setupAuthRoute(router fiber.Router, controllers *dependency_injection.Contr
 		users.Patch("/_current", controllers.UserController.Update)
 		users.Get("/_current", controllers.UserController.Current)
 		users.Post("/_follow", controllers.UserController.Follow)
+		users.Get("/:id/images", controllers.ImageController.GetUserImages)
 	}
 
 	images := router.Group("/images")

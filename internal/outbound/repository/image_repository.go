@@ -19,6 +19,7 @@ type ImageRepository interface {
 	Create(ctx context.Context, db *gorm.DB, image *entity.Image) error
 	FindByID(ctx context.Context, db *gorm.DB, image *entity.Image, id int64) error
 	FindFeedByFollowerID(ctx context.Context, db *gorm.DB, imageList *entity.ImageList, followerID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error
+	FindByUserID(ctx context.Context, db *gorm.DB, imageList *entity.ImageList, userID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error
 	IncrementCommentCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error
 	IncrementLikeCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error
 }
@@ -73,6 +74,25 @@ func (r *ImageRepositoryImpl) FindFeedByFollowerID(ctx context.Context, db *gorm
 	err := query.Find(imageList).Error
 	if err != nil {
 		return errkit.AddFuncName(err, "repository.(*ImageRepositoryImpl).FindFeedByFollowerID")
+	}
+	return nil
+}
+
+func (r *ImageRepositoryImpl) FindByUserID(ctx context.Context, db *gorm.DB, imageList *entity.ImageList, userID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
+	query := db.WithContext(ctx).
+		Where(column.UserID.Eq(userID)).
+		Order(column.CreatedAt.Desc()).
+		Order(column.ID.Desc()).
+		Limit(limit)
+
+	if cursorID > 0 {
+		whereKeyset, argCreatedAt, argID := column.KeysetBefore(cursorCreatedAt, cursorID)
+		query = query.Where(whereKeyset, argCreatedAt, argID)
+	}
+
+	err := query.Find(imageList).Error
+	if err != nil {
+		return errkit.AddFuncName(err, "repository.(*ImageRepositoryImpl).FindByUserID")
 	}
 	return nil
 }

@@ -71,6 +71,16 @@ type ImageResponseList []ImageResponse
 // FeedResponse is the feed page: images from followed users, newest first.
 type FeedResponse = CursorPage[ImageResponseList]
 
+// UserImagesRequest is the input for GET /api/users/:id/images. The target user
+// comes from the path; Page carries the cursor pagination input.
+type UserImagesRequest struct {
+	UserID int64
+	Page   PageRequest
+}
+
+// UserImagesResponse is the user's post grid page, newest first.
+type UserImagesResponse = CursorPage[ImageResponseList]
+
 type GetLikeRequest struct {
 	ImageID int64
 }
