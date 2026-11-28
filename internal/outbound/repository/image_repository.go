@@ -59,7 +59,8 @@ func (r *ImageRepositoryImpl) FindFeedByFollowerID(ctx context.Context, db *gorm
 	following := db.WithContext(ctx).
 		Table(table.Follow).
 		Select(column.FollowingID.Str()).
-		Where(column.FollowerID.Eq(followerID))
+		Where(column.FollowerID.Eq(followerID)).
+		Where(column.DeletedAt.IsNull())
 
 	whereIn, argsIn := column.UserID.InSubquery(following)
 	query := db.WithContext(ctx).

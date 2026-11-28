@@ -24,6 +24,11 @@ func (c Column) InSubquery(subquery any) (string, any) {
 	return string(c) + " IN (?)", subquery
 }
 
+// IsNull returns a "<column> IS NULL" predicate.
+func (c Column) IsNull() string {
+	return string(c) + " IS NULL"
+}
+
 // KeysetBefore returns the keyed-keyset predicate that positions a descending
 // (created_at, id) ordered query strictly before the given cursor values.
 func KeysetBefore(cursorCreatedAt any, cursorID any) (string, any, any) {

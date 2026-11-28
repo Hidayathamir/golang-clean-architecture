@@ -18,7 +18,10 @@ func idempotencyKey(record *kgo.Record) string {
 	return ""
 }
 
-func IdempotencyHandlerSingle(usecase idempotencyusecase.IdempotencyUsecase, handler ConsumerHandlerSingle) ConsumerHandlerSingle {
+// IdempotencyHandlerSingle de-duplicates per consumer group: the same event is
+// legitimately processed by several groups on one topic, so a group-shared key
+// would make every later group skip it.
+func IdempotencyHandlerSingle(usecase idempotencyusecase.IdempotencyUsecase, consumerGroup string, handler ConsumerHandlerSingle) ConsumerHandlerSingle {
 	return func(ctx context.Context, record *kgo.Record) error {
 		key := idempotencyKey(record)
 		if key == "" {
@@ -26,7 +29,7 @@ func IdempotencyHandlerSingle(usecase idempotencyusecase.IdempotencyUsecase, han
 			return handler(ctx, record)
 		}
 
-		isNew, err := usecase.InsertIfNotExists(ctx, key, record.Topic, record.Partition, record.Offset)
+		isNew, err := usecase.InsertIfNotExists(ctx, key, consumerGroup, record.Topic, record.Partition, record.Offset)
 		if err != nil {
 			logkit.Logger.WithContext(ctx).WithError(err).Error("idempotency check failed, processing without idempotency")
 			return handler(ctx, record)
@@ -46,7 +49,7 @@ func IdempotencyHandlerSingle(usecase idempotencyusecase.IdempotencyUsecase, han
 	}
 }
 
-func IdempotencyHandlerBatch(usecase idempotencyusecase.IdempotencyUsecase, handler ConsumerHandlerBatch) ConsumerHandlerBatch {
+func IdempotencyHandlerBatch(usecase idempotencyusecase.IdempotencyUsecase, consumerGroup string, handler ConsumerHandlerBatch) ConsumerHandlerBatch {
 	return func(ctx context.Context, records []*kgo.Record) error {
 		filtered := make([]*kgo.Record, 0, len(records))
 		for _, record := range records {
@@ -57,7 +60,7 @@ func IdempotencyHandlerBatch(usecase idempotencyusecase.IdempotencyUsecase, hand
 				continue
 			}
 
-			isNew, err := usecase.InsertIfNotExists(ctx, key, record.Topic, record.Partition, record.Offset)
+			isNew, err := usecase.InsertIfNotExists(ctx, key, consumerGroup, record.Topic, record.Partition, record.Offset)
 			if err != nil {
 				logkit.Logger.WithContext(ctx).WithError(err).Error("idempotency check failed, including record without idempotency")
 				filtered = append(filtered, record)

@@ -2,6 +2,7 @@ package messaging
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
@@ -9,7 +10,6 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/telemetry"
-	"github.com/google/uuid"
 	"github.com/twmb/franz-go/pkg/kgo"
 	"gorm.io/gorm"
 )
@@ -63,7 +63,9 @@ func (p *OutboxProducerImpl) ProducePending(ctx context.Context) error {
 		var producedIDs []int64
 		for _, outbox := range outboxes {
 			recordCtx := telemetry.ExtractTraceContext(ctx, outbox.TraceContext)
-			idempotencyKey := uuid.New().String()
+			// Stable per outbox row (not per produce attempt): a re-publish after a
+			// crash must carry the same key, or the consumer would process it twice.
+			idempotencyKey := strconv.FormatInt(outbox.ID, 10)
 			record := &kgo.Record{
 				Topic: outbox.Topic,
 				Value: outbox.Payload,

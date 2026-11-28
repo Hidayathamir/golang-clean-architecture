@@ -14,7 +14,7 @@ import (
 //go:generate moq -out=../../mock/MockRepositoryIdempotency.go -pkg=mock . IdempotencyRepository
 
 type IdempotencyRepository interface {
-	InsertIfNotExists(ctx context.Context, db *gorm.DB, key, topic string, partition int32, offset int64) (bool, error)
+	InsertIfNotExists(ctx context.Context, db *gorm.DB, key, consumerGroup, topic string, partition int32, offset int64) (bool, error)
 	DeleteOlderThan(ctx context.Context, db *gorm.DB, age time.Duration) (int64, error)
 }
 
@@ -30,9 +30,10 @@ func NewIdempotencyRepository(cfg *config.Config) *IdempotencyRepositoryImpl {
 	}
 }
 
-func (r *IdempotencyRepositoryImpl) InsertIfNotExists(ctx context.Context, db *gorm.DB, key, topic string, partition int32, offset int64) (bool, error) {
+func (r *IdempotencyRepositoryImpl) InsertIfNotExists(ctx context.Context, db *gorm.DB, key, consumerGroup, topic string, partition int32, offset int64) (bool, error) {
 	record := entity.MessageIdempotency{
 		IdempotencyKey: key,
+		ConsumerGroup:  consumerGroup,
 		Topic:          topic,
 		Partition:      partition,
 		RecordOffset:   offset,

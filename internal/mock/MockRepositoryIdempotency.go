@@ -24,7 +24,7 @@ var _ repository.IdempotencyRepository = &IdempotencyRepositoryMock{}
 //			DeleteOlderThanFunc: func(ctx context.Context, db *gorm.DB, age time.Duration) (int64, error) {
 //				panic("mock out the DeleteOlderThan method")
 //			},
-//			InsertIfNotExistsFunc: func(ctx context.Context, db *gorm.DB, key string, topic string, partition int32, offset int64) (bool, error) {
+//			InsertIfNotExistsFunc: func(ctx context.Context, db *gorm.DB, key string, consumerGroup string, topic string, partition int32, offset int64) (bool, error) {
 //				panic("mock out the InsertIfNotExists method")
 //			},
 //		}
@@ -38,7 +38,7 @@ type IdempotencyRepositoryMock struct {
 	DeleteOlderThanFunc func(ctx context.Context, db *gorm.DB, age time.Duration) (int64, error)
 
 	// InsertIfNotExistsFunc mocks the InsertIfNotExists method.
-	InsertIfNotExistsFunc func(ctx context.Context, db *gorm.DB, key string, topic string, partition int32, offset int64) (bool, error)
+	InsertIfNotExistsFunc func(ctx context.Context, db *gorm.DB, key string, consumerGroup string, topic string, partition int32, offset int64) (bool, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -59,6 +59,8 @@ type IdempotencyRepositoryMock struct {
 			Db *gorm.DB
 			// Key is the key argument value.
 			Key string
+			// ConsumerGroup is the consumerGroup argument value.
+			ConsumerGroup string
 			// Topic is the topic argument value.
 			Topic string
 			// Partition is the partition argument value.
@@ -112,29 +114,31 @@ func (mock *IdempotencyRepositoryMock) DeleteOlderThanCalls() []struct {
 }
 
 // InsertIfNotExists calls InsertIfNotExistsFunc.
-func (mock *IdempotencyRepositoryMock) InsertIfNotExists(ctx context.Context, db *gorm.DB, key string, topic string, partition int32, offset int64) (bool, error) {
+func (mock *IdempotencyRepositoryMock) InsertIfNotExists(ctx context.Context, db *gorm.DB, key string, consumerGroup string, topic string, partition int32, offset int64) (bool, error) {
 	if mock.InsertIfNotExistsFunc == nil {
 		panic("IdempotencyRepositoryMock.InsertIfNotExistsFunc: method is nil but IdempotencyRepository.InsertIfNotExists was just called")
 	}
 	callInfo := struct {
-		Ctx       context.Context
-		Db        *gorm.DB
-		Key       string
-		Topic     string
-		Partition int32
-		Offset    int64
+		Ctx           context.Context
+		Db            *gorm.DB
+		Key           string
+		ConsumerGroup string
+		Topic         string
+		Partition     int32
+		Offset        int64
 	}{
-		Ctx:       ctx,
-		Db:        db,
-		Key:       key,
-		Topic:     topic,
-		Partition: partition,
-		Offset:    offset,
+		Ctx:           ctx,
+		Db:            db,
+		Key:           key,
+		ConsumerGroup: consumerGroup,
+		Topic:         topic,
+		Partition:     partition,
+		Offset:        offset,
 	}
 	mock.lockInsertIfNotExists.Lock()
 	mock.calls.InsertIfNotExists = append(mock.calls.InsertIfNotExists, callInfo)
 	mock.lockInsertIfNotExists.Unlock()
-	return mock.InsertIfNotExistsFunc(ctx, db, key, topic, partition, offset)
+	return mock.InsertIfNotExistsFunc(ctx, db, key, consumerGroup, topic, partition, offset)
 }
 
 // InsertIfNotExistsCalls gets all the calls that were made to InsertIfNotExists.
@@ -142,20 +146,22 @@ func (mock *IdempotencyRepositoryMock) InsertIfNotExists(ctx context.Context, db
 //
 //	len(mockedIdempotencyRepository.InsertIfNotExistsCalls())
 func (mock *IdempotencyRepositoryMock) InsertIfNotExistsCalls() []struct {
-	Ctx       context.Context
-	Db        *gorm.DB
-	Key       string
-	Topic     string
-	Partition int32
-	Offset    int64
+	Ctx           context.Context
+	Db            *gorm.DB
+	Key           string
+	ConsumerGroup string
+	Topic         string
+	Partition     int32
+	Offset        int64
 } {
 	var calls []struct {
-		Ctx       context.Context
-		Db        *gorm.DB
-		Key       string
-		Topic     string
-		Partition int32
-		Offset    int64
+		Ctx           context.Context
+		Db            *gorm.DB
+		Key           string
+		ConsumerGroup string
+		Topic         string
+		Partition     int32
+		Offset        int64
 	}
 	mock.lockInsertIfNotExists.RLock()
 	calls = mock.calls.InsertIfNotExists

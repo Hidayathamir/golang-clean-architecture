@@ -12,7 +12,7 @@ import (
 //go:generate moq -out=../../mock/MockUsecaseIdempotency.go -pkg=mock . IdempotencyUsecase
 
 type IdempotencyUsecase interface {
-	InsertIfNotExists(ctx context.Context, key, topic string, partition int32, offset int64) (bool, error)
+	InsertIfNotExists(ctx context.Context, key, consumerGroup, topic string, partition int32, offset int64) (bool, error)
 	DeleteOlderThan(ctx context.Context, age time.Duration) (int64, error)
 }
 

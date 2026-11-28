@@ -21,15 +21,16 @@ func NewIdempotencyUsecaseMwLogger(next IdempotencyUsecase) *IdempotencyUsecaseM
 	}
 }
 
-func (u *IdempotencyUsecaseMwLogger) InsertIfNotExists(ctx context.Context, key, topic string, partition int32, offset int64) (bool, error) {
+func (u *IdempotencyUsecaseMwLogger) InsertIfNotExists(ctx context.Context, key, consumerGroup, topic string, partition int32, offset int64) (bool, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	isNew, err := u.Next.InsertIfNotExists(ctx, key, topic, partition, offset)
+	isNew, err := u.Next.InsertIfNotExists(ctx, key, consumerGroup, topic, partition, offset)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"idempotency_key": key,
+		"consumer_group":  consumerGroup,
 		"topic":           topic,
 		"partition":       partition,
 		"record_offset":   offset,

@@ -23,7 +23,7 @@ var _ idempotencyusecase.IdempotencyUsecase = &IdempotencyUsecaseMock{}
 //			DeleteOlderThanFunc: func(ctx context.Context, age time.Duration) (int64, error) {
 //				panic("mock out the DeleteOlderThan method")
 //			},
-//			InsertIfNotExistsFunc: func(ctx context.Context, key string, topic string, partition int32, offset int64) (bool, error) {
+//			InsertIfNotExistsFunc: func(ctx context.Context, key string, consumerGroup string, topic string, partition int32, offset int64) (bool, error) {
 //				panic("mock out the InsertIfNotExists method")
 //			},
 //		}
@@ -37,7 +37,7 @@ type IdempotencyUsecaseMock struct {
 	DeleteOlderThanFunc func(ctx context.Context, age time.Duration) (int64, error)
 
 	// InsertIfNotExistsFunc mocks the InsertIfNotExists method.
-	InsertIfNotExistsFunc func(ctx context.Context, key string, topic string, partition int32, offset int64) (bool, error)
+	InsertIfNotExistsFunc func(ctx context.Context, key string, consumerGroup string, topic string, partition int32, offset int64) (bool, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -54,6 +54,8 @@ type IdempotencyUsecaseMock struct {
 			Ctx context.Context
 			// Key is the key argument value.
 			Key string
+			// ConsumerGroup is the consumerGroup argument value.
+			ConsumerGroup string
 			// Topic is the topic argument value.
 			Topic string
 			// Partition is the partition argument value.
@@ -103,27 +105,29 @@ func (mock *IdempotencyUsecaseMock) DeleteOlderThanCalls() []struct {
 }
 
 // InsertIfNotExists calls InsertIfNotExistsFunc.
-func (mock *IdempotencyUsecaseMock) InsertIfNotExists(ctx context.Context, key string, topic string, partition int32, offset int64) (bool, error) {
+func (mock *IdempotencyUsecaseMock) InsertIfNotExists(ctx context.Context, key string, consumerGroup string, topic string, partition int32, offset int64) (bool, error) {
 	if mock.InsertIfNotExistsFunc == nil {
 		panic("IdempotencyUsecaseMock.InsertIfNotExistsFunc: method is nil but IdempotencyUsecase.InsertIfNotExists was just called")
 	}
 	callInfo := struct {
-		Ctx       context.Context
-		Key       string
-		Topic     string
-		Partition int32
-		Offset    int64
+		Ctx           context.Context
+		Key           string
+		ConsumerGroup string
+		Topic         string
+		Partition     int32
+		Offset        int64
 	}{
-		Ctx:       ctx,
-		Key:       key,
-		Topic:     topic,
-		Partition: partition,
-		Offset:    offset,
+		Ctx:           ctx,
+		Key:           key,
+		ConsumerGroup: consumerGroup,
+		Topic:         topic,
+		Partition:     partition,
+		Offset:        offset,
 	}
 	mock.lockInsertIfNotExists.Lock()
 	mock.calls.InsertIfNotExists = append(mock.calls.InsertIfNotExists, callInfo)
 	mock.lockInsertIfNotExists.Unlock()
-	return mock.InsertIfNotExistsFunc(ctx, key, topic, partition, offset)
+	return mock.InsertIfNotExistsFunc(ctx, key, consumerGroup, topic, partition, offset)
 }
 
 // InsertIfNotExistsCalls gets all the calls that were made to InsertIfNotExists.
@@ -131,18 +135,20 @@ func (mock *IdempotencyUsecaseMock) InsertIfNotExists(ctx context.Context, key s
 //
 //	len(mockedIdempotencyUsecase.InsertIfNotExistsCalls())
 func (mock *IdempotencyUsecaseMock) InsertIfNotExistsCalls() []struct {
-	Ctx       context.Context
-	Key       string
-	Topic     string
-	Partition int32
-	Offset    int64
+	Ctx           context.Context
+	Key           string
+	ConsumerGroup string
+	Topic         string
+	Partition     int32
+	Offset        int64
 } {
 	var calls []struct {
-		Ctx       context.Context
-		Key       string
-		Topic     string
-		Partition int32
-		Offset    int64
+		Ctx           context.Context
+		Key           string
+		ConsumerGroup string
+		Topic         string
+		Partition     int32
+		Offset        int64
 	}
 	mock.lockInsertIfNotExists.RLock()
 	calls = mock.calls.InsertIfNotExists

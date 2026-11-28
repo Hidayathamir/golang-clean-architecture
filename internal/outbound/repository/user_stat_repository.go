@@ -43,12 +43,7 @@ func (r *UserStatRepositoryImpl) FindByUserID(ctx context.Context, db *gorm.DB, 
 }
 
 func (r *UserStatRepositoryImpl) IncrementFollowerCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error {
-	err := db.WithContext(ctx).
-		Table(table.UserStat).
-		Where(column.UserID.Eq(id)).
-		Updates(map[string]any{
-			column.FollowerCount.Str(): gorm.Expr(column.FollowerCount.Plus(count)),
-		}).Error
+	err := r.upsert(ctx, db, id, count, 0)
 	if err != nil {
 		return errkit.AddFuncName(err, "repository.(*UserStatRepositoryImpl).IncrementFollowerCountByID")
 	}
@@ -56,12 +51,7 @@ func (r *UserStatRepositoryImpl) IncrementFollowerCountByID(ctx context.Context,
 }
 
 func (r *UserStatRepositoryImpl) IncrementFollowingCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error {
-	err := db.WithContext(ctx).
-		Table(table.UserStat).
-		Where(column.UserID.Eq(id)).
-		Updates(map[string]any{
-			column.FollowingCount.Str(): gorm.Expr(column.FollowingCount.Plus(count)),
-		}).Error
+	err := r.upsert(ctx, db, id, 0, count)
 	if err != nil {
 		return errkit.AddFuncName(err, "repository.(*UserStatRepositoryImpl).IncrementFollowingCountByID")
 	}
@@ -69,15 +59,29 @@ func (r *UserStatRepositoryImpl) IncrementFollowingCountByID(ctx context.Context
 }
 
 func (r *UserStatRepositoryImpl) IncrementFollowerCountAndFollowingCountByID(ctx context.Context, db *gorm.DB, id int64, followerCount int, followingCount int) error {
-	err := db.WithContext(ctx).
-		Table(table.UserStat).
-		Where(column.UserID.Eq(id)).
-		Updates(map[string]any{
-			column.FollowerCount.Str():  gorm.Expr(column.FollowerCount.Plus(followerCount)),
-			column.FollowingCount.Str(): gorm.Expr(column.FollowingCount.Plus(followingCount)),
-		}).Error
+	err := r.upsert(ctx, db, id, followerCount, followingCount)
 	if err != nil {
 		return errkit.AddFuncName(err, "repository.(*UserStatRepositoryImpl).IncrementFollowerCountAndFollowingCountByID")
+	}
+	return nil
+}
+
+// upsert applies a follower/following count delta, creating the row on first
+// activity. user_stats rows are not seeded at registration, so an update-only
+// increment would silently affect zero rows.
+func (r *UserStatRepositoryImpl) upsert(ctx context.Context, db *gorm.DB, id int64, followerCount int, followingCount int) error {
+	err := db.WithContext(ctx).
+		Exec(
+			`INSERT INTO `+table.UserStat+` (`+column.UserID.Str()+`, `+column.FollowerCount.Str()+`, `+column.FollowingCount.Str()+`)
+			 VALUES (?, ?, ?)
+			 ON CONFLICT (`+column.UserID.Str()+`) DO UPDATE SET
+			   `+column.FollowerCount.Str()+` = `+table.UserStat+`.`+column.FollowerCount.Str()+` + EXCLUDED.`+column.FollowerCount.Str()+`,
+			   `+column.FollowingCount.Str()+` = `+table.UserStat+`.`+column.FollowingCount.Str()+` + EXCLUDED.`+column.FollowingCount.Str()+`,
+			   `+column.UpdatedAt.Str()+` = now()`,
+			id, followerCount, followingCount,
+		).Error
+	if err != nil {
+		return errkit.AddFuncName(err, "repository.(*UserStatRepositoryImpl).upsert")
 	}
 	return nil
 }

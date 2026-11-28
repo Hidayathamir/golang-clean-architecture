@@ -23,20 +23,21 @@ func NewIdempotencyRepositoryMwLogger(next IdempotencyRepository) *IdempotencyRe
 	}
 }
 
-func (r *IdempotencyRepositoryMwLogger) InsertIfNotExists(ctx context.Context, db *gorm.DB, key, topic string, partition int32, offset int64) (bool, error) {
+func (r *IdempotencyRepositoryMwLogger) InsertIfNotExists(ctx context.Context, db *gorm.DB, key, consumerGroup, topic string, partition int32, offset int64) (bool, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
 	var isNew bool
 	err := retrykit.DBRetry(ctx, func() error {
 		var innerErr error
-		isNew, innerErr = r.Next.InsertIfNotExists(ctx, db, key, topic, partition, offset)
+		isNew, innerErr = r.Next.InsertIfNotExists(ctx, db, key, consumerGroup, topic, partition, offset)
 		return innerErr
 	})
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{
 		"idempotency_key": key,
+		"consumer_group":  consumerGroup,
 		"topic":           topic,
 		"partition":       partition,
 		"record_offset":   offset,

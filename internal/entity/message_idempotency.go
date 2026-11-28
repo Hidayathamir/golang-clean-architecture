@@ -8,6 +8,7 @@ import (
 
 type MessageIdempotency struct {
 	IdempotencyKey string    `gorm:"column:idempotency_key;primaryKey"`
+	ConsumerGroup  string    `gorm:"column:consumer_group;primaryKey"`
 	Topic          string    `gorm:"column:topic"`
 	Partition      int32     `gorm:"column:partition"`
 	RecordOffset   int64     `gorm:"column:record_offset"`
