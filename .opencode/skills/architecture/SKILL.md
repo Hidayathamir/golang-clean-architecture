@@ -87,6 +87,15 @@ Enforced by `make check-rules` (`scripts/checkrules`) in the pre-commit hook: Go
 
 Errors are tagged centrally via `pkg/errkit`: they carry the HTTP status, a client-facing message, and the call site that produced them. The HTTP layer reads it back with `errkit.GetHTTPError` (see `internal/inbound/http/response`). Non-retryable Kafka errors are marked with `errkit.WrapNonRetryable`.
 
+### Error wrapping (enforced)
+
+Every handled error returned from an impl file in `internal/outbound/*`, `internal/usecase`, or `internal/inbound` must be wrapped with `errkit.AddFuncName(err, "<call site>")`.
+
+- Bare propagation of an `err` identifier is allowed (e.g. the outer `return err` after a `DB.Transaction` closure, whose body already wrapped).
+- Decorators (`_mw_logger.go`) and tests are exempt.
+
+Enforced by `make check-rules` (`checkErrorWrapping`).
+
 ## Diagrams
 
 `docs/architecture.mermaid` is the source; `docs/architecture.png` is generated (used by README).

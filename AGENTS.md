@@ -85,6 +85,14 @@ Repository implementations (`internal/outbound/repository/`) must never hardcode
 
 **Enforced** via `make check-rules` (`scripts/checkrules`): any string literal equal to a known table/column name in a repository impl fails. Decorators (`_mw_logger.go`) and tests are exempt.
 
+## Error wrapping — `errkit.AddFuncName`
+
+A handled error must be wrapped with `errkit.AddFuncName(err, "<call site>")` before it is returned, in the impl files of every layer: `internal/outbound/*`, `internal/usecase`, `internal/inbound`.
+
+Bare propagation of an `err` identifier (e.g. the outer `return err` after a `DB.Transaction` closure whose body already wrapped) is exempt. Decorators (`_mw_logger.go`) and tests are exempt — decorators record the error instead of wrapping it.
+
+**Enforced** via `make check-rules` (`scripts/checkrules`): a return inside an `if err != nil` guard that returns an unwrapped error value fails.
+
 ## Error handling — tagged via `pkg/errkit`
 
 Errors carry their HTTP status, a client-facing message, and the call site that produced them, all handled centrally by `pkg/errkit`. Non-retryable errors for Kafka are marked with `errkit.WrapNonRetryable` / read back with `errkit.IsNonRetryable` (see the `kafka-error-handling` skill → "Error Classification"). Details live in the `architecture` skill → "Error handling".

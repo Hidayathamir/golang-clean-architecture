@@ -26,6 +26,11 @@
 //     string literals for table or column names; use pkg/constant/table and
 //     pkg/constant/column instead. Decorators (_mw_logger.go) are exempt because
 //     their literals are log field keys, and tests (_test.go) are exempt.
+//   - Error wrapping: error-returning methods in the impl files of every layer
+//     (outbound/*, usecase, inbound) must wrap a handled error with
+//     errkit.AddFuncName before returning it. Bare propagation of an err
+//     identifier (e.g. the outer return of a DB.Transaction closure, whose inner
+//     body already wrapped) is exempt. Decorators and tests are exempt.
 //
 // Run with `make check-rules`. Exits non-zero on any violation.
 package main
@@ -66,6 +71,7 @@ func main() {
 	violations = append(violations, checkInboundSpans()...)
 	violations = append(violations, checkConsumerIdempotency()...)
 	violations = append(violations, checkRepositoryTableColumnLiterals()...)
+	violations = append(violations, checkErrorWrapping()...)
 
 	if len(violations) > 0 {
 		fmt.Fprintln(os.Stderr, "❌ check-rules failed:")
@@ -694,4 +700,154 @@ func constantStringValues(path string) []string {
 		return true
 	})
 	return out
+}
+
+// errorWrappingRoots are the layers whose impl files must wrap handled errors.
+var errorWrappingRoots = []string{
+	"internal/outbound/repository",
+	"internal/outbound/cache",
+	"internal/outbound/messaging",
+	"internal/outbound/search",
+	"internal/outbound/storage",
+	"internal/usecase",
+	"internal/inbound",
+}
+
+// checkErrorWrapping fails when a handled error is returned without
+// errkit.AddFuncName. Decorators and tests are skipped; bare propagation of an
+// err identifier is allowed because the originating body already wrapped it.
+func checkErrorWrapping() []string {
+	var violations []string
+	for _, root := range errorWrappingRoots {
+		err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			if d.IsDir() || !strings.HasSuffix(path, ".go") {
+				return nil
+			}
+			if strings.HasSuffix(path, "_mw_logger.go") || strings.HasSuffix(path, "_test.go") {
+				return nil
+			}
+
+			fset := token.NewFileSet()
+			file, perr := parser.ParseFile(fset, path, nil, 0)
+			if perr != nil {
+				violations = append(violations, fmt.Sprintf("parse %s: %v", path, perr))
+				return nil
+			}
+			violations = append(violations, unwrappedErrorReturns(fset, path, file)...)
+			return nil
+		})
+		if err != nil {
+			violations = append(violations, fmt.Sprintf("walk %s: %v", root, err))
+		}
+	}
+	return violations
+}
+
+// unwrappedErrorReturns reports every return inside an `if err != nil` guard
+// that returns an unwrapped error value. A return of a bare err identifier is
+// treated as propagation and allowed.
+func unwrappedErrorReturns(fset *token.FileSet, path string, file *ast.File) []string {
+	var violations []string
+
+	ast.Inspect(file, func(n ast.Node) bool {
+		ifStmt, ok := n.(*ast.IfStmt)
+		if !ok || !guardsOnErrNil(ifStmt.Cond) {
+			return true
+		}
+
+		ast.Inspect(ifStmt.Body, func(in ast.Node) bool {
+			ret, ok := in.(*ast.ReturnStmt)
+			if !ok || len(ret.Results) == 0 {
+				return true
+			}
+			if returnIsWrapped(ret) || returnIsBarePropagation(ret) || returnDoesNotReferenceErr(ret) {
+				return true
+			}
+			violations = append(violations,
+				fmt.Sprintf("%s:%d error return without errkit.AddFuncName",
+					path, fset.Position(ret.Pos()).Line))
+			return true
+		})
+		return true
+	})
+	return violations
+}
+
+// guardsOnErrNil reports whether a condition is `<x> err != nil` or
+// `err := <call>; err != nil`.
+func guardsOnErrNil(cond ast.Expr) bool {
+	bin, ok := cond.(*ast.BinaryExpr)
+	if !ok || bin.Op != token.NEQ {
+		return false
+	}
+	left, ok := bin.X.(*ast.Ident)
+	if !ok || left.Name != "err" {
+		return false
+	}
+	right, ok := bin.Y.(*ast.Ident)
+	return ok && right.Name == "nil"
+}
+
+// returnIsWrapped reports whether any returned expression calls AddFuncName.
+func returnIsWrapped(ret *ast.ReturnStmt) bool {
+	wrapped := false
+	for _, res := range ret.Results {
+		ast.Inspect(res, func(n ast.Node) bool {
+			if call, ok := n.(*ast.CallExpr); ok && calleeName(call.Fun) == "AddFuncName" {
+				wrapped = true
+			}
+			return true
+		})
+	}
+	return wrapped
+}
+
+// returnIsBarePropagation reports whether every result is either the err
+// identifier or a zero-value literal (nil, {}, ""), i.e. the propagation of an
+// already-wrapped error alongside zero values.
+func returnIsBarePropagation(ret *ast.ReturnStmt) bool {
+	sawErr := false
+	for _, res := range ret.Results {
+		if isZeroValueExpr(res) {
+			continue
+		}
+		id, ok := res.(*ast.Ident)
+		if !ok || id.Name != "err" {
+			return false
+		}
+		sawErr = true
+	}
+	return sawErr
+}
+
+// returnDoesNotReferenceErr reports whether no result mentions the err
+// identifier, meaning the return is not propagating a handled error at all
+// (e.g. a fail-open wrapper returning handler(...)).
+func returnDoesNotReferenceErr(ret *ast.ReturnStmt) bool {
+	sawErr := false
+	for _, res := range ret.Results {
+		ast.Inspect(res, func(n ast.Node) bool {
+			if id, ok := n.(*ast.Ident); ok && id.Name == "err" {
+				sawErr = true
+			}
+			return true
+		})
+	}
+	return !sawErr
+}
+
+// isZeroValueExpr reports whether an expression is a nil literal or a composite
+// literal with no elements (e.g. dto.ImageResponse{}), used as a placeholder
+// alongside a propagated error.
+func isZeroValueExpr(expr ast.Expr) bool {
+	switch e := expr.(type) {
+	case *ast.Ident:
+		return e.Name == "nil"
+	case *ast.CompositeLit:
+		return len(e.Elts) == 0
+	}
+	return false
 }
