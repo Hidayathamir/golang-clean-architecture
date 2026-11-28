@@ -183,8 +183,9 @@ func ConsumeEventBatch(ctx context.Context, cfg *config.Config, producer *kgo.Cl
 			})
 			if err != nil {
 				localLogger.WithError(err).Error("handler got error processing message")
-				// TODO: improve by knowing which individual record failed in the batch,
-				//       so only failed records go to retry
+				// The batch handler reports one error for the whole batch, so every
+				// record goes to retry; the idempotency check skips the ones that
+				// already succeeded, so only wasted Kafka traffic, never double-apply.
 				for _, record := range records {
 					produceToRetry(ctx, producer, _topic, record, 1)
 				}

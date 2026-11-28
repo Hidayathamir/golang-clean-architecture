@@ -108,7 +108,7 @@ flowchart TD
     J -->|Yes| K[Stop consumer, close client]
 ```
 
-> **Note**: Batch consumers currently send *all* records in the batch to retry even if only one failed. A TODO in the code acknowledges this should be per-record granularity.
+> **Note**: Batch consumers send *all* records in the batch to retry even if only one failed. The idempotency check skips records that already succeeded, so this costs wasted Kafka traffic but never double-applies a record.
 
 ### Retry Consumer (`ConsumeEventRetry`)
 
