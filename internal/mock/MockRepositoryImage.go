@@ -9,6 +9,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/repository"
 	"gorm.io/gorm"
 	"sync"
+	"time"
 )
 
 // Ensure, that ImageRepositoryMock does implement repository.ImageRepository.
@@ -26,6 +27,9 @@ var _ repository.ImageRepository = &ImageRepositoryMock{}
 //			},
 //			FindByIDFunc: func(ctx context.Context, db *gorm.DB, image *entity.Image, id int64) error {
 //				panic("mock out the FindByID method")
+//			},
+//			FindFeedByFollowerIDFunc: func(ctx context.Context, db *gorm.DB, imageList *entity.ImageList, followerID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
+//				panic("mock out the FindFeedByFollowerID method")
 //			},
 //			IncrementCommentCountByIDFunc: func(ctx context.Context, db *gorm.DB, id int64, count int) error {
 //				panic("mock out the IncrementCommentCountByID method")
@@ -45,6 +49,9 @@ type ImageRepositoryMock struct {
 
 	// FindByIDFunc mocks the FindByID method.
 	FindByIDFunc func(ctx context.Context, db *gorm.DB, image *entity.Image, id int64) error
+
+	// FindFeedByFollowerIDFunc mocks the FindFeedByFollowerID method.
+	FindFeedByFollowerIDFunc func(ctx context.Context, db *gorm.DB, imageList *entity.ImageList, followerID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error
 
 	// IncrementCommentCountByIDFunc mocks the IncrementCommentCountByID method.
 	IncrementCommentCountByIDFunc func(ctx context.Context, db *gorm.DB, id int64, count int) error
@@ -74,6 +81,23 @@ type ImageRepositoryMock struct {
 			// ID is the id argument value.
 			ID int64
 		}
+		// FindFeedByFollowerID holds details about calls to the FindFeedByFollowerID method.
+		FindFeedByFollowerID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
+			// ImageList is the imageList argument value.
+			ImageList *entity.ImageList
+			// FollowerID is the followerID argument value.
+			FollowerID int64
+			// CursorCreatedAt is the cursorCreatedAt argument value.
+			CursorCreatedAt time.Time
+			// CursorID is the cursorID argument value.
+			CursorID int64
+			// Limit is the limit argument value.
+			Limit int
+		}
 		// IncrementCommentCountByID holds details about calls to the IncrementCommentCountByID method.
 		IncrementCommentCountByID []struct {
 			// Ctx is the ctx argument value.
@@ -99,6 +123,7 @@ type ImageRepositoryMock struct {
 	}
 	lockCreate                    sync.RWMutex
 	lockFindByID                  sync.RWMutex
+	lockFindFeedByFollowerID      sync.RWMutex
 	lockIncrementCommentCountByID sync.RWMutex
 	lockIncrementLikeCountByID    sync.RWMutex
 }
@@ -184,6 +209,62 @@ func (mock *ImageRepositoryMock) FindByIDCalls() []struct {
 	mock.lockFindByID.RLock()
 	calls = mock.calls.FindByID
 	mock.lockFindByID.RUnlock()
+	return calls
+}
+
+// FindFeedByFollowerID calls FindFeedByFollowerIDFunc.
+func (mock *ImageRepositoryMock) FindFeedByFollowerID(ctx context.Context, db *gorm.DB, imageList *entity.ImageList, followerID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
+	if mock.FindFeedByFollowerIDFunc == nil {
+		panic("ImageRepositoryMock.FindFeedByFollowerIDFunc: method is nil but ImageRepository.FindFeedByFollowerID was just called")
+	}
+	callInfo := struct {
+		Ctx             context.Context
+		Db              *gorm.DB
+		ImageList       *entity.ImageList
+		FollowerID      int64
+		CursorCreatedAt time.Time
+		CursorID        int64
+		Limit           int
+	}{
+		Ctx:             ctx,
+		Db:              db,
+		ImageList:       imageList,
+		FollowerID:      followerID,
+		CursorCreatedAt: cursorCreatedAt,
+		CursorID:        cursorID,
+		Limit:           limit,
+	}
+	mock.lockFindFeedByFollowerID.Lock()
+	mock.calls.FindFeedByFollowerID = append(mock.calls.FindFeedByFollowerID, callInfo)
+	mock.lockFindFeedByFollowerID.Unlock()
+	return mock.FindFeedByFollowerIDFunc(ctx, db, imageList, followerID, cursorCreatedAt, cursorID, limit)
+}
+
+// FindFeedByFollowerIDCalls gets all the calls that were made to FindFeedByFollowerID.
+// Check the length with:
+//
+//	len(mockedImageRepository.FindFeedByFollowerIDCalls())
+func (mock *ImageRepositoryMock) FindFeedByFollowerIDCalls() []struct {
+	Ctx             context.Context
+	Db              *gorm.DB
+	ImageList       *entity.ImageList
+	FollowerID      int64
+	CursorCreatedAt time.Time
+	CursorID        int64
+	Limit           int
+} {
+	var calls []struct {
+		Ctx             context.Context
+		Db              *gorm.DB
+		ImageList       *entity.ImageList
+		FollowerID      int64
+		CursorCreatedAt time.Time
+		CursorID        int64
+		Limit           int
+	}
+	mock.lockFindFeedByFollowerID.RLock()
+	calls = mock.calls.FindFeedByFollowerID
+	mock.lockFindFeedByFollowerID.RUnlock()
 	return calls
 }
 

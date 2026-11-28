@@ -32,6 +32,9 @@ var _ imageusecase.ImageUsecase = &ImageUsecaseMock{}
 //			GetCommentFunc: func(ctx context.Context, req dto.GetCommentRequest) (dto.CommentResponseList, error) {
 //				panic("mock out the GetComment method")
 //			},
+//			GetFeedFunc: func(ctx context.Context, req dto.FeedRequest) (dto.FeedResponse, error) {
+//				panic("mock out the GetFeed method")
+//			},
 //			GetImageFunc: func(ctx context.Context, req dto.GetImageRequest) (dto.ImageResponse, error) {
 //				panic("mock out the GetImage method")
 //			},
@@ -74,6 +77,9 @@ type ImageUsecaseMock struct {
 
 	// GetCommentFunc mocks the GetComment method.
 	GetCommentFunc func(ctx context.Context, req dto.GetCommentRequest) (dto.CommentResponseList, error)
+
+	// GetFeedFunc mocks the GetFeed method.
+	GetFeedFunc func(ctx context.Context, req dto.FeedRequest) (dto.FeedResponse, error)
 
 	// GetImageFunc mocks the GetImage method.
 	GetImageFunc func(ctx context.Context, req dto.GetImageRequest) (dto.ImageResponse, error)
@@ -128,6 +134,13 @@ type ImageUsecaseMock struct {
 			Ctx context.Context
 			// Req is the req argument value.
 			Req dto.GetCommentRequest
+		}
+		// GetFeed holds details about calls to the GetFeed method.
+		GetFeed []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req dto.FeedRequest
 		}
 		// GetImage holds details about calls to the GetImage method.
 		GetImage []struct {
@@ -190,6 +203,7 @@ type ImageUsecaseMock struct {
 	lockBatchUpdateImageLikeCount    sync.RWMutex
 	lockComment                      sync.RWMutex
 	lockGetComment                   sync.RWMutex
+	lockGetFeed                      sync.RWMutex
 	lockGetImage                     sync.RWMutex
 	lockGetLike                      sync.RWMutex
 	lockLike                         sync.RWMutex
@@ -341,6 +355,42 @@ func (mock *ImageUsecaseMock) GetCommentCalls() []struct {
 	mock.lockGetComment.RLock()
 	calls = mock.calls.GetComment
 	mock.lockGetComment.RUnlock()
+	return calls
+}
+
+// GetFeed calls GetFeedFunc.
+func (mock *ImageUsecaseMock) GetFeed(ctx context.Context, req dto.FeedRequest) (dto.FeedResponse, error) {
+	if mock.GetFeedFunc == nil {
+		panic("ImageUsecaseMock.GetFeedFunc: method is nil but ImageUsecase.GetFeed was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req dto.FeedRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockGetFeed.Lock()
+	mock.calls.GetFeed = append(mock.calls.GetFeed, callInfo)
+	mock.lockGetFeed.Unlock()
+	return mock.GetFeedFunc(ctx, req)
+}
+
+// GetFeedCalls gets all the calls that were made to GetFeed.
+// Check the length with:
+//
+//	len(mockedImageUsecase.GetFeedCalls())
+func (mock *ImageUsecaseMock) GetFeedCalls() []struct {
+	Ctx context.Context
+	Req dto.FeedRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req dto.FeedRequest
+	}
+	mock.lockGetFeed.RLock()
+	calls = mock.calls.GetFeed
+	mock.lockGetFeed.RUnlock()
 	return calls
 }
 

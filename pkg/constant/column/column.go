@@ -14,6 +14,22 @@ func (c Column) In(value any) (string, any) {
 	return string(c) + " IN ?", value
 }
 
+// Desc returns the column qualified for a descending ORDER BY.
+func (c Column) Desc() string {
+	return string(c) + " DESC"
+}
+
+// InSubquery returns a "<column> IN (subquery)" predicate for the given subquery.
+func (c Column) InSubquery(subquery any) (string, any) {
+	return string(c) + " IN (?)", subquery
+}
+
+// KeysetBefore returns the keyed-keyset predicate that positions a descending
+// (created_at, id) ordered query strictly before the given cursor values.
+func KeysetBefore(cursorCreatedAt any, cursorID any) (string, any, any) {
+	return "(" + CreatedAt.Str() + ", " + ID.Str() + ") < (?, ?)", cursorCreatedAt, cursorID
+}
+
 func (c Column) Plus(value any) (string, any) {
 	return string(c) + " + ?", value
 }

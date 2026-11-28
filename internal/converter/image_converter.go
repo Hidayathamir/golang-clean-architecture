@@ -81,6 +81,14 @@ func EntityImageToDtoImageResponse(image entity.Image, res *dto.ImageResponse) {
 	res.DeletedAt = image.DeletedAt
 }
 
+func EntityImageListToDtoImageResponseList(imageList entity.ImageList, res *dto.ImageResponseList) {
+	for _, image := range imageList {
+		r := dto.ImageResponse{}
+		EntityImageToDtoImageResponse(image, &r)
+		*res = append(*res, r)
+	}
+}
+
 func EntityLikeToDtoLikeResponse(like entity.Like, res *dto.LikeResponse) {
 	res.ID = like.ID
 	res.UserID = like.UserID

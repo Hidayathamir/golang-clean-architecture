@@ -19,6 +19,7 @@ type ImageUsecase interface {
 	Like(ctx context.Context, req dto.LikeImageRequest) error
 	Comment(ctx context.Context, req dto.CommentImageRequest) error
 	GetImage(ctx context.Context, req dto.GetImageRequest) (dto.ImageResponse, error)
+	GetFeed(ctx context.Context, req dto.FeedRequest) (dto.FeedResponse, error)
 	GetLike(ctx context.Context, req dto.GetLikeRequest) (dto.LikeResponseList, error)
 	GetComment(ctx context.Context, req dto.GetCommentRequest) (dto.CommentResponseList, error)
 	NotifyFollowerOnUpload(ctx context.Context, req dto.NotifyFollowerOnUploadRequest) error

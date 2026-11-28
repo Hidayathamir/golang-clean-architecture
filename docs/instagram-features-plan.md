@@ -40,7 +40,7 @@ Keep each item small. Prefer reusing existing repositories/usecases over new one
 
 ### Phase 1 — Read APIs (data already exists)
 
-- [ ] `GET /api/feed` — posts from users the current user follows, newest first (paginated). **Highest priority; the core IG feature.**
+- [x] `GET /api/feed` — posts from users the current user follows, newest first (paginated). **Highest priority; the core IG feature.**
 - [ ] `GET /api/images/:id` — single post detail.
 - [ ] `GET /api/users/:id/images` — a user's post grid (their profile feed), paginated.
 - [ ] `GET /api/users/:id` — public profile: username, name, follower/following counts.

@@ -125,6 +125,42 @@ func (c *ImageController) Comment(ctx *fiber.Ctx) error {
 	return response.Data(ctx, http.StatusOK, "ok")
 }
 
+// GetFeed godoc
+//
+//	@Summary		Get feed
+//	@Description	Get posts from users the current user follows, newest first (cursor paginated)
+//	@Tags			images
+//	@Produce		json
+//	@Param			limit	query	int		false	"Page size (default 20, max 100)"
+//	@Param			cursor	query	string	false	"Opaque cursor from the previous page; empty for the first page"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[dto.FeedResponse]
+//	@Router			/api/feed [get]
+func (c *ImageController) GetFeed(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
+	req := dto.FeedRequest{}
+	if limitStr := ctx.Query("limit"); limitStr != "" {
+		limit, err := strconv.Atoi(limitStr)
+		if err != nil {
+			err = errkit.SetCode(err, http.StatusBadRequest)
+			logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+			return errkit.AddFuncName(err, "http.(*ImageController).GetFeed")
+		}
+		req.Page.Limit = limit
+	}
+	req.Page.Cursor = ctx.Query("cursor")
+
+	res, err := c.Usecase.GetFeed(ctx.UserContext(), req)
+	if err != nil {
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*ImageController).GetFeed")
+	}
+
+	return response.Data(ctx, http.StatusOK, res)
+}
+
 // GetLike godoc
 //
 //	@Summary		Get image likes

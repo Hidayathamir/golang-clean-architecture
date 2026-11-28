@@ -57,4 +57,6 @@ func setupAuthRoute(router fiber.Router, controllers *dependency_injection.Contr
 		images.Get("/:imageId/likes", controllers.ImageController.GetLike)
 		images.Get("/:imageId/comments", controllers.ImageController.GetComment)
 	}
+
+	router.Get("/feed", controllers.ImageController.GetFeed)
 }

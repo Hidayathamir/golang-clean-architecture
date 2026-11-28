@@ -60,6 +60,17 @@ type CommentResponse struct {
 
 type CommentResponseList []CommentResponse
 
+// FeedRequest is the input for GET /api/feed. The user is taken from auth
+// context; Page carries the cursor pagination input.
+type FeedRequest struct {
+	Page PageRequest
+}
+
+type ImageResponseList []ImageResponse
+
+// FeedResponse is the feed page: images from followed users, newest first.
+type FeedResponse = CursorPage[ImageResponseList]
+
 type GetLikeRequest struct {
 	ImageID int64
 }

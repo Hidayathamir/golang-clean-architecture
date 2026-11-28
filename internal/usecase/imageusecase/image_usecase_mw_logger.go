@@ -83,6 +83,22 @@ func (u *ImageUsecaseMwLogger) GetImage(ctx context.Context, req dto.GetImageReq
 	return res, err
 }
 
+func (u *ImageUsecaseMwLogger) GetFeed(ctx context.Context, req dto.FeedRequest) (dto.FeedResponse, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	res, err := u.Next.GetFeed(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+		"res": res,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return res, err
+}
+
 func (u *ImageUsecaseMwLogger) GetComment(ctx context.Context, req dto.GetCommentRequest) (dto.CommentResponseList, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
@@ -52,6 +53,24 @@ func (r *ImageRepositoryMwLogger) FindByID(ctx context.Context, db *gorm.DB, ima
 	fields := logrus.Fields{
 		"image": image,
 		"id":    id,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return err
+}
+
+func (r *ImageRepositoryMwLogger) FindFeedByFollowerID(ctx context.Context, db *gorm.DB, imageList *entity.ImageList, followerID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.FindFeedByFollowerID(ctx, db, imageList, followerID, cursorCreatedAt, cursorID, limit)
+	})
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"image_list": imageList,
+		"follower":   followerID,
 	}
 	logkit.LogMw(ctx, fields, err)
 

@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
@@ -17,6 +18,7 @@ import (
 type ImageRepository interface {
 	Create(ctx context.Context, db *gorm.DB, image *entity.Image) error
 	FindByID(ctx context.Context, db *gorm.DB, image *entity.Image, id int64) error
+	FindFeedByFollowerID(ctx context.Context, db *gorm.DB, imageList *entity.ImageList, followerID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error
 	IncrementCommentCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error
 	IncrementLikeCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error
 }
@@ -46,6 +48,31 @@ func (r *ImageRepositoryImpl) FindByID(ctx context.Context, db *gorm.DB, image *
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusNotFound)
 		return errkit.AddFuncName(err, "repository.(*ImageRepositoryImpl).FindByID")
+	}
+	return nil
+}
+
+func (r *ImageRepositoryImpl) FindFeedByFollowerID(ctx context.Context, db *gorm.DB, imageList *entity.ImageList, followerID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
+	following := db.WithContext(ctx).
+		Table(table.Follow).
+		Select(column.FollowingID.Str()).
+		Where(column.FollowerID.Eq(followerID))
+
+	whereIn, argsIn := column.UserID.InSubquery(following)
+	query := db.WithContext(ctx).
+		Where(whereIn, argsIn).
+		Order(column.CreatedAt.Desc()).
+		Order(column.ID.Desc()).
+		Limit(limit)
+
+	if cursorID > 0 {
+		whereKeyset, argCreatedAt, argID := column.KeysetBefore(cursorCreatedAt, cursorID)
+		query = query.Where(whereKeyset, argCreatedAt, argID)
+	}
+
+	err := query.Find(imageList).Error
+	if err != nil {
+		return errkit.AddFuncName(err, "repository.(*ImageRepositoryImpl).FindFeedByFollowerID")
 	}
 	return nil
 }
