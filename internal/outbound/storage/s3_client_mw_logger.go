@@ -40,25 +40,6 @@ func (c *S3ClientMwLogger) UploadImage(ctx context.Context, req dto.S3UploadImag
 	return url, err
 }
 
-func (c *S3ClientMwLogger) Download(ctx context.Context, req dto.S3DownloadRequest) (dto.S3DownloadResponse, error) {
-	ctx, span := telemetry.Start(ctx)
-	defer span.End()
-
-	res, err := retrykit.StorageRetryWithData(ctx, func() (dto.S3DownloadResponse, error) {
-		return c.Next.Download(ctx, req)
-	})
-	telemetry.RecordError(span, err)
-
-	fields := logrus.Fields{
-		"bucket": req.Bucket,
-		"key":    req.Key,
-		"data":   res.Data,
-	}
-	logkit.LogMw(ctx, fields, err)
-
-	return res, err
-}
-
 func (c *S3ClientMwLogger) DeleteObject(ctx context.Context, req dto.S3DeleteObjectRequest) (dto.S3DeleteObjectResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()

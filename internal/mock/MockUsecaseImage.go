@@ -26,6 +26,9 @@ var _ imageusecase.ImageUsecase = &ImageUsecaseMock{}
 //			BatchUpdateImageLikeCountFunc: func(ctx context.Context, req dto.BatchUpdateImageLikeCountRequest) error {
 //				panic("mock out the BatchUpdateImageLikeCount method")
 //			},
+//			CleanupDeletedImageStorageFunc: func(ctx context.Context, req dto.CleanupDeletedImageStorageRequest) error {
+//				panic("mock out the CleanupDeletedImageStorage method")
+//			},
 //			CommentFunc: func(ctx context.Context, req dto.CommentImageRequest) error {
 //				panic("mock out the Comment method")
 //			},
@@ -89,6 +92,9 @@ type ImageUsecaseMock struct {
 
 	// BatchUpdateImageLikeCountFunc mocks the BatchUpdateImageLikeCount method.
 	BatchUpdateImageLikeCountFunc func(ctx context.Context, req dto.BatchUpdateImageLikeCountRequest) error
+
+	// CleanupDeletedImageStorageFunc mocks the CleanupDeletedImageStorage method.
+	CleanupDeletedImageStorageFunc func(ctx context.Context, req dto.CleanupDeletedImageStorageRequest) error
 
 	// CommentFunc mocks the Comment method.
 	CommentFunc func(ctx context.Context, req dto.CommentImageRequest) error
@@ -156,6 +162,13 @@ type ImageUsecaseMock struct {
 			Ctx context.Context
 			// Req is the req argument value.
 			Req dto.BatchUpdateImageLikeCountRequest
+		}
+		// CleanupDeletedImageStorage holds details about calls to the CleanupDeletedImageStorage method.
+		CleanupDeletedImageStorage []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req dto.CleanupDeletedImageStorageRequest
 		}
 		// Comment holds details about calls to the Comment method.
 		Comment []struct {
@@ -279,6 +292,7 @@ type ImageUsecaseMock struct {
 	}
 	lockBatchUpdateImageCommentCount sync.RWMutex
 	lockBatchUpdateImageLikeCount    sync.RWMutex
+	lockCleanupDeletedImageStorage   sync.RWMutex
 	lockComment                      sync.RWMutex
 	lockDeleteImage                  sync.RWMutex
 	lockDeleteImageComment           sync.RWMutex
@@ -367,6 +381,42 @@ func (mock *ImageUsecaseMock) BatchUpdateImageLikeCountCalls() []struct {
 	mock.lockBatchUpdateImageLikeCount.RLock()
 	calls = mock.calls.BatchUpdateImageLikeCount
 	mock.lockBatchUpdateImageLikeCount.RUnlock()
+	return calls
+}
+
+// CleanupDeletedImageStorage calls CleanupDeletedImageStorageFunc.
+func (mock *ImageUsecaseMock) CleanupDeletedImageStorage(ctx context.Context, req dto.CleanupDeletedImageStorageRequest) error {
+	if mock.CleanupDeletedImageStorageFunc == nil {
+		panic("ImageUsecaseMock.CleanupDeletedImageStorageFunc: method is nil but ImageUsecase.CleanupDeletedImageStorage was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req dto.CleanupDeletedImageStorageRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockCleanupDeletedImageStorage.Lock()
+	mock.calls.CleanupDeletedImageStorage = append(mock.calls.CleanupDeletedImageStorage, callInfo)
+	mock.lockCleanupDeletedImageStorage.Unlock()
+	return mock.CleanupDeletedImageStorageFunc(ctx, req)
+}
+
+// CleanupDeletedImageStorageCalls gets all the calls that were made to CleanupDeletedImageStorage.
+// Check the length with:
+//
+//	len(mockedImageUsecase.CleanupDeletedImageStorageCalls())
+func (mock *ImageUsecaseMock) CleanupDeletedImageStorageCalls() []struct {
+	Ctx context.Context
+	Req dto.CleanupDeletedImageStorageRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req dto.CleanupDeletedImageStorageRequest
+	}
+	mock.lockCleanupDeletedImageStorage.RLock()
+	calls = mock.calls.CleanupDeletedImageStorage
+	mock.lockCleanupDeletedImageStorage.RUnlock()
 	return calls
 }
 

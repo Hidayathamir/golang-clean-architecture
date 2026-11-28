@@ -37,6 +37,16 @@ func EntityImageToDtoImageUploadedEvent(image entity.Image, event *dto.ImageUplo
 	event.DeletedAt = image.DeletedAt
 }
 
+func EntityImageToDtoImageDeletedEvent(image entity.Image, event *dto.ImageDeletedEvent) {
+	event.ID = image.ID
+	event.URL = image.URL
+}
+
+func DtoImageDeletedEventToDtoCleanupDeletedImageStorageRequest(event dto.ImageDeletedEvent, req *dto.CleanupDeletedImageStorageRequest) {
+	req.ID = event.ID
+	req.URL = event.URL
+}
+
 func DtoLikeImageRequestToEntityLike(ctx context.Context, req dto.LikeImageRequest, like *entity.Like) {
 	userAuth := ctxuserauth.Get(ctx)
 	like.UserID = userAuth.ID

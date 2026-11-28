@@ -16,6 +16,7 @@ const (
 	ImageLikedBatchCount         = "image.liked.batch-count"
 	ImageCommentedNotifyOwner    = "image.commented.notify-owner"
 	ImageCommentedBatchCount     = "image.commented.batch-count"
+	ImageDeletedCleanupStorage   = "image.deleted.cleanup-storage"
 
 	UserFollowedNotifyUser = "user.followed.notify-user"
 	UserFollowedBatchStats = "user.followed.batch-stats"
@@ -28,6 +29,7 @@ const (
 	ImageLikedBatchCountRetry         = "image.liked.batch-count.retry"
 	ImageCommentedNotifyOwnerRetry    = "image.commented.notify-owner.retry"
 	ImageCommentedBatchCountRetry     = "image.commented.batch-count.retry"
+	ImageDeletedCleanupStorageRetry   = "image.deleted.cleanup-storage.retry"
 
 	UserFollowedNotifyUserRetry = "user.followed.notify-user.retry"
 	UserFollowedBatchStatsRetry = "user.followed.batch-stats.retry"

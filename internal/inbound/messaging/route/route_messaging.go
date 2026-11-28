@@ -51,6 +51,13 @@ func Setup(ctx context.Context, cfg *config.Config, producer *kgo.Client, consum
 	})
 
 	wg.Go(func() {
+		consumerGroup := consumergroup.ImageDeletedCleanupStorage
+		_topic := topic.ImageDeleted
+		handler := messaging.IdempotencyHandlerSingle(consumers.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.CleanupDeletedImageStorage)
+		messaging.ConsumeEventSingle(ctx, cfg, producer, consumerGroup, _topic, handler)
+	})
+
+	wg.Go(func() {
 		consumerGroup := consumergroup.NotifLog
 		_topic := topic.Notif
 		handler := messaging.IdempotencyHandlerSingle(consumers.IdempotencyUsecase, consumerGroup, consumers.NotifConsumer.Notify)
@@ -114,6 +121,13 @@ func Setup(ctx context.Context, cfg *config.Config, producer *kgo.Client, consum
 		consumerGroup := consumergroup.ImageCommentedNotifyOwnerRetry
 		_topic := topic.ImageCommented
 		handler := messaging.IdempotencyHandlerSingle(consumers.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.NotifyUserImageCommented)
+		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
+	})
+
+	wg.Go(func() {
+		consumerGroup := consumergroup.ImageDeletedCleanupStorageRetry
+		_topic := topic.ImageDeleted
+		handler := messaging.IdempotencyHandlerSingle(consumers.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.CleanupDeletedImageStorage)
 		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 

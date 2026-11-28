@@ -3,6 +3,7 @@ package imageusecase_test
 import (
 	"bytes"
 	"database/sql"
+	"errors"
 	"mime/multipart"
 	"testing"
 
@@ -11,6 +12,8 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
+
+var errDeleteS3 = errors.New("s3 delete failed")
 
 func newFakeDB(t *testing.T) (gormDB *gorm.DB, sqlMockDB sqlmock.Sqlmock) {
 	t.Helper()

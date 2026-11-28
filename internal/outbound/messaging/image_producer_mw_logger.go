@@ -73,3 +73,20 @@ func (p *ImageProducerMwLogger) SendImageCommented(ctx context.Context, db *gorm
 
 	return err
 }
+
+func (p *ImageProducerMwLogger) SendImageDeleted(ctx context.Context, db *gorm.DB, event *dto.ImageDeletedEvent) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := retrykit.MessagingRetry(ctx, func() error {
+		return p.Next.SendImageDeleted(ctx, db, event)
+	})
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"event": event,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return err
+}

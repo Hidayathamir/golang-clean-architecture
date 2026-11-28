@@ -172,3 +172,26 @@ func (c *ImageConsumer) UpdateImageCommentCount(ctx context.Context, record *kgo
 
 	return nil
 }
+
+func (c *ImageConsumer) CleanupDeletedImageStorage(ctx context.Context, record *kgo.Record) error {
+	ctx, span := telemetry.StartConsumer(ctx, record)
+	defer span.End()
+
+	event := dto.ImageDeletedEvent{}
+	err := json.Unmarshal(record.Value, &event)
+	if err != nil {
+		logkit.Logger.WithContext(ctx).WithError(err).Error()
+		return errkit.AddFuncName(errkit.WrapNonRetryable(err), "messaging.(*ImageConsumer).CleanupDeletedImageStorage")
+	}
+
+	req := dto.CleanupDeletedImageStorageRequest{}
+	converter.DtoImageDeletedEventToDtoCleanupDeletedImageStorageRequest(event, &req)
+
+	err = c.Usecase.CleanupDeletedImageStorage(ctx, req)
+	if err != nil {
+		logkit.Logger.WithContext(ctx).WithError(err).Error()
+		return errkit.AddFuncName(err, "messaging.(*ImageConsumer).CleanupDeletedImageStorage")
+	}
+
+	return nil
+}

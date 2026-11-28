@@ -16,19 +16,21 @@ import (
 )
 
 func TestImageUsecaseImpl_DeleteImage_Success(t *testing.T) {
-	gormDB, _ := newFakeDB(t)
+	gormDB, mockDB := newFakeDB(t)
 	imageRepository := &mock.ImageRepositoryMock{}
+	imageProducer := &mock.ImageProducerMock{}
 
 	u := &imageusecase.ImageUsecaseImpl{
 		DB:              gormDB,
 		ImageRepository: imageRepository,
+		ImageProducer:   imageProducer,
 	}
 
 	ctx := ctxuserauth.Set(context.Background(), &dto.UserAuth{ID: 7})
 
 	imageRepository.FindByIDFunc = func(ctx context.Context, db *gorm.DB, image *entity.Image, id int64) error {
 		require.Equal(t, int64(5), id)
-		*image = entity.Image{ID: 5, UserID: 7}
+		*image = entity.Image{ID: 5, UserID: 7, URL: "http://localhost:9100/image/user/123_file.jpg"}
 		return nil
 	}
 	var deletedID int64
@@ -36,11 +38,21 @@ func TestImageUsecaseImpl_DeleteImage_Success(t *testing.T) {
 		deletedID = image.ID
 		return nil
 	}
+	var producedURL string
+	imageProducer.SendImageDeletedFunc = func(ctx context.Context, db *gorm.DB, event *dto.ImageDeletedEvent) error {
+		producedURL = event.URL
+		return nil
+	}
+
+	mockDB.ExpectBegin()
+	mockDB.ExpectCommit()
 
 	err := u.DeleteImage(ctx, dto.DeleteImageRequest{ID: 5})
 
 	require.Nil(t, err)
 	require.Equal(t, int64(5), deletedID)
+	require.Equal(t, "http://localhost:9100/image/user/123_file.jpg", producedURL)
+	require.Len(t, imageProducer.SendImageDeletedCalls(), 1)
 }
 
 func TestImageUsecaseImpl_DeleteImage_Fail_ValidateStruct(t *testing.T) {

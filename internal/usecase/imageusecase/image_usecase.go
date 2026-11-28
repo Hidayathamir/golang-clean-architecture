@@ -34,6 +34,7 @@ type ImageUsecase interface {
 	BatchUpdateImageCommentCount(ctx context.Context, req dto.BatchUpdateImageCommentCountRequest) error
 	NotifyUserImageLiked(ctx context.Context, req dto.NotifyUserImageLikedRequest) error
 	BatchUpdateImageLikeCount(ctx context.Context, req dto.BatchUpdateImageLikeCountRequest) error
+	CleanupDeletedImageStorage(ctx context.Context, req dto.CleanupDeletedImageStorageRequest) error
 }
 
 var _ ImageUsecase = &ImageUsecaseImpl{}

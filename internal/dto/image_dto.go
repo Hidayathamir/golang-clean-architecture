@@ -64,6 +64,11 @@ type UpdateImageRequest struct {
 	Caption string `json:"caption" validate:"required,max=2200"`
 }
 
+type CleanupDeletedImageStorageRequest struct {
+	ID  int64
+	URL string
+}
+
 type LikeResponse struct {
 	ID        int64          `json:"id"`
 	UserID    int64          `json:"user_id"`
@@ -225,4 +230,9 @@ type ImageCommentedEvent struct {
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `json:"deleted_at"`
+}
+
+type ImageDeletedEvent struct {
+	ID  int64  `json:"id"`
+	URL string `json:"url"`
 }

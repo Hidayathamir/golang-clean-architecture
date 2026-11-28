@@ -15,7 +15,6 @@ import (
 
 type S3Client interface {
 	UploadImage(ctx context.Context, req dto.S3UploadImageRequest) (url string, err error)
-	Download(ctx context.Context, req dto.S3DownloadRequest) (dto.S3DownloadResponse, error)
 	DeleteObject(ctx context.Context, req dto.S3DeleteObjectRequest) (dto.S3DeleteObjectResponse, error)
 }
 
@@ -49,16 +48,14 @@ func (c *S3ClientImpl) UploadImage(ctx context.Context, req dto.S3UploadImageReq
 	return url, nil
 }
 
-func (c *S3ClientImpl) Download(ctx context.Context, req dto.S3DownloadRequest) (dto.S3DownloadResponse, error) {
-	// TODO implement hit external rest api
-	return dto.S3DownloadResponse{
-		Data: "dummy data",
-	}, nil
-}
-
 func (c *S3ClientImpl) DeleteObject(ctx context.Context, req dto.S3DeleteObjectRequest) (dto.S3DeleteObjectResponse, error) {
-	// TODO implement hit external rest api
-	return dto.S3DeleteObjectResponse{
-		Deleted: true,
-	}, nil
+	_, err := c.AWSS3Client.DeleteObject(ctx, &s3.DeleteObjectInput{
+		Bucket: &req.Bucket,
+		Key:    &req.Key,
+	})
+	if err != nil {
+		return dto.S3DeleteObjectResponse{}, errkit.AddFuncName(err, "storage.(*S3ClientImpl).DeleteObject")
+	}
+
+	return dto.S3DeleteObjectResponse{Deleted: true}, nil
 }

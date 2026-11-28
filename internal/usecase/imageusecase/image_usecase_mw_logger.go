@@ -312,3 +312,18 @@ func (u *ImageUsecaseMwLogger) BatchUpdateImageLikeCount(ctx context.Context, re
 
 	return err
 }
+
+func (u *ImageUsecaseMwLogger) CleanupDeletedImageStorage(ctx context.Context, req dto.CleanupDeletedImageStorageRequest) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := u.Next.CleanupDeletedImageStorage(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return err
+}

@@ -21,6 +21,7 @@ type ImageProducer interface {
 	SendImageUploaded(ctx context.Context, db *gorm.DB, event *dto.ImageUploadedEvent) error
 	SendImageLiked(ctx context.Context, db *gorm.DB, event *dto.ImageLikedEvent) error
 	SendImageCommented(ctx context.Context, db *gorm.DB, event *dto.ImageCommentedEvent) error
+	SendImageDeleted(ctx context.Context, db *gorm.DB, event *dto.ImageDeletedEvent) error
 }
 
 var _ ImageProducer = &ImageProducerImpl{}
@@ -57,6 +58,14 @@ func (p *ImageProducerImpl) SendImageCommented(ctx context.Context, db *gorm.DB,
 	err := p.send(ctx, db, topic.ImageCommented, event)
 	if err != nil {
 		return errkit.AddFuncName(err, "messaging.(*ImageProducerImpl).SendImageCommented")
+	}
+	return nil
+}
+
+func (p *ImageProducerImpl) SendImageDeleted(ctx context.Context, db *gorm.DB, event *dto.ImageDeletedEvent) error {
+	err := p.send(ctx, db, topic.ImageDeleted, event)
+	if err != nil {
+		return errkit.AddFuncName(err, "messaging.(*ImageProducerImpl).SendImageDeleted")
 	}
 	return nil
 }

@@ -23,9 +23,6 @@ var _ storage.S3Client = &S3ClientMock{}
 //			DeleteObjectFunc: func(ctx context.Context, req dto.S3DeleteObjectRequest) (dto.S3DeleteObjectResponse, error) {
 //				panic("mock out the DeleteObject method")
 //			},
-//			DownloadFunc: func(ctx context.Context, req dto.S3DownloadRequest) (dto.S3DownloadResponse, error) {
-//				panic("mock out the Download method")
-//			},
 //			UploadImageFunc: func(ctx context.Context, req dto.S3UploadImageRequest) (string, error) {
 //				panic("mock out the UploadImage method")
 //			},
@@ -39,9 +36,6 @@ type S3ClientMock struct {
 	// DeleteObjectFunc mocks the DeleteObject method.
 	DeleteObjectFunc func(ctx context.Context, req dto.S3DeleteObjectRequest) (dto.S3DeleteObjectResponse, error)
 
-	// DownloadFunc mocks the Download method.
-	DownloadFunc func(ctx context.Context, req dto.S3DownloadRequest) (dto.S3DownloadResponse, error)
-
 	// UploadImageFunc mocks the UploadImage method.
 	UploadImageFunc func(ctx context.Context, req dto.S3UploadImageRequest) (string, error)
 
@@ -54,13 +48,6 @@ type S3ClientMock struct {
 			// Req is the req argument value.
 			Req dto.S3DeleteObjectRequest
 		}
-		// Download holds details about calls to the Download method.
-		Download []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
-			// Req is the req argument value.
-			Req dto.S3DownloadRequest
-		}
 		// UploadImage holds details about calls to the UploadImage method.
 		UploadImage []struct {
 			// Ctx is the ctx argument value.
@@ -70,7 +57,6 @@ type S3ClientMock struct {
 		}
 	}
 	lockDeleteObject sync.RWMutex
-	lockDownload     sync.RWMutex
 	lockUploadImage  sync.RWMutex
 }
 
@@ -107,42 +93,6 @@ func (mock *S3ClientMock) DeleteObjectCalls() []struct {
 	mock.lockDeleteObject.RLock()
 	calls = mock.calls.DeleteObject
 	mock.lockDeleteObject.RUnlock()
-	return calls
-}
-
-// Download calls DownloadFunc.
-func (mock *S3ClientMock) Download(ctx context.Context, req dto.S3DownloadRequest) (dto.S3DownloadResponse, error) {
-	if mock.DownloadFunc == nil {
-		panic("S3ClientMock.DownloadFunc: method is nil but S3Client.Download was just called")
-	}
-	callInfo := struct {
-		Ctx context.Context
-		Req dto.S3DownloadRequest
-	}{
-		Ctx: ctx,
-		Req: req,
-	}
-	mock.lockDownload.Lock()
-	mock.calls.Download = append(mock.calls.Download, callInfo)
-	mock.lockDownload.Unlock()
-	return mock.DownloadFunc(ctx, req)
-}
-
-// DownloadCalls gets all the calls that were made to Download.
-// Check the length with:
-//
-//	len(mockedS3Client.DownloadCalls())
-func (mock *S3ClientMock) DownloadCalls() []struct {
-	Ctx context.Context
-	Req dto.S3DownloadRequest
-} {
-	var calls []struct {
-		Ctx context.Context
-		Req dto.S3DownloadRequest
-	}
-	mock.lockDownload.RLock()
-	calls = mock.calls.Download
-	mock.lockDownload.RUnlock()
 	return calls
 }
 
