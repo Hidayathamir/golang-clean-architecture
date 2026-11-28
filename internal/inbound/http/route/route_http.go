@@ -64,4 +64,5 @@ func setupAuthRoute(router fiber.Router, controllers *dependency_injection.Contr
 	}
 
 	router.Get("/feed", controllers.ImageController.GetFeed)
+	router.Get("/explore", controllers.ImageController.Explore)
 }

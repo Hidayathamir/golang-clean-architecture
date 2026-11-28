@@ -81,6 +81,15 @@ type UserImagesRequest struct {
 // UserImagesResponse is the user's post grid page, newest first.
 type UserImagesResponse = CursorPage[ImageResponseList]
 
+// ExploreRequest is the input for GET /api/explore. Page carries the cursor
+// pagination input; discovery order is newest first.
+type ExploreRequest struct {
+	Page PageRequest
+}
+
+// ExploreResponse is a page of discovered posts, newest first.
+type ExploreResponse = CursorPage[ImageResponseList]
+
 type GetLikeRequest struct {
 	ImageID int64
 }

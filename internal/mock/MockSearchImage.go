@@ -6,8 +6,10 @@ package mock
 import (
 	"context"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
+	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/search"
 	"sync"
+	"time"
 )
 
 // Ensure, that ImageSearchMock does implement search.ImageSearch.
@@ -23,6 +25,9 @@ var _ search.ImageSearch = &ImageSearchMock{}
 //			IndexImageFunc: func(ctx context.Context, document *dto.ImageDocument) error {
 //				panic("mock out the IndexImage method")
 //			},
+//			SearchImagesFunc: func(ctx context.Context, imageList *entity.ImageList, cursorCreatedAt time.Time, cursorID int64, limit int) error {
+//				panic("mock out the SearchImages method")
+//			},
 //		}
 //
 //		// use mockedImageSearch in code that requires search.ImageSearch
@@ -33,6 +38,9 @@ type ImageSearchMock struct {
 	// IndexImageFunc mocks the IndexImage method.
 	IndexImageFunc func(ctx context.Context, document *dto.ImageDocument) error
 
+	// SearchImagesFunc mocks the SearchImages method.
+	SearchImagesFunc func(ctx context.Context, imageList *entity.ImageList, cursorCreatedAt time.Time, cursorID int64, limit int) error
+
 	// calls tracks calls to the methods.
 	calls struct {
 		// IndexImage holds details about calls to the IndexImage method.
@@ -42,8 +50,22 @@ type ImageSearchMock struct {
 			// Document is the document argument value.
 			Document *dto.ImageDocument
 		}
+		// SearchImages holds details about calls to the SearchImages method.
+		SearchImages []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// ImageList is the imageList argument value.
+			ImageList *entity.ImageList
+			// CursorCreatedAt is the cursorCreatedAt argument value.
+			CursorCreatedAt time.Time
+			// CursorID is the cursorID argument value.
+			CursorID int64
+			// Limit is the limit argument value.
+			Limit int
+		}
 	}
-	lockIndexImage sync.RWMutex
+	lockIndexImage   sync.RWMutex
+	lockSearchImages sync.RWMutex
 }
 
 // IndexImage calls IndexImageFunc.
@@ -79,5 +101,53 @@ func (mock *ImageSearchMock) IndexImageCalls() []struct {
 	mock.lockIndexImage.RLock()
 	calls = mock.calls.IndexImage
 	mock.lockIndexImage.RUnlock()
+	return calls
+}
+
+// SearchImages calls SearchImagesFunc.
+func (mock *ImageSearchMock) SearchImages(ctx context.Context, imageList *entity.ImageList, cursorCreatedAt time.Time, cursorID int64, limit int) error {
+	if mock.SearchImagesFunc == nil {
+		panic("ImageSearchMock.SearchImagesFunc: method is nil but ImageSearch.SearchImages was just called")
+	}
+	callInfo := struct {
+		Ctx             context.Context
+		ImageList       *entity.ImageList
+		CursorCreatedAt time.Time
+		CursorID        int64
+		Limit           int
+	}{
+		Ctx:             ctx,
+		ImageList:       imageList,
+		CursorCreatedAt: cursorCreatedAt,
+		CursorID:        cursorID,
+		Limit:           limit,
+	}
+	mock.lockSearchImages.Lock()
+	mock.calls.SearchImages = append(mock.calls.SearchImages, callInfo)
+	mock.lockSearchImages.Unlock()
+	return mock.SearchImagesFunc(ctx, imageList, cursorCreatedAt, cursorID, limit)
+}
+
+// SearchImagesCalls gets all the calls that were made to SearchImages.
+// Check the length with:
+//
+//	len(mockedImageSearch.SearchImagesCalls())
+func (mock *ImageSearchMock) SearchImagesCalls() []struct {
+	Ctx             context.Context
+	ImageList       *entity.ImageList
+	CursorCreatedAt time.Time
+	CursorID        int64
+	Limit           int
+} {
+	var calls []struct {
+		Ctx             context.Context
+		ImageList       *entity.ImageList
+		CursorCreatedAt time.Time
+		CursorID        int64
+		Limit           int
+	}
+	mock.lockSearchImages.RLock()
+	calls = mock.calls.SearchImages
+	mock.lockSearchImages.RUnlock()
 	return calls
 }

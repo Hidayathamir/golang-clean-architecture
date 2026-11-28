@@ -241,6 +241,42 @@ func (c *ImageController) GetUserImages(ctx *fiber.Ctx) error {
 	return response.Data(ctx, http.StatusOK, res)
 }
 
+// Explore godoc
+//
+//	@Summary		Explore images
+//	@Description	Discover posts via Elasticsearch, newest first (cursor paginated)
+//	@Tags			images
+//	@Produce		json
+//	@Param			limit	query	int		false	"Page size (default 20, max 100)"
+//	@Param			cursor	query	string	false	"Opaque cursor from the previous page; empty for the first page"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[dto.ExploreResponse]
+//	@Router			/api/explore [get]
+func (c *ImageController) Explore(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
+	req := dto.ExploreRequest{}
+	if limitStr := ctx.Query("limit"); limitStr != "" {
+		limit, err := strconv.Atoi(limitStr)
+		if err != nil {
+			err = errkit.SetCode(err, http.StatusBadRequest)
+			logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+			return errkit.AddFuncName(err, "http.(*ImageController).Explore")
+		}
+		req.Page.Limit = limit
+	}
+	req.Page.Cursor = ctx.Query("cursor")
+
+	res, err := c.Usecase.Explore(ctx.UserContext(), req)
+	if err != nil {
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*ImageController).Explore")
+	}
+
+	return response.Data(ctx, http.StatusOK, res)
+}
+
 // GetLike godoc
 //
 //	@Summary		Get image likes

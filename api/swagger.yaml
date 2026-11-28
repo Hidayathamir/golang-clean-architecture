@@ -26,6 +26,15 @@ definitions:
       user_id:
         type: integer
     type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.ExploreResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.ImageResponse'
+        type: array
+      next_cursor:
+        type: string
+    type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_dto.FeedResponse:
     properties:
       data:
@@ -212,6 +221,17 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.PageMetadata'
     type: object
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ExploreResponse
+  : properties:
+      data:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.ExploreResponse'
+      error_detail:
+        type: string
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.PageMetadata'
+    type: object
   ? github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_FeedResponse
   : properties:
       data:
@@ -336,6 +356,30 @@ info:
   contact: {}
   title: Golang Clean Architecture
 paths:
+  /api/explore:
+    get:
+      description: Discover posts via Elasticsearch, newest first (cursor paginated)
+      parameters:
+      - description: Page size (default 20, max 100)
+        in: query
+        name: limit
+        type: integer
+      - description: Opaque cursor from the previous page; empty for the first page
+        in: query
+        name: cursor
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ExploreResponse'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Explore images
+      tags:
+      - images
   /api/feed:
     get:
       description: Get posts from users the current user follows, newest first (cursor

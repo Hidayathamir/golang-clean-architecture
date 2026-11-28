@@ -29,6 +29,9 @@ var _ imageusecase.ImageUsecase = &ImageUsecaseMock{}
 //			CommentFunc: func(ctx context.Context, req dto.CommentImageRequest) error {
 //				panic("mock out the Comment method")
 //			},
+//			ExploreFunc: func(ctx context.Context, req dto.ExploreRequest) (dto.ExploreResponse, error) {
+//				panic("mock out the Explore method")
+//			},
 //			GetCommentFunc: func(ctx context.Context, req dto.GetCommentRequest) (dto.CommentResponseList, error) {
 //				panic("mock out the GetComment method")
 //			},
@@ -77,6 +80,9 @@ type ImageUsecaseMock struct {
 
 	// CommentFunc mocks the Comment method.
 	CommentFunc func(ctx context.Context, req dto.CommentImageRequest) error
+
+	// ExploreFunc mocks the Explore method.
+	ExploreFunc func(ctx context.Context, req dto.ExploreRequest) (dto.ExploreResponse, error)
 
 	// GetCommentFunc mocks the GetComment method.
 	GetCommentFunc func(ctx context.Context, req dto.GetCommentRequest) (dto.CommentResponseList, error)
@@ -133,6 +139,13 @@ type ImageUsecaseMock struct {
 			Ctx context.Context
 			// Req is the req argument value.
 			Req dto.CommentImageRequest
+		}
+		// Explore holds details about calls to the Explore method.
+		Explore []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req dto.ExploreRequest
 		}
 		// GetComment holds details about calls to the GetComment method.
 		GetComment []struct {
@@ -215,6 +228,7 @@ type ImageUsecaseMock struct {
 	lockBatchUpdateImageCommentCount sync.RWMutex
 	lockBatchUpdateImageLikeCount    sync.RWMutex
 	lockComment                      sync.RWMutex
+	lockExplore                      sync.RWMutex
 	lockGetComment                   sync.RWMutex
 	lockGetFeed                      sync.RWMutex
 	lockGetImage                     sync.RWMutex
@@ -333,6 +347,42 @@ func (mock *ImageUsecaseMock) CommentCalls() []struct {
 	mock.lockComment.RLock()
 	calls = mock.calls.Comment
 	mock.lockComment.RUnlock()
+	return calls
+}
+
+// Explore calls ExploreFunc.
+func (mock *ImageUsecaseMock) Explore(ctx context.Context, req dto.ExploreRequest) (dto.ExploreResponse, error) {
+	if mock.ExploreFunc == nil {
+		panic("ImageUsecaseMock.ExploreFunc: method is nil but ImageUsecase.Explore was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req dto.ExploreRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockExplore.Lock()
+	mock.calls.Explore = append(mock.calls.Explore, callInfo)
+	mock.lockExplore.Unlock()
+	return mock.ExploreFunc(ctx, req)
+}
+
+// ExploreCalls gets all the calls that were made to Explore.
+// Check the length with:
+//
+//	len(mockedImageUsecase.ExploreCalls())
+func (mock *ImageUsecaseMock) ExploreCalls() []struct {
+	Ctx context.Context
+	Req dto.ExploreRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req dto.ExploreRequest
+	}
+	mock.lockExplore.RLock()
+	calls = mock.calls.Explore
+	mock.lockExplore.RUnlock()
 	return calls
 }
 
