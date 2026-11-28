@@ -86,7 +86,7 @@ sequenceDiagram
     main->>main: defer stopTrace + stopLog
 ```
 
-Boot code (`cmd/webserver/main.go:48-54`):
+Boot code (`cmd/webserver/main.go`):
 
 ```go
 stopTraceProvider := telemetry.InitTraceProvider(cfg)
@@ -135,7 +135,7 @@ flowchart TD
     Controller --> Out
 ```
 
-Route wiring (`internal/inbound/http/route/route_http.go:16`):
+Route wiring (`internal/inbound/http/route/route_http.go`):
 
 ```go
 api := root.Group("/api", middlewares.OtelFiberMiddleware, middlewares.TraceIDMiddleware)
@@ -143,7 +143,7 @@ api := root.Group("/api", middlewares.OtelFiberMiddleware, middlewares.TraceIDMi
 
 1. **OtelFiberMiddleware** (`gofiber/contrib/otelfiber`) auto-instruments inbound HTTP: extracts the parent context from `traceparent`, creates a span named `"METHOD /path"` (custom `WithSpanNameFormatter`), and ends it when the response finishes.
 2. **TraceIDMiddleware** reads `telemetry.GetTraceID(ctx)` and echoes it as the `X-Trace-ID` response header for the caller.
-3. Each **controller** starts a function-named span via `telemetry.StartController(ctx)` (`pkg/telemetry/otel_start.go:12`) which seeds `ctx.UserContext()` so everything downstream inherits the trace.
+3. Each **controller** starts a function-named span via `telemetry.StartController(ctx)` (`pkg/telemetry/otel_start.go`) which seeds `ctx.UserContext()` so everything downstream inherits the trace.
 
 ---
 
@@ -161,7 +161,7 @@ flowchart LR
     MW -->|"4. logkit.LogMw(ctx, fields, err)"| Log["logrus → OtelHook"]
 ```
 
-For the make-or-break rule (every outbound interface must have a decorator, and where to wire it) see **AGENTS.md → Decorator pattern**. This section documents only the telemetry mechanics inside every generated method (see e.g. `internal/outbound/repository/user_repository_mw_logger.go:26`):
+For the make-or-break rule (every outbound interface must have a decorator, and where to wire it) see **AGENTS.md → Decorator pattern**. This section documents only the telemetry mechanics inside every generated method (see e.g. `internal/outbound/repository/user_repository_mw_logger.go`):
 
 ```go
 func (r *UserRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, user *entity.User) error {
@@ -178,8 +178,8 @@ func (r *UserRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, user *
 ```
 
 - Four steps, always in this order: **start span → call real method (wrapped in retry) → record error → emit log**.
-- `telemetry.Start` derives the span name from the **caller's function name** via `pkg/caller` (`otel_start.go:80`) — so the function name *is* the span name.
-- `retrykit.DBRetry(ctx, fn)` for no-value methods; `retrykit.DBRetryWithData(ctx, fn)` for value-returning ones (see `CountByUsername`). The helper matches the outbound layer — `CacheRetry`, `MessagingRetry`, `SearchRetry`, `StorageRetry` (each with a `*WithData` form), each tuned separately in `pkg/retrykit`. Usecase decorators call `Next` directly, with no retry.
+- `telemetry.Start` derives the span name from the **caller's function name** via `pkg/caller` (`pkg/telemetry/otel_start.go`) — so the function name *is* the span name.
+- `retrykit.DBRetry(ctx, fn)` for no-value methods; `retrykit.DBRetryWithData(ctx, fn)` for value-returning ones (see `CountByUsername`). The helper matches the outbound layer — `CacheRetry`, `MessagingRetry`, `SearchRetry`, `StorageRetry`, `EmailRetry` (each with a `*WithData` form), each tuned separately in `pkg/retrykit`. Usecase decorators call `Next` directly, with no retry.
 - `logkit.LogMw(ctx, fields, err)` emits **Debug on success, Error on failure**; `fields` carries the call's inputs/outputs (e.g. `username`, `total`).
 - The wrapper struct holds the real impl in a `Next` field, and `var _ Interface = &InterfaceMwLogger{}` asserts it still satisfies the interface.
 
@@ -249,8 +249,8 @@ opts = append(opts, kgo.WithHooks(tracer))
 
 **Outbox trace hand-off** — the outbox row stores the trace context as JSON so the *async* produce step can recreate it:
 
-- Write (`internal/outbound/messaging/user_producer.go:60`): `TraceContext: telemetry.InjectTraceContext(ctx)` — serializes the active `traceparent`/`baggage` into a JSON string column.
-- Read (`internal/outbound/messaging/outbox_producer.go:65`): `recordCtx := telemetry.ExtractTraceContext(ctx, outbox.TraceContext)` — rebuilds the span context before `ProduceSync`, so kotel embeds the **original** trace ID into the Kafka message headers.
+- Write (`internal/outbound/messaging/user_producer.go`): `TraceContext: telemetry.InjectTraceContext(ctx)` — serializes the active `traceparent`/`baggage` into a JSON string column.
+- Read (`internal/outbound/messaging/outbox_producer.go`): `recordCtx := telemetry.ExtractTraceContext(ctx, outbox.TraceContext)` — rebuilds the span context before `ProduceSync`, so kotel embeds the **original** trace ID into the Kafka message headers.
 
 ```mermaid
 sequenceDiagram
@@ -306,7 +306,7 @@ flowchart LR
 
 ## 7. Configuration
 
-Single source: `settings/config.json` → `internal/config/configkey.go:43`
+Single source: `settings/config.json` → `internal/config/configkey.go`
 
 ```jsonc
 {

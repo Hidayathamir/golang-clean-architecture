@@ -186,7 +186,7 @@ sequenceDiagram
 ```
 
 Key points:
-- `cmd/workerconsumer/main.go` sets up a shared `context.WithCancel` and `sync.WaitGroup`.
-- All consumer goroutines are started via `wg.Go` (syntactic sugar for `go func()` + `wg.Add`/`wg.Done`).
+- `cmd/workerconsumer/main.go` sets up a shared `context.WithCancel` and `sync.WaitGroup`, then calls `route.Setup(...)`.
+- All consumer goroutines are started via `wg.Go` (syntactic sugar for `go func()` + `wg.Add`/`wg.Done`) inside `internal/inbound/messaging/route/route_messaging.go`.
 - Each consumer loop checks `ctx.Err()` after every poll-commit cycle.
 - On OS signal, `cancel()` triggers `ctx.Done()` which causes all loops to exit, then `wg.Wait()` blocks until all consumers finish their current processing.

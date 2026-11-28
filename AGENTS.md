@@ -57,7 +57,7 @@ func (r *FollowRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, foll
 }
 ```
 
-- The retry helper matches the outbound layer: `DBRetry`/`DBRetryWithData` (repository), `CacheRetry`/`CacheRetryWithData` (cache), `MessagingRetry`/`MessagingRetryWithData` (messaging), `SearchRetry`/`SearchRetryWithData` (search), `StorageRetry`/`StorageRetryWithData` (storage). Use the `*WithData` form for value-returning methods. Each layer has its own tuning in `pkg/retrykit`. Usecases call `Next` directly — no retry.
+- The retry helper matches the outbound layer: `DBRetry`/`DBRetryWithData` (repository), `CacheRetry`/`CacheRetryWithData` (cache), `MessagingRetry`/`MessagingRetryWithData` (messaging), `SearchRetry`/`SearchRetryWithData` (search), `StorageRetry`/`StorageRetryWithData` (storage), `EmailRetry`/`EmailRetryWithData` (email). Use the `*WithData` form for value-returning methods. Each layer has its own tuning in `pkg/retrykit`. Usecases call `Next` directly — no retry.
 - **Enforced** by `make check-rules`: every error-returning method in an outbound `_mw_logger.go` must contain `telemetry.Start(ctx)`, `defer span.End()`, a `retrykit.` call, `telemetry.RecordError(span, err)`, and `logkit.LogMw(ctx, ...)`; usecase decorators are exempt from the retry marker.
 - The telemetry mechanics (span naming, error recording, log correlation) live in the `otel-architecture` skill → "Decorator pattern".
 
@@ -129,7 +129,7 @@ Errors carry their HTTP status, a client-facing message, and the call site that 
 
 Configuration is `settings/config.json` (Viper). Always run in this order:
 
-1. **Start infrastructure** — `make docker-compose-up` (wait for it to finish). Postgres, Kafka (+ Zookeeper), Redis, Elasticsearch, Kibana, MinIO (S3 on `:9100`, console on `:9001`), Mailpit (SMTP on `:1025`, web UI on `:8025`), Redpanda Console, and Grafana LGTM (one container: OpenTelemetry Collector + Tempo + Loki + Prometheus + Grafana; OTLP on `:4317`/`:4318`, UI on `:3000`). The app creates the `image` bucket on startup, so no manual bucket setup is needed.
+1. **Start infrastructure** — `make docker-compose-up` (wait for it to finish). Postgres, Kafka (+ Zookeeper), Redis, Elasticsearch, Kibana, MinIO (S3 on `:9100`, console on `:9001`), Mailpit (SMTP on `:1025`, web UI on `:8025`), Redpanda Console, and Grafana LGTM (one container: OpenTelemetry Collector + Tempo + Loki + Prometheus + Grafana; OTLP on `:4317`/`:4318`, UI on `:3001`). The app creates the `image` bucket on startup, so no manual bucket setup is needed.
 2. **Run migrations** — `make migrate`.
 3. **Seed dev data** — `make seed` (optional; dev fixtures only, see the `seeding` skill).
 4. **Run the app servers** — one command starts all four in the background:
@@ -236,6 +236,12 @@ Layers (`cmd`/`internal`/`pkg`), route conventions, config, and the step-by-step
 ---
 
 # Skills — deep reference (loaded on demand)
+
+**Writing skills:** skills must be **durable** — they are stable anchors, not a snapshot of the code at one moment.
+
+- **Never cite line numbers** (`file.go:42`). Lines shift on every edit; name the file or symbol instead.
+- **Never assert counts** ("34 migrations", "5 retry helpers", "N files"). Counts drift the moment something is added; say "read the registry/file for the current set". Changing code alone must not make a skill stale.
+- Prefer naming the owning package/constant/file and telling the reader to follow it, over restating its contents.
 
 - **`architecture`** — layers, file layout, route/config conventions, and how to add a feature.
 - **`tracing-logs`** — find all logs for one request by trace id (local files or Grafana/Tempo).

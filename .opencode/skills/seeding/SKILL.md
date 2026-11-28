@@ -31,7 +31,7 @@ Seeding is **separate from migrations**. Migrations own the schema and are versi
 
 ```bash
 make docker-compose-up-clean   # reset infra (down -v, then up)
-make migrate                   # schema (34 migrations)
+make migrate                   # schema
 make seed                      # dev data
 make run-all                   # start the 4 servers
 ```
