@@ -311,6 +311,47 @@ func (c *ImageController) DeleteImage(ctx *fiber.Ctx) error {
 	return response.Data(ctx, http.StatusOK, "ok")
 }
 
+// UpdateImage godoc
+//
+//	@Summary		Update image
+//	@Description	Edit an image caption (only the owner may edit)
+//	@Tags			images
+//	@Accept			json
+//	@Produce		json
+//	@Param			imageId	path	int						true	"Image ID"
+//	@Param			request	body	dto.UpdateImageRequest	true	"Update Image Request"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[string]
+//	@Router			/api/images/{imageId} [patch]
+func (c *ImageController) UpdateImage(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
+	imageID, err := strconv.ParseInt(ctx.Params("imageId"), 10, 64)
+	if err != nil {
+		err = errkit.SetCode(err, http.StatusBadRequest)
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*ImageController).UpdateImage")
+	}
+
+	req := dto.UpdateImageRequest{}
+	err = ctx.BodyParser(&req)
+	if err != nil {
+		err = errkit.SetCode(err, http.StatusBadRequest)
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*ImageController).UpdateImage")
+	}
+	req.ID = imageID
+
+	err = c.Usecase.UpdateImage(ctx.UserContext(), req)
+	if err != nil {
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*ImageController).UpdateImage")
+	}
+
+	return response.Data(ctx, http.StatusOK, "ok")
+}
+
 // GetLike godoc
 //
 //	@Summary		Get image likes

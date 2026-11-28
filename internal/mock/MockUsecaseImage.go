@@ -65,6 +65,9 @@ var _ imageusecase.ImageUsecase = &ImageUsecaseMock{}
 //			SyncImageToElasticsearchFunc: func(ctx context.Context, req dto.SyncImageToElasticsearchRequest) error {
 //				panic("mock out the SyncImageToElasticsearch method")
 //			},
+//			UpdateImageFunc: func(ctx context.Context, req dto.UpdateImageRequest) error {
+//				panic("mock out the UpdateImage method")
+//			},
 //			UploadFunc: func(ctx context.Context, req dto.UploadImageRequest) (dto.ImageResponse, error) {
 //				panic("mock out the Upload method")
 //			},
@@ -119,6 +122,9 @@ type ImageUsecaseMock struct {
 
 	// SyncImageToElasticsearchFunc mocks the SyncImageToElasticsearch method.
 	SyncImageToElasticsearchFunc func(ctx context.Context, req dto.SyncImageToElasticsearchRequest) error
+
+	// UpdateImageFunc mocks the UpdateImage method.
+	UpdateImageFunc func(ctx context.Context, req dto.UpdateImageRequest) error
 
 	// UploadFunc mocks the Upload method.
 	UploadFunc func(ctx context.Context, req dto.UploadImageRequest) (dto.ImageResponse, error)
@@ -230,6 +236,13 @@ type ImageUsecaseMock struct {
 			// Req is the req argument value.
 			Req dto.SyncImageToElasticsearchRequest
 		}
+		// UpdateImage holds details about calls to the UpdateImage method.
+		UpdateImage []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req dto.UpdateImageRequest
+		}
 		// Upload holds details about calls to the Upload method.
 		Upload []struct {
 			// Ctx is the ctx argument value.
@@ -253,6 +266,7 @@ type ImageUsecaseMock struct {
 	lockNotifyUserImageCommented     sync.RWMutex
 	lockNotifyUserImageLiked         sync.RWMutex
 	lockSyncImageToElasticsearch     sync.RWMutex
+	lockUpdateImage                  sync.RWMutex
 	lockUpload                       sync.RWMutex
 }
 
@@ -793,6 +807,42 @@ func (mock *ImageUsecaseMock) SyncImageToElasticsearchCalls() []struct {
 	mock.lockSyncImageToElasticsearch.RLock()
 	calls = mock.calls.SyncImageToElasticsearch
 	mock.lockSyncImageToElasticsearch.RUnlock()
+	return calls
+}
+
+// UpdateImage calls UpdateImageFunc.
+func (mock *ImageUsecaseMock) UpdateImage(ctx context.Context, req dto.UpdateImageRequest) error {
+	if mock.UpdateImageFunc == nil {
+		panic("ImageUsecaseMock.UpdateImageFunc: method is nil but ImageUsecase.UpdateImage was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req dto.UpdateImageRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockUpdateImage.Lock()
+	mock.calls.UpdateImage = append(mock.calls.UpdateImage, callInfo)
+	mock.lockUpdateImage.Unlock()
+	return mock.UpdateImageFunc(ctx, req)
+}
+
+// UpdateImageCalls gets all the calls that were made to UpdateImage.
+// Check the length with:
+//
+//	len(mockedImageUsecase.UpdateImageCalls())
+func (mock *ImageUsecaseMock) UpdateImageCalls() []struct {
+	Ctx context.Context
+	Req dto.UpdateImageRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req dto.UpdateImageRequest
+	}
+	mock.lockUpdateImage.RLock()
+	calls = mock.calls.UpdateImage
+	mock.lockUpdateImage.RUnlock()
 	return calls
 }
 

@@ -43,6 +43,13 @@ type DeleteImageRequest struct {
 	ID int64 `json:"-" validate:"required"`
 }
 
+// UpdateImageRequest is the input for PATCH /api/images/:imageId. The caller
+// (owner check) comes from the auth context.
+type UpdateImageRequest struct {
+	ID      int64  `json:"-"       validate:"required"`
+	Caption string `json:"caption" validate:"required,max=2200"`
+}
+
 type LikeResponse struct {
 	ID        int64          `json:"id"`
 	UserID    int64          `json:"user_id"`

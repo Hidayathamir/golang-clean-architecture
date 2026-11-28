@@ -45,6 +45,7 @@ const (
 	FollowerID     Column = "follower_id"
 	FollowingID    Column = "following_id"
 	URL            Column = "url"
+	Caption        Column = "caption"
 	LikeCount      Column = "like_count"
 	CommentCount   Column = "comment_count"
 	Username       Column = "username"

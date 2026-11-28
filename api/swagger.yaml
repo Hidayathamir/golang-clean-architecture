@@ -151,6 +151,14 @@ definitions:
     - password
     - username
     type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.UpdateImageRequest:
+    properties:
+      caption:
+        maxLength: 2200
+        type: string
+    required:
+    - caption
+    type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_dto.UpdateUserRequest:
     properties:
       name:
@@ -515,6 +523,34 @@ paths:
       security:
       - SimpleApiKeyAuth: []
       summary: Get image
+      tags:
+      - images
+    patch:
+      consumes:
+      - application/json
+      description: Edit an image caption (only the owner may edit)
+      parameters:
+      - description: Image ID
+        in: path
+        name: imageId
+        required: true
+        type: integer
+      - description: Update Image Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.UpdateImageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-string'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Update image
       tags:
       - images
   /api/images/{imageId}/comments:

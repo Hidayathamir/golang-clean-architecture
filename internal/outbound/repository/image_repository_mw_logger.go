@@ -112,6 +112,24 @@ func (r *ImageRepositoryMwLogger) DeleteByID(ctx context.Context, db *gorm.DB, i
 	return err
 }
 
+func (r *ImageRepositoryMwLogger) UpdateCaptionByID(ctx context.Context, db *gorm.DB, id int64, caption string) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.UpdateCaptionByID(ctx, db, id, caption)
+	})
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"id":      id,
+		"caption": caption,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return err
+}
+
 func (r *ImageRepositoryMwLogger) IncrementCommentCountByID(ctx context.Context, db *gorm.DB, id int64, count int) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
