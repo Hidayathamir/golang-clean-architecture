@@ -4,7 +4,8 @@
 #   2. Keep errkit.AddFuncName call arguments in sync with function names (auto-fix).
 #   3. Enforce gofmt on staged Go files.
 #   4. Run golangci-lint on staged Go packages (required — no skip).
-#   5. Enforce project rules before the commit is created.
+#   5. Run unit tests (required — no skip).
+#   6. Enforce project rules before the commit is created.
 # Installed via `make setup` (sets core.hooksPath to .githooks).
 #
 # To bypass in an emergency: git commit --no-verify
@@ -63,7 +64,18 @@ if [ -n "$staged_go" ]; then
 	fi
 fi
 
-# 5. Enforce project rules.
+# 5. Run unit tests. Required: commit is blocked when tests fail.
+if [ -n "$staged_go" ]; then
+	echo "🧪 Running unit tests..."
+	if ! make go-test; then
+		echo ""
+		echo "❌ Commit blocked: unit tests failed (see logs/go_test.jsonl)."
+		echo "   Fix the issues above, or bypass with: git commit --no-verify"
+		exit 1
+	fi
+fi
+
+# 6. Enforce project rules.
 if ! make check-rules; then
 	echo ""
 	echo "❌ Commit blocked: project rules violated (see make check-rules)."
