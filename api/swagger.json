@@ -342,6 +342,47 @@
                 }
             }
         },
+        "/api/images/{imageId}/comments/{commentId}": {
+            "delete": {
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete a comment (comment owner or image owner)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "images"
+                ],
+                "summary": "Delete image comment",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Image ID",
+                        "name": "imageId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Comment ID",
+                        "name": "commentId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/images/{imageId}/like": {
             "delete": {
                 "security": [

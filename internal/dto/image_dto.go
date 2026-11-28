@@ -34,6 +34,14 @@ type UnlikeImageRequest struct {
 	ImageID int64 `json:"-" validate:"required"`
 }
 
+// DeleteImageCommentRequest is the input for
+// DELETE /api/images/:imageId/comments/:commentId. Both ids come from the path;
+// the caller (owner check) comes from the auth context.
+type DeleteImageCommentRequest struct {
+	ImageID   int64 `json:"-" validate:"required"`
+	CommentID int64 `json:"-" validate:"required"`
+}
+
 type CommentImageRequest struct {
 	ImageID int64  `json:"image_id" validate:"required"`
 	Comment string `json:"comment"  validate:"required"`
@@ -205,6 +213,7 @@ type ImageCommentedEvent struct {
 	UserID    int64          `json:"user_id"`
 	ImageID   int64          `json:"image_id"`
 	Comment   string         `json:"comment"`
+	Count     int            `json:"count"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `json:"deleted_at"`

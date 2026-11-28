@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
@@ -14,7 +15,9 @@ import (
 
 type CommentRepository interface {
 	Create(ctx context.Context, db *gorm.DB, comment *entity.Comment) error
+	FindByID(ctx context.Context, db *gorm.DB, comment *entity.Comment, id int64) error
 	FindByImageID(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64) error
+	DeleteByID(ctx context.Context, db *gorm.DB, comment *entity.Comment) error
 }
 
 var _ CommentRepository = &CommentRepositoryImpl{}
@@ -37,10 +40,27 @@ func (r *CommentRepositoryImpl) Create(ctx context.Context, db *gorm.DB, comment
 	return nil
 }
 
+func (r *CommentRepositoryImpl) FindByID(ctx context.Context, db *gorm.DB, comment *entity.Comment, id int64) error {
+	err := db.WithContext(ctx).Where(column.ID.Eq(id)).Take(comment).Error
+	if err != nil {
+		err = errkit.SetCode(err, http.StatusNotFound)
+		return errkit.AddFuncName(err, "repository.(*CommentRepositoryImpl).FindByID")
+	}
+	return nil
+}
+
 func (r *CommentRepositoryImpl) FindByImageID(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64) error {
 	err := db.WithContext(ctx).Where(column.ImageID.Eq(imageID)).Find(commentList).Error
 	if err != nil {
 		return errkit.AddFuncName(err, "repository.(*CommentRepositoryImpl).FindByImageID")
+	}
+	return nil
+}
+
+func (r *CommentRepositoryImpl) DeleteByID(ctx context.Context, db *gorm.DB, comment *entity.Comment) error {
+	err := db.WithContext(ctx).Delete(comment).Error
+	if err != nil {
+		return errkit.AddFuncName(err, "repository.(*CommentRepositoryImpl).DeleteByID")
 	}
 	return nil
 }

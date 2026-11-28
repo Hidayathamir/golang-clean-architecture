@@ -65,6 +65,7 @@ func EntityCommentToDtoImageCommentedEvent(comment entity.Comment, event *dto.Im
 	event.UserID = comment.UserID
 	event.ImageID = comment.ImageID
 	event.Comment = comment.Comment
+	event.Count = 1
 	event.CreatedAt = comment.CreatedAt
 	event.UpdatedAt = comment.UpdatedAt
 	event.DeletedAt = comment.DeletedAt
@@ -168,7 +169,13 @@ func KGoRecordListToDtoBatchUpdateImageCommentCountRequest(ctx context.Context, 
 			logkit.Logger.WithContext(ctx).WithError(err).Warn("Failed to unmarshal image commented event")
 			continue
 		}
-		mapCounter[event.ImageID]++
+		// Count is +1 for a comment and -1 for a delete. Older events predate
+		// the field, so a zero is treated as a single comment.
+		count := event.Count
+		if count == 0 {
+			count = 1
+		}
+		mapCounter[event.ImageID] += count
 	}
 
 	for imageID, count := range mapCounter {

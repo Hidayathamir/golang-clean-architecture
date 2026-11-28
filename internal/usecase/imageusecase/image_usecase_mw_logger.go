@@ -176,6 +176,21 @@ func (u *ImageUsecaseMwLogger) Unlike(ctx context.Context, req dto.UnlikeImageRe
 	return err
 }
 
+func (u *ImageUsecaseMwLogger) DeleteImageComment(ctx context.Context, req dto.DeleteImageCommentRequest) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := u.Next.DeleteImageComment(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return err
+}
+
 func (u *ImageUsecaseMwLogger) GetComment(ctx context.Context, req dto.GetCommentRequest) (dto.CommentResponseList, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()

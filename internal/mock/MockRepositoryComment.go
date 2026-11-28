@@ -24,6 +24,12 @@ var _ repository.CommentRepository = &CommentRepositoryMock{}
 //			CreateFunc: func(ctx context.Context, db *gorm.DB, comment *entity.Comment) error {
 //				panic("mock out the Create method")
 //			},
+//			DeleteByIDFunc: func(ctx context.Context, db *gorm.DB, comment *entity.Comment) error {
+//				panic("mock out the DeleteByID method")
+//			},
+//			FindByIDFunc: func(ctx context.Context, db *gorm.DB, comment *entity.Comment, id int64) error {
+//				panic("mock out the FindByID method")
+//			},
 //			FindByImageIDFunc: func(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64) error {
 //				panic("mock out the FindByImageID method")
 //			},
@@ -36,6 +42,12 @@ var _ repository.CommentRepository = &CommentRepositoryMock{}
 type CommentRepositoryMock struct {
 	// CreateFunc mocks the Create method.
 	CreateFunc func(ctx context.Context, db *gorm.DB, comment *entity.Comment) error
+
+	// DeleteByIDFunc mocks the DeleteByID method.
+	DeleteByIDFunc func(ctx context.Context, db *gorm.DB, comment *entity.Comment) error
+
+	// FindByIDFunc mocks the FindByID method.
+	FindByIDFunc func(ctx context.Context, db *gorm.DB, comment *entity.Comment, id int64) error
 
 	// FindByImageIDFunc mocks the FindByImageID method.
 	FindByImageIDFunc func(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64) error
@@ -51,6 +63,26 @@ type CommentRepositoryMock struct {
 			// Comment is the comment argument value.
 			Comment *entity.Comment
 		}
+		// DeleteByID holds details about calls to the DeleteByID method.
+		DeleteByID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
+			// Comment is the comment argument value.
+			Comment *entity.Comment
+		}
+		// FindByID holds details about calls to the FindByID method.
+		FindByID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
+			// Comment is the comment argument value.
+			Comment *entity.Comment
+			// ID is the id argument value.
+			ID int64
+		}
 		// FindByImageID holds details about calls to the FindByImageID method.
 		FindByImageID []struct {
 			// Ctx is the ctx argument value.
@@ -64,6 +96,8 @@ type CommentRepositoryMock struct {
 		}
 	}
 	lockCreate        sync.RWMutex
+	lockDeleteByID    sync.RWMutex
+	lockFindByID      sync.RWMutex
 	lockFindByImageID sync.RWMutex
 }
 
@@ -104,6 +138,90 @@ func (mock *CommentRepositoryMock) CreateCalls() []struct {
 	mock.lockCreate.RLock()
 	calls = mock.calls.Create
 	mock.lockCreate.RUnlock()
+	return calls
+}
+
+// DeleteByID calls DeleteByIDFunc.
+func (mock *CommentRepositoryMock) DeleteByID(ctx context.Context, db *gorm.DB, comment *entity.Comment) error {
+	if mock.DeleteByIDFunc == nil {
+		panic("CommentRepositoryMock.DeleteByIDFunc: method is nil but CommentRepository.DeleteByID was just called")
+	}
+	callInfo := struct {
+		Ctx     context.Context
+		Db      *gorm.DB
+		Comment *entity.Comment
+	}{
+		Ctx:     ctx,
+		Db:      db,
+		Comment: comment,
+	}
+	mock.lockDeleteByID.Lock()
+	mock.calls.DeleteByID = append(mock.calls.DeleteByID, callInfo)
+	mock.lockDeleteByID.Unlock()
+	return mock.DeleteByIDFunc(ctx, db, comment)
+}
+
+// DeleteByIDCalls gets all the calls that were made to DeleteByID.
+// Check the length with:
+//
+//	len(mockedCommentRepository.DeleteByIDCalls())
+func (mock *CommentRepositoryMock) DeleteByIDCalls() []struct {
+	Ctx     context.Context
+	Db      *gorm.DB
+	Comment *entity.Comment
+} {
+	var calls []struct {
+		Ctx     context.Context
+		Db      *gorm.DB
+		Comment *entity.Comment
+	}
+	mock.lockDeleteByID.RLock()
+	calls = mock.calls.DeleteByID
+	mock.lockDeleteByID.RUnlock()
+	return calls
+}
+
+// FindByID calls FindByIDFunc.
+func (mock *CommentRepositoryMock) FindByID(ctx context.Context, db *gorm.DB, comment *entity.Comment, id int64) error {
+	if mock.FindByIDFunc == nil {
+		panic("CommentRepositoryMock.FindByIDFunc: method is nil but CommentRepository.FindByID was just called")
+	}
+	callInfo := struct {
+		Ctx     context.Context
+		Db      *gorm.DB
+		Comment *entity.Comment
+		ID      int64
+	}{
+		Ctx:     ctx,
+		Db:      db,
+		Comment: comment,
+		ID:      id,
+	}
+	mock.lockFindByID.Lock()
+	mock.calls.FindByID = append(mock.calls.FindByID, callInfo)
+	mock.lockFindByID.Unlock()
+	return mock.FindByIDFunc(ctx, db, comment, id)
+}
+
+// FindByIDCalls gets all the calls that were made to FindByID.
+// Check the length with:
+//
+//	len(mockedCommentRepository.FindByIDCalls())
+func (mock *CommentRepositoryMock) FindByIDCalls() []struct {
+	Ctx     context.Context
+	Db      *gorm.DB
+	Comment *entity.Comment
+	ID      int64
+} {
+	var calls []struct {
+		Ctx     context.Context
+		Db      *gorm.DB
+		Comment *entity.Comment
+		ID      int64
+	}
+	mock.lockFindByID.RLock()
+	calls = mock.calls.FindByID
+	mock.lockFindByID.RUnlock()
 	return calls
 }
 

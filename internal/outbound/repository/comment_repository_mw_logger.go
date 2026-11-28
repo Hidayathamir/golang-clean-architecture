@@ -40,6 +40,41 @@ func (r *CommentRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, com
 	return err
 }
 
+func (r *CommentRepositoryMwLogger) FindByID(ctx context.Context, db *gorm.DB, comment *entity.Comment, id int64) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.FindByID(ctx, db, comment, id)
+	})
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"id":      id,
+		"comment": comment,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return err
+}
+
+func (r *CommentRepositoryMwLogger) DeleteByID(ctx context.Context, db *gorm.DB, comment *entity.Comment) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.DeleteByID(ctx, db, comment)
+	})
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"comment": comment,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return err
+}
+
 func (r *CommentRepositoryMwLogger) FindByImageID(ctx context.Context, db *gorm.DB, commentList *entity.CommentList, imageID int64) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()

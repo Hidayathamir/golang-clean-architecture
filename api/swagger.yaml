@@ -574,6 +574,32 @@ paths:
       summary: Get image comments
       tags:
       - images
+  /api/images/{imageId}/comments/{commentId}:
+    delete:
+      description: Delete a comment (comment owner or image owner)
+      parameters:
+      - description: Image ID
+        in: path
+        name: imageId
+        required: true
+        type: integer
+      - description: Comment ID
+        in: path
+        name: commentId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-string'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Delete image comment
+      tags:
+      - images
   /api/images/{imageId}/like:
     delete:
       description: Remove the current user's like from an image

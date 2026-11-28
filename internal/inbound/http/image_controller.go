@@ -386,6 +386,49 @@ func (c *ImageController) Unlike(ctx *fiber.Ctx) error {
 	return response.Data(ctx, http.StatusOK, "ok")
 }
 
+// DeleteImageComment godoc
+//
+//	@Summary		Delete image comment
+//	@Description	Delete a comment (comment owner or image owner)
+//	@Tags			images
+//	@Produce		json
+//	@Param			imageId		path	int	true	"Image ID"
+//	@Param			commentId	path	int	true	"Comment ID"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[string]
+//	@Router			/api/images/{imageId}/comments/{commentId} [delete]
+func (c *ImageController) DeleteImageComment(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
+	imageID, err := strconv.ParseInt(ctx.Params("imageId"), 10, 64)
+	if err != nil {
+		err = errkit.SetCode(err, http.StatusBadRequest)
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*ImageController).DeleteImageComment")
+	}
+
+	commentID, err := strconv.ParseInt(ctx.Params("commentId"), 10, 64)
+	if err != nil {
+		err = errkit.SetCode(err, http.StatusBadRequest)
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*ImageController).DeleteImageComment")
+	}
+
+	req := dto.DeleteImageCommentRequest{
+		ImageID:   imageID,
+		CommentID: commentID,
+	}
+
+	err = c.Usecase.DeleteImageComment(ctx.UserContext(), req)
+	if err != nil {
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*ImageController).DeleteImageComment")
+	}
+
+	return response.Data(ctx, http.StatusOK, "ok")
+}
+
 // GetLike godoc
 //
 //	@Summary		Get image likes
