@@ -176,12 +176,13 @@ func writeOutput(path string, lines []logLine) error {
 	enc := json.NewEncoder(w)
 	enc.SetEscapeHTML(false)
 	for _, line := range lines {
-		out := make(map[string]any, len(line.Raw)+1)
-		for k, v := range line.Raw {
-			out[k] = v
+		// Prefix each line with its source service and re-encode the log entry
+		// verbatim, so the original JSON is never mutated.
+		if _, err := fmt.Fprintf(w, "[%s] ", line.Service); err != nil {
+			_ = f.Close()
+			return err
 		}
-		out["service"] = line.Service
-		if err := enc.Encode(out); err != nil {
+		if err := enc.Encode(line.Raw); err != nil {
 			_ = f.Close()
 			return err
 		}

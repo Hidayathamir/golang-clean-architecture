@@ -116,11 +116,16 @@ check-commit-msg:
 	go run ./scripts/checkcommitmsg "$(MSG_FILE)"
 
 # Aggregate every logs/<service>_log.jsonl line for one trace into a single
-# time-sorted file, tagging each line with the service it came from.
-# Output: logs/trace_logs_search_result.jsonl (override with OUT=<path>).
+# time-sorted file, prefixing each line with [source] and keeping the JSON verbatim.
+# Usage: make trace-logs <trace-id>   (output: logs/trace_logs_search_result.jsonl)
+# Override the output path with OUT=<file>.
 trace-logs:
-	@if [ -z "$(TRACE_ID)" ]; then echo "usage: make trace-logs TRACE_ID=<trace-id> [OUT=<file>]"; exit 2; fi
-	go run ./scripts/tracelogs "$(TRACE_ID)" $(if $(OUT),"$(OUT)",)
+	@if [ -z "$(filter-out $@,$(MAKECMDGOALS))" ]; then echo "usage: make trace-logs <trace-id> [OUT=<file>]"; exit 2; fi
+	go run ./scripts/tracelogs "$(filter-out $@,$(MAKECMDGOALS))" $(if $(OUT),"$(OUT)",)
+
+# Swallow the positional trace-id so make doesn't treat it as a target.
+%:
+	@:
 
 # Render docs/*.mermaid to docs/*.png (requires Node; fetches mmdc via npx).
 # -s 3 renders at 3x scale for crisp text on hi-dpi displays.
