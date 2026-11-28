@@ -21,6 +21,7 @@ func (u *ImageUsecaseImpl) BatchUpdateImageLikeCount(ctx context.Context, req dt
 		err = u.ImageRepository.IncrementLikeCountByID(ctx, u.DB, v.ImageID, v.Count)
 		if err != nil {
 			logkit.Logger.WithContext(ctx).WithError(err).WithField("v", v).Warn()
+			return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).BatchUpdateImageLikeCount")
 		}
 	}
 

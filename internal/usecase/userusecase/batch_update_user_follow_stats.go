@@ -18,7 +18,7 @@ func (u *UserUsecaseImpl) BatchUpdateUserFollowStats(ctx context.Context, req dt
 	}
 
 	for _, v := range req.UserIncreaseFollowerFollowingCountList {
-		var err error = nil
+		var err error
 		switch {
 		case v.HasFollowerCountAndFollowingCount():
 			err = u.UserStatRepository.IncrementFollowerCountAndFollowingCountByID(ctx, u.DB, v.UserID, v.FollowerCount, v.FollowingCount)
@@ -28,9 +28,11 @@ func (u *UserUsecaseImpl) BatchUpdateUserFollowStats(ctx context.Context, req dt
 			err = u.UserStatRepository.IncrementFollowingCountByID(ctx, u.DB, v.UserID, v.FollowingCount)
 		default:
 			logkit.Logger.WithContext(ctx).WithField("v", v).Warn("invalid follower count and following count")
+			continue
 		}
 		if err != nil {
-			logkit.Logger.WithContext(ctx).WithError(err).Warn()
+			logkit.Logger.WithContext(ctx).WithError(err).WithField("v", v).Warn()
+			return errkit.AddFuncName(err, "userusecase.(*UserUsecaseImpl).BatchUpdateUserFollowStats")
 		}
 	}
 

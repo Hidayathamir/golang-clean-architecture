@@ -21,6 +21,7 @@ func (u *ImageUsecaseImpl) BatchUpdateImageCommentCount(ctx context.Context, req
 		err = u.ImageRepository.IncrementCommentCountByID(ctx, u.DB, v.ImageID, v.Count)
 		if err != nil {
 			logkit.Logger.WithContext(ctx).WithError(err).WithField("v", v).Warn()
+			return errkit.AddFuncName(err, "imageusecase.(*ImageUsecaseImpl).BatchUpdateImageCommentCount")
 		}
 	}
 
