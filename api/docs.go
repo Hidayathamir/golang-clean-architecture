@@ -169,6 +169,40 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/images/{imageId}": {
+            "get": {
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
+                ],
+                "description": "Get a single image by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "images"
+                ],
+                "summary": "Get image",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Image ID",
+                        "name": "imageId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ImageResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/images/{imageId}/comments": {
             "get": {
                 "security": [

@@ -125,6 +125,40 @@ func (c *ImageController) Comment(ctx *fiber.Ctx) error {
 	return response.Data(ctx, http.StatusOK, "ok")
 }
 
+// GetImage godoc
+//
+//	@Summary		Get image
+//	@Description	Get a single image by id
+//	@Tags			images
+//	@Produce		json
+//	@Param			imageId	path	int	true	"Image ID"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[dto.ImageResponse]
+//	@Router			/api/images/{imageId} [get]
+func (c *ImageController) GetImage(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
+	imageID, err := strconv.ParseInt(ctx.Params("imageId"), 10, 64)
+	if err != nil {
+		err = errkit.SetCode(err, http.StatusBadRequest)
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*ImageController).GetImage")
+	}
+
+	req := dto.GetImageRequest{
+		ID: imageID,
+	}
+
+	res, err := c.Usecase.GetImage(ctx.UserContext(), req)
+	if err != nil {
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*ImageController).GetImage")
+	}
+
+	return response.Data(ctx, http.StatusOK, res)
+}
+
 // GetFeed godoc
 //
 //	@Summary		Get feed

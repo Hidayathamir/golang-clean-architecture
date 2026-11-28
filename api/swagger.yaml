@@ -348,6 +348,27 @@ paths:
       summary: Like image
       tags:
       - images
+  /api/images/{imageId}:
+    get:
+      description: Get a single image by id
+      parameters:
+      - description: Image ID
+        in: path
+        name: imageId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ImageResponse'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Get image
+      tags:
+      - images
   /api/images/{imageId}/comments:
     get:
       description: Get list of comments for an image
