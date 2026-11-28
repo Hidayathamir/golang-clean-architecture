@@ -17,13 +17,13 @@ internal/
   inbound/        HTTP controllers (package http), Kafka consumers (package messaging)
   dto/            Request/response DTOs between layers
   converter/      Entity ↔ DTO transforms
-  usecase/*usecase/   Business logic (package userusecase, imageusecase, notifusecase, idempotencyusecase)
+  usecase/<name>usecase/   Business logic, one package per feature (list dir for the current set)
   entity/         Domain models (GORM structs, e.g. message_idempotency)
   outbound/       External implementations: repository, cache, messaging, storage, search
   provider/       Component initialization (DB, Redis, Kafka, S3, Elasticsearch, Fiber)
   dependency_injection/   Wire everything together
   config/         Viper-based config from settings/config.json
-pkg/              Shared utilities: logkit, errkit, telemetry, retrykit, validatorkit, caller, ctx, constant
+pkg/              Shared utilities (logkit, errkit, telemetry, retrykit, validatorkit, caller, ctx, constant — list the dir)
 ```
 
 The flow of a request is always **inbound → usecase → outbound**, with `converter` translating between `entity` and `dto` at the boundaries. Nothing skips a layer.

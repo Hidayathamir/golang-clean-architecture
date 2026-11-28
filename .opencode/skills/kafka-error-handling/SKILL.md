@@ -11,15 +11,7 @@ This skill covers the retry/DLQ path. Consumer **de-duplication** (`x-idempotenc
 
 ## Topic Topology
 
-Every primary topic has a corresponding **retry** and **DLQ** topic, mapped in `pkg/constant/topic/topic.go`.
-
-| Primary | Retry | DLQ |
-|---------|-------|-----|
-| `image.uploaded` | `image.uploaded.retry` | `image.uploaded.dlq` |
-| `image.liked` | `image.liked.retry` | `image.liked.dlq` |
-| `image.commented` | `image.commented.retry` | `image.commented.dlq` |
-| `user.followed` | `user.followed.retry` | `user.followed.dlq` |
-| `notif` | `notif.retry` | `notif.dlq` |
+The registry is `pkg/constant/topic/topic.go` — a `Topic{Primary}` value per topic. Do **not** keep a copy here; read that file for the current set. Every primary topic derives its pair by convention (`topic.Retry()` / `topic.DLQ()` append the suffix), so the mapping is mechanical, e.g. `image.uploaded` → `image.uploaded.retry` → `image.uploaded.dlq`.
 
 A `x-retry-count` header tracks retry attempts (stored on the record, incremented each hop). Max retries configured via `kafka.consumer.max_retries`.
 

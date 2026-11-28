@@ -11,10 +11,12 @@ Kafka consumers are **at-least-once**, so every message carries an **`x-idempote
 
 ## Pieces
 
+Each piece below is a stable anchor (a package or entry point that owns the concern); follow it into the code rather than expecting the paths to grow here.
+
 | Piece | Location |
 |-------|----------|
 | Entity | `internal/entity/message_idempotency.go` (table `message_idempotency`, PK `idempotency_key`) |
-| Migration | `db/migrations/20260724000000_create_table_message_idempotency.sql` |
+| Schema | migrations under `db/migrations/` matching `*message_idempotency*` |
 | Repository | `internal/outbound/repository/idempotency_repository.go` (+ `_mw_logger.go`) |
 | Usecase | `internal/usecase/idempotencyusecase/` — `InsertIfNotExists` (insert-if-absent) and `DeleteOlderThan` |
 | Inbound wrapper | `internal/inbound/messaging/idempotency.go` — `IdempotencyHandlerSingle` / `IdempotencyHandlerBatch` |
