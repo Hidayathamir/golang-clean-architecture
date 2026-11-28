@@ -30,6 +30,9 @@ var _ repository.UserRepository = &UserRepositoryMock{}
 //			FindByIDFunc: func(ctx context.Context, db *gorm.DB, user *entity.User, id int64) error {
 //				panic("mock out the FindByID method")
 //			},
+//			FindByIDsFunc: func(ctx context.Context, db *gorm.DB, userList *entity.UserList, ids []int64) error {
+//				panic("mock out the FindByIDs method")
+//			},
 //			FindByUsernameFunc: func(ctx context.Context, db *gorm.DB, user *entity.User, username string) error {
 //				panic("mock out the FindByUsername method")
 //			},
@@ -51,6 +54,9 @@ type UserRepositoryMock struct {
 
 	// FindByIDFunc mocks the FindByID method.
 	FindByIDFunc func(ctx context.Context, db *gorm.DB, user *entity.User, id int64) error
+
+	// FindByIDsFunc mocks the FindByIDs method.
+	FindByIDsFunc func(ctx context.Context, db *gorm.DB, userList *entity.UserList, ids []int64) error
 
 	// FindByUsernameFunc mocks the FindByUsername method.
 	FindByUsernameFunc func(ctx context.Context, db *gorm.DB, user *entity.User, username string) error
@@ -89,6 +95,17 @@ type UserRepositoryMock struct {
 			// ID is the id argument value.
 			ID int64
 		}
+		// FindByIDs holds details about calls to the FindByIDs method.
+		FindByIDs []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
+			// UserList is the userList argument value.
+			UserList *entity.UserList
+			// Ids is the ids argument value.
+			Ids []int64
+		}
 		// FindByUsername holds details about calls to the FindByUsername method.
 		FindByUsername []struct {
 			// Ctx is the ctx argument value.
@@ -113,6 +130,7 @@ type UserRepositoryMock struct {
 	lockCountByUsername sync.RWMutex
 	lockCreate          sync.RWMutex
 	lockFindByID        sync.RWMutex
+	lockFindByIDs       sync.RWMutex
 	lockFindByUsername  sync.RWMutex
 	lockUpdate          sync.RWMutex
 }
@@ -238,6 +256,50 @@ func (mock *UserRepositoryMock) FindByIDCalls() []struct {
 	mock.lockFindByID.RLock()
 	calls = mock.calls.FindByID
 	mock.lockFindByID.RUnlock()
+	return calls
+}
+
+// FindByIDs calls FindByIDsFunc.
+func (mock *UserRepositoryMock) FindByIDs(ctx context.Context, db *gorm.DB, userList *entity.UserList, ids []int64) error {
+	if mock.FindByIDsFunc == nil {
+		panic("UserRepositoryMock.FindByIDsFunc: method is nil but UserRepository.FindByIDs was just called")
+	}
+	callInfo := struct {
+		Ctx      context.Context
+		Db       *gorm.DB
+		UserList *entity.UserList
+		Ids      []int64
+	}{
+		Ctx:      ctx,
+		Db:       db,
+		UserList: userList,
+		Ids:      ids,
+	}
+	mock.lockFindByIDs.Lock()
+	mock.calls.FindByIDs = append(mock.calls.FindByIDs, callInfo)
+	mock.lockFindByIDs.Unlock()
+	return mock.FindByIDsFunc(ctx, db, userList, ids)
+}
+
+// FindByIDsCalls gets all the calls that were made to FindByIDs.
+// Check the length with:
+//
+//	len(mockedUserRepository.FindByIDsCalls())
+func (mock *UserRepositoryMock) FindByIDsCalls() []struct {
+	Ctx      context.Context
+	Db       *gorm.DB
+	UserList *entity.UserList
+	Ids      []int64
+} {
+	var calls []struct {
+		Ctx      context.Context
+		Db       *gorm.DB
+		UserList *entity.UserList
+		Ids      []int64
+	}
+	mock.lockFindByIDs.RLock()
+	calls = mock.calls.FindByIDs
+	mock.lockFindByIDs.RUnlock()
 	return calls
 }
 

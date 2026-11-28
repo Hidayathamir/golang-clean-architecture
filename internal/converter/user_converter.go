@@ -51,6 +51,16 @@ func EntityUserAndUserStatToDtoProfileResponse(user entity.User, userStat entity
 	res.FollowingCount = userStat.FollowingCount
 }
 
+// EntityUserListToDtoUserResponseList maps users in the given order.
+func EntityUserListToDtoUserResponseList(userList entity.UserList, res *dto.UserResponseList) {
+	*res = make(dto.UserResponseList, 0, len(userList))
+	for _, user := range userList {
+		item := dto.UserResponse{}
+		EntityUserToDtoUserResponse(user, &item)
+		*res = append(*res, item)
+	}
+}
+
 func EntityUserToDtoUserAuth(user entity.User, userAuth *dto.UserAuth) {
 	userAuth.ID = user.ID
 	userAuth.Username = user.Username

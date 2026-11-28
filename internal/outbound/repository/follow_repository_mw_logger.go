@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
@@ -52,6 +53,42 @@ func (r *FollowRepositoryMwLogger) FindByFollowingID(ctx context.Context, db *go
 	fields := logrus.Fields{
 		"followList":  followList,
 		"followingID": followingID,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return err
+}
+
+func (r *FollowRepositoryMwLogger) FindFollowersByFollowingID(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followingID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.FindFollowersByFollowingID(ctx, db, followList, followingID, cursorCreatedAt, cursorID, limit)
+	})
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"followList":  followList,
+		"followingID": followingID,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return err
+}
+
+func (r *FollowRepositoryMwLogger) FindFollowingsByFollowerID(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followerID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.FindFollowingsByFollowerID(ctx, db, followList, followerID, cursorCreatedAt, cursorID, limit)
+	})
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"followList": followList,
+		"followerID": followerID,
 	}
 	logkit.LogMw(ctx, fields, err)
 

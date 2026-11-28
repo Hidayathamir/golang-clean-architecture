@@ -20,6 +20,7 @@ type UserRepository interface {
 	CountByUsername(ctx context.Context, db *gorm.DB, username string) (int64, error)
 	FindByID(ctx context.Context, db *gorm.DB, user *entity.User, id int64) error
 	FindByUsername(ctx context.Context, db *gorm.DB, user *entity.User, username string) error
+	FindByIDs(ctx context.Context, db *gorm.DB, userList *entity.UserList, ids []int64) error
 }
 
 var _ UserRepository = &UserRepositoryImpl{}
@@ -84,6 +85,15 @@ func (r *UserRepositoryImpl) FindByUsername(ctx context.Context, db *gorm.DB, us
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusNotFound)
 		return errkit.AddFuncName(err, "repository.(*UserRepositoryImpl).FindByUsername")
+	}
+	return nil
+}
+
+func (r *UserRepositoryImpl) FindByIDs(ctx context.Context, db *gorm.DB, userList *entity.UserList, ids []int64) error {
+	whereIn, argsIn := column.ID.In(ids)
+	err := db.WithContext(ctx).Where(whereIn, argsIn).Find(userList).Error
+	if err != nil {
+		return errkit.AddFuncName(err, "repository.(*UserRepositoryImpl).FindByIDs")
 	}
 	return nil
 }

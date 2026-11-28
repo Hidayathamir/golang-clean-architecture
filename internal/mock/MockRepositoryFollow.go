@@ -9,6 +9,7 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/outbound/repository"
 	"gorm.io/gorm"
 	"sync"
+	"time"
 )
 
 // Ensure, that FollowRepositoryMock does implement repository.FollowRepository.
@@ -27,6 +28,12 @@ var _ repository.FollowRepository = &FollowRepositoryMock{}
 //			FindByFollowingIDFunc: func(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followingID int64) error {
 //				panic("mock out the FindByFollowingID method")
 //			},
+//			FindFollowersByFollowingIDFunc: func(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followingID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
+//				panic("mock out the FindFollowersByFollowingID method")
+//			},
+//			FindFollowingsByFollowerIDFunc: func(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followerID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
+//				panic("mock out the FindFollowingsByFollowerID method")
+//			},
 //		}
 //
 //		// use mockedFollowRepository in code that requires repository.FollowRepository
@@ -39,6 +46,12 @@ type FollowRepositoryMock struct {
 
 	// FindByFollowingIDFunc mocks the FindByFollowingID method.
 	FindByFollowingIDFunc func(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followingID int64) error
+
+	// FindFollowersByFollowingIDFunc mocks the FindFollowersByFollowingID method.
+	FindFollowersByFollowingIDFunc func(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followingID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error
+
+	// FindFollowingsByFollowerIDFunc mocks the FindFollowingsByFollowerID method.
+	FindFollowingsByFollowerIDFunc func(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followerID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -62,9 +75,45 @@ type FollowRepositoryMock struct {
 			// FollowingID is the followingID argument value.
 			FollowingID int64
 		}
+		// FindFollowersByFollowingID holds details about calls to the FindFollowersByFollowingID method.
+		FindFollowersByFollowingID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
+			// FollowList is the followList argument value.
+			FollowList *entity.FollowList
+			// FollowingID is the followingID argument value.
+			FollowingID int64
+			// CursorCreatedAt is the cursorCreatedAt argument value.
+			CursorCreatedAt time.Time
+			// CursorID is the cursorID argument value.
+			CursorID int64
+			// Limit is the limit argument value.
+			Limit int
+		}
+		// FindFollowingsByFollowerID holds details about calls to the FindFollowingsByFollowerID method.
+		FindFollowingsByFollowerID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
+			// FollowList is the followList argument value.
+			FollowList *entity.FollowList
+			// FollowerID is the followerID argument value.
+			FollowerID int64
+			// CursorCreatedAt is the cursorCreatedAt argument value.
+			CursorCreatedAt time.Time
+			// CursorID is the cursorID argument value.
+			CursorID int64
+			// Limit is the limit argument value.
+			Limit int
+		}
 	}
-	lockCreate            sync.RWMutex
-	lockFindByFollowingID sync.RWMutex
+	lockCreate                     sync.RWMutex
+	lockFindByFollowingID          sync.RWMutex
+	lockFindFollowersByFollowingID sync.RWMutex
+	lockFindFollowingsByFollowerID sync.RWMutex
 }
 
 // Create calls CreateFunc.
@@ -148,5 +197,117 @@ func (mock *FollowRepositoryMock) FindByFollowingIDCalls() []struct {
 	mock.lockFindByFollowingID.RLock()
 	calls = mock.calls.FindByFollowingID
 	mock.lockFindByFollowingID.RUnlock()
+	return calls
+}
+
+// FindFollowersByFollowingID calls FindFollowersByFollowingIDFunc.
+func (mock *FollowRepositoryMock) FindFollowersByFollowingID(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followingID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
+	if mock.FindFollowersByFollowingIDFunc == nil {
+		panic("FollowRepositoryMock.FindFollowersByFollowingIDFunc: method is nil but FollowRepository.FindFollowersByFollowingID was just called")
+	}
+	callInfo := struct {
+		Ctx             context.Context
+		Db              *gorm.DB
+		FollowList      *entity.FollowList
+		FollowingID     int64
+		CursorCreatedAt time.Time
+		CursorID        int64
+		Limit           int
+	}{
+		Ctx:             ctx,
+		Db:              db,
+		FollowList:      followList,
+		FollowingID:     followingID,
+		CursorCreatedAt: cursorCreatedAt,
+		CursorID:        cursorID,
+		Limit:           limit,
+	}
+	mock.lockFindFollowersByFollowingID.Lock()
+	mock.calls.FindFollowersByFollowingID = append(mock.calls.FindFollowersByFollowingID, callInfo)
+	mock.lockFindFollowersByFollowingID.Unlock()
+	return mock.FindFollowersByFollowingIDFunc(ctx, db, followList, followingID, cursorCreatedAt, cursorID, limit)
+}
+
+// FindFollowersByFollowingIDCalls gets all the calls that were made to FindFollowersByFollowingID.
+// Check the length with:
+//
+//	len(mockedFollowRepository.FindFollowersByFollowingIDCalls())
+func (mock *FollowRepositoryMock) FindFollowersByFollowingIDCalls() []struct {
+	Ctx             context.Context
+	Db              *gorm.DB
+	FollowList      *entity.FollowList
+	FollowingID     int64
+	CursorCreatedAt time.Time
+	CursorID        int64
+	Limit           int
+} {
+	var calls []struct {
+		Ctx             context.Context
+		Db              *gorm.DB
+		FollowList      *entity.FollowList
+		FollowingID     int64
+		CursorCreatedAt time.Time
+		CursorID        int64
+		Limit           int
+	}
+	mock.lockFindFollowersByFollowingID.RLock()
+	calls = mock.calls.FindFollowersByFollowingID
+	mock.lockFindFollowersByFollowingID.RUnlock()
+	return calls
+}
+
+// FindFollowingsByFollowerID calls FindFollowingsByFollowerIDFunc.
+func (mock *FollowRepositoryMock) FindFollowingsByFollowerID(ctx context.Context, db *gorm.DB, followList *entity.FollowList, followerID int64, cursorCreatedAt time.Time, cursorID int64, limit int) error {
+	if mock.FindFollowingsByFollowerIDFunc == nil {
+		panic("FollowRepositoryMock.FindFollowingsByFollowerIDFunc: method is nil but FollowRepository.FindFollowingsByFollowerID was just called")
+	}
+	callInfo := struct {
+		Ctx             context.Context
+		Db              *gorm.DB
+		FollowList      *entity.FollowList
+		FollowerID      int64
+		CursorCreatedAt time.Time
+		CursorID        int64
+		Limit           int
+	}{
+		Ctx:             ctx,
+		Db:              db,
+		FollowList:      followList,
+		FollowerID:      followerID,
+		CursorCreatedAt: cursorCreatedAt,
+		CursorID:        cursorID,
+		Limit:           limit,
+	}
+	mock.lockFindFollowingsByFollowerID.Lock()
+	mock.calls.FindFollowingsByFollowerID = append(mock.calls.FindFollowingsByFollowerID, callInfo)
+	mock.lockFindFollowingsByFollowerID.Unlock()
+	return mock.FindFollowingsByFollowerIDFunc(ctx, db, followList, followerID, cursorCreatedAt, cursorID, limit)
+}
+
+// FindFollowingsByFollowerIDCalls gets all the calls that were made to FindFollowingsByFollowerID.
+// Check the length with:
+//
+//	len(mockedFollowRepository.FindFollowingsByFollowerIDCalls())
+func (mock *FollowRepositoryMock) FindFollowingsByFollowerIDCalls() []struct {
+	Ctx             context.Context
+	Db              *gorm.DB
+	FollowList      *entity.FollowList
+	FollowerID      int64
+	CursorCreatedAt time.Time
+	CursorID        int64
+	Limit           int
+} {
+	var calls []struct {
+		Ctx             context.Context
+		Db              *gorm.DB
+		FollowList      *entity.FollowList
+		FollowerID      int64
+		CursorCreatedAt time.Time
+		CursorID        int64
+		Limit           int
+	}
+	mock.lockFindFollowingsByFollowerID.RLock()
+	calls = mock.calls.FindFollowingsByFollowerID
+	mock.lockFindFollowingsByFollowerID.RUnlock()
 	return calls
 }

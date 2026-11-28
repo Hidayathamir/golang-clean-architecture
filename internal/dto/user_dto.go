@@ -67,6 +67,18 @@ type GetProfileRequest struct {
 	ID int64 `json:"id" validate:"required"`
 }
 
+type UserResponseList []UserResponse
+
+// FollowersRequest is the input for GET /api/users/:id/followers. The target
+// user comes from the path; Page carries the cursor pagination input.
+type FollowersRequest struct {
+	UserID int64
+	Page   PageRequest
+}
+
+// FollowersResponse is a page of the target user's followers.
+type FollowersResponse = CursorPage[UserResponseList]
+
 type FollowUserRequest struct {
 	FollowingID int64 `json:"following_id"`
 }

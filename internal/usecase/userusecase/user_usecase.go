@@ -20,6 +20,7 @@ type UserUsecase interface {
 	Login(ctx context.Context, req dto.LoginUserRequest) (dto.UserLoginResponse, error)
 	Current(ctx context.Context, req dto.GetUserRequest) (dto.UserResponse, error)
 	GetProfile(ctx context.Context, req dto.GetProfileRequest) (dto.ProfileResponse, error)
+	GetFollowers(ctx context.Context, req dto.FollowersRequest) (dto.FollowersResponse, error)
 	Update(ctx context.Context, req dto.UpdateUserRequest) (dto.UserResponse, error)
 	Follow(ctx context.Context, req dto.FollowUserRequest) error
 	NotifyUserBeingFollowed(ctx context.Context, req dto.NotifyUserBeingFollowedRequest) error

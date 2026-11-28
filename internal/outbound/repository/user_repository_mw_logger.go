@@ -110,3 +110,21 @@ func (r *UserRepositoryMwLogger) Update(ctx context.Context, db *gorm.DB, user *
 
 	return err
 }
+
+func (r *UserRepositoryMwLogger) FindByIDs(ctx context.Context, db *gorm.DB, userList *entity.UserList, ids []int64) error {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	err := retrykit.DBRetry(ctx, func() error {
+		return r.Next.FindByIDs(ctx, db, userList, ids)
+	})
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"ids":      ids,
+		"userList": userList,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return err
+}

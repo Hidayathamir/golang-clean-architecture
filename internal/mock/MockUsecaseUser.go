@@ -32,6 +32,9 @@ var _ userusecase.UserUsecase = &UserUsecaseMock{}
 //			FollowFunc: func(ctx context.Context, req dto.FollowUserRequest) error {
 //				panic("mock out the Follow method")
 //			},
+//			GetFollowersFunc: func(ctx context.Context, req dto.FollowersRequest) (dto.FollowersResponse, error) {
+//				panic("mock out the GetFollowers method")
+//			},
 //			GetProfileFunc: func(ctx context.Context, req dto.GetProfileRequest) (dto.ProfileResponse, error) {
 //				panic("mock out the GetProfile method")
 //			},
@@ -65,6 +68,9 @@ type UserUsecaseMock struct {
 
 	// FollowFunc mocks the Follow method.
 	FollowFunc func(ctx context.Context, req dto.FollowUserRequest) error
+
+	// GetFollowersFunc mocks the GetFollowers method.
+	GetFollowersFunc func(ctx context.Context, req dto.FollowersRequest) (dto.FollowersResponse, error)
 
 	// GetProfileFunc mocks the GetProfile method.
 	GetProfileFunc func(ctx context.Context, req dto.GetProfileRequest) (dto.ProfileResponse, error)
@@ -111,6 +117,13 @@ type UserUsecaseMock struct {
 			// Req is the req argument value.
 			Req dto.FollowUserRequest
 		}
+		// GetFollowers holds details about calls to the GetFollowers method.
+		GetFollowers []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req dto.FollowersRequest
+		}
 		// GetProfile holds details about calls to the GetProfile method.
 		GetProfile []struct {
 			// Ctx is the ctx argument value.
@@ -151,6 +164,7 @@ type UserUsecaseMock struct {
 	lockCreate                     sync.RWMutex
 	lockCurrent                    sync.RWMutex
 	lockFollow                     sync.RWMutex
+	lockGetFollowers               sync.RWMutex
 	lockGetProfile                 sync.RWMutex
 	lockLogin                      sync.RWMutex
 	lockNotifyUserBeingFollowed    sync.RWMutex
@@ -299,6 +313,42 @@ func (mock *UserUsecaseMock) FollowCalls() []struct {
 	mock.lockFollow.RLock()
 	calls = mock.calls.Follow
 	mock.lockFollow.RUnlock()
+	return calls
+}
+
+// GetFollowers calls GetFollowersFunc.
+func (mock *UserUsecaseMock) GetFollowers(ctx context.Context, req dto.FollowersRequest) (dto.FollowersResponse, error) {
+	if mock.GetFollowersFunc == nil {
+		panic("UserUsecaseMock.GetFollowersFunc: method is nil but UserUsecase.GetFollowers was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req dto.FollowersRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockGetFollowers.Lock()
+	mock.calls.GetFollowers = append(mock.calls.GetFollowers, callInfo)
+	mock.lockGetFollowers.Unlock()
+	return mock.GetFollowersFunc(ctx, req)
+}
+
+// GetFollowersCalls gets all the calls that were made to GetFollowers.
+// Check the length with:
+//
+//	len(mockedUserUsecase.GetFollowersCalls())
+func (mock *UserUsecaseMock) GetFollowersCalls() []struct {
+	Ctx context.Context
+	Req dto.FollowersRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req dto.FollowersRequest
+	}
+	mock.lockGetFollowers.RLock()
+	calls = mock.calls.GetFollowers
+	mock.lockGetFollowers.RUnlock()
 	return calls
 }
 

@@ -46,7 +46,7 @@ Work items one at a time using the `instagram-feature` skill (the step-by-step r
 - [x] `GET /api/images/:id` — single post detail.
 - [x] `GET /api/users/:id/images` — a user's post grid (their profile feed), paginated.
 - [x] `GET /api/users/:id` — public profile: username, name, follower/following counts.
-- [ ] `GET /api/users/:id/followers` — list of followers (paginated).
+- [x] `GET /api/users/:id/followers` — list of followers (paginated).
 - [ ] `GET /api/users/:id/following` — list of followings (paginated).
 - [ ] `GET /api/explore` — discover posts; wire the existing Elasticsearch image search to an HTTP endpoint.
 
