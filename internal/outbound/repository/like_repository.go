@@ -15,6 +15,7 @@ import (
 type LikeRepository interface {
 	Create(ctx context.Context, db *gorm.DB, like *entity.Like) error
 	FindByImageID(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64) error
+	DeleteByUserIDAndImageID(ctx context.Context, db *gorm.DB, userID int64, imageID int64) (int64, error)
 }
 
 var _ LikeRepository = &LikeRepositoryImpl{}
@@ -43,4 +44,17 @@ func (r *LikeRepositoryImpl) FindByImageID(ctx context.Context, db *gorm.DB, lik
 		return errkit.AddFuncName(err, "repository.(*LikeRepositoryImpl).FindByImageID")
 	}
 	return nil
+}
+
+func (r *LikeRepositoryImpl) DeleteByUserIDAndImageID(ctx context.Context, db *gorm.DB, userID int64, imageID int64) (int64, error) {
+	whereUser, argUser := column.UserID.Eq(userID)
+	whereImage, argImage := column.ImageID.Eq(imageID)
+	result := db.WithContext(ctx).
+		Where(whereUser, argUser).
+		Where(whereImage, argImage).
+		Delete(&entity.Like{})
+	if result.Error != nil {
+		return 0, errkit.AddFuncName(result.Error, "repository.(*LikeRepositoryImpl).DeleteByUserIDAndImageID")
+	}
+	return result.RowsAffected, nil
 }

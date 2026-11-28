@@ -65,6 +65,9 @@ var _ imageusecase.ImageUsecase = &ImageUsecaseMock{}
 //			SyncImageToElasticsearchFunc: func(ctx context.Context, req dto.SyncImageToElasticsearchRequest) error {
 //				panic("mock out the SyncImageToElasticsearch method")
 //			},
+//			UnlikeFunc: func(ctx context.Context, req dto.UnlikeImageRequest) error {
+//				panic("mock out the Unlike method")
+//			},
 //			UpdateImageFunc: func(ctx context.Context, req dto.UpdateImageRequest) error {
 //				panic("mock out the UpdateImage method")
 //			},
@@ -122,6 +125,9 @@ type ImageUsecaseMock struct {
 
 	// SyncImageToElasticsearchFunc mocks the SyncImageToElasticsearch method.
 	SyncImageToElasticsearchFunc func(ctx context.Context, req dto.SyncImageToElasticsearchRequest) error
+
+	// UnlikeFunc mocks the Unlike method.
+	UnlikeFunc func(ctx context.Context, req dto.UnlikeImageRequest) error
 
 	// UpdateImageFunc mocks the UpdateImage method.
 	UpdateImageFunc func(ctx context.Context, req dto.UpdateImageRequest) error
@@ -236,6 +242,13 @@ type ImageUsecaseMock struct {
 			// Req is the req argument value.
 			Req dto.SyncImageToElasticsearchRequest
 		}
+		// Unlike holds details about calls to the Unlike method.
+		Unlike []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req dto.UnlikeImageRequest
+		}
 		// UpdateImage holds details about calls to the UpdateImage method.
 		UpdateImage []struct {
 			// Ctx is the ctx argument value.
@@ -266,6 +279,7 @@ type ImageUsecaseMock struct {
 	lockNotifyUserImageCommented     sync.RWMutex
 	lockNotifyUserImageLiked         sync.RWMutex
 	lockSyncImageToElasticsearch     sync.RWMutex
+	lockUnlike                       sync.RWMutex
 	lockUpdateImage                  sync.RWMutex
 	lockUpload                       sync.RWMutex
 }
@@ -807,6 +821,42 @@ func (mock *ImageUsecaseMock) SyncImageToElasticsearchCalls() []struct {
 	mock.lockSyncImageToElasticsearch.RLock()
 	calls = mock.calls.SyncImageToElasticsearch
 	mock.lockSyncImageToElasticsearch.RUnlock()
+	return calls
+}
+
+// Unlike calls UnlikeFunc.
+func (mock *ImageUsecaseMock) Unlike(ctx context.Context, req dto.UnlikeImageRequest) error {
+	if mock.UnlikeFunc == nil {
+		panic("ImageUsecaseMock.UnlikeFunc: method is nil but ImageUsecase.Unlike was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req dto.UnlikeImageRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockUnlike.Lock()
+	mock.calls.Unlike = append(mock.calls.Unlike, callInfo)
+	mock.lockUnlike.Unlock()
+	return mock.UnlikeFunc(ctx, req)
+}
+
+// UnlikeCalls gets all the calls that were made to Unlike.
+// Check the length with:
+//
+//	len(mockedImageUsecase.UnlikeCalls())
+func (mock *ImageUsecaseMock) UnlikeCalls() []struct {
+	Ctx context.Context
+	Req dto.UnlikeImageRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req dto.UnlikeImageRequest
+	}
+	mock.lockUnlike.RLock()
+	calls = mock.calls.Unlike
+	mock.lockUnlike.RUnlock()
 	return calls
 }
 

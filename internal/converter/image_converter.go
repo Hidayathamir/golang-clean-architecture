@@ -47,6 +47,7 @@ func EntityLikeToDtoImageLikedEvent(like entity.Like, event *dto.ImageLikedEvent
 	event.ID = like.ID
 	event.UserID = like.UserID
 	event.ImageID = like.ImageID
+	event.Count = 1
 	event.CreatedAt = like.CreatedAt
 	event.UpdatedAt = like.UpdatedAt
 	event.DeletedAt = like.DeletedAt
@@ -193,7 +194,13 @@ func KGoRecordListToDtoBatchUpdateImageLikeCountRequest(ctx context.Context, rec
 			logkit.Logger.WithContext(ctx).WithError(err).Warn("Failed to unmarshal image liked event")
 			continue
 		}
-		mapCounter[event.ImageID]++
+		// Count is +1 for a like and -1 for an unlike. Older events predate the
+		// field, so a zero is treated as a single like.
+		count := event.Count
+		if count == 0 {
+			count = 1
+		}
+		mapCounter[event.ImageID] += count
 	}
 
 	for imageID, count := range mapCounter {

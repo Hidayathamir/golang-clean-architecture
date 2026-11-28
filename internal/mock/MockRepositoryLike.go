@@ -24,6 +24,9 @@ var _ repository.LikeRepository = &LikeRepositoryMock{}
 //			CreateFunc: func(ctx context.Context, db *gorm.DB, like *entity.Like) error {
 //				panic("mock out the Create method")
 //			},
+//			DeleteByUserIDAndImageIDFunc: func(ctx context.Context, db *gorm.DB, userID int64, imageID int64) (int64, error) {
+//				panic("mock out the DeleteByUserIDAndImageID method")
+//			},
 //			FindByImageIDFunc: func(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64) error {
 //				panic("mock out the FindByImageID method")
 //			},
@@ -36,6 +39,9 @@ var _ repository.LikeRepository = &LikeRepositoryMock{}
 type LikeRepositoryMock struct {
 	// CreateFunc mocks the Create method.
 	CreateFunc func(ctx context.Context, db *gorm.DB, like *entity.Like) error
+
+	// DeleteByUserIDAndImageIDFunc mocks the DeleteByUserIDAndImageID method.
+	DeleteByUserIDAndImageIDFunc func(ctx context.Context, db *gorm.DB, userID int64, imageID int64) (int64, error)
 
 	// FindByImageIDFunc mocks the FindByImageID method.
 	FindByImageIDFunc func(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64) error
@@ -51,6 +57,17 @@ type LikeRepositoryMock struct {
 			// Like is the like argument value.
 			Like *entity.Like
 		}
+		// DeleteByUserIDAndImageID holds details about calls to the DeleteByUserIDAndImageID method.
+		DeleteByUserIDAndImageID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db *gorm.DB
+			// UserID is the userID argument value.
+			UserID int64
+			// ImageID is the imageID argument value.
+			ImageID int64
+		}
 		// FindByImageID holds details about calls to the FindByImageID method.
 		FindByImageID []struct {
 			// Ctx is the ctx argument value.
@@ -63,8 +80,9 @@ type LikeRepositoryMock struct {
 			ImageID int64
 		}
 	}
-	lockCreate        sync.RWMutex
-	lockFindByImageID sync.RWMutex
+	lockCreate                   sync.RWMutex
+	lockDeleteByUserIDAndImageID sync.RWMutex
+	lockFindByImageID            sync.RWMutex
 }
 
 // Create calls CreateFunc.
@@ -104,6 +122,50 @@ func (mock *LikeRepositoryMock) CreateCalls() []struct {
 	mock.lockCreate.RLock()
 	calls = mock.calls.Create
 	mock.lockCreate.RUnlock()
+	return calls
+}
+
+// DeleteByUserIDAndImageID calls DeleteByUserIDAndImageIDFunc.
+func (mock *LikeRepositoryMock) DeleteByUserIDAndImageID(ctx context.Context, db *gorm.DB, userID int64, imageID int64) (int64, error) {
+	if mock.DeleteByUserIDAndImageIDFunc == nil {
+		panic("LikeRepositoryMock.DeleteByUserIDAndImageIDFunc: method is nil but LikeRepository.DeleteByUserIDAndImageID was just called")
+	}
+	callInfo := struct {
+		Ctx     context.Context
+		Db      *gorm.DB
+		UserID  int64
+		ImageID int64
+	}{
+		Ctx:     ctx,
+		Db:      db,
+		UserID:  userID,
+		ImageID: imageID,
+	}
+	mock.lockDeleteByUserIDAndImageID.Lock()
+	mock.calls.DeleteByUserIDAndImageID = append(mock.calls.DeleteByUserIDAndImageID, callInfo)
+	mock.lockDeleteByUserIDAndImageID.Unlock()
+	return mock.DeleteByUserIDAndImageIDFunc(ctx, db, userID, imageID)
+}
+
+// DeleteByUserIDAndImageIDCalls gets all the calls that were made to DeleteByUserIDAndImageID.
+// Check the length with:
+//
+//	len(mockedLikeRepository.DeleteByUserIDAndImageIDCalls())
+func (mock *LikeRepositoryMock) DeleteByUserIDAndImageIDCalls() []struct {
+	Ctx     context.Context
+	Db      *gorm.DB
+	UserID  int64
+	ImageID int64
+} {
+	var calls []struct {
+		Ctx     context.Context
+		Db      *gorm.DB
+		UserID  int64
+		ImageID int64
+	}
+	mock.lockDeleteByUserIDAndImageID.RLock()
+	calls = mock.calls.DeleteByUserIDAndImageID
+	mock.lockDeleteByUserIDAndImageID.RUnlock()
 	return calls
 }
 

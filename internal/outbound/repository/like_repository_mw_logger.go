@@ -40,6 +40,25 @@ func (r *LikeRepositoryMwLogger) Create(ctx context.Context, db *gorm.DB, like *
 	return err
 }
 
+func (r *LikeRepositoryMwLogger) DeleteByUserIDAndImageID(ctx context.Context, db *gorm.DB, userID int64, imageID int64) (int64, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	deleted, err := retrykit.DBRetryWithData(ctx, func() (int64, error) {
+		return r.Next.DeleteByUserIDAndImageID(ctx, db, userID, imageID)
+	})
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"userID":  userID,
+		"imageID": imageID,
+		"deleted": deleted,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return deleted, err
+}
+
 func (r *LikeRepositoryMwLogger) FindByImageID(ctx context.Context, db *gorm.DB, likeList *entity.LikeList, imageID int64) error {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()

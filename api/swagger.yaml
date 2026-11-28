@@ -574,6 +574,27 @@ paths:
       summary: Get image comments
       tags:
       - images
+  /api/images/{imageId}/like:
+    delete:
+      description: Remove the current user's like from an image
+      parameters:
+      - description: Image ID
+        in: path
+        name: imageId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-string'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Unlike image
+      tags:
+      - images
   /api/images/{imageId}/likes:
     get:
       description: Get list of likes for an image

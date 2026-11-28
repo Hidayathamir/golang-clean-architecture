@@ -342,6 +342,40 @@
                 }
             }
         },
+        "/api/images/{imageId}/like": {
+            "delete": {
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
+                ],
+                "description": "Remove the current user's like from an image",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "images"
+                ],
+                "summary": "Unlike image",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Image ID",
+                        "name": "imageId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/images/{imageId}/likes": {
             "get": {
                 "security": [

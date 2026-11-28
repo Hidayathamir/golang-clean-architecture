@@ -24,6 +24,7 @@ type ImageUsecase interface {
 	Explore(ctx context.Context, req dto.ExploreRequest) (dto.ExploreResponse, error)
 	DeleteImage(ctx context.Context, req dto.DeleteImageRequest) error
 	UpdateImage(ctx context.Context, req dto.UpdateImageRequest) error
+	Unlike(ctx context.Context, req dto.UnlikeImageRequest) error
 	GetLike(ctx context.Context, req dto.GetLikeRequest) (dto.LikeResponseList, error)
 	GetComment(ctx context.Context, req dto.GetCommentRequest) (dto.CommentResponseList, error)
 	NotifyFollowerOnUpload(ctx context.Context, req dto.NotifyFollowerOnUploadRequest) error

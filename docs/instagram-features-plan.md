@@ -54,7 +54,7 @@ Work items one at a time using the `instagram-feature` skill (the step-by-step r
 
 - [x] `DELETE /api/images/:id` — delete own post (only the owner may delete).
 - [x] `PATCH /api/images/:id` — edit own post caption (only the owner may edit).
-- [ ] Unlike — `DELETE /api/images/:id/like` (only like currently exists); decrement like count.
+- [x] Unlike — `DELETE /api/images/:id/like` (only like currently exists); decrement like count.
 - [ ] `DELETE /api/images/:id/comments/:commentId` — delete a comment (comment owner or image owner).
 - [ ] Unfollow — `DELETE /api/users/:id/follow` (only follow exists); decrement follower stats.
 

@@ -28,6 +28,12 @@ type LikeImageRequest struct {
 	ImageID int64 `json:"image_id" validate:"required"`
 }
 
+// UnlikeImageRequest is the input for DELETE /api/images/:imageId/like. The
+// liker comes from the auth context.
+type UnlikeImageRequest struct {
+	ImageID int64 `json:"-" validate:"required"`
+}
+
 type CommentImageRequest struct {
 	ImageID int64  `json:"image_id" validate:"required"`
 	Comment string `json:"comment"  validate:"required"`
@@ -188,6 +194,7 @@ type ImageLikedEvent struct {
 	ID        int64          `json:"id"`
 	UserID    int64          `json:"user_id"`
 	ImageID   int64          `json:"image_id"`
+	Count     int            `json:"count"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `json:"deleted_at"`
