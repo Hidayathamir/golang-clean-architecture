@@ -60,9 +60,19 @@ Authorization: {{login.response.body.$.data.token}}
 
 ### Upload image
 POST {{baseUrl}}/api/images
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 Authorization: {{login.response.body.$.data.token}}
 
-image: < ./sample.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="sample.png"
+Content-Type: image/png
+
+< ./sample.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="caption"
+
+my first upload
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
 caption: my first upload
 
 ### Like image
