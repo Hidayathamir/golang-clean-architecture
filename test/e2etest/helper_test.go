@@ -238,6 +238,7 @@ func ClearAll() {
 	ClearLikes()
 	ClearImages()
 	ClearFollows()
+	ClearNotifications()
 	ClearUserStats()
 	ClearMessageIdempotency()
 	ClearUsers()
@@ -282,6 +283,13 @@ func ClearFollows() {
 	err := db.Unscoped().Where("id is not null").Delete(&entity.Follow{}).Error
 	if err != nil {
 		logkit.Logger.Panicf("Failed clear follow data : %+v", err)
+	}
+}
+
+func ClearNotifications() {
+	err := db.Unscoped().Where("id is not null").Delete(&entity.Notification{}).Error
+	if err != nil {
+		logkit.Logger.Panicf("Failed clear notification data : %+v", err)
 	}
 }
 
