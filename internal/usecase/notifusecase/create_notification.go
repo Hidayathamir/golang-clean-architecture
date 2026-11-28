@@ -45,7 +45,7 @@ func (u *NotifUsecaseImpl) createAndPush(ctx context.Context, req dto.NotifyRequ
 	res.ImageID = notification.ImageID
 	res.IsRead = notification.IsRead
 	res.CreatedAt = notification.CreatedAt
-	err = u.Publisher.Publish(ctx, notification.UserID, res)
+	err = u.NotificationPublisher.Publish(ctx, notification.UserID, res)
 	if err != nil {
 		return errkit.AddFuncName(err, "notifusecase.(*NotifUsecaseImpl).createAndPush")
 	}

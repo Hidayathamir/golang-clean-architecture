@@ -85,6 +85,12 @@ Repository implementations (`internal/outbound/repository/`) must never hardcode
 
 **Enforced** via `make check-rules` (`scripts/checkrules`): any string literal equal to a known table/column name in a repository impl fails. Decorators (`_mw_logger.go`) and tests are exempt.
 
+## Struct field names — mirror the outbound interface
+
+A struct field whose type is an outbound interface (`cache.*`, `repository.*`, `messaging.*`, `search.*`, `storage.*`) must be named after that interface — `NotificationPublisher cache.NotificationPublisher`, not `Publisher cache.NotificationPublisher`. Controllers and consumers keep their single short `Usecase` field; that is intentional and out of scope.
+
+**Enforced** via `make check-rules` (`scripts/checkrules`): a mismatched field name in `internal/outbound`, `internal/usecase`, `internal/inbound`, or `internal/dependency_injection` fails. Decorators (`_mw_logger.go`) and tests are exempt.
+
 ## Error wrapping — `errkit.AddFuncName`
 
 A handled error must be wrapped with `errkit.AddFuncName(err, "<call site>")` before it is returned, in the impl files of every layer: `internal/outbound/*`, `internal/usecase`, `internal/inbound`.

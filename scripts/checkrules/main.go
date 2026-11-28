@@ -31,6 +31,10 @@
 //     errkit.AddFuncName before returning it. Bare propagation of an err
 //     identifier (e.g. the outer return of a DB.Transaction closure, whose inner
 //     body already wrapped) is exempt. Decorators and tests are exempt.
+//   - Struct field names: a field whose type is an outbound interface
+//     (cache/repository/messaging/search/storage) must be named after that
+//     interface, so `NotificationPublisher cache.NotificationPublisher` rather
+//     than `Publisher cache.NotificationPublisher`.
 //
 // Run with `make check-rules`. Exits non-zero on any violation.
 package main
@@ -71,6 +75,7 @@ func main() {
 	violations = append(violations, checkInboundSpans()...)
 	violations = append(violations, checkConsumerIdempotency()...)
 	violations = append(violations, checkRepositoryTableColumnLiterals()...)
+	violations = append(violations, checkStructFieldNames()...)
 	violations = append(violations, checkErrorWrapping()...)
 
 	if len(violations) > 0 {
@@ -850,4 +855,77 @@ func isZeroValueExpr(expr ast.Expr) bool {
 		return len(e.Elts) == 0
 	}
 	return false
+}
+
+// structFieldNameRoots are the directories walked for the field-name rule.
+var structFieldNameRoots = []string{
+	"internal/outbound",
+	"internal/usecase",
+	"internal/inbound",
+	"internal/dependency_injection",
+}
+
+// outboundFieldPackages are the selector packages whose fields must be named
+// after their type. Only outbound interfaces are covered: controllers and
+// consumers deliberately hold their single usecase in a short `Usecase` field.
+var outboundFieldPackages = map[string]bool{
+	"cache":      true,
+	"repository": true,
+	"messaging":  true,
+	"search":     true,
+	"storage":    true,
+}
+
+// checkStructFieldNames fails when a field whose type is an outbound interface
+// is not named after that interface, e.g. `Publisher cache.NotificationPublisher`
+// instead of `NotificationPublisher cache.NotificationPublisher`.
+func checkStructFieldNames() []string {
+	var violations []string
+	for _, root := range structFieldNameRoots {
+		err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			if d.IsDir() || !strings.HasSuffix(path, ".go") ||
+				strings.HasSuffix(path, "_test.go") || strings.HasSuffix(path, "_mw_logger.go") {
+				return nil
+			}
+			fset := token.NewFileSet()
+			file, perr := parser.ParseFile(fset, path, nil, 0)
+			if perr != nil {
+				violations = append(violations, fmt.Sprintf("parse %s: %v", path, perr))
+				return nil
+			}
+			ast.Inspect(file, func(n ast.Node) bool {
+				st, ok := n.(*ast.StructType)
+				if !ok {
+					return true
+				}
+				for _, field := range st.Fields.List {
+					sel, ok := field.Type.(*ast.SelectorExpr)
+					if !ok {
+						continue
+					}
+					pkg, ok := sel.X.(*ast.Ident)
+					if !ok || !outboundFieldPackages[pkg.Name] {
+						continue
+					}
+					for _, name := range field.Names {
+						if name.Name == sel.Sel.Name {
+							continue
+						}
+						violations = append(violations,
+							fmt.Sprintf("%s:%d struct field %q should be named %q to match its type %s.%s",
+								path, fset.Position(name.Pos()).Line, name.Name, sel.Sel.Name, pkg.Name, sel.Sel.Name))
+					}
+				}
+				return true
+			})
+			return nil
+		})
+		if err != nil {
+			violations = append(violations, fmt.Sprintf("walk %s: %v", root, err))
+		}
+	}
+	return violations
 }

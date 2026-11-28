@@ -26,7 +26,7 @@ type NotifUsecaseImpl struct {
 	DB                     *gorm.DB
 	NotificationRepository repository.NotificationRepository
 	UserRepository         repository.UserRepository
-	Publisher              cache.NotificationPublisher
+	NotificationPublisher  cache.NotificationPublisher
 }
 
 func NewNotifUsecase(
@@ -34,13 +34,13 @@ func NewNotifUsecase(
 	DB *gorm.DB,
 	notificationRepository repository.NotificationRepository,
 	userRepository repository.UserRepository,
-	publisher cache.NotificationPublisher,
+	notificationPublisher cache.NotificationPublisher,
 ) *NotifUsecaseImpl {
 	return &NotifUsecaseImpl{
 		Config:                 Cfg,
 		DB:                     DB,
 		NotificationRepository: notificationRepository,
 		UserRepository:         userRepository,
-		Publisher:              publisher,
+		NotificationPublisher:  notificationPublisher,
 	}
 }

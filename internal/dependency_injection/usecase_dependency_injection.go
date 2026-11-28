@@ -20,13 +20,13 @@ import (
 )
 
 type Usecases struct {
-	UserUsecase        userusecase.UserUsecase
-	ImageUsecase       imageusecase.ImageUsecase
-	NotifUsecase       notifusecase.NotifUsecase
-	NotificationHub    *websocket.Hub
-	RedisClient        *redis.Client
-	IdempotencyRepo    repository.IdempotencyRepository
-	IdempotencyUsecase idempotencyusecase.IdempotencyUsecase
+	UserUsecase           userusecase.UserUsecase
+	ImageUsecase          imageusecase.ImageUsecase
+	NotifUsecase          notifusecase.NotifUsecase
+	NotificationHub       *websocket.Hub
+	RedisClient           *redis.Client
+	IdempotencyRepository repository.IdempotencyRepository
+	IdempotencyUsecase    idempotencyusecase.IdempotencyUsecase
 }
 
 func SetupUsecases(
@@ -127,12 +127,12 @@ func SetupUsecases(
 	imageUsecase = imageusecase.NewImageUsecaseMwLogger(imageUsecase)
 
 	return &Usecases{
-		UserUsecase:        userUsecase,
-		ImageUsecase:       imageUsecase,
-		NotifUsecase:       notifUsecase,
-		NotificationHub:    notificationHub,
-		RedisClient:        redisClient,
-		IdempotencyRepo:    idempotencyRepo,
-		IdempotencyUsecase: idempotencyUsecase,
+		UserUsecase:           userUsecase,
+		ImageUsecase:          imageUsecase,
+		NotifUsecase:          notifUsecase,
+		NotificationHub:       notificationHub,
+		RedisClient:           redisClient,
+		IdempotencyRepository: idempotencyRepo,
+		IdempotencyUsecase:    idempotencyUsecase,
 	}
 }
