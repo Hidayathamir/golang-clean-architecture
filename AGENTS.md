@@ -79,6 +79,12 @@ Migration files under `db/migrations/` must be named `<14-digit-timestamp>_<snak
 
 **Enforced** via `make check-rules` (`scripts/checkrules`). How to run migrations: see **Database migrations** under Workflow.
 
+## Repository table/column names — use the constants
+
+Repository implementations (`internal/outbound/repository/`) must never hardcode table or column names as string literals. Use `pkg/constant/table` (e.g. `Table(table.User)`) and `pkg/constant/column` (e.g. `column.CreatedAt.Eq(t)`). Entities' `TableName()` return the same `table.*` constant.
+
+**Enforced** via `make check-rules` (`scripts/checkrules`): any string literal equal to a known table/column name in a repository impl fails. Decorators (`_mw_logger.go`) and tests are exempt.
+
 ## Error handling — tagged via `pkg/errkit`
 
 Errors carry their HTTP status, a client-facing message, and the call site that produced them, all handled centrally by `pkg/errkit`. Non-retryable errors for Kafka are marked with `errkit.WrapNonRetryable` / read back with `errkit.IsNonRetryable` (see the `kafka-error-handling` skill → "Error Classification"). Details live in the `architecture` skill → "Error handling".

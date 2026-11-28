@@ -51,6 +51,17 @@ Single file: `settings/config.json`. Parsed via Viper in `internal/config/config
 8. Register routes in `internal/inbound/<http|messaging>/route/`.
 9. Run `make generate && make swag`.
 
+## Repository table & column names (enforced)
+
+Repository implementations must never hardcode table or column names as string literals. Use the constants:
+
+- Tables: `pkg/constant/table` — e.g. `Table(table.User)`.
+- Columns: `pkg/constant/column` — e.g. `column.CreatedAt.Eq(t)`.
+
+Every entity's `TableName()` also returns the `table.*` constant, so GORM's auto-resolution stays in sync.
+
+Enforced by `make check-rules` (`checkRepositoryTableColumnLiterals`): any string literal in `internal/outbound/repository/*.go` that equals a known table/column name fails. Decorators (`_mw_logger.go`, whose literals are log field keys) and tests (`_test.go`) are exempt.
+
 ## File naming (enforced)
 
 | Pattern | Example | Purpose |

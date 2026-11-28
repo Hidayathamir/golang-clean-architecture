@@ -22,6 +22,10 @@
 //     internal/inbound/messaging/route/route_messaging.go must pass a handler
 //     produced by messaging.IdempotencyHandlerSingle/Batch, unless the consumer
 //     group is allowlisted as inherently idempotent.
+//   - Repository table/column literals: repository implementations must not use
+//     string literals for table or column names; use pkg/constant/table and
+//     pkg/constant/column instead. Decorators (_mw_logger.go) are exempt because
+//     their literals are log field keys, and tests (_test.go) are exempt.
 //
 // Run with `make check-rules`. Exits non-zero on any violation.
 package main
@@ -34,6 +38,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -60,6 +65,7 @@ func main() {
 	violations = append(violations, checkMigrations()...)
 	violations = append(violations, checkInboundSpans()...)
 	violations = append(violations, checkConsumerIdempotency()...)
+	violations = append(violations, checkRepositoryTableColumnLiterals()...)
 
 	if len(violations) > 0 {
 		fmt.Fprintln(os.Stderr, "❌ check-rules failed:")
@@ -592,4 +598,100 @@ func consumerGroupForCall(fset *token.FileSet, file ast.Node, call *ast.CallExpr
 		return true
 	})
 	return group
+}
+
+// repositoryImplDir holds the repository layer's real implementations.
+const repositoryImplDir = "internal/outbound/repository"
+
+// tableConstantFile and columnConstantFile are the single source of truth for
+// table and column names. The rule reads their values from source so the list
+// never drifts from the constants themselves.
+const (
+	tableConstantFile  = "pkg/constant/table/table.go"
+	columnConstantFile = "pkg/constant/column/column.go"
+)
+
+// checkRepositoryTableColumnLiterals fails when a repository implementation uses
+// a string literal that equals a known table or column name, since those must
+// come from pkg/constant/table and pkg/constant/column. Decorators and tests are
+// skipped: decorator literals are log field keys, not SQL.
+func checkRepositoryTableColumnLiterals() []string {
+	names := constantStringValues(tableConstantFile)
+	names = append(names, constantStringValues(columnConstantFile)...)
+	// "context"/"time" style package names are not table/column names, and the
+	// constants never collide with import paths, so a plain set lookup is safe.
+	banned := make(map[string]bool, len(names))
+	for _, n := range names {
+		banned[n] = true
+	}
+
+	var violations []string
+
+	err := filepath.WalkDir(repositoryImplDir, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() || !strings.HasSuffix(path, ".go") {
+			return nil
+		}
+		if strings.HasSuffix(path, "_mw_logger.go") || strings.HasSuffix(path, "_test.go") {
+			return nil
+		}
+
+		fset := token.NewFileSet()
+		file, perr := parser.ParseFile(fset, path, nil, 0)
+		if perr != nil {
+			violations = append(violations, fmt.Sprintf("parse %s: %v", path, perr))
+			return nil
+		}
+
+		ast.Inspect(file, func(n ast.Node) bool {
+			lit, ok := n.(*ast.BasicLit)
+			if !ok || lit.Kind != token.STRING {
+				return true
+			}
+			value, uerr := strconv.Unquote(lit.Value)
+			if uerr != nil || !banned[value] {
+				return true
+			}
+			violations = append(violations,
+				fmt.Sprintf("%s:%d hardcoded table/column literal %q: use pkg/constant/table or pkg/constant/column",
+					path, fset.Position(lit.Pos()).Line, value))
+			return true
+		})
+		return nil
+	})
+	if err != nil {
+		violations = append(violations, fmt.Sprintf("walk %s: %v", repositoryImplDir, err))
+	}
+	return violations
+}
+
+// constantStringValues returns the string values assigned to constants in a
+// Go source file, which for the table/column packages are the name literals.
+func constantStringValues(path string) []string {
+	fset := token.NewFileSet()
+	file, err := parser.ParseFile(fset, path, nil, 0)
+	if err != nil {
+		return nil
+	}
+
+	var out []string
+	ast.Inspect(file, func(n ast.Node) bool {
+		spec, ok := n.(*ast.ValueSpec)
+		if !ok {
+			return true
+		}
+		for _, v := range spec.Values {
+			lit, ok := v.(*ast.BasicLit)
+			if !ok || lit.Kind != token.STRING {
+				continue
+			}
+			if value, err := strconv.Unquote(lit.Value); err == nil {
+				out = append(out, value)
+			}
+		}
+		return true
+	})
+	return out
 }
