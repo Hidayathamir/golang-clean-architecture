@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Hidayathamir/golang-clean-architecture/internal/config"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/dto"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/internal/mock"
@@ -16,13 +17,98 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestImageUsecaseImpl_Upload_Success(t *testing.T) {
+func TestImageUsecaseImpl_PresignUpload_Success(t *testing.T) {
+	cfg := config.NewConfig()
+	s3Client := &mock.S3ClientMock{}
+
+	u := &imageusecase.ImageUsecaseImpl{
+		Cfg:      cfg,
+		S3Client: s3Client,
+	}
+
+	// ------------------------------------------------------- //
+
+	req := &dto.PresignUploadImageRequest{
+		Filename:    "image.png",
+		ContentType: "image/png",
+	}
+
+	var got dto.S3PresignUploadRequest
+	s3Client.PresignUploadImageFunc = func(ctx context.Context, req dto.S3PresignUploadRequest) (dto.S3PresignUploadResponse, error) {
+		got = req
+		return dto.S3PresignUploadResponse{UploadURL: "http://presigned.url", Key: req.Key}, nil
+	}
+
+	// ------------------------------------------------------- //
+
+	ctx := context.Background()
+	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1, Username: "user1"})
+
+	res, err := u.PresignUpload(ctx, *req)
+
+	// ------------------------------------------------------- //
+
+	require.Nil(t, err)
+	require.Equal(t, "image/png", got.ContentType)
+	require.NotEmpty(t, got.Key)
+	require.Equal(t, "http://presigned.url", res.UploadURL)
+	require.Equal(t, got.Key, res.Key)
+	require.Contains(t, res.URL, got.Key)
+}
+
+func TestImageUsecaseImpl_PresignUpload_Fail_ValidateStruct(t *testing.T) {
+	cfg := config.NewConfig()
+	u := &imageusecase.ImageUsecaseImpl{
+		Cfg: cfg,
+	}
+
+	req := &dto.PresignUploadImageRequest{} // invalid request
+
+	res, err := u.PresignUpload(context.Background(), *req)
+
+	require.Equal(t, dto.PresignUploadImageResponse{}, res)
+	require.NotNil(t, err)
+	var verrs validator.ValidationErrors
+	require.ErrorAs(t, err, &verrs)
+}
+
+func TestImageUsecaseImpl_PresignUpload_Fail_Presign(t *testing.T) {
+	cfg := config.NewConfig()
+	s3Client := &mock.S3ClientMock{}
+
+	u := &imageusecase.ImageUsecaseImpl{
+		Cfg:      cfg,
+		S3Client: s3Client,
+	}
+
+	req := &dto.PresignUploadImageRequest{
+		Filename:    "image.png",
+		ContentType: "image/png",
+	}
+
+	s3Client.PresignUploadImageFunc = func(ctx context.Context, req dto.S3PresignUploadRequest) (dto.S3PresignUploadResponse, error) {
+		return dto.S3PresignUploadResponse{}, assert.AnError
+	}
+
+	ctx := context.Background()
+	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1, Username: "user1"})
+
+	res, err := u.PresignUpload(ctx, *req)
+
+	require.Equal(t, dto.PresignUploadImageResponse{}, res)
+	require.NotNil(t, err)
+	require.ErrorIs(t, err, assert.AnError)
+}
+
+func TestImageUsecaseImpl_ConfirmUpload_Success(t *testing.T) {
+	cfg := config.NewConfig()
 	gormDB, mockDB := newFakeDB(t)
 	ImageRepository := &mock.ImageRepositoryMock{}
 	ImageProducer := &mock.ImageProducerMock{}
 	S3Client := &mock.S3ClientMock{}
 
 	u := &imageusecase.ImageUsecaseImpl{
+		Cfg:             cfg,
 		DB:              gormDB,
 		ImageRepository: ImageRepository,
 		ImageProducer:   ImageProducer,
@@ -31,12 +117,13 @@ func TestImageUsecaseImpl_Upload_Success(t *testing.T) {
 
 	// ------------------------------------------------------- //
 
-	req := &dto.UploadImageRequest{
-		File: newFileHeader(t, "image.png", []byte("image-data")),
+	req := &dto.ConfirmUploadImageRequest{
+		Key:     "user1/123_image.png",
+		Caption: "my caption",
 	}
 
-	S3Client.UploadImageFunc = func(ctx context.Context, req dto.S3UploadImageRequest) (string, error) {
-		return "http://image-url.com/image.png", nil
+	S3Client.ObjectExistsFunc = func(ctx context.Context, req dto.S3ObjectExistsRequest) (dto.S3ObjectExistsResponse, error) {
+		return dto.S3ObjectExistsResponse{Exists: true}, nil
 	}
 
 	ImageRepository.CreateFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Image) error {
@@ -56,14 +143,15 @@ func TestImageUsecaseImpl_Upload_Success(t *testing.T) {
 	mockDB.ExpectBegin()
 	mockDB.ExpectCommit()
 
-	res, err := u.Upload(ctx, *req)
+	res, err := u.ConfirmUpload(ctx, *req)
 
 	// ------------------------------------------------------- //
 
 	expected := dto.ImageResponse{
 		ID:        100,
 		UserID:    1,
-		URL:       "http://image-url.com/image.png",
+		Caption:   "my caption",
+		URL:       cfg.GetAWSBaseEndpoint() + "/image/" + req.Key,
 		CreatedAt: time.Time{},
 		UpdatedAt: time.Time{},
 	}
@@ -72,15 +160,17 @@ func TestImageUsecaseImpl_Upload_Success(t *testing.T) {
 	require.Nil(t, err)
 }
 
-func TestImageUsecaseImpl_Upload_Fail_ValidateStruct(t *testing.T) {
+func TestImageUsecaseImpl_ConfirmUpload_Fail_ValidateStruct(t *testing.T) {
+	cfg := config.NewConfig()
 	gormDB, _ := newFakeDB(t)
 	u := &imageusecase.ImageUsecaseImpl{
-		DB: gormDB,
+		Cfg: cfg,
+		DB:  gormDB,
 	}
 
-	req := &dto.UploadImageRequest{} // invalid request
+	req := &dto.ConfirmUploadImageRequest{} // invalid request
 
-	res, err := u.Upload(context.Background(), *req)
+	res, err := u.ConfirmUpload(context.Background(), *req)
 
 	require.Equal(t, dto.ImageResponse{}, res)
 	require.NotNil(t, err)
@@ -88,50 +178,70 @@ func TestImageUsecaseImpl_Upload_Fail_ValidateStruct(t *testing.T) {
 	require.ErrorAs(t, err, &verrs)
 }
 
-func TestImageUsecaseImpl_Upload_Fail_S3Upload(t *testing.T) {
+func TestImageUsecaseImpl_ConfirmUpload_Fail_ObjectMissing(t *testing.T) {
+	cfg := config.NewConfig()
 	gormDB, _ := newFakeDB(t)
 	S3Client := &mock.S3ClientMock{}
 
 	u := &imageusecase.ImageUsecaseImpl{
+		Cfg:      cfg,
 		DB:       gormDB,
 		S3Client: S3Client,
 	}
 
-	req := &dto.UploadImageRequest{
-		File: newFileHeader(t, "image.png", []byte("image-data")),
+	req := &dto.ConfirmUploadImageRequest{Key: "user1/123_image.png"}
+
+	S3Client.ObjectExistsFunc = func(ctx context.Context, req dto.S3ObjectExistsRequest) (dto.S3ObjectExistsResponse, error) {
+		return dto.S3ObjectExistsResponse{Exists: false}, nil
 	}
 
-	S3Client.UploadImageFunc = func(ctx context.Context, req dto.S3UploadImageRequest) (string, error) {
-		return "", assert.AnError
+	res, err := u.ConfirmUpload(context.Background(), *req)
+
+	require.Equal(t, dto.ImageResponse{}, res)
+	require.NotNil(t, err)
+}
+
+func TestImageUsecaseImpl_ConfirmUpload_Fail_ObjectExists(t *testing.T) {
+	cfg := config.NewConfig()
+	gormDB, _ := newFakeDB(t)
+	S3Client := &mock.S3ClientMock{}
+
+	u := &imageusecase.ImageUsecaseImpl{
+		Cfg:      cfg,
+		DB:       gormDB,
+		S3Client: S3Client,
 	}
 
-	ctx := context.Background()
-	ctx = ctxuserauth.Set(ctx, &dto.UserAuth{ID: 1, Username: "user1"})
+	req := &dto.ConfirmUploadImageRequest{Key: "user1/123_image.png"}
 
-	res, err := u.Upload(ctx, *req)
+	S3Client.ObjectExistsFunc = func(ctx context.Context, req dto.S3ObjectExistsRequest) (dto.S3ObjectExistsResponse, error) {
+		return dto.S3ObjectExistsResponse{}, assert.AnError
+	}
+
+	res, err := u.ConfirmUpload(context.Background(), *req)
 
 	require.Equal(t, dto.ImageResponse{}, res)
 	require.NotNil(t, err)
 	require.ErrorIs(t, err, assert.AnError)
 }
 
-func TestImageUsecaseImpl_Upload_Fail_Create(t *testing.T) {
+func TestImageUsecaseImpl_ConfirmUpload_Fail_Create(t *testing.T) {
+	cfg := config.NewConfig()
 	gormDB, mockDB := newFakeDB(t)
 	ImageRepository := &mock.ImageRepositoryMock{}
 	S3Client := &mock.S3ClientMock{}
 
 	u := &imageusecase.ImageUsecaseImpl{
+		Cfg:             cfg,
 		DB:              gormDB,
 		ImageRepository: ImageRepository,
 		S3Client:        S3Client,
 	}
 
-	req := &dto.UploadImageRequest{
-		File: newFileHeader(t, "image.png", []byte("image-data")),
-	}
+	req := &dto.ConfirmUploadImageRequest{Key: "user1/123_image.png"}
 
-	S3Client.UploadImageFunc = func(ctx context.Context, req dto.S3UploadImageRequest) (string, error) {
-		return "url", nil
+	S3Client.ObjectExistsFunc = func(ctx context.Context, req dto.S3ObjectExistsRequest) (dto.S3ObjectExistsResponse, error) {
+		return dto.S3ObjectExistsResponse{Exists: true}, nil
 	}
 
 	ImageRepository.CreateFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Image) error {
@@ -144,32 +254,32 @@ func TestImageUsecaseImpl_Upload_Fail_Create(t *testing.T) {
 	mockDB.ExpectBegin()
 	mockDB.ExpectRollback()
 
-	res, err := u.Upload(ctx, *req)
+	res, err := u.ConfirmUpload(ctx, *req)
 
 	require.Equal(t, dto.ImageResponse{}, res)
 	require.NotNil(t, err)
 	require.ErrorIs(t, err, assert.AnError)
 }
 
-func TestImageUsecaseImpl_Upload_Fail_Send(t *testing.T) {
+func TestImageUsecaseImpl_ConfirmUpload_Fail_Send(t *testing.T) {
+	cfg := config.NewConfig()
 	gormDB, mockDB := newFakeDB(t)
 	ImageRepository := &mock.ImageRepositoryMock{}
 	ImageProducer := &mock.ImageProducerMock{}
 	S3Client := &mock.S3ClientMock{}
 
 	u := &imageusecase.ImageUsecaseImpl{
+		Cfg:             cfg,
 		DB:              gormDB,
 		ImageRepository: ImageRepository,
 		ImageProducer:   ImageProducer,
 		S3Client:        S3Client,
 	}
 
-	req := &dto.UploadImageRequest{
-		File: newFileHeader(t, "image.png", []byte("image-data")),
-	}
+	req := &dto.ConfirmUploadImageRequest{Key: "user1/123_image.png"}
 
-	S3Client.UploadImageFunc = func(ctx context.Context, req dto.S3UploadImageRequest) (string, error) {
-		return "url", nil
+	S3Client.ObjectExistsFunc = func(ctx context.Context, req dto.S3ObjectExistsRequest) (dto.S3ObjectExistsResponse, error) {
+		return dto.S3ObjectExistsResponse{Exists: true}, nil
 	}
 
 	ImageRepository.CreateFunc = func(ctx context.Context, db *gorm.DB, entityMoqParam *entity.Image) error {
@@ -186,7 +296,7 @@ func TestImageUsecaseImpl_Upload_Fail_Send(t *testing.T) {
 	mockDB.ExpectBegin()
 	mockDB.ExpectRollback()
 
-	res, err := u.Upload(ctx, *req)
+	res, err := u.ConfirmUpload(ctx, *req)
 
 	require.Equal(t, dto.ImageResponse{}, res)
 	require.NotNil(t, err)

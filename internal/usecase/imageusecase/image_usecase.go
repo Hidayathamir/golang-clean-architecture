@@ -15,7 +15,8 @@ import (
 //go:generate moq -out=../../mock/MockUsecaseImage.go -pkg=mock . ImageUsecase
 
 type ImageUsecase interface {
-	Upload(ctx context.Context, req dto.UploadImageRequest) (dto.ImageResponse, error)
+	PresignUpload(ctx context.Context, req dto.PresignUploadImageRequest) (dto.PresignUploadImageResponse, error)
+	ConfirmUpload(ctx context.Context, req dto.ConfirmUploadImageRequest) (dto.ImageResponse, error)
 	Like(ctx context.Context, req dto.LikeImageRequest) error
 	Comment(ctx context.Context, req dto.CommentImageRequest) error
 	GetImage(ctx context.Context, req dto.GetImageRequest) (dto.ImageResponse, error)

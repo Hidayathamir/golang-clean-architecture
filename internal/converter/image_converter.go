@@ -8,21 +8,14 @@ import (
 	"github.com/Hidayathamir/golang-clean-architecture/internal/entity"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/constant/s3key"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/ctx/ctxuserauth"
-	"github.com/Hidayathamir/golang-clean-architecture/pkg/errkit"
 	"github.com/Hidayathamir/golang-clean-architecture/pkg/logkit"
 	"github.com/twmb/franz-go/pkg/kgo"
 )
 
-func DtoUploadImageRequestToDtoS3UploadImageRequest(ctx context.Context, req dto.UploadImageRequest, s3UploadImgReq *dto.S3UploadImageRequest) error {
+func DtoPresignUploadImageRequestToDtoS3PresignUploadRequest(ctx context.Context, req dto.PresignUploadImageRequest, s3PresignReq *dto.S3PresignUploadRequest) {
 	userAuth := ctxuserauth.Get(ctx)
-	s3UploadImgReq.Key = s3key.Image(userAuth.Username, req.File.Filename)
-	file, err := req.File.Open()
-	if err != nil {
-		return errkit.AddFuncName(err, "converter.DtoUploadImageRequestToDtoS3UploadImageRequest")
-	}
-	defer logkit.LogIfErrForDeferContext(ctx, file.Close)
-	s3UploadImgReq.Body = file
-	return nil
+	s3PresignReq.Key = s3key.Image(userAuth.Username, req.Filename)
+	s3PresignReq.ContentType = req.ContentType
 }
 
 func EntityImageToDtoImageUploadedEvent(image entity.Image, event *dto.ImageUploadedEvent) {

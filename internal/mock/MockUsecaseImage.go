@@ -32,6 +32,9 @@ var _ imageusecase.ImageUsecase = &ImageUsecaseMock{}
 //			CommentFunc: func(ctx context.Context, req dto.CommentImageRequest) error {
 //				panic("mock out the Comment method")
 //			},
+//			ConfirmUploadFunc: func(ctx context.Context, req dto.ConfirmUploadImageRequest) (dto.ImageResponse, error) {
+//				panic("mock out the ConfirmUpload method")
+//			},
 //			DeleteImageFunc: func(ctx context.Context, req dto.DeleteImageRequest) error {
 //				panic("mock out the DeleteImage method")
 //			},
@@ -68,6 +71,9 @@ var _ imageusecase.ImageUsecase = &ImageUsecaseMock{}
 //			NotifyUserImageLikedFunc: func(ctx context.Context, req dto.NotifyUserImageLikedRequest) error {
 //				panic("mock out the NotifyUserImageLiked method")
 //			},
+//			PresignUploadFunc: func(ctx context.Context, req dto.PresignUploadImageRequest) (dto.PresignUploadImageResponse, error) {
+//				panic("mock out the PresignUpload method")
+//			},
 //			SyncImageToElasticsearchFunc: func(ctx context.Context, req dto.SyncImageToElasticsearchRequest) error {
 //				panic("mock out the SyncImageToElasticsearch method")
 //			},
@@ -76,9 +82,6 @@ var _ imageusecase.ImageUsecase = &ImageUsecaseMock{}
 //			},
 //			UpdateImageFunc: func(ctx context.Context, req dto.UpdateImageRequest) error {
 //				panic("mock out the UpdateImage method")
-//			},
-//			UploadFunc: func(ctx context.Context, req dto.UploadImageRequest) (dto.ImageResponse, error) {
-//				panic("mock out the Upload method")
 //			},
 //		}
 //
@@ -98,6 +101,9 @@ type ImageUsecaseMock struct {
 
 	// CommentFunc mocks the Comment method.
 	CommentFunc func(ctx context.Context, req dto.CommentImageRequest) error
+
+	// ConfirmUploadFunc mocks the ConfirmUpload method.
+	ConfirmUploadFunc func(ctx context.Context, req dto.ConfirmUploadImageRequest) (dto.ImageResponse, error)
 
 	// DeleteImageFunc mocks the DeleteImage method.
 	DeleteImageFunc func(ctx context.Context, req dto.DeleteImageRequest) error
@@ -135,6 +141,9 @@ type ImageUsecaseMock struct {
 	// NotifyUserImageLikedFunc mocks the NotifyUserImageLiked method.
 	NotifyUserImageLikedFunc func(ctx context.Context, req dto.NotifyUserImageLikedRequest) error
 
+	// PresignUploadFunc mocks the PresignUpload method.
+	PresignUploadFunc func(ctx context.Context, req dto.PresignUploadImageRequest) (dto.PresignUploadImageResponse, error)
+
 	// SyncImageToElasticsearchFunc mocks the SyncImageToElasticsearch method.
 	SyncImageToElasticsearchFunc func(ctx context.Context, req dto.SyncImageToElasticsearchRequest) error
 
@@ -143,9 +152,6 @@ type ImageUsecaseMock struct {
 
 	// UpdateImageFunc mocks the UpdateImage method.
 	UpdateImageFunc func(ctx context.Context, req dto.UpdateImageRequest) error
-
-	// UploadFunc mocks the Upload method.
-	UploadFunc func(ctx context.Context, req dto.UploadImageRequest) (dto.ImageResponse, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -176,6 +182,13 @@ type ImageUsecaseMock struct {
 			Ctx context.Context
 			// Req is the req argument value.
 			Req dto.CommentImageRequest
+		}
+		// ConfirmUpload holds details about calls to the ConfirmUpload method.
+		ConfirmUpload []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req dto.ConfirmUploadImageRequest
 		}
 		// DeleteImage holds details about calls to the DeleteImage method.
 		DeleteImage []struct {
@@ -261,6 +274,13 @@ type ImageUsecaseMock struct {
 			// Req is the req argument value.
 			Req dto.NotifyUserImageLikedRequest
 		}
+		// PresignUpload holds details about calls to the PresignUpload method.
+		PresignUpload []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req dto.PresignUploadImageRequest
+		}
 		// SyncImageToElasticsearch holds details about calls to the SyncImageToElasticsearch method.
 		SyncImageToElasticsearch []struct {
 			// Ctx is the ctx argument value.
@@ -282,18 +302,12 @@ type ImageUsecaseMock struct {
 			// Req is the req argument value.
 			Req dto.UpdateImageRequest
 		}
-		// Upload holds details about calls to the Upload method.
-		Upload []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
-			// Req is the req argument value.
-			Req dto.UploadImageRequest
-		}
 	}
 	lockBatchUpdateImageCommentCount sync.RWMutex
 	lockBatchUpdateImageLikeCount    sync.RWMutex
 	lockCleanupDeletedImageStorage   sync.RWMutex
 	lockComment                      sync.RWMutex
+	lockConfirmUpload                sync.RWMutex
 	lockDeleteImage                  sync.RWMutex
 	lockDeleteImageComment           sync.RWMutex
 	lockExplore                      sync.RWMutex
@@ -306,10 +320,10 @@ type ImageUsecaseMock struct {
 	lockNotifyFollowerOnUpload       sync.RWMutex
 	lockNotifyUserImageCommented     sync.RWMutex
 	lockNotifyUserImageLiked         sync.RWMutex
+	lockPresignUpload                sync.RWMutex
 	lockSyncImageToElasticsearch     sync.RWMutex
 	lockUnlike                       sync.RWMutex
 	lockUpdateImage                  sync.RWMutex
-	lockUpload                       sync.RWMutex
 }
 
 // BatchUpdateImageCommentCount calls BatchUpdateImageCommentCountFunc.
@@ -453,6 +467,42 @@ func (mock *ImageUsecaseMock) CommentCalls() []struct {
 	mock.lockComment.RLock()
 	calls = mock.calls.Comment
 	mock.lockComment.RUnlock()
+	return calls
+}
+
+// ConfirmUpload calls ConfirmUploadFunc.
+func (mock *ImageUsecaseMock) ConfirmUpload(ctx context.Context, req dto.ConfirmUploadImageRequest) (dto.ImageResponse, error) {
+	if mock.ConfirmUploadFunc == nil {
+		panic("ImageUsecaseMock.ConfirmUploadFunc: method is nil but ImageUsecase.ConfirmUpload was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req dto.ConfirmUploadImageRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockConfirmUpload.Lock()
+	mock.calls.ConfirmUpload = append(mock.calls.ConfirmUpload, callInfo)
+	mock.lockConfirmUpload.Unlock()
+	return mock.ConfirmUploadFunc(ctx, req)
+}
+
+// ConfirmUploadCalls gets all the calls that were made to ConfirmUpload.
+// Check the length with:
+//
+//	len(mockedImageUsecase.ConfirmUploadCalls())
+func (mock *ImageUsecaseMock) ConfirmUploadCalls() []struct {
+	Ctx context.Context
+	Req dto.ConfirmUploadImageRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req dto.ConfirmUploadImageRequest
+	}
+	mock.lockConfirmUpload.RLock()
+	calls = mock.calls.ConfirmUpload
+	mock.lockConfirmUpload.RUnlock()
 	return calls
 }
 
@@ -888,6 +938,42 @@ func (mock *ImageUsecaseMock) NotifyUserImageLikedCalls() []struct {
 	return calls
 }
 
+// PresignUpload calls PresignUploadFunc.
+func (mock *ImageUsecaseMock) PresignUpload(ctx context.Context, req dto.PresignUploadImageRequest) (dto.PresignUploadImageResponse, error) {
+	if mock.PresignUploadFunc == nil {
+		panic("ImageUsecaseMock.PresignUploadFunc: method is nil but ImageUsecase.PresignUpload was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req dto.PresignUploadImageRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockPresignUpload.Lock()
+	mock.calls.PresignUpload = append(mock.calls.PresignUpload, callInfo)
+	mock.lockPresignUpload.Unlock()
+	return mock.PresignUploadFunc(ctx, req)
+}
+
+// PresignUploadCalls gets all the calls that were made to PresignUpload.
+// Check the length with:
+//
+//	len(mockedImageUsecase.PresignUploadCalls())
+func (mock *ImageUsecaseMock) PresignUploadCalls() []struct {
+	Ctx context.Context
+	Req dto.PresignUploadImageRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req dto.PresignUploadImageRequest
+	}
+	mock.lockPresignUpload.RLock()
+	calls = mock.calls.PresignUpload
+	mock.lockPresignUpload.RUnlock()
+	return calls
+}
+
 // SyncImageToElasticsearch calls SyncImageToElasticsearchFunc.
 func (mock *ImageUsecaseMock) SyncImageToElasticsearch(ctx context.Context, req dto.SyncImageToElasticsearchRequest) error {
 	if mock.SyncImageToElasticsearchFunc == nil {
@@ -993,41 +1079,5 @@ func (mock *ImageUsecaseMock) UpdateImageCalls() []struct {
 	mock.lockUpdateImage.RLock()
 	calls = mock.calls.UpdateImage
 	mock.lockUpdateImage.RUnlock()
-	return calls
-}
-
-// Upload calls UploadFunc.
-func (mock *ImageUsecaseMock) Upload(ctx context.Context, req dto.UploadImageRequest) (dto.ImageResponse, error) {
-	if mock.UploadFunc == nil {
-		panic("ImageUsecaseMock.UploadFunc: method is nil but ImageUsecase.Upload was just called")
-	}
-	callInfo := struct {
-		Ctx context.Context
-		Req dto.UploadImageRequest
-	}{
-		Ctx: ctx,
-		Req: req,
-	}
-	mock.lockUpload.Lock()
-	mock.calls.Upload = append(mock.calls.Upload, callInfo)
-	mock.lockUpload.Unlock()
-	return mock.UploadFunc(ctx, req)
-}
-
-// UploadCalls gets all the calls that were made to Upload.
-// Check the length with:
-//
-//	len(mockedImageUsecase.UploadCalls())
-func (mock *ImageUsecaseMock) UploadCalls() []struct {
-	Ctx context.Context
-	Req dto.UploadImageRequest
-} {
-	var calls []struct {
-		Ctx context.Context
-		Req dto.UploadImageRequest
-	}
-	mock.lockUpload.RLock()
-	calls = mock.calls.Upload
-	mock.lockUpload.RUnlock()
 	return calls
 }

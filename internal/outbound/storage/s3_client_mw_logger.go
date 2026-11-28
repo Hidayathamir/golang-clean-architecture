@@ -40,6 +40,41 @@ func (c *S3ClientMwLogger) UploadImage(ctx context.Context, req dto.S3UploadImag
 	return url, err
 }
 
+func (c *S3ClientMwLogger) PresignUploadImage(ctx context.Context, req dto.S3PresignUploadRequest) (dto.S3PresignUploadResponse, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	res, err := retrykit.StorageRetryWithData(ctx, func() (dto.S3PresignUploadResponse, error) {
+		return c.Next.PresignUploadImage(ctx, req)
+	})
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"key": req.Key,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return res, err
+}
+
+func (c *S3ClientMwLogger) ObjectExists(ctx context.Context, req dto.S3ObjectExistsRequest) (dto.S3ObjectExistsResponse, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	res, err := retrykit.StorageRetryWithData(ctx, func() (dto.S3ObjectExistsResponse, error) {
+		return c.Next.ObjectExists(ctx, req)
+	})
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"key":    req.Key,
+		"exists": res.Exists,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return res, err
+}
+
 func (c *S3ClientMwLogger) DeleteObject(ctx context.Context, req dto.S3DeleteObjectRequest) (dto.S3DeleteObjectResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()

@@ -100,9 +100,9 @@ const docTemplate = `{
                         "SimpleApiKeyAuth": []
                     }
                 ],
-                "description": "Upload an image file",
+                "description": "Returns a presigned S3 PUT URL. The client uploads the image bytes directly to S3, then calls /api/images/_confirm with the key.",
                 "consumes": [
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -110,21 +110,23 @@ const docTemplate = `{
                 "tags": [
                     "images"
                 ],
-                "summary": "Upload image",
+                "summary": "Presign image upload",
                 "parameters": [
                     {
-                        "type": "file",
-                        "description": "Image to upload",
-                        "name": "image",
-                        "in": "formData",
-                        "required": true
+                        "description": "Presign Upload Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.PresignUploadImageRequest"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ImageResponse"
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_PresignUploadImageResponse"
                         }
                     }
                 }
@@ -164,6 +166,45 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/images/_confirm": {
+            "post": {
+                "security": [
+                    {
+                        "SimpleApiKeyAuth": []
+                    }
+                ],
+                "description": "Finalizes a client-side upload after the bytes landed in S3. Creates the image record and emits the upload event.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "images"
+                ],
+                "summary": "Confirm image upload",
+                "parameters": [
+                    {
+                        "description": "Confirm Upload Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.ConfirmUploadImageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ImageResponse"
                         }
                     }
                 }
@@ -890,6 +931,20 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_dto.ConfirmUploadImageRequest": {
+            "type": "object",
+            "required": [
+                "key"
+            ],
+            "properties": {
+                "caption": {
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_Hidayathamir_golang-clean-architecture_internal_dto.ExploreResponse": {
             "type": "object",
             "properties": {
@@ -1048,6 +1103,35 @@ const docTemplate = `{
                 "username": {
                     "type": "string",
                     "maxLength": 100
+                }
+            }
+        },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_dto.PresignUploadImageRequest": {
+            "type": "object",
+            "required": [
+                "content_type",
+                "filename"
+            ],
+            "properties": {
+                "content_type": {
+                    "type": "string"
+                },
+                "filename": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_dto.PresignUploadImageResponse": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "upload_url": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
                 }
             }
         },
@@ -1299,6 +1383,23 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.LikesResponse"
+                },
+                "error_detail": {
+                    "type": "string"
+                },
+                "error_message": {
+                    "type": "string"
+                },
+                "paging": {
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.PageMetadata"
+                }
+            }
+        },
+        "github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_PresignUploadImageResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.PresignUploadImageResponse"
                 },
                 "error_detail": {
                     "type": "string"

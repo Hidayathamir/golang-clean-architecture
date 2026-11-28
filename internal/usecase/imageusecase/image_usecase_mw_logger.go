@@ -51,11 +51,27 @@ func (u *ImageUsecaseMwLogger) Like(ctx context.Context, req dto.LikeImageReques
 	return err
 }
 
-func (u *ImageUsecaseMwLogger) Upload(ctx context.Context, req dto.UploadImageRequest) (dto.ImageResponse, error) {
+func (u *ImageUsecaseMwLogger) PresignUpload(ctx context.Context, req dto.PresignUploadImageRequest) (dto.PresignUploadImageResponse, error) {
 	ctx, span := telemetry.Start(ctx)
 	defer span.End()
 
-	res, err := u.Next.Upload(ctx, req)
+	res, err := u.Next.PresignUpload(ctx, req)
+	telemetry.RecordError(span, err)
+
+	fields := logrus.Fields{
+		"req": req,
+		"res": res,
+	}
+	logkit.LogMw(ctx, fields, err)
+
+	return res, err
+}
+
+func (u *ImageUsecaseMwLogger) ConfirmUpload(ctx context.Context, req dto.ConfirmUploadImageRequest) (dto.ImageResponse, error) {
+	ctx, span := telemetry.Start(ctx)
+	defer span.End()
+
+	res, err := u.Next.ConfirmUpload(ctx, req)
 	telemetry.RecordError(span, err)
 
 	fields := logrus.Fields{

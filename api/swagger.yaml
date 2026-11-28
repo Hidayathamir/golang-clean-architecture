@@ -35,6 +35,15 @@ definitions:
       next_cursor:
         type: string
     type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.ConfirmUploadImageRequest:
+    properties:
+      caption:
+        type: string
+      key:
+        type: string
+    required:
+    - key
+    type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_dto.ExploreResponse:
     properties:
       data:
@@ -139,6 +148,25 @@ definitions:
     required:
     - password
     - username
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.PresignUploadImageRequest:
+    properties:
+      content_type:
+        type: string
+      filename:
+        type: string
+    required:
+    - content_type
+    - filename
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.PresignUploadImageResponse:
+    properties:
+      key:
+        type: string
+      upload_url:
+        type: string
+      url:
+        type: string
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_dto.ProfileResponse:
     properties:
@@ -311,6 +339,17 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.PageMetadata'
     type: object
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_PresignUploadImageResponse
+  : properties:
+      data:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.PresignUploadImageResponse'
+      error_detail:
+        type: string
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.PageMetadata'
+    type: object
   ? github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ProfileResponse
   : properties:
       data:
@@ -430,24 +469,26 @@ paths:
   /api/images:
     post:
       consumes:
-      - multipart/form-data
-      description: Upload an image file
+      - application/json
+      description: Returns a presigned S3 PUT URL. The client uploads the image bytes
+        directly to S3, then calls /api/images/_confirm with the key.
       parameters:
-      - description: Image to upload
-        in: formData
-        name: image
+      - description: Presign Upload Request
+        in: body
+        name: request
         required: true
-        type: file
+        schema:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.PresignUploadImageRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ImageResponse'
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_PresignUploadImageResponse'
       security:
       - SimpleApiKeyAuth: []
-      summary: Upload image
+      summary: Presign image upload
       tags:
       - images
   /api/images/_comment:
@@ -472,6 +513,31 @@ paths:
       security:
       - SimpleApiKeyAuth: []
       summary: Comment image
+      tags:
+      - images
+  /api/images/_confirm:
+    post:
+      consumes:
+      - application/json
+      description: Finalizes a client-side upload after the bytes landed in S3. Creates
+        the image record and emits the upload event.
+      parameters:
+      - description: Confirm Upload Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.ConfirmUploadImageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_ImageResponse'
+      security:
+      - SimpleApiKeyAuth: []
+      summary: Confirm image upload
       tags:
       - images
   /api/images/_like:

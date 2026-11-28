@@ -56,7 +56,8 @@ func setupAuthRoute(router fiber.Router, controllers *dependency_injection.Contr
 
 	images := router.Group("/images")
 	{
-		images.Post("", controllers.ImageController.Upload)
+		images.Post("", controllers.ImageController.PresignUpload)
+		images.Post("/_confirm", controllers.ImageController.ConfirmUpload)
 		images.Post("/_like", controllers.ImageController.Like)
 		images.Post("/_comment", controllers.ImageController.Comment)
 		images.Get("/:imageId", controllers.ImageController.GetImage)

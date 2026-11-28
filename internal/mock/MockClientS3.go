@@ -23,6 +23,12 @@ var _ storage.S3Client = &S3ClientMock{}
 //			DeleteObjectFunc: func(ctx context.Context, req dto.S3DeleteObjectRequest) (dto.S3DeleteObjectResponse, error) {
 //				panic("mock out the DeleteObject method")
 //			},
+//			ObjectExistsFunc: func(ctx context.Context, req dto.S3ObjectExistsRequest) (dto.S3ObjectExistsResponse, error) {
+//				panic("mock out the ObjectExists method")
+//			},
+//			PresignUploadImageFunc: func(ctx context.Context, req dto.S3PresignUploadRequest) (dto.S3PresignUploadResponse, error) {
+//				panic("mock out the PresignUploadImage method")
+//			},
 //			UploadImageFunc: func(ctx context.Context, req dto.S3UploadImageRequest) (string, error) {
 //				panic("mock out the UploadImage method")
 //			},
@@ -36,6 +42,12 @@ type S3ClientMock struct {
 	// DeleteObjectFunc mocks the DeleteObject method.
 	DeleteObjectFunc func(ctx context.Context, req dto.S3DeleteObjectRequest) (dto.S3DeleteObjectResponse, error)
 
+	// ObjectExistsFunc mocks the ObjectExists method.
+	ObjectExistsFunc func(ctx context.Context, req dto.S3ObjectExistsRequest) (dto.S3ObjectExistsResponse, error)
+
+	// PresignUploadImageFunc mocks the PresignUploadImage method.
+	PresignUploadImageFunc func(ctx context.Context, req dto.S3PresignUploadRequest) (dto.S3PresignUploadResponse, error)
+
 	// UploadImageFunc mocks the UploadImage method.
 	UploadImageFunc func(ctx context.Context, req dto.S3UploadImageRequest) (string, error)
 
@@ -48,6 +60,20 @@ type S3ClientMock struct {
 			// Req is the req argument value.
 			Req dto.S3DeleteObjectRequest
 		}
+		// ObjectExists holds details about calls to the ObjectExists method.
+		ObjectExists []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req dto.S3ObjectExistsRequest
+		}
+		// PresignUploadImage holds details about calls to the PresignUploadImage method.
+		PresignUploadImage []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Req is the req argument value.
+			Req dto.S3PresignUploadRequest
+		}
 		// UploadImage holds details about calls to the UploadImage method.
 		UploadImage []struct {
 			// Ctx is the ctx argument value.
@@ -56,8 +82,10 @@ type S3ClientMock struct {
 			Req dto.S3UploadImageRequest
 		}
 	}
-	lockDeleteObject sync.RWMutex
-	lockUploadImage  sync.RWMutex
+	lockDeleteObject       sync.RWMutex
+	lockObjectExists       sync.RWMutex
+	lockPresignUploadImage sync.RWMutex
+	lockUploadImage        sync.RWMutex
 }
 
 // DeleteObject calls DeleteObjectFunc.
@@ -93,6 +121,78 @@ func (mock *S3ClientMock) DeleteObjectCalls() []struct {
 	mock.lockDeleteObject.RLock()
 	calls = mock.calls.DeleteObject
 	mock.lockDeleteObject.RUnlock()
+	return calls
+}
+
+// ObjectExists calls ObjectExistsFunc.
+func (mock *S3ClientMock) ObjectExists(ctx context.Context, req dto.S3ObjectExistsRequest) (dto.S3ObjectExistsResponse, error) {
+	if mock.ObjectExistsFunc == nil {
+		panic("S3ClientMock.ObjectExistsFunc: method is nil but S3Client.ObjectExists was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req dto.S3ObjectExistsRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockObjectExists.Lock()
+	mock.calls.ObjectExists = append(mock.calls.ObjectExists, callInfo)
+	mock.lockObjectExists.Unlock()
+	return mock.ObjectExistsFunc(ctx, req)
+}
+
+// ObjectExistsCalls gets all the calls that were made to ObjectExists.
+// Check the length with:
+//
+//	len(mockedS3Client.ObjectExistsCalls())
+func (mock *S3ClientMock) ObjectExistsCalls() []struct {
+	Ctx context.Context
+	Req dto.S3ObjectExistsRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req dto.S3ObjectExistsRequest
+	}
+	mock.lockObjectExists.RLock()
+	calls = mock.calls.ObjectExists
+	mock.lockObjectExists.RUnlock()
+	return calls
+}
+
+// PresignUploadImage calls PresignUploadImageFunc.
+func (mock *S3ClientMock) PresignUploadImage(ctx context.Context, req dto.S3PresignUploadRequest) (dto.S3PresignUploadResponse, error) {
+	if mock.PresignUploadImageFunc == nil {
+		panic("S3ClientMock.PresignUploadImageFunc: method is nil but S3Client.PresignUploadImage was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Req dto.S3PresignUploadRequest
+	}{
+		Ctx: ctx,
+		Req: req,
+	}
+	mock.lockPresignUploadImage.Lock()
+	mock.calls.PresignUploadImage = append(mock.calls.PresignUploadImage, callInfo)
+	mock.lockPresignUploadImage.Unlock()
+	return mock.PresignUploadImageFunc(ctx, req)
+}
+
+// PresignUploadImageCalls gets all the calls that were made to PresignUploadImage.
+// Check the length with:
+//
+//	len(mockedS3Client.PresignUploadImageCalls())
+func (mock *S3ClientMock) PresignUploadImageCalls() []struct {
+	Ctx context.Context
+	Req dto.S3PresignUploadRequest
+} {
+	var calls []struct {
+		Ctx context.Context
+		Req dto.S3PresignUploadRequest
+	}
+	mock.lockPresignUploadImage.RLock()
+	calls = mock.calls.PresignUploadImage
+	mock.lockPresignUploadImage.RUnlock()
 	return calls
 }
 

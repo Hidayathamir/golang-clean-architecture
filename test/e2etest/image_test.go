@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
-	"mime/multipart"
 	"net/http"
 	"testing"
 
@@ -15,35 +13,81 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func uploadImage(t *testing.T, token string) int64 {
+// presignImage asks the server for a presigned S3 PUT URL for the given filename.
+func presignImage(t *testing.T, token, filename string) dto.PresignUploadImageResponse {
 	t.Helper()
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile("image", "test.jpg")
-	require.Nil(t, err)
-	_, err = part.Write([]byte("dummy image content"))
-	require.Nil(t, err)
-	require.Nil(t, writer.Close())
 
-	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/images", body)
+	reqBody := dto.PresignUploadImageRequest{
+		Filename:    filename,
+		ContentType: "image/jpeg",
+	}
+	bodyJson, err := json.Marshal(reqBody)
 	require.Nil(t, err)
-	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	req, err := http.NewRequest(http.MethodPost, baseURL+"/api/images", bytes.NewReader(bodyJson))
+	require.Nil(t, err)
+	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", bearerToken(token))
 
 	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
 	defer requireNil(t, res.Body.Close)
-
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
-	bytesBody, err := io.ReadAll(res.Body)
+	respBody := &response.WebResponse[dto.PresignUploadImageResponse]{}
+	require.Nil(t, json.NewDecoder(res.Body).Decode(respBody))
+	require.NotEmpty(t, respBody.Data.UploadURL)
+	require.NotEmpty(t, respBody.Data.Key)
+	return respBody.Data
+}
+
+// putToPresignedURL uploads the image bytes directly to S3 via the presigned URL.
+func putToPresignedURL(t *testing.T, uploadURL, contentType string, content []byte) {
+	t.Helper()
+
+	req, err := http.NewRequest(http.MethodPut, uploadURL, bytes.NewReader(content))
+	require.Nil(t, err)
+	req.Header.Set("Content-Type", contentType)
+
+	res, err := http.DefaultClient.Do(req)
+	require.Nil(t, err)
+	defer requireNil(t, res.Body.Close)
+	require.Equal(t, http.StatusOK, res.StatusCode)
+}
+
+// confirmImage finalizes the upload and returns the new image id.
+func confirmImage(t *testing.T, token, key, caption string) int64 {
+	t.Helper()
+
+	reqBody := dto.ConfirmUploadImageRequest{
+		Key:     key,
+		Caption: caption,
+	}
+	bodyJson, err := json.Marshal(reqBody)
 	require.Nil(t, err)
 
-	responseBody := &response.WebResponse[dto.ImageResponse]{}
-	err = json.Unmarshal(bytesBody, responseBody)
+	req, err := http.NewRequest(http.MethodPost, baseURL+"/api/images/_confirm", bytes.NewReader(bodyJson))
 	require.Nil(t, err)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", bearerToken(token))
 
-	return responseBody.Data.ID
+	res, err := http.DefaultClient.Do(req)
+	require.Nil(t, err)
+	defer requireNil(t, res.Body.Close)
+	require.Equal(t, http.StatusOK, res.StatusCode)
+
+	respBody := &response.WebResponse[dto.ImageResponse]{}
+	require.Nil(t, json.NewDecoder(res.Body).Decode(respBody))
+	require.NotZero(t, respBody.Data.ID)
+	return respBody.Data.ID
+}
+
+func uploadImage(t *testing.T, token string) int64 {
+	t.Helper()
+
+	presigned := presignImage(t, token, "test.jpg")
+	putToPresignedURL(t, presigned.UploadURL, "image/jpeg", []byte("dummy image content"))
+	return confirmImage(t, token, presigned.Key, "")
 }
 
 func TestUploadImage(t *testing.T) {
@@ -52,47 +96,18 @@ func TestUploadImage(t *testing.T) {
 	// Register and login user
 	token := registerAndLoginDefaultUser(t)
 
-	// Prepare image upload request
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile("image", "test.jpg")
-	require.Nil(t, err)
-	_, err = part.Write([]byte("dummy image content"))
-	require.Nil(t, err)
-	err = writer.WriteField("caption", "My Caption")
-	require.Nil(t, err)
-	require.Nil(t, writer.Close())
-
-	// Send upload request
-	req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:3000/api/images", body)
-	require.Nil(t, err)
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-	req.Header.Set("Authorization", bearerToken(token))
-
-	res, err := http.DefaultClient.Do(req)
-	require.Nil(t, err)
-	defer requireNil(t, res.Body.Close)
-
-	// Verify response status code
-	require.Equal(t, http.StatusOK, res.StatusCode)
-
-	// Verify response body
-	bytesBody, err := io.ReadAll(res.Body)
-	require.Nil(t, err)
-
-	responseBody := &response.WebResponse[dto.ImageResponse]{}
-	err = json.Unmarshal(bytesBody, responseBody)
-	require.Nil(t, err)
-
-	require.NotZero(t, responseBody.Data.ID)
-	require.NotEmpty(t, responseBody.Data.URL)
-	require.Equal(t, "My Caption", responseBody.Data.Caption)
+	// Presign, upload bytes directly to S3, then confirm
+	presigned := presignImage(t, token, "test.jpg")
+	require.NotEmpty(t, presigned.URL)
+	putToPresignedURL(t, presigned.UploadURL, "image/jpeg", []byte("dummy image content"))
+	imageID := confirmImage(t, token, presigned.Key, "My Caption")
 
 	// Verify database record
 	image := &entity.Image{}
-	err = db.First(image, responseBody.Data.ID).Error
+	err := db.First(image, imageID).Error
 	require.Nil(t, err)
 	require.Equal(t, "My Caption", image.Caption)
+	require.Equal(t, presigned.URL, image.URL)
 }
 
 func TestLikeImage(t *testing.T) {

@@ -1,7 +1,6 @@
 package dto
 
 import (
-	"mime/multipart"
 	"time"
 
 	"gorm.io/gorm"
@@ -19,9 +18,25 @@ type ImageResponse struct {
 	DeletedAt    gorm.DeletedAt `json:"deleted_at"`
 }
 
-type UploadImageRequest struct {
-	File    *multipart.FileHeader `validate:"required"`
-	Caption string
+// PresignUploadImageRequest is the JSON body for POST /api/images. It starts a
+// client-side upload: the server returns a short-lived presigned S3 PUT URL
+// instead of receiving the bytes itself.
+type PresignUploadImageRequest struct {
+	Filename    string `json:"filename"     validate:"required"`
+	ContentType string `json:"content_type" validate:"required"`
+}
+
+type PresignUploadImageResponse struct {
+	UploadURL string `json:"upload_url"`
+	Key       string `json:"key"`
+	URL       string `json:"url"`
+}
+
+// ConfirmUploadImageRequest finalizes a client-side upload after the bytes have
+// landed in S3. The key is the one returned by the presign step.
+type ConfirmUploadImageRequest struct {
+	Key     string `json:"key"     validate:"required"`
+	Caption string `json:"caption"`
 }
 
 type LikeImageRequest struct {

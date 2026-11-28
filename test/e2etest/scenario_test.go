@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"mime/multipart"
 	"net/http"
 	"testing"
 	"time"
@@ -27,33 +26,13 @@ func getUserID(t *testing.T, username string) int64 {
 	return user.ID
 }
 
-// uploadImageWithCaption uploads an image with a caption and returns the new image id.
+// uploadImageWithCaption presigns, uploads bytes directly to S3, confirms, and returns the new image id.
 func uploadImageWithCaption(t *testing.T, token, caption string) int64 {
 	t.Helper()
 
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile("image", "photo.jpg")
-	require.Nil(t, err)
-	_, err = part.Write([]byte("dummy image content"))
-	require.Nil(t, err)
-	require.Nil(t, writer.WriteField("caption", caption))
-	require.Nil(t, writer.Close())
-
-	req, err := http.NewRequest(http.MethodPost, baseURL+"/api/images", body)
-	require.Nil(t, err)
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-	req.Header.Set("Authorization", bearerToken(token))
-
-	res, err := http.DefaultClient.Do(req)
-	require.Nil(t, err)
-	defer requireNil(t, res.Body.Close)
-	require.Equal(t, http.StatusOK, res.StatusCode)
-
-	respBody := &response.WebResponse[dto.ImageResponse]{}
-	require.Nil(t, json.NewDecoder(res.Body).Decode(respBody))
-	require.NotZero(t, respBody.Data.ID)
-	return respBody.Data.ID
+	presigned := presignImage(t, token, "photo.jpg")
+	putToPresignedURL(t, presigned.UploadURL, "image/jpeg", []byte("dummy image content"))
+	return confirmImage(t, token, presigned.Key, caption)
 }
 
 // getFeed fetches the current user's feed page.

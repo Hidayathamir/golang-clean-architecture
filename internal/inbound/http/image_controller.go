@@ -26,36 +26,65 @@ func NewImageController(cfg *config.Config, usecase imageusecase.ImageUsecase) *
 	}
 }
 
-// Upload godoc
+// PresignUpload godoc
 //
-//	@Summary		Upload image
-//	@Description	Upload an image file
+//	@Summary		Presign image upload
+//	@Description	Returns a presigned S3 PUT URL. The client uploads the image bytes directly to S3, then calls /api/images/_confirm with the key.
 //	@Tags			images
-//	@Accept			multipart/form-data
+//	@Accept			json
 //	@Produce		json
-//	@Param			image	formData	file	true	"Image to upload"
+//	@Param			request	body	dto.PresignUploadImageRequest	true	"Presign Upload Request"
 //	@Security		SimpleApiKeyAuth
-//	@Success		200	{object}	response.WebResponse[dto.ImageResponse]
+//	@Success		200	{object}	response.WebResponse[dto.PresignUploadImageResponse]
 //	@Router			/api/images [post]
-func (c *ImageController) Upload(ctx *fiber.Ctx) error {
+func (c *ImageController) PresignUpload(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
 
-	file, err := ctx.FormFile("image")
+	req := dto.PresignUploadImageRequest{}
+	err := ctx.BodyParser(&req)
 	if err != nil {
 		err = errkit.SetCode(err, http.StatusBadRequest)
 		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err, "http.(*ImageController).Upload")
+		return errkit.AddFuncName(err, "http.(*ImageController).PresignUpload")
 	}
 
-	req := dto.UploadImageRequest{}
-	req.File = file
-	req.Caption = ctx.FormValue("caption")
-
-	res, err := c.Usecase.Upload(ctx.UserContext(), req)
+	res, err := c.Usecase.PresignUpload(ctx.UserContext(), req)
 	if err != nil {
 		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
-		return errkit.AddFuncName(err, "http.(*ImageController).Upload")
+		return errkit.AddFuncName(err, "http.(*ImageController).PresignUpload")
+	}
+
+	return response.Data(ctx, http.StatusOK, res)
+}
+
+// ConfirmUpload godoc
+//
+//	@Summary		Confirm image upload
+//	@Description	Finalizes a client-side upload after the bytes landed in S3. Creates the image record and emits the upload event.
+//	@Tags			images
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body	dto.ConfirmUploadImageRequest	true	"Confirm Upload Request"
+//	@Security		SimpleApiKeyAuth
+//	@Success		200	{object}	response.WebResponse[dto.ImageResponse]
+//	@Router			/api/images/_confirm [post]
+func (c *ImageController) ConfirmUpload(ctx *fiber.Ctx) error {
+	span := telemetry.StartController(ctx)
+	defer span.End()
+
+	req := dto.ConfirmUploadImageRequest{}
+	err := ctx.BodyParser(&req)
+	if err != nil {
+		err = errkit.SetCode(err, http.StatusBadRequest)
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*ImageController).ConfirmUpload")
+	}
+
+	res, err := c.Usecase.ConfirmUpload(ctx.UserContext(), req)
+	if err != nil {
+		logkit.Logger.WithContext(ctx.UserContext()).WithError(err).Error()
+		return errkit.AddFuncName(err, "http.(*ImageController).ConfirmUpload")
 	}
 
 	return response.Data(ctx, http.StatusOK, res)
