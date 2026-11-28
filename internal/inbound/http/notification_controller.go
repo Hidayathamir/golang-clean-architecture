@@ -53,11 +53,11 @@ func (c *NotificationController) List(ctx *fiber.Ctx) error {
 
 // MarkRead godoc
 //
-//	@Summary		Mark a notification read
-//	@Tags			notifications
-//	@Param			request	body		dto.MarkNotificationReadRequest	true	"Mark Read Request"
-//	@Success		200		{object}	response.WebResponse[any]
-//	@Router			/api/notifications/_read [post]
+//	@Summary	Mark a notification read
+//	@Tags		notifications
+//	@Param		request	body		dto.MarkNotificationReadRequest	true	"Mark Read Request"
+//	@Success	200		{object}	response.WebResponse[any]
+//	@Router		/api/notifications/_read [post]
 func (c *NotificationController) MarkRead(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
@@ -77,10 +77,10 @@ func (c *NotificationController) MarkRead(ctx *fiber.Ctx) error {
 
 // MarkAllRead godoc
 //
-//	@Summary		Mark all notifications read
-//	@Tags			notifications
-//	@Success		200	{object}	response.WebResponse[any]
-//	@Router			/api/notifications/_read_all [post]
+//	@Summary	Mark all notifications read
+//	@Tags		notifications
+//	@Success	200	{object}	response.WebResponse[any]
+//	@Router		/api/notifications/_read_all [post]
 func (c *NotificationController) MarkAllRead(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()
@@ -94,10 +94,10 @@ func (c *NotificationController) MarkAllRead(ctx *fiber.Ctx) error {
 
 // UnreadCount godoc
 //
-//	@Summary		Unread notification count
-//	@Tags			notifications
-//	@Success		200	{object}	response.WebResponse[dto.UnreadCountResponse]
-//	@Router			/api/notifications/_unread_count [get]
+//	@Summary	Unread notification count
+//	@Tags		notifications
+//	@Success	200	{object}	response.WebResponse[dto.UnreadCountResponse]
+//	@Router		/api/notifications/_unread_count [get]
 func (c *NotificationController) UnreadCount(ctx *fiber.Ctx) error {
 	span := telemetry.StartController(ctx)
 	defer span.End()

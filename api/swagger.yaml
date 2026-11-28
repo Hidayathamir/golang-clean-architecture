@@ -149,6 +149,30 @@ definitions:
     - password
     - username
     type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.MarkNotificationReadRequest:
+    properties:
+      notificationID:
+        type: integer
+    required:
+    - notificationID
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.NotificationResponse:
+    properties:
+      actor_id:
+        type: integer
+      actor_name:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      image_id:
+        type: integer
+      is_read:
+        type: boolean
+      type:
+        type: string
+    type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_dto.PresignUploadImageRequest:
     properties:
       content_type:
@@ -196,6 +220,11 @@ definitions:
     - name
     - password
     - username
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_dto.UnreadCountResponse:
+    properties:
+      unread_count:
+        type: integer
     type: object
   github_com_Hidayathamir_golang-clean-architecture_internal_dto.UpdateImageRequest:
     properties:
@@ -261,6 +290,16 @@ definitions:
         type: integer
       total_page:
         type: integer
+    type: object
+  github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-any:
+    properties:
+      data: {}
+      error_detail:
+        type: string
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.PageMetadata'
     type: object
   ? github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_CommentsResponse
   : properties:
@@ -339,6 +378,19 @@ definitions:
       paging:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.PageMetadata'
     type: object
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_NotificationResponseList
+  : properties:
+      data:
+        items:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.NotificationResponse'
+        type: array
+      error_detail:
+        type: string
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.PageMetadata'
+    type: object
   ? github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_PresignUploadImageResponse
   : properties:
       data:
@@ -354,6 +406,17 @@ definitions:
   : properties:
       data:
         $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.ProfileResponse'
+      error_detail:
+        type: string
+      error_message:
+        type: string
+      paging:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.PageMetadata'
+    type: object
+  ? github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_UnreadCountResponse
+  : properties:
+      data:
+        $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.UnreadCountResponse'
       error_detail:
         type: string
       error_message:
@@ -738,6 +801,63 @@ paths:
       summary: Get image likes
       tags:
       - images
+  /api/notifications:
+    get:
+      description: List the current user's notifications, newest first
+      parameters:
+      - description: page size
+        in: query
+        name: limit
+        type: integer
+      - description: opaque cursor
+        in: query
+        name: cursor
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_NotificationResponseList'
+      summary: List notifications
+      tags:
+      - notifications
+  /api/notifications/_read:
+    post:
+      parameters:
+      - description: Mark Read Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_dto.MarkNotificationReadRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-any'
+      summary: Mark a notification read
+      tags:
+      - notifications
+  /api/notifications/_read_all:
+    post:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-any'
+      summary: Mark all notifications read
+      tags:
+      - notifications
+  /api/notifications/_unread_count:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Hidayathamir_golang-clean-architecture_internal_inbound_http_response.WebResponse-github_com_Hidayathamir_golang-clean-architecture_internal_dto_UnreadCountResponse'
+      summary: Unread notification count
+      tags:
+      - notifications
   /api/users:
     post:
       description: Register a new user account
