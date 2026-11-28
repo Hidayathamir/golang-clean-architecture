@@ -36,13 +36,19 @@ func main() {
 
 	db := provider.NewDatabase(cfg)
 	awsS3Client := provider.NewAWSS3Client(cfg)
-	producer := provider.NewKafkaClientProducer(cfg)
 	redisClient := provider.NewRedisClient(cfg)
 	elasticsearchClient := provider.NewElasticsearchClient(cfg)
 
-	usecases := dependency_injection.SetupUsecases(cfg, db, producer, awsS3Client, redisClient, elasticsearchClient)
+	repositories := dependency_injection.SetupRepositories(cfg)
+	messagings := dependency_injection.SetupMessagings(cfg, repositories)
+	caches := dependency_injection.SetupCaches(redisClient)
+	searches := dependency_injection.SetupSearches(elasticsearchClient)
+	storages := dependency_injection.SetupStorages(cfg, awsS3Client)
+	hubs := dependency_injection.SetupHubs()
 
-	controllers := dependency_injection.SetupControllers(cfg, usecases)
+	usecases := dependency_injection.SetupUsecases(cfg, db, caches, messagings, repositories, searches, storages)
+
+	controllers := dependency_injection.SetupControllers(cfg, redisClient, hubs, usecases)
 	middlewares := dependency_injection.SetupMiddlewares(usecases)
 
 	stopTraceProvider := telemetry.InitTraceProvider(cfg)

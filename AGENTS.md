@@ -91,6 +91,14 @@ A struct field whose type is an outbound interface (`cache.*`, `repository.*`, `
 
 **Enforced** via `make check-rules` (`scripts/checkrules`): a mismatched field name in `internal/outbound`, `internal/usecase`, `internal/inbound`, or `internal/dependency_injection` fails. Decorators (`_mw_logger.go`) and tests are exempt.
 
+## Dependency injection containers — one layer per file
+
+`internal/dependency_injection/` has one file per layer — `inbound_dependency_injection.go`, `usecase_dependency_injection.go`, `outbound_dependency_injection.go`, `middleware_dependency_injection.go`. Each declares plural container structs (`Controllers`, `Hubs`, `Consumers`, `Usecases`, `Caches`, `Messagings`, `Repositories`, `Searches`, `Storages`, `Middlewares`) that hold **only** that layer's type, each with a matching `Setup<Container>` func.
+
+A container must not mix layers — e.g. no `Usecases` field in a `Consumers` struct, no raw client or repository in `Usecases`. Pass cross-layer dependencies as `SetupX` parameters instead.
+
+**Enforced** via `make check-rules` (`scripts/checkrules`): a container file declaring a struct field from a different layer fails.
+
 ## Error wrapping — `errkit.AddFuncName`
 
 A handled error must be wrapped with `errkit.AddFuncName(err, "<call site>")` before it is returned, in the impl files of every layer: `internal/outbound/*`, `internal/usecase`, `internal/inbound`.

@@ -30,7 +30,13 @@ func main() {
 	redisClient := provider.NewRedisClient(cfg)
 	elasticsearchClient := provider.NewElasticsearchClient(cfg)
 
-	usecases := dependency_injection.SetupUsecases(cfg, db, producer, s3Client, redisClient, elasticsearchClient)
+	repositories := dependency_injection.SetupRepositories(cfg)
+	messagings := dependency_injection.SetupMessagings(cfg, repositories)
+	caches := dependency_injection.SetupCaches(redisClient)
+	searches := dependency_injection.SetupSearches(elasticsearchClient)
+	storages := dependency_injection.SetupStorages(cfg, s3Client)
+
+	usecases := dependency_injection.SetupUsecases(cfg, db, caches, messagings, repositories, searches, storages)
 
 	consumers := dependency_injection.SetupConsumers(cfg, usecases)
 
@@ -42,16 +48,16 @@ func main() {
 	stopLogProvider := telemetry.InitLogProvider(cfg)
 	defer stopLogProvider()
 
-	runConsumers(cfg, producer, consumers)
+	runConsumers(cfg, producer, consumers, usecases)
 }
 
-func runConsumers(cfg *config.Config, producer *kgo.Client, consumers *dependency_injection.Consumers) {
+func runConsumers(cfg *config.Config, producer *kgo.Client, consumers *dependency_injection.Consumers, usecases *dependency_injection.Usecases) {
 	ctx, cancel := context.WithCancel(context.Background())
 	wg := &sync.WaitGroup{}
 
 	logkit.Logger.Info("starting worker service")
 
-	route.Setup(ctx, cfg, producer, consumers, wg)
+	route.Setup(ctx, cfg, producer, consumers, usecases, wg)
 
 	terminateSignals := make(chan os.Signal, 1)
 	signal.Notify(terminateSignals, syscall.SIGINT, syscall.SIGTERM)

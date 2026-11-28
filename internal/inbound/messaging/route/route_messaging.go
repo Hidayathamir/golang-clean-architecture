@@ -12,20 +12,20 @@ import (
 	"github.com/twmb/franz-go/pkg/kgo"
 )
 
-func Setup(ctx context.Context, cfg *config.Config, producer *kgo.Client, consumers *dependency_injection.Consumers, wg *sync.WaitGroup) {
+func Setup(ctx context.Context, cfg *config.Config, producer *kgo.Client, consumers *dependency_injection.Consumers, usecases *dependency_injection.Usecases, wg *sync.WaitGroup) {
 	// --- primary consumers: single ---
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.UserFollowedNotifyUser
 		_topic := topic.UserFollowed
-		handler := messaging.IdempotencyHandlerSingle(consumers.IdempotencyUsecase, consumerGroup, consumers.UserConsumer.NotifyUserBeingFollowed)
+		handler := messaging.IdempotencyHandlerSingle(usecases.IdempotencyUsecase, consumerGroup, consumers.UserConsumer.NotifyUserBeingFollowed)
 		messaging.ConsumeEventSingle(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageUploadedNotifyFollowers
 		_topic := topic.ImageUploaded
-		handler := messaging.IdempotencyHandlerSingle(consumers.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.NotifyFollowerOnUpload)
+		handler := messaging.IdempotencyHandlerSingle(usecases.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.NotifyFollowerOnUpload)
 		messaging.ConsumeEventSingle(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
@@ -39,28 +39,28 @@ func Setup(ctx context.Context, cfg *config.Config, producer *kgo.Client, consum
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageLikedNotifyOwner
 		_topic := topic.ImageLiked
-		handler := messaging.IdempotencyHandlerSingle(consumers.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.NotifyUserImageLiked)
+		handler := messaging.IdempotencyHandlerSingle(usecases.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.NotifyUserImageLiked)
 		messaging.ConsumeEventSingle(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageCommentedNotifyOwner
 		_topic := topic.ImageCommented
-		handler := messaging.IdempotencyHandlerSingle(consumers.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.NotifyUserImageCommented)
+		handler := messaging.IdempotencyHandlerSingle(usecases.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.NotifyUserImageCommented)
 		messaging.ConsumeEventSingle(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageDeletedCleanupStorage
 		_topic := topic.ImageDeleted
-		handler := messaging.IdempotencyHandlerSingle(consumers.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.CleanupDeletedImageStorage)
+		handler := messaging.IdempotencyHandlerSingle(usecases.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.CleanupDeletedImageStorage)
 		messaging.ConsumeEventSingle(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.NotifLog
 		_topic := topic.Notif
-		handler := messaging.IdempotencyHandlerSingle(consumers.IdempotencyUsecase, consumerGroup, consumers.NotifConsumer.Notify)
+		handler := messaging.IdempotencyHandlerSingle(usecases.IdempotencyUsecase, consumerGroup, consumers.NotifConsumer.Notify)
 		messaging.ConsumeEventSingle(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
@@ -69,21 +69,21 @@ func Setup(ctx context.Context, cfg *config.Config, producer *kgo.Client, consum
 	wg.Go(func() {
 		consumerGroup := consumergroup.UserFollowedBatchStats
 		_topic := topic.UserFollowed
-		handler := messaging.IdempotencyHandlerBatch(consumers.IdempotencyUsecase, consumerGroup, consumers.UserConsumer.BatchUpdateUserFollowStats)
+		handler := messaging.IdempotencyHandlerBatch(usecases.IdempotencyUsecase, consumerGroup, consumers.UserConsumer.BatchUpdateUserFollowStats)
 		messaging.ConsumeEventBatch(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageLikedBatchCount
 		_topic := topic.ImageLiked
-		handler := messaging.IdempotencyHandlerBatch(consumers.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.BatchUpdateImageLikeCount)
+		handler := messaging.IdempotencyHandlerBatch(usecases.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.BatchUpdateImageLikeCount)
 		messaging.ConsumeEventBatch(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageCommentedBatchCount
 		_topic := topic.ImageCommented
-		handler := messaging.IdempotencyHandlerBatch(consumers.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.BatchUpdateImageCommentCount)
+		handler := messaging.IdempotencyHandlerBatch(usecases.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.BatchUpdateImageCommentCount)
 		messaging.ConsumeEventBatch(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
@@ -92,14 +92,14 @@ func Setup(ctx context.Context, cfg *config.Config, producer *kgo.Client, consum
 	wg.Go(func() {
 		consumerGroup := consumergroup.UserFollowedNotifyUserRetry
 		_topic := topic.UserFollowed
-		handler := messaging.IdempotencyHandlerSingle(consumers.IdempotencyUsecase, consumerGroup, consumers.UserConsumer.NotifyUserBeingFollowed)
+		handler := messaging.IdempotencyHandlerSingle(usecases.IdempotencyUsecase, consumerGroup, consumers.UserConsumer.NotifyUserBeingFollowed)
 		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageUploadedNotifyFollowersRetry
 		_topic := topic.ImageUploaded
-		handler := messaging.IdempotencyHandlerSingle(consumers.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.NotifyFollowerOnUpload)
+		handler := messaging.IdempotencyHandlerSingle(usecases.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.NotifyFollowerOnUpload)
 		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
@@ -113,28 +113,28 @@ func Setup(ctx context.Context, cfg *config.Config, producer *kgo.Client, consum
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageLikedNotifyOwnerRetry
 		_topic := topic.ImageLiked
-		handler := messaging.IdempotencyHandlerSingle(consumers.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.NotifyUserImageLiked)
+		handler := messaging.IdempotencyHandlerSingle(usecases.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.NotifyUserImageLiked)
 		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageCommentedNotifyOwnerRetry
 		_topic := topic.ImageCommented
-		handler := messaging.IdempotencyHandlerSingle(consumers.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.NotifyUserImageCommented)
+		handler := messaging.IdempotencyHandlerSingle(usecases.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.NotifyUserImageCommented)
 		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageDeletedCleanupStorageRetry
 		_topic := topic.ImageDeleted
-		handler := messaging.IdempotencyHandlerSingle(consumers.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.CleanupDeletedImageStorage)
+		handler := messaging.IdempotencyHandlerSingle(usecases.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.CleanupDeletedImageStorage)
 		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.NotifLogRetry
 		_topic := topic.Notif
-		handler := messaging.IdempotencyHandlerSingle(consumers.IdempotencyUsecase, consumerGroup, consumers.NotifConsumer.Notify)
+		handler := messaging.IdempotencyHandlerSingle(usecases.IdempotencyUsecase, consumerGroup, consumers.NotifConsumer.Notify)
 		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
@@ -143,21 +143,21 @@ func Setup(ctx context.Context, cfg *config.Config, producer *kgo.Client, consum
 	wg.Go(func() {
 		consumerGroup := consumergroup.UserFollowedBatchStatsRetry
 		_topic := topic.UserFollowed
-		handler := messaging.IdempotencyHandlerSingle(consumers.IdempotencyUsecase, consumerGroup, consumers.UserConsumer.UpdateUserFollowStats)
+		handler := messaging.IdempotencyHandlerSingle(usecases.IdempotencyUsecase, consumerGroup, consumers.UserConsumer.UpdateUserFollowStats)
 		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageLikedBatchCountRetry
 		_topic := topic.ImageLiked
-		handler := messaging.IdempotencyHandlerSingle(consumers.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.UpdateImageLikeCount)
+		handler := messaging.IdempotencyHandlerSingle(usecases.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.UpdateImageLikeCount)
 		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 
 	wg.Go(func() {
 		consumerGroup := consumergroup.ImageCommentedBatchCountRetry
 		_topic := topic.ImageCommented
-		handler := messaging.IdempotencyHandlerSingle(consumers.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.UpdateImageCommentCount)
+		handler := messaging.IdempotencyHandlerSingle(usecases.IdempotencyUsecase, consumerGroup, consumers.ImageConsumer.UpdateImageCommentCount)
 		messaging.ConsumeEventRetry(ctx, cfg, producer, consumerGroup, _topic, handler)
 	})
 }

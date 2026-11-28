@@ -46,7 +46,7 @@ Single file: `settings/config.json`. Parsed via Viper in `internal/config/config
 3. Create interface + impl in `internal/usecase/<name>usecase/` — add the `//go:generate moq` directive.
 4. Create outbound interface + impl in `internal/outbound/<layer>/` — add the `//go:generate moq` directive.
 5. Add MwLogger decorators for **both** usecase and infra (see the `otel-architecture` skill → "Decorator pattern"; the structure itself is an enforced rule in AGENTS.md).
-6. Wire in `internal/dependency_injection/` (real impl first, then logger wrapper).
+6. Wire in `internal/dependency_injection/` (real impl first, then logger wrapper). Put the new type in the container for its layer — one file per layer, one field, no mixing layers (enforced rule in AGENTS.md → "Dependency injection containers").
 7. Create controller/consumer in `internal/inbound/<http|messaging>/`.
 8. Register routes in `internal/inbound/<http|messaging>/route/`.
 9. Run `make generate && make swag`.

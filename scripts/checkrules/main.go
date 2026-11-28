@@ -76,6 +76,7 @@ func main() {
 	violations = append(violations, checkConsumerIdempotency()...)
 	violations = append(violations, checkRepositoryTableColumnLiterals()...)
 	violations = append(violations, checkStructFieldNames()...)
+	violations = append(violations, checkDIContainers()...)
 	violations = append(violations, checkErrorWrapping()...)
 
 	if len(violations) > 0 {
@@ -926,6 +927,106 @@ func checkStructFieldNames() []string {
 		if err != nil {
 			violations = append(violations, fmt.Sprintf("walk %s: %v", root, err))
 		}
+	}
+	return violations
+}
+
+// diLayerOfImportPath maps an import path to the architectural layer it belongs
+// to. Only project-internal layers are mapped; any other import is ignored.
+func diLayerOfImportPath(path string) string {
+	markers := []struct {
+		marker string
+		layer  string
+	}{
+		{"internal/inbound/http/middleware", "middleware"},
+		{"internal/inbound/", "inbound"},
+		{"internal/usecase/", "usecase"},
+		{"internal/outbound/", "outbound"},
+	}
+	for _, m := range markers {
+		if strings.Contains(path, m.marker) {
+			return m.layer
+		}
+	}
+	return ""
+}
+
+// checkDIContainers enforces the dependency_injection layout: a container file
+// named <layer>_dependency_injection.go may declare structs whose fields come
+// only from that same layer. The inbound and outbound messaging packages share
+// the name `messaging`, so each field's layer is resolved from its type's
+// import path, not the selector name.
+func checkDIContainers() []string {
+	const dir = "internal/dependency_injection"
+	var violations []string
+	err := filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() || !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
+			return nil
+		}
+		fileLayer := ""
+		switch {
+		case strings.HasPrefix(filepath.Base(path), "inbound"):
+			fileLayer = "inbound"
+		case strings.HasPrefix(filepath.Base(path), "usecase"):
+			fileLayer = "usecase"
+		case strings.HasPrefix(filepath.Base(path), "outbound"):
+			fileLayer = "outbound"
+		case strings.HasPrefix(filepath.Base(path), "middleware"):
+			fileLayer = "middleware"
+		default:
+			return nil
+		}
+		fset := token.NewFileSet()
+		file, perr := parser.ParseFile(fset, path, nil, 0)
+		if perr != nil {
+			violations = append(violations, fmt.Sprintf("parse %s: %v", path, perr))
+			return nil
+		}
+		pkgLayer := map[string]string{} // selector name -> layer
+		for _, imp := range file.Imports {
+			ipath, uerr := strconv.Unquote(imp.Path.Value)
+			if uerr != nil {
+				continue
+			}
+			if layer := diLayerOfImportPath(ipath); layer != "" {
+				name := filepath.Base(ipath)
+				if imp.Name != nil {
+					name = imp.Name.Name
+				}
+				pkgLayer[name] = layer
+			}
+		}
+		ast.Inspect(file, func(n ast.Node) bool {
+			st, ok := n.(*ast.StructType)
+			if !ok {
+				return true
+			}
+			for _, field := range st.Fields.List {
+				sel, ok := field.Type.(*ast.SelectorExpr)
+				if !ok {
+					continue
+				}
+				pkg, ok := sel.X.(*ast.Ident)
+				if !ok {
+					continue
+				}
+				fieldLayer, ok := pkgLayer[pkg.Name]
+				if !ok || fieldLayer == fileLayer {
+					continue
+				}
+				violations = append(violations,
+					fmt.Sprintf("%s:%d field %s.%s is %s but the file is %s",
+						path, fset.Position(field.Pos()).Line, pkg.Name, sel.Sel.Name, fieldLayer, fileLayer))
+			}
+			return true
+		})
+		return nil
+	})
+	if err != nil {
+		violations = append(violations, fmt.Sprintf("walk %s: %v", dir, err))
 	}
 	return violations
 }
