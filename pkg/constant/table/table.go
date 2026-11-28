@@ -10,4 +10,5 @@ const (
 	UserStat           = "user_stats"
 	MessageIdempotency = "message_idempotency"
 	Notification       = "notifications"
+	Chat               = "chats"
 )

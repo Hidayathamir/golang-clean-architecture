@@ -64,4 +64,7 @@ const (
 	ActorID        Column = "actor_id"
 	Type           Column = "type"
 	IsRead         Column = "is_read"
+	RecipientID    Column = "recipient_id"
+	Content        Column = "content"
+	ReadAt         Column = "read_at"
 )
