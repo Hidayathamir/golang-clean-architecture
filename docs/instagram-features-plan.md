@@ -38,6 +38,8 @@ Keep each item small. Prefer reusing existing repositories/usecases over new one
 
 ## Checklist
 
+Work items one at a time using the `instagram-feature` skill (the step-by-step recipe for adding an endpoint).
+
 ### Phase 1 — Read APIs (data already exists)
 
 - [x] `GET /api/feed` — posts from users the current user follows, newest first (paginated). **Highest priority; the core IG feature.**
