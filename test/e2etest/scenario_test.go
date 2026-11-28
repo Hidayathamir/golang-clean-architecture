@@ -73,9 +73,12 @@ func getProfile(t *testing.T, token string, userID int64) dto.ProfileResponse {
 
 // eventually retries cond for a short while, since follow stats are updated
 // asynchronously by a Kafka consumer (a real client would just refresh).
+// The batch consumer waits up to kgo.FetchMaxWait (5s) for a full batch, and a
+// lone follow event is far below FetchMinBytes, so allow a margin over that.
 func eventually(t *testing.T, cond func() bool) {
 	t.Helper()
-	for i := 0; i < 50; i++ {
+	deadline := time.Now().Add(30 * time.Second)
+	for time.Now().Before(deadline) {
 		if cond() {
 			return
 		}
